@@ -1,6 +1,18 @@
 import { useEffect, useMemo, useRef } from "react";
-import { Map as MapLibreMap, NavigationControl, type GeoJSONSource } from "maplibre-gl";
+import {
+  Map as MapLibreMap,
+  NavigationControl,
+  setWorkerUrl,
+  type GeoJSONSource,
+} from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
+
+// v6 resolves its worker via import.meta.url, which bundlers rewrite to
+// nothing — the worker 404s in production and every GeoJSON source (wilaya
+// borders, dots) silently never renders. ?worker&url bundles the worker and
+// its maplibre-gl-shared.mjs sibling into one self-contained asset.
+setWorkerUrl(maplibreWorkerUrl);
 
 import { useTheme } from "@/hooks/useTheme";
 import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
