@@ -1,4 +1,9 @@
-import { setRTLTextPlugin, type Map as MapLibreMap } from "maplibre-gl";
+import {
+  setRTLTextPlugin,
+  setWorkerUrl,
+  type Map as MapLibreMap,
+} from "maplibre-gl";
+import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 
 export const ALGERIA_BOUNDS: [[number, number], [number, number]] = [
   [-8.7, 18.9],
@@ -33,6 +38,15 @@ export function colorsFor(theme: "light" | "dark"): ThemeColors {
         wilayaFill: "#2ead4b",
       };
 }
+
+// v6 resolves its worker via import.meta.url, which bundlers rewrite to
+// nothing — the worker 404s in production and every GeoJSON source (wilaya
+// borders, dots) silently never renders. ?worker&url bundles the worker and
+// its maplibre-gl-shared.mjs sibling into one self-contained asset.
+// MUST run before setRTLTextPlugin below: registering the RTL plugin
+// instantiates an internal throwaway map, which acquires the (singleton)
+// worker pool using whatever WORKER_URL is set at that moment.
+setWorkerUrl(maplibreWorkerUrl);
 
 // Arabic labels need the RTL shaping plugin or they render reversed and
 // detached. Browser-only (SSR has no document); module scope so maplibre's
