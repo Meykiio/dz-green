@@ -1,0 +1,307 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/manrope";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Green Algeria design system (docs/DESIGN.md).
+ *
+ * Light theme is the default: sage canvas (#e8ebe6) with white cards, ink
+ * text, and a single lime-green accent (#9fe870) reserved for primary CTAs.
+ * The .dark block repolarizes the same system — same shapes, same spacing,
+ * same radius — it is not a separate design language.
+ *
+ * Semantic mapping (deliberate, per the doc's "don't repurpose the lime"):
+ *   plant → positive green family   (never the lime CTA color)
+ *   care  → accent cyan
+ *   fire  → negative red family
+ *
+ * Typography: Manrope 900 for hero-scale display only, Inter for everything
+ * below (weight 600). Both self-hosted via @fontsource-variable.
+ *
+ * Radius: 24px (--radius) is the canonical button + card radius; 12px for
+ * inputs; full pill for badges/chips.
+ */
+
+@theme inline {
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 12px);
+  --radius-3xl: calc(var(--radius) + 16px);
+  --radius-4xl: calc(var(--radius) + 20px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@theme inline {
+  --font-sans:
+    "Inter Variable", "Inter", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  --color-plant: var(--plant);
+  --color-plant-foreground: var(--plant-foreground);
+  --color-care: var(--care);
+  --color-care-foreground: var(--care-foreground);
+  --color-fire: var(--fire);
+  --color-fire-foreground: var(--fire-foreground);
+  --color-canvas: var(--canvas);
+  --color-glass: var(--glass);
+  --color-primary-pale: var(--primary-pale);
+  --color-positive-deep: var(--positive-deep);
+}
+
+:root {
+  --radius: 1.5rem;
+
+  /* Light palette */
+  --canvas: oklch(0.93 0.012 130); /* sage page canvas (#e8ebe6) */
+  --background: oklch(0.93 0.012 130);
+  --foreground: oklch(0.17 0.008 120); /* ink (#0e0f0c) */
+  --card: oklch(1 0 0); /* white cards */
+  --card-foreground: oklch(0.17 0.008 120);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.17 0.008 120);
+
+  --primary: oklch(0.87 0.21 137); /* lime CTA (#9fe870) */
+  --primary-foreground: oklch(0.17 0.008 120); /* on-primary ink */
+  --primary-pale: oklch(0.94 0.085 130); /* #e2f6d5 badge/soft tint */
+  --secondary: oklch(0.93 0.012 130); /* sage secondary button */
+  --secondary-foreground: oklch(0.17 0.008 120);
+  --muted: oklch(0.9 0.012 130);
+  --muted-foreground: oklch(0.58 0.008 120); /* #868685 */
+  --accent: oklch(0.9 0.012 130);
+  --accent-foreground: oklch(0.17 0.008 120);
+  --destructive: oklch(0.55 0.2 25); /* #d03238 */
+  --destructive-foreground: oklch(0.98 0.005 20);
+
+  --border: oklch(0.17 0.008 120 / 14%);
+  --input: oklch(0.17 0.008 120); /* inputs carry a 1px ink hairline */
+  --ring: oklch(0.63 0.17 145 / 60%);
+
+  /* plant → positive green, care → cyan, fire → negative red */
+  --plant: oklch(0.63 0.17 145); /* #2ead4b */
+  --plant-foreground: oklch(0.98 0.01 140);
+  --positive-deep: oklch(0.35 0.08 155); /* #054d28 */
+  --care: oklch(0.66 0.13 235); /* #38c8ff darkened for light surfaces */
+  --care-foreground: oklch(0.98 0.01 240);
+  --fire: oklch(0.55 0.2 25); /* #d03238 */
+  --fire-foreground: oklch(0.98 0.005 20);
+  --glass: oklch(1 0 0 / 78%);
+
+  /* Map surface (light): sage-to-pale landmass, ink hairline borders */
+  --map-land-1: oklch(0.94 0.085 130);
+  --map-land-2: oklch(0.91 0.05 132);
+  --map-land-3: oklch(0.87 0.03 134);
+  --map-stroke: oklch(0.35 0.03 140);
+  --map-halo: oklch(0.87 0.21 137);
+  --map-canvas: oklch(1 0 0);
+
+  --chart-1: var(--plant);
+  --chart-2: var(--care);
+  --chart-3: var(--fire);
+  --chart-4: oklch(0.8 0.15 90);
+  --chart-5: oklch(0.7 0.1 200);
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.17 0.008 120);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: oklch(0.93 0.012 130);
+  --sidebar-accent-foreground: oklch(0.17 0.008 120);
+  --sidebar-border: oklch(0.17 0.008 120 / 10%);
+  --sidebar-ring: var(--ring);
+}
+
+.dark {
+  /* Repolarized — same system, dark polarity */
+  --canvas: oklch(0.17 0.008 120);
+  --background: oklch(0.17 0.008 120);
+  --foreground: oklch(0.95 0.01 130);
+  --card: oklch(0.22 0.012 130);
+  --card-foreground: oklch(0.95 0.01 130);
+  --popover: oklch(0.22 0.012 130);
+  --popover-foreground: oklch(0.95 0.01 130);
+
+  --primary: oklch(0.87 0.21 137); /* the lime CTA survives the flip */
+  --primary-foreground: oklch(0.17 0.008 120);
+  --primary-pale: oklch(0.3 0.06 140);
+  --secondary: oklch(0.26 0.012 130);
+  --secondary-foreground: oklch(0.95 0.01 130);
+  --muted: oklch(0.26 0.012 130);
+  --muted-foreground: oklch(0.66 0.01 130);
+  --accent: oklch(0.28 0.015 130);
+  --accent-foreground: oklch(0.95 0.01 130);
+  --destructive: oklch(0.6 0.21 25);
+  --destructive-foreground: oklch(0.98 0.005 20);
+
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 45%);
+  --ring: oklch(0.87 0.21 137 / 60%);
+
+  --plant: oklch(0.72 0.17 145);
+  --plant-foreground: oklch(0.17 0.03 150);
+  --positive-deep: oklch(0.85 0.12 145);
+  --care: oklch(0.76 0.13 235);
+  --care-foreground: oklch(0.16 0.03 240);
+  --fire: oklch(0.67 0.21 25);
+  --fire-foreground: oklch(0.98 0.005 20);
+  --glass: oklch(0.21 0.01 130 / 72%);
+
+  /* Map surface (dark): the original near-black treatment */
+  --map-land-1: oklch(0.315 0.05 165);
+  --map-land-2: oklch(0.292 0.035 170);
+  --map-land-3: oklch(0.258 0.022 174);
+  --map-stroke: oklch(0.85 0.12 155);
+  --map-halo: oklch(0.42 0.07 160);
+  --map-canvas: oklch(0.1 0.005 175);
+
+  --sidebar: oklch(0.2 0.01 130);
+  --sidebar-foreground: oklch(0.95 0.01 130);
+  --sidebar-accent: oklch(0.26 0.012 130);
+  --sidebar-accent-foreground: oklch(0.95 0.01 130);
+  --sidebar-border: oklch(1 0 0 / 10%);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "calt";
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@utility glass-panel {
+  background-color: var(--glass);
+  backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid var(--border);
+}
+
+@utility eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+
+@utility tap-target {
+  min-block-size: 44px;
+  min-inline-size: 44px;
+}
+
+@utility display-hero {
+  font-family: "Manrope Variable", "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  text-wrap: balance;
+}
+
+@keyframes ga-fire-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes ga-pin-in {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes ga-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 80px 80px;
+  }
+}
+
+.ga-grid {
+  background-image:
+    linear-gradient(to right, var(--map-stroke) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--map-stroke) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.06;
+  animation: ga-drift 40s linear infinite;
+}
+
+.ga-fire-pulse {
+  animation: ga-fire-pulse 1.8s ease-out infinite;
+  transform-origin: center;
+}
+
+.ga-pin-in {
+  animation: ga-pin-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transform-origin: center;
+}
+
+.ga-ease {
+  transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ga-grid,
+  .ga-fire-pulse,
+  .ga-pin-in {
+    animation: none;
+  }
+  .ga-ease {
+    transition: none;
+  }
+}
