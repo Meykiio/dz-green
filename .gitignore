@@ -25,6 +25,9 @@ dist-ssr
 test-results
 playwright-report
 
+# Vercel CLI / build output
+.vercel
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars
