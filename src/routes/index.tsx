@@ -12,6 +12,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { FeedbackDialog } from "@/components/FeedbackDialog";
 import { Chip } from "@/components/home/HomeBits";
 import { DetailPanel } from "@/components/map/DetailPanel";
 import { HeroMap, type Layer } from "@/components/map/HeroMap";
@@ -222,12 +223,15 @@ function HomePage() {
                     onClick={() => setLayers((l) => ({ ...l, fires: !l.fires }))}
                   />
                 </div>
-                <Link
-                  to="/about"
-                  className="tap-target inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  How it works <ArrowRight className="size-3.5" />
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    to="/about"
+                    className="tap-target inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    How it works <ArrowRight className="size-3.5" />
+                  </Link>
+                  <FeedbackDialog />
+                </div>
               </div>
             </div>
           </div>

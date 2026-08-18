@@ -13,8 +13,8 @@ run in order to reproduce the current project:
   one. The current project (`jnunqilxiajinylgehuh`) was bootstrapped in a
   single pass from the export file on 2026-08-17 (live migration
   `20260817012002 green_algeria_full_schema_from_live_export`).
-- The last five files (`20260817…` → `20260818…`) are the real changes
-  since the bootstrap, mirrored into the export as sections 13–17. Their
+- The last six files (`20260817…` → `20260818…`) are the real changes
+  since the bootstrap, mirrored into the export as sections 13–18. Their
   filenames don't match the live migration versions because they were
   applied through the platform MCP, which assigns its own version labels.
 - Two fixture-DML files (an audit-test insert + its delete, 2026-08-16)

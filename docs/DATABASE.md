@@ -1,6 +1,6 @@
 # DATABASE.md
 
-Verified directly against the **live** database via `psql` and the platform MCP (`pg_class`, `pg_policies`, `pg_proc`, `pg_trigger`, `pg_indexes`, `information_schema`, `storage.buckets`), not from the migration files: 2026-08-13, re-verified 2026-08-18 (policies, functions, indexes, enums, bucket, realtime publication — all match). Anything I could not read from the live instance is marked as such.
+Verified directly against the **live** database via `psql` and the platform MCP (`pg_class`, `pg_policies`, `pg_proc`, `pg_trigger`, `pg_indexes`, `information_schema`, `storage.buckets`), not from the migration files: 2026-08-13, re-verified 2026-08-18 (policies, functions, indexes, enums, bucket, realtime publication — all match). Anything I could not read from the live instance is marked as such. `public.feedback` added 2026-08-18 (section 18 below).
 
 **2026-08-17 project migration.** The app moved to a new, empty Supabase project (`jnunqilxiajinylgehuh`); this exact schema was re-applied there from `FULL_SCHEMA_EXPORT.sql` and re-verified table-by-table via MCP (same policies, grants, functions, bucket, realtime publication). Row counts are deliberately **not** in this file — they change daily. Verify against the live project.
 
@@ -209,6 +209,19 @@ Receipt-link tokens for anonymous submissions. The raw token is a 128-bit UUID s
 | `created_at` | timestamptz | no | `now()` | |
 
 RLS **enabled with zero client policies** — deny-all for `anon`/`authenticated`; `SELECT`/`INSERT`/`DELETE` granted to `service_role` only. Lookups go through the `getReceipt` server function, which returns kind, status, date and wilaya — never PII, never the photo.
+
+### `public.feedback` (2026-08-18)
+
+Visitor feedback box (home page "Feedback" button). Writes come from the `submitFeedback` server function; reads are service-role only (the owner queries directly — no UI exists).
+
+| Column | Type | Null | Default | Purpose |
+|---|---|---|---|---|
+| `id` | uuid PK | no | `gen_random_uuid()` | |
+| `message` | text | no | — | CHECK `char_length(message) BETWEEN 1 AND 2000` (mirrors the client-side zod rule). |
+| `page` | text | yes | — | Path the feedback was sent from (e.g. `/about`); informational. |
+| `created_at` | timestamptz | no | `now()` | |
+
+RLS **enabled with zero client policies** — `anon`/`authenticated` have no grants at all (revoked); only `service_role` can write or read. Bot spam is handled client-side by the shared honeypot; no rate limit (deliberately — this is a low-value write path).
 
 ### `public.spatial_ref_sys`
 
