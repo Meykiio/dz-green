@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { MessageSquareText } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -45,9 +46,14 @@ export function FeedbackDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          Feedback
-        </Button>
+        <button
+          type="button"
+          aria-label="Send feedback"
+          className="tap-target inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-semibold text-muted-foreground transition-transform active:scale-[0.97]"
+        >
+          <MessageSquareText className="size-3.5" />
+          <span className="hidden sm:inline">Feedback</span>
+        </button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

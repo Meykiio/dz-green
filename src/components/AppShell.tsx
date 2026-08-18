@@ -22,6 +22,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { EmergencyContacts } from "@/components/EmergencyContacts";
+import { FeedbackDialog } from "@/components/FeedbackDialog";
 
 const ACTIONS = [
   { to: "/plant", label: "Plant", icon: Sprout, tone: "text-plant" },
@@ -126,7 +127,7 @@ function Shell({
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">
-      {/* Slim top bar everywhere: hamburger + brand left, theme + auth right. */}
+      {/* Slim top bar everywhere: hamburger + brand left, SOS + feedback + theme right. */}
       <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-border bg-card/80 px-3 backdrop-blur-md">
         <div className="flex items-center gap-1">
           <button
@@ -144,8 +145,8 @@ function Shell({
         </div>
         <div className="flex items-center gap-1">
           <EmergencyContacts />
+          <FeedbackDialog />
           {themeButton}
-          {authAction}
         </div>
       </header>
 
@@ -195,6 +196,9 @@ function Shell({
           <nav aria-label="Sections" className="mt-2 flex-1 space-y-1 px-3 py-2">
             {rows.map(navRow)}
           </nav>
+          <div className="flex items-center gap-2 border-t border-sidebar-border px-4 py-3">
+            {authAction}
+          </div>
         </aside>
       )}
 
