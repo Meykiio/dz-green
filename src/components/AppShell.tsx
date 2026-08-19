@@ -13,6 +13,7 @@ import {
   Sprout,
   Sun,
   TreePine,
+  User,
   X,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
@@ -74,6 +75,7 @@ function Shell({
     { to: "/care", label: t.nav.care, icon: Droplets, show: true, tone: "text-care" },
     { to: "/fire", label: t.nav.fire, icon: Flame, show: true, tone: "text-fire" },
     { to: "/about", label: t.nav.about, icon: Info, show: true },
+    { to: "/profile", label: t.nav.profile, icon: User, show: !!user },
     { to: "/activity", label: t.nav.activity, icon: ListChecks, show: !!user },
     { to: "/moderate", label: t.nav.moderate, icon: ShieldCheck, show: isModerator },
     { to: "/admin", label: t.nav.admin, icon: LayoutDashboard, show: isAdmin },

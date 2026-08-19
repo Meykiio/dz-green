@@ -19,7 +19,9 @@ import { Route as PlantRouteImport } from './routes/plant'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedModerateRouteImport } from './routes/_authenticated/moderate'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as MyTokenRouteImport } from './routes/my/$token'
+import { Route as UUserIdRouteImport } from './routes/u/$userId'
 import { Route as ApiPublicPhotoSplatRouteImport } from './routes/api/public/photo/$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -71,9 +73,19 @@ const AuthenticatedModerateRoute = AuthenticatedModerateRouteImport.update({
   path: '/moderate',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const MyTokenRoute = MyTokenRouteImport.update({
   id: '/my/$token',
   path: '/my/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UUserIdRoute = UUserIdRouteImport.update({
+  id: '/u/$userId',
+  path: '/u/$userId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicPhotoSplatRoute = ApiPublicPhotoSplatRouteImport.update({
@@ -92,7 +104,9 @@ export interface FileRoutesByFullPath {
   '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/moderate': typeof AuthenticatedModerateRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/my/$token': typeof MyTokenRoute
+  '/u/$userId': typeof UUserIdRoute
   '/api/public/photo/$': typeof ApiPublicPhotoSplatRoute
 }
 export interface FileRoutesByTo {
@@ -105,7 +119,9 @@ export interface FileRoutesByTo {
   '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/moderate': typeof AuthenticatedModerateRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/my/$token': typeof MyTokenRoute
+  '/u/$userId': typeof UUserIdRoute
   '/api/public/photo/$': typeof ApiPublicPhotoSplatRoute
 }
 export interface FileRoutesById {
@@ -120,7 +136,9 @@ export interface FileRoutesById {
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/moderate': typeof AuthenticatedModerateRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/my/$token': typeof MyTokenRoute
+  '/u/$userId': typeof UUserIdRoute
   '/api/public/photo/$': typeof ApiPublicPhotoSplatRoute
 }
 export interface FileRouteTypes {
@@ -135,7 +153,9 @@ export interface FileRouteTypes {
     | '/activity'
     | '/admin'
     | '/moderate'
+    | '/profile'
     | '/my/$token'
+    | '/u/$userId'
     | '/api/public/photo/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -148,7 +168,9 @@ export interface FileRouteTypes {
     | '/activity'
     | '/admin'
     | '/moderate'
+    | '/profile'
     | '/my/$token'
+    | '/u/$userId'
     | '/api/public/photo/$'
   id:
     | '__root__'
@@ -162,7 +184,9 @@ export interface FileRouteTypes {
     | '/_authenticated/activity'
     | '/_authenticated/admin'
     | '/_authenticated/moderate'
+    | '/_authenticated/profile'
     | '/my/$token'
+    | '/u/$userId'
     | '/api/public/photo/$'
   fileRoutesById: FileRoutesById
 }
@@ -175,6 +199,7 @@ export interface RootRouteChildren {
   FireRoute: typeof FireRoute
   PlantRoute: typeof PlantRoute
   MyTokenRoute: typeof MyTokenRoute
+  UUserIdRoute: typeof UUserIdRoute
   ApiPublicPhotoSplatRoute: typeof ApiPublicPhotoSplatRoute
 }
 
@@ -250,11 +275,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedModerateRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/my/$token': {
       id: '/my/$token'
       path: '/my/$token'
       fullPath: '/my/$token'
       preLoaderRoute: typeof MyTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/u/$userId': {
+      id: '/u/$userId'
+      path: '/u/$userId'
+      fullPath: '/u/$userId'
+      preLoaderRoute: typeof UUserIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/photo/$': {
@@ -271,12 +310,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedModerateRoute: typeof AuthenticatedModerateRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedActivityRoute: AuthenticatedActivityRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedModerateRoute: AuthenticatedModerateRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -291,6 +332,7 @@ const rootRouteChildren: RootRouteChildren = {
   FireRoute: FireRoute,
   PlantRoute: PlantRoute,
   MyTokenRoute: MyTokenRoute,
+  UUserIdRoute: UUserIdRoute,
   ApiPublicPhotoSplatRoute: ApiPublicPhotoSplatRoute,
 }
 export const routeTree = rootRouteImport
