@@ -98,7 +98,13 @@ function HomePage() {
         {view === "list" ? (
           <div className="h-full overflow-y-auto bg-background p-3 md:p-6">
             <div className="mx-auto max-w-2xl">
-              <SiteList sites={siteList} careLogs={logList} onSelectFeature={setFeature} />
+              <SiteList
+                sites={siteList}
+                careLogs={logList}
+                fires={fireList}
+                layers={layers}
+                onSelectFeature={setFeature}
+              />
             </div>
           </div>
         ) : sites.isLoading ? (

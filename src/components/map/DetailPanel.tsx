@@ -30,7 +30,7 @@ export function DetailPanel({
 
   return (
     <aside
-      className="glass-panel fixed inset-x-0 bottom-0 z-40 max-h-[72vh] overflow-y-auto overflow-x-hidden rounded-t-xl p-5 md:inset-auto md:top-24 md:end-6 md:max-h-[76vh] md:w-[360px] md:rounded-xl"
+      className="glass-panel fixed inset-x-0 bottom-0 z-40 max-h-[72vh] overflow-y-auto overflow-x-hidden rounded-t-xl p-5 md:inset-auto md:top-24 md:end-6 md:max-h-[76vh] md:w-[400px] md:rounded-xl"
       aria-label="Details"
     >
       <div className="flex items-start justify-between gap-3">
@@ -103,12 +103,12 @@ export function DetailPanel({
             </div>
 
             <div className="flex gap-2">
-              <Button asChild variant="secondary" className="flex-1">
+              <Button asChild variant="secondary" size="sm" className="min-w-0 flex-1 whitespace-normal text-center leading-tight">
                 <Link to="/care" search={{ site: site.id }}>
                   Log care for this site
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="flex-1">
+              <Button asChild variant="outline" size="sm" className="min-w-0 flex-1 whitespace-normal text-center leading-tight">
                 <a
                   href={directionsUrl(site.lat, site.lng)}
                   target="_blank"

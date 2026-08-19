@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-19 (twentieth pass) — First backlog fixes: fires in the list, Directions button unclipped
+
+Two confirmed bugs from the community backlog, fixed and verified against the production bundle (7-check Playwright pass on `vite preview`). `tsc` clean, 97/97 unit tests, build green.
+
+- **Issue #2 — the List view now shows fire reports.** `SiteList` previously received only `sites` + `careLogs`, so the Map/List toggle's List view showed plantings and never fires (fires existed on the map and in the legend). The list now renders both plantings and fires, sorted by date, with fire status + severity badges and a flame badge — and it respects the same Trees/Fires layer toggles as the map (`index.tsx` passes `fires` + `layers` through). Empty state reworded to "Nothing on the map yet" since the list is no longer plantings-only.
+- **Issue #3 — the Directions button is no longer clipped.** `DetailPanel` was a fixed 360 px desktop panel with `overflow-x-hidden` and two `flex-1` buttons; the labels physically overflowed and were cut off (worse in French, the reporter's language). Fixed by widening the panel to 400 px and switching the buttons to the `sm` size with wrapping allowed. Verified: the button's right edge sits inside the panel on a 1280 px viewport.
+
 ## 2026-08-19 (nineteenth pass) — Full verification of the community backlog
 
 No code fixes — this pass replaced every "assigned from title" guess with evidence. All 3 PRs reviewed diff-by-diff, all 5 issues checked against the actual code, `tsc` clean + 97/97 tests + build verified on `main`.
