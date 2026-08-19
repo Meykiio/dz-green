@@ -2,23 +2,32 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/i18n";
+import { format } from "@/i18n/format";
 import { supabase } from "@/integrations/supabase/client";
-import { fireReportsQuery, formatDate, photoUrl } from "@/lib/data";
-import type { FireReport, FireStatus } from "@/lib/types";
+import { fireReportsQuery, photoUrl } from "@/lib/data";
+import type { FireStatus } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
 import { StatusBadge } from "./StatusBadge";
 
-const STATUS_META: Record<FireStatus, { label: string; tone: "fire" | "plant" | "muted" }> = {
-  active: { label: "Active", tone: "fire" },
-  resolved: { label: "Resolved", tone: "plant" },
-  false_alarm: { label: "False alarm", tone: "muted" },
+const STATUS_TONE: Record<FireStatus, "fire" | "plant" | "muted"> = {
+  active: "fire",
+  resolved: "plant",
+  false_alarm: "muted",
 };
 
 /** Fire report triage — mark active reports resolved or false alarms. */
 export function FireTriage() {
+  const { t, formatDate } = useI18n();
   const queryClient = useQueryClient();
 
   const fires = useQuery(fireReportsQuery);
+
+  const statusLabel: Record<FireStatus, string> = {
+    active: t.staff.fires.statusActive,
+    resolved: t.staff.fires.statusResolved,
+    false_alarm: t.staff.fires.statusFalseAlarm,
+  };
 
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: FireStatus }) => {
@@ -37,18 +46,18 @@ export function FireTriage() {
   });
 
   if (fires.isLoading) {
-    return <p className="text-muted-foreground">Loading fire reports…</p>;
+    return <p className="text-muted-foreground">{t.staff.fires.loading}</p>;
   }
   if (fires.isError) {
     return (
       <p className="rounded-lg border border-fire/40 bg-fire/10 px-4 py-3 text-sm">
-        Couldn't load fire reports — check your connection and refresh.
+        {t.staff.fires.error}
       </p>
     );
   }
   const list = fires.data ?? [];
   if (list.length === 0) {
-    return <p className="text-muted-foreground">No fire reports yet.</p>;
+    return <p className="text-muted-foreground">{t.staff.fires.empty}</p>;
   }
 
   return (
@@ -58,23 +67,21 @@ export function FireTriage() {
           {photoUrl(fire.photo_url) && (
             <img
               src={photoUrl(fire.photo_url)!}
-              alt={`Fire report in ${wilayaName(fire.wilaya_code)}`}
+              alt={format(t.staff.fires.photoAlt, { wilaya: wilayaName(fire.wilaya_code) })}
               className="aspect-[16/9] w-full object-cover"
               loading="lazy"
             />
           )}
           <div className="space-y-1 p-4">
             <div className="flex flex-wrap items-center gap-2">
-              <StatusBadge tone={STATUS_META[fire.status].tone}>
-                {STATUS_META[fire.status].label}
-              </StatusBadge>
+              <StatusBadge tone={STATUS_TONE[fire.status]}>{statusLabel[fire.status]}</StatusBadge>
               {fire.severity === "large" ? (
-                <StatusBadge tone="fire">Large</StatusBadge>
+                <StatusBadge tone="fire">{t.staff.fires.large}</StatusBadge>
               ) : fire.severity === "small" ? (
-                <StatusBadge>Small</StatusBadge>
+                <StatusBadge>{t.staff.fires.small}</StatusBadge>
               ) : null}
               <span className="text-xs text-muted-foreground">
-                Reported {formatDate(fire.created_at)}
+                {format(t.staff.fires.reported, { date: formatDate(fire.created_at) })}
               </span>
             </div>
             <p className="font-medium">
@@ -85,8 +92,12 @@ export function FireTriage() {
             {fire.description && <p className="text-sm">{fire.description}</p>}
             {fire.resolved_at && (
               <p className="text-xs text-muted-foreground">
-                {fire.status === "false_alarm" ? "Marked false alarm" : "Resolved"} on{" "}
-                {formatDate(fire.resolved_at)}
+                {format(
+                  fire.status === "false_alarm"
+                    ? t.staff.fires.falseAlarmOn
+                    : t.staff.fires.resolvedOn,
+                  { date: formatDate(fire.resolved_at) },
+                )}
               </p>
             )}
             <div className="flex flex-wrap gap-2 pt-3">
@@ -96,14 +107,14 @@ export function FireTriage() {
                     onClick={() => setStatus.mutate({ id: fire.id, status: "resolved" })}
                     disabled={setStatus.isPending}
                   >
-                    Mark resolved
+                    {t.staff.fires.markResolved}
                   </Button>
                   <Button
                     variant="secondary"
                     onClick={() => setStatus.mutate({ id: fire.id, status: "false_alarm" })}
                     disabled={setStatus.isPending}
                   >
-                    False alarm
+                    {t.staff.fires.markFalseAlarm}
                   </Button>
                 </>
               ) : (
@@ -112,7 +123,7 @@ export function FireTriage() {
                   onClick={() => setStatus.mutate({ id: fire.id, status: "active" })}
                   disabled={setStatus.isPending}
                 >
-                  Reopen
+                  {t.staff.fires.reopen}
                 </Button>
               )}
             </div>

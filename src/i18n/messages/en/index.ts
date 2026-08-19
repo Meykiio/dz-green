@@ -2,6 +2,7 @@ import { account } from "./account";
 import { content } from "./content";
 import { forms } from "./forms";
 import { shell } from "./shell";
+import { staff } from "./staff";
 
 /**
  * English catalogue — the source of truth for the message shape. `Messages` is
@@ -13,6 +14,7 @@ export const en = {
   ...content,
   ...forms,
   ...account,
+  staff,
 };
 
 export type Messages = typeof en;

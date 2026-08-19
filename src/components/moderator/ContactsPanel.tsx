@@ -4,8 +4,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/i18n";
+import { format } from "@/i18n/format";
 import { supabase } from "@/integrations/supabase/client";
-import { formatDate } from "@/lib/data";
 import type { AlertContact } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { StatusBadge } from "./StatusBadge";
@@ -25,6 +26,7 @@ const contactQuery = {
 
 /** Alert contact management. Storage only — nothing sends alerts yet. */
 export function ContactsPanel() {
+  const { t, formatDate } = useI18n();
   const queryClient = useQueryClient();
   const contacts = useQuery(contactQuery);
 
@@ -71,51 +73,56 @@ export function ContactsPanel() {
   return (
     <div className="space-y-4">
       <div className="rounded-lg border border-care/40 bg-care/10 p-4 text-sm text-care">
-        Contacts are stored for future alerting. Nothing is sent yet — this list is preparation
-        only.
+        {t.staff.contacts.notice}
       </div>
 
       <div className="rounded-lg border border-border bg-card p-4">
-        <p className="text-sm font-medium">Add a contact</p>
+        <p className="text-sm font-medium">{t.staff.contacts.addTitle}</p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <div className="flex rounded-full border border-border bg-background p-1">
-            {(["email", "phone"] as const).map((t) => (
+            {(["email", "phone"] as const).map((option) => (
               <button
-                key={t}
+                key={option}
                 type="button"
-                onClick={() => setType(t)}
+                onClick={() => setType(option)}
                 className={cn(
-                  "rounded-full px-4 py-1.5 text-sm font-semibold capitalize transition-colors",
-                  type === t ? "bg-secondary text-secondary-foreground" : "text-muted-foreground",
+                  "rounded-full px-4 py-1.5 text-sm font-semibold transition-colors",
+                  type === option
+                    ? "bg-secondary text-secondary-foreground"
+                    : "text-muted-foreground",
                 )}
               >
-                {t}
+                {option === "email" ? t.staff.contacts.email : t.staff.contacts.phone}
               </button>
             ))}
           </div>
           <input
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            placeholder={type === "email" ? "name@example.com" : "05 55 55 55 55"}
+            placeholder={
+              type === "email"
+                ? t.staff.contacts.emailPlaceholder
+                : t.staff.contacts.phonePlaceholder
+            }
             className="min-w-0 flex-1 rounded-md border border-input bg-background px-3 py-2 text-base"
             onKeyDown={(e) => {
               if (e.key === "Enter" && value.trim()) add.mutate();
             }}
           />
           <Button onClick={() => add.mutate()} disabled={add.isPending || !value.trim()}>
-            Add
+            {t.staff.contacts.add}
           </Button>
         </div>
       </div>
 
       {contacts.isLoading ? (
-        <p className="text-muted-foreground">Loading contacts…</p>
+        <p className="text-muted-foreground">{t.staff.contacts.loading}</p>
       ) : contacts.isError ? (
         <p className="rounded-lg border border-fire/40 bg-fire/10 px-4 py-3 text-sm">
-          Couldn't load contacts — check your connection and refresh.
+          {t.staff.contacts.error}
         </p>
       ) : (contacts.data ?? []).length === 0 ? (
-        <p className="text-muted-foreground">No contacts yet.</p>
+        <p className="text-muted-foreground">{t.staff.contacts.empty}</p>
       ) : (
         <ul className="space-y-3">
           {(contacts.data ?? []).map((contact) => (
@@ -123,16 +130,20 @@ export function ContactsPanel() {
               key={contact.id}
               className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4"
             >
-              <StatusBadge tone={contact.type === "phone" ? "care" : "plant"}>{contact.type}</StatusBadge>
+              <StatusBadge tone={contact.type === "phone" ? "care" : "plant"}>
+                {contact.type === "phone" ? t.staff.contacts.phone : t.staff.contacts.email}
+              </StatusBadge>
               <div className="min-w-0 flex-1">
                 <p className={cn("truncate font-medium", !contact.active && "opacity-50")}>
                   {contact.value}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {contact.region_filter?.wilayas?.length
-                    ? `${contact.region_filter.wilayas.length} wilaya${contact.region_filter.wilayas.length > 1 ? "s" : ""}`
-                    : "All wilayas"}{" "}
-                  · added {formatDate(contact.created_at)}
+                    ? format(t.staff.contacts.wilayasCount, {
+                        count: contact.region_filter.wilayas.length,
+                      })
+                    : t.staff.contacts.allWilayas}{" "}
+                  · {format(t.staff.contacts.added, { date: formatDate(contact.created_at) })}
                 </p>
               </div>
               <button
@@ -146,13 +157,13 @@ export function ContactsPanel() {
                     : "border-plant/50 bg-plant/15 text-plant",
                 )}
               >
-                {contact.active ? "Active" : "Paused"}
+                {contact.active ? t.staff.contacts.active : t.staff.contacts.paused}
               </button>
               <button
                 type="button"
                 onClick={() => remove.mutate(contact.id)}
                 disabled={remove.isPending}
-                aria-label={`Remove ${contact.value}`}
+                aria-label={format(t.staff.contacts.remove, { value: contact.value })}
                 className="tap-target grid size-9 place-items-center rounded-full border border-border bg-background text-muted-foreground hover:text-fire"
               >
                 <Trash2 className="size-4" />

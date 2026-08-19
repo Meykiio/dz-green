@@ -6,11 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { formatDate, photoUrl } from "@/lib/data";
+import { useI18n } from "@/i18n";
+import { format } from "@/i18n/format";
+import { photoUrl } from "@/lib/data";
 import type { Site } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
 
 export function PendingQueue() {
+  const { t, formatDate } = useI18n();
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [notes, setNotes] = useState<Record<string, string>>({});
@@ -51,18 +54,18 @@ export function PendingQueue() {
   });
 
   if (pending.isLoading) {
-    return <p className="text-muted-foreground">Loading queue…</p>;
+    return <p className="text-muted-foreground">{t.staff.queue.loading}</p>;
   }
   if (pending.isError) {
     return (
       <p className="rounded-lg border border-fire/40 bg-fire/10 px-4 py-3 text-sm">
-        Couldn't load the queue — check your connection and refresh.
+        {t.staff.queue.error}
       </p>
     );
   }
   const list = pending.data ?? [];
   if (list.length === 0) {
-    return <p className="text-muted-foreground">Nothing waiting. The queue is clear.</p>;
+    return <p className="text-muted-foreground">{t.staff.queue.empty}</p>;
   }
 
   return (
@@ -72,14 +75,15 @@ export function PendingQueue() {
           {photoUrl(site.photo_url) && (
             <img
               src={photoUrl(site.photo_url)!}
-              alt={`Planting in ${wilayaName(site.wilaya_code)}`}
+              alt={format(t.detail.photoAltPlanting, { wilaya: wilayaName(site.wilaya_code) })}
               className="aspect-[16/9] w-full object-cover"
               loading="lazy"
             />
           )}
           <div className="space-y-1 p-4">
             <p className="font-medium">
-              {site.tree_count} trees{site.species ? ` · ${site.species}` : ""}
+              {site.tree_count} {t.staff.queue.trees}
+              {site.species ? ` · ${site.species}` : ""}
             </p>
             <p className="text-sm text-muted-foreground">
               {wilayaName(site.wilaya_code)}
@@ -94,14 +98,14 @@ export function PendingQueue() {
                 htmlFor={`note-${site.id}`}
                 className="text-xs font-medium text-muted-foreground"
               >
-                Moderator note (optional — recommended when rejecting)
+                {t.staff.queue.notePrompt}
               </label>
               <Textarea
                 id={`note-${site.id}`}
                 rows={2}
                 value={notes[site.id] ?? ""}
                 onChange={(e) => setNotes((n) => ({ ...n, [site.id]: e.target.value }))}
-                placeholder="Why this was approved or rejected"
+                placeholder={t.staff.queue.notePlaceholder}
                 className="mt-1"
               />
             </div>
@@ -110,14 +114,14 @@ export function PendingQueue() {
                 onClick={() => decide.mutate({ id: site.id, status: "approved" })}
                 disabled={decide.isPending}
               >
-                Approve
+                {t.staff.queue.approve}
               </Button>
               <Button
                 variant="secondary"
                 onClick={() => decide.mutate({ id: site.id, status: "rejected" })}
                 disabled={decide.isPending}
               >
-                Reject
+                {t.staff.queue.reject}
               </Button>
             </div>
           </div>

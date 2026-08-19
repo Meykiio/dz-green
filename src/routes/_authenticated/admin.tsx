@@ -9,6 +9,8 @@ import { AdminOverview } from "@/components/admin/AdminOverview";
 import { AssignWilayasDialog } from "@/components/admin/AssignWilayasDialog";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useI18n } from "@/i18n";
+import { format } from "@/i18n/format";
 import {
   adminListUsers,
   adminSetRole,
@@ -30,16 +32,17 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-const ROLE_LABEL: Record<"admin" | "moderator", string> = {
-  admin: "Admin",
-  moderator: "Moderator",
-};
-
 function AdminPage() {
+  const { t } = useI18n();
   const { isAdmin, loading, user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [assigning, setAssigning] = useState<AdminUser | null>(null);
+
+  const roleLabel: Record<"admin" | "moderator", string> = {
+    admin: t.staff.admin.roleAdmin,
+    moderator: t.staff.admin.roleModerator,
+  };
 
   useEffect(() => {
     if (!loading && !isAdmin) void navigate({ to: "/" });
@@ -52,7 +55,7 @@ function AdminPage() {
   const setRole = useMutation({
     mutationFn: adminSetRole,
     onSuccess: () => {
-      toast.success("Role updated");
+      toast.success(t.staff.admin.roleUpdated);
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -61,7 +64,7 @@ function AdminPage() {
   const signOut = useMutation({
     mutationFn: adminSignOutUser,
     onSuccess: () => {
-      toast.success("User signed out");
+      toast.success(t.staff.admin.userSignedOut);
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -70,7 +73,7 @@ function AdminPage() {
   if (loading) {
     return (
       <AppShell>
-        <p className="p-8 text-muted-foreground">Checking your access…</p>
+        <p className="p-8 text-muted-foreground">{t.staff.moderate.checkingAccess}</p>
       </AppShell>
     );
   }
@@ -80,53 +83,65 @@ function AdminPage() {
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-5xl px-4 py-8">
-        <p className="eyebrow">Administration</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">Overview</h1>
+        <p className="eyebrow">{t.staff.admin.eyebrow}</p>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight">
+          {t.staff.admin.overviewHeading}
+        </h1>
         <div className="mt-6">
           <AdminOverview />
         </div>
 
-        <h2 className="mt-10 text-2xl font-semibold tracking-tight">Moderators &amp; roles</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Admins control everything. Moderators act only inside their assigned wilayas.
-        </p>
+        <h2 className="mt-10 text-2xl font-semibold tracking-tight">
+          {t.staff.admin.rolesHeading}
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t.staff.admin.rolesSubtitle}</p>
 
         {users.isError && (
           <p className="mt-6 rounded-lg border border-fire/40 bg-fire/10 px-4 py-3 text-sm">
-            Couldn't load the user list — refresh to try again.
+            {t.staff.admin.usersError}
           </p>
         )}
-        {users.isLoading && <p className="mt-6 text-muted-foreground">Loading users…</p>}
+        {users.isLoading && (
+          <p className="mt-6 text-muted-foreground">{t.staff.admin.usersLoading}</p>
+        )}
 
         <div className="mt-6 space-y-3">
           {(users.data ?? []).map((u) => (
-            <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4">
+            <div
+              key={u.id}
+              className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4"
+            >
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">
-                  {u.display_name || "No display name"}
-                  <span className="ml-2 text-xs font-normal text-muted-foreground">{u.email}</span>
+                  {u.display_name || t.staff.admin.noDisplayName}
+                  <span className="mx-2 text-xs font-normal text-muted-foreground">{u.email}</span>
                 </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   {u.role ? (
                     <>
-                      <span className="font-semibold text-foreground">{ROLE_LABEL[u.role]}</span>
+                      <span className="font-semibold text-foreground">{roleLabel[u.role]}</span>
                       {u.role === "moderator" &&
                         (u.wilayas.length > 0
-                          ? ` · ${u.wilayas.length} wilaya${u.wilayas.length > 1 ? "s" : ""}: ${u.wilayas
-                              .slice(0, 4)
-                              .map(wilayaName)
-                              .join(", ")}${u.wilayas.length > 4 ? "…" : ""}`
-                          : " · no wilayas assigned yet")}
+                          ? ` · ${format(t.staff.admin.wilayasList, {
+                              count: u.wilayas.length,
+                              names:
+                                u.wilayas.slice(0, 4).map(wilayaName).join("، ") +
+                                (u.wilayas.length > 4 ? "…" : ""),
+                            })}`
+                          : ` · ${t.staff.admin.noWilayas}`)}
                     </>
                   ) : (
-                    "No role"
+                    t.staff.admin.noRole
                   )}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {u.role !== "admin" && (
-                  <Button size="sm" onClick={() => setRole.mutate({ data: { userId: u.id, role: "admin" } })}>
-                    Make admin
+                  <Button
+                    size="sm"
+                    onClick={() => setRole.mutate({ data: { userId: u.id, role: "admin" } })}
+                  >
+                    {t.staff.admin.makeAdmin}
                   </Button>
                 )}
                 {u.role !== "moderator" && (
@@ -135,12 +150,12 @@ function AdminPage() {
                     variant="secondary"
                     onClick={() => setRole.mutate({ data: { userId: u.id, role: "moderator" } })}
                   >
-                    Make moderator
+                    {t.staff.admin.makeModerator}
                   </Button>
                 )}
                 {u.role === "moderator" && (
                   <Button size="sm" variant="outline" onClick={() => setAssigning(u)}>
-                    Assign wilayas
+                    {t.staff.admin.assignWilayas}
                   </Button>
                 )}
                 {u.role && u.id !== user?.id && (
@@ -151,7 +166,7 @@ function AdminPage() {
                     disabled={setRole.isPending}
                   >
                     <UserX className="size-4" />
-                    Remove role
+                    {t.staff.admin.removeRole}
                   </Button>
                 )}
                 {u.id !== user?.id && (
@@ -161,14 +176,14 @@ function AdminPage() {
                     onClick={() => signOut.mutate({ data: { userId: u.id } })}
                     disabled={signOut.isPending}
                   >
-                    Sign out
+                    {t.staff.admin.signOutUser}
                   </Button>
                 )}
               </div>
             </div>
           ))}
           {users.data && users.data.length === 0 && (
-            <p className="text-muted-foreground">No users yet.</p>
+            <p className="text-muted-foreground">{t.staff.admin.noUsers}</p>
           )}
         </div>
       </div>

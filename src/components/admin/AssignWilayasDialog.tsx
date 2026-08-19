@@ -12,6 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useI18n } from "@/i18n";
+import { format } from "@/i18n/format";
 import { adminSetWilayas, type AdminUser } from "@/lib/admin.functions";
 import { WILAYAS } from "@/lib/wilayas";
 
@@ -30,13 +32,14 @@ export function AssignWilayasDialog({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState<Set<string>>(() => new Set(user.wilayas));
 
   const save = useMutation({
     mutationFn: () => adminSetWilayas({ data: { userId: user.id, wilayas: [...selected] } }),
     onSuccess: () => {
-      toast.success("Wilayas updated");
+      toast.success(t.staff.assign.updated);
       void queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
       onSaved();
     },
@@ -56,11 +59,12 @@ export function AssignWilayasDialog({
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Assign wilayas — {user.email ?? user.display_name ?? user.id}</DialogTitle>
-          <DialogDescription>
-            This moderator reviews submissions only in the selected wilayas. New wilayas share
-            their historic parent's territory.
-          </DialogDescription>
+          <DialogTitle>
+            {format(t.staff.assign.title, {
+              name: user.email ?? user.display_name ?? user.id,
+            })}
+          </DialogTitle>
+          <DialogDescription>{t.staff.assign.description}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -76,7 +80,10 @@ export function AssignWilayasDialog({
               {children.length > 0 && (
                 <div className="ms-7 mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
                   {children.map((c) => (
-                    <label key={c.code} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <label
+                      key={c.code}
+                      className="flex items-center gap-1.5 text-xs text-muted-foreground"
+                    >
                       <Checkbox
                         checked={selected.has(c.code)}
                         onCheckedChange={(v) => toggle(c.code, v === true)}
@@ -92,11 +99,11 @@ export function AssignWilayasDialog({
 
         <div className="flex justify-end gap-2">
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            {t.staff.assign.cancel}
           </Button>
           <Button onClick={() => save.mutate()} disabled={save.isPending}>
             <ShieldCheck className="size-4" />
-            Save
+            {t.staff.assign.save}
           </Button>
         </div>
       </DialogContent>
