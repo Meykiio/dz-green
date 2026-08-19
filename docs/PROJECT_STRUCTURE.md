@@ -106,7 +106,7 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `activity.functions.ts` | `myFireReports`: a signed-in user's own fire reports — `fire_reports.user_id` is not column-granted to clients, so the server filters by the caller's token. |
 | `error-capture.ts`, `error-page.ts` | Platform error plumbing. |
 | `utils.ts` | `cn()` class merge helper. |
-| `__tests__/` | 5 files, **91 unit tests** (2026-08-18 run): abuse gate, Zod schemas, wilaya derivation/geometry, Google Maps link parsing, `needsWater` boundaries. |
+| `__tests__/` | 6 files, **97 unit tests** (2026-08-19 run): abuse gate, Zod schemas, wilaya derivation/geometry, Google Maps link parsing, `needsWater` boundaries, feedback schemas. |
 
 ## `src/hooks/`, `src/data/`, `src/integrations/`
 
@@ -136,4 +136,4 @@ Fixtures are SQL-seeded per the recipe in `docs/SYSTEM_INSTRUCTIONS.md` §E2E fi
 
 - All hand-written source files are under the 250-line rule. Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`) are exempt.
 - `src/components/ui/` is template surface area, not project code; treat it as vendored. `chart.tsx` and `sidebar.tsx` currently have zero consumers (flagged in `docs/AUDIT.md` P2 #7).
-- Test suite: 91 unit tests + 16 live E2E tests, plus a 40-check RLS role-matrix battery run from a session script kept out of the repo. See `docs/CHANGELOG.md` for the full verification round-up.
+- Test suite: 97 unit tests + 16 live E2E tests, plus a 40-check RLS role-matrix battery run from a session script kept out of the repo. See `docs/CHANGELOG.md` for the full verification round-up.
