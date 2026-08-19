@@ -195,7 +195,7 @@ export function LocationField({
               onChange={(e) => void applyMapsLink(e.target.value)}
               placeholder={t.location.pasteLink}
               inputMode="url"
-              className="w-full bg-transparent outline-none placeholder:text-muted-foreground"
+              className="w-full bg-transparent text-base outline-none placeholder:text-muted-foreground"
             />
             {linkState === "busy" && (
               <Loader2 className="size-4 animate-spin text-muted-foreground" />

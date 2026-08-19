@@ -142,11 +142,16 @@ function Shell({
             <Menu className="size-5" />
           </button>
           <Link to="/" className="flex items-center gap-2 px-1">
-            <TreePine className="size-5 text-plant" />
-            <span className="text-base font-semibold tracking-tight">{t.nav.brand}</span>
+            <TreePine className="size-5 shrink-0 text-plant" />
+            {/* Icon-only logo on phones; the wordmark returns at sm+ so the
+                top-bar controls (SOS, feedback, language, theme) never crowd or
+                overflow the bar at phone widths. */}
+            <span className="hidden truncate text-base font-semibold tracking-tight sm:inline">
+              {t.nav.brand}
+            </span>
           </Link>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 sm:gap-1">
           <EmergencyContacts />
           <FeedbackDialog />
           <LanguageSwitcher />
@@ -165,7 +170,10 @@ function Shell({
       <aside
         className={cn(
           "fixed inset-y-0 start-0 z-50 flex w-72 flex-col border-e border-border bg-card transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
-          drawerOpen ? "translate-x-0" : "-translate-x-full",
+          // The drawer is anchored to the inline-start edge; hiding it must move
+          // toward that edge in both directions (physical translate doesn't flip
+          // for RTL, so mirror it explicitly).
+          drawerOpen ? "translate-x-0" : "-translate-x-full rtl:translate-x-full",
         )}
         aria-label={t.nav.menu}
         aria-hidden={!drawerOpen}
