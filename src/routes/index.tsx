@@ -125,7 +125,7 @@ function HomePage() {
               type="button"
               onClick={() => setView("map")}
               aria-pressed={view === "map"}
-              className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 transition-colors ${view === "map" ? "bg-accent text-foreground" : "text-muted-foreground"}`}
+              className={`inline-flex items-center gap-1 rounded-full px-3 py-2.5 transition-colors ${view === "map" ? "bg-accent text-foreground" : "text-muted-foreground"}`}
             >
               <MapIcon className="size-3.5" /> {t.home.viewMap}
             </button>
@@ -133,7 +133,7 @@ function HomePage() {
               type="button"
               onClick={() => setView("list")}
               aria-pressed={view === "list"}
-              className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 transition-colors ${view === "list" ? "bg-accent text-foreground" : "text-muted-foreground"}`}
+              className={`inline-flex items-center gap-1 rounded-full px-3 py-2.5 transition-colors ${view === "list" ? "bg-accent text-foreground" : "text-muted-foreground"}`}
             >
               <List className="size-3.5" /> {t.home.viewList}
             </button>
