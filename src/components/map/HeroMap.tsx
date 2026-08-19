@@ -1,9 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import {
-  Map as MapLibreMap,
-  NavigationControl,
-  type GeoJSONSource,
-} from "maplibre-gl";
+import { Map as MapLibreMap, NavigationControl, type GeoJSONSource } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useTheme } from "@/hooks/useTheme";
@@ -39,6 +35,8 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
   const mapRef = useRef<MapLibreMap | null>(null);
   const pulseRef = useRef(0);
   const cancelledRef = useRef(false);
+  const styleRef = useRef<string>(LIGHT_STYLE);
+  const firstThemeRun = useRef(true);
   const { theme } = useTheme();
   const themeRef = useRef(theme);
   themeRef.current = theme;
@@ -60,9 +58,18 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
     // map's init entirely (the no-layers bug).
     let cancelled = false;
     cancelledRef.current = false;
+    // Read the live theme + direction straight from the DOM: the no-flash
+    // script in __root already applied `.dark`, and the i18n loader set `dir`.
+    // useTheme's value is "light" on the first render (SSR-safe), so relying on
+    // it here would open the map in the light style even in dark mode.
+    const initialDark = document.documentElement.classList.contains("dark");
+    const isRtl = document.documentElement.dir === "rtl";
+    const initialStyle = initialDark ? DARK_STYLE : LIGHT_STYLE;
+    themeRef.current = initialDark ? "dark" : "light";
+    styleRef.current = initialStyle;
     const map = new MapLibreMap({
       container: container.current,
-      style: theme === "dark" ? DARK_STYLE : LIGHT_STYLE,
+      style: initialStyle,
       bounds: ALGERIA_BOUNDS,
       fitBoundsOptions: { padding: 24 },
       minZoom: 4,
@@ -74,8 +81,12 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
       ],
       attributionControl: { compact: true },
     });
-    map.addControl(new NavigationControl({ showCompass: false }), "bottom-right");
-    map.addControl(new RecenterControl(), "bottom-right");
+    // Put the zoom + recenter controls on the side opposite the action card
+    // (which sits at the inline-start corner) so they never overlap it — the
+    // card is bottom-left in LTR and bottom-right in RTL.
+    const controlSide = isRtl ? "bottom-left" : "bottom-right";
+    map.addControl(new NavigationControl({ showCompass: false }), controlSide);
+    map.addControl(new RecenterControl(), controlSide);
 
     const init = () => {
       if (cancelled) return;
@@ -107,9 +118,13 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
   }, []);
 
   // Theme switch: setStyle wipes custom layers, so re-add on style load.
-  // Skip the first run — the mount effect already set the right style.
-  const styleRef = useRef(theme === "dark" ? DARK_STYLE : LIGHT_STYLE);
   useEffect(() => {
+    // Skip the first run — the mount effect already opened the map with the
+    // correct style (read from the DOM), so there is nothing to switch yet.
+    if (firstThemeRun.current) {
+      firstThemeRun.current = false;
+      return;
+    }
     const map = mapRef.current;
     if (!map) return;
     const style = theme === "dark" ? DARK_STYLE : LIGHT_STYLE;

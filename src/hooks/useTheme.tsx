@@ -38,10 +38,18 @@ export function useTheme() {
   const [theme, setTheme] = useState<Theme>(current);
 
   useEffect(() => {
-    const stored = storedTheme();
-    if (stored !== current) setGlobalTheme(stored);
+    // Register the listener BEFORE syncing so we still receive our own
+    // notification when the sync flips the global theme. The else-branch
+    // catches the case where another consumer already synced `current` before
+    // this hook mounted — without it, a consumer that mounts after the sync
+    // (e.g. the map, once it stopped being gated behind data loading) would
+    // stay stuck on the SSR-safe "light" default and render a light map in
+    // dark mode.
     const listener = (t: Theme) => setTheme(t);
     listeners.add(listener);
+    const stored = storedTheme();
+    if (stored !== current) setGlobalTheme(stored);
+    else setTheme(current);
     return () => {
       listeners.delete(listener);
     };
