@@ -2,6 +2,10 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-19 (seventeenth pass) — Feedback box actually works now
+
+- **Live bug: feedback submissions failed with 42501.** A real user reported the Feedback dialog erroring out. Root cause: the feedback migration revoked anon/authenticated grants but never granted DML to `service_role` — and RLS bypass does not imply table privileges, so `supabaseAdmin.from("feedback").insert(...)` returned `permission denied for table feedback`. Every other app table already had `SELECT, INSERT, UPDATE, DELETE` for service_role; feedback was the odd one out. It slipped through because the feedback tests only covered the zod schema — no live end-to-end insert was ever run (a "not verified" gap, owned). Fix: `GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.feedback TO service_role` applied live; migration file, `FULL_SCHEMA_EXPORT.sql` §18 and `DATABASE.md` updated to match. **Verified end-to-end on the live site:** Playwright drove the real dialog on `green-dz.vercel.app`, success toast shown, row confirmed in the table, probe row deleted.
+
 ## 2026-08-19 (sixteenth pass) — Vercel Web Analytics
 
 - **`@vercel/analytics` 2.0.1 wired into the root layout** (`src/routes/__root.tsx`): `<Analytics />` from `@vercel/analytics/react` mounted in `RootComponent`. Note for future readers: this app is TanStack Start, not Next.js, so the `@vercel/analytics/next` entry is wrong here (it pulls Next.js internals) — the framework-agnostic `/react` entry is the correct import. The loader script self-detects the Vercel environment server-side and no-ops elsewhere. Web Analytics must be toggled ON in the Vercel dashboard (Project → Analytics) for data to be collected; that toggle lives outside the repo.

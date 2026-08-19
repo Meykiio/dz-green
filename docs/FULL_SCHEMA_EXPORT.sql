@@ -528,4 +528,6 @@ alter table public.feedback enable row level security;
 
 revoke all on table public.feedback from anon, authenticated;
 
+grant select, insert, update, delete on table public.feedback to service_role;
+
 comment on table public.feedback is 'Visitor feedback from the home page Feedback dialog; service-role write and read only.';

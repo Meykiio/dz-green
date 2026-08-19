@@ -13,4 +13,8 @@ alter table public.feedback enable row level security;
 
 revoke all on table public.feedback from anon, authenticated;
 
+-- service_role needs explicit DML grants: bypassing RLS does NOT grant table
+-- privileges. Without this, the server-fn insert fails with 42501.
+grant select, insert, update, delete on table public.feedback to service_role;
+
 comment on table public.feedback is 'Visitor feedback from the home page Feedback dialog; service-role write and read only.';

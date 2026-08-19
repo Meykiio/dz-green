@@ -221,7 +221,7 @@ Visitor feedback box (home page "Feedback" button). Writes come from the `submit
 | `page` | text | yes | — | Path the feedback was sent from (e.g. `/about`); informational. |
 | `created_at` | timestamptz | no | `now()` | |
 
-RLS **enabled with zero client policies** — `anon`/`authenticated` have no grants at all (revoked); only `service_role` can write or read. Bot spam is handled client-side by the shared honeypot; no rate limit (deliberately — this is a low-value write path).
+RLS **enabled with zero client policies** — `anon`/`authenticated` have no grants at all (revoked); only `service_role` can write or read. **Note:** RLS bypass does not imply table privileges — `service_role` needed an explicit `GRANT SELECT, INSERT, UPDATE, DELETE` (added 2026-08-19 after a live insert failed with 42501). Bot spam is handled client-side by the shared honeypot; no rate limit (deliberately — this is a low-value write path).
 
 ### `public.spatial_ref_sys`
 
