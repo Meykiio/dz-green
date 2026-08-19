@@ -2,6 +2,11 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-19 (twenty-first pass) — Mobile app research; issues #2/#3 replied to and closed
+
+- **`docs/MOBILE_RESEARCH.md` written** — research phase for the community-proposed mobile app (no code, no repo setup). All 7 questions answered with 2026 sources: (1) write path = a new route in this app reusing the gate (not RLS inserts — honeypot/timing can't survive in Postgres; not an Edge Function — would duplicate the gate in Deno); (2) append-only offline need = expo-sqlite outbox + NetInfo drain + backoff, no WatermelonDB/RxDB; (3) auth = Supabase JS client direct, SecureStore (LargeSecureStore pattern), PKCE + deep-link email confirmation; (4) sharing = vendored copy of pure-TS files via sync script, server fns stay here; (5) map = `@maplibre/maplibre-react-native` v11 stable, OpenFreeMap proven compatible, offline packs real but cut from v1; (6) repo = separate `dz-green-mobile`; (7) EAS free tier 15+15 builds/mo, TestFlight internal is the zero-gatekeeping channel, Play's 14-day closed test is the long pole for new personal accounts. Lock-in flags: write path + repo structure hard to reverse, decide before code. PRD split: v1 = field submission + offline queue; v2 = offline map tiles, push, realtime sync, App Attest/Play Integrity (alpha — not v1).
+- **Issues #2 and #3 closed with replies** — after verifying the fixes live on `green-dz.vercel.app` (Playwright 5/5), posted French replies (reporter wrote in French) and closed both. Links: #2 https://github.com/Meykiio/dz-green/issues/2#issuecomment-5345310575, #3 https://github.com/Meykiio/dz-green/issues/3#issuecomment-5345310750.
+
 ## 2026-08-19 (twentieth pass) — First backlog fixes: fires in the list, Directions button unclipped
 
 Two confirmed bugs from the community backlog, fixed and verified against the production bundle (7-check Playwright pass on `vite preview`). `tsc` clean, 97/97 unit tests, build green.
