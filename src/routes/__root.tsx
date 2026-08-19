@@ -7,6 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { Analytics } from "@vercel/analytics/react";
 import { type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
@@ -123,6 +124,8 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster position="top-center" richColors />
+      {/* Vercel Web Analytics — self-contained loader script; no-ops off-Vercel. */}
+      <Analytics />
     </QueryClientProvider>
   );
 }
