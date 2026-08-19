@@ -37,7 +37,7 @@ export function SiteList({ sites, careLogs, onSelectFeature }: Props) {
             <button
               type="button"
               onClick={() => onSelectFeature({ kind: "site", site })}
-              className="tap-target flex w-full items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 text-left hover:border-plant/40"
+              className="tap-target flex w-full items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 text-start hover:border-plant/40"
             >
               <span className="grid size-9 shrink-0 place-items-center rounded-full bg-plant/15 text-sm font-semibold text-plant">
                 {site.tree_count}

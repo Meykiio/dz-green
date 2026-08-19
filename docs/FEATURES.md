@@ -96,7 +96,6 @@ The gate is four layers, all server-side, no third-party dependency:
 ## 10. Not built at all
 
 - Alerting (email/SMS) — nothing sends alerts; `alert_contacts` now has a moderator management screen (storage only, persistent notice).
-- Any Arabic/French UI translation. Wilaya Arabic names exist in data; the interface itself is English only.
 - Search, per-wilaya pages, user profiles, leaderboards, sharing cards.
 
 ## 11. Automated tests (2026-08-18)
@@ -126,3 +125,12 @@ Done in code/schema:
 - Auth: staff can now sign out from the header (was missing — there was no logout path at all).
 
 Owner actions before launch (not code): Supabase Pro ($25/mo), Vercel Pro + Firewall rules on the public POST endpoints (defense-in-depth on top of the gate), the 1k-concurrent load test against the deployed URL (needs the deploy target and a stable route to supabase.co — the local route was down during this sprint), and the spam-flood rerun at scale. Alerting on rate-limit spikes: wire or drop `alert_contacts` — owner decision, flagged.
+
+## 14. Internationalization — AR / FR / EN + RTL (2026-08-18)
+
+Dependency-free i18n on the existing stack (`src/i18n/`). Locale resolved server-side from the `ga-locale` cookie → `Accept-Language` → English default; SSR emits the correct `<html lang dir>` and translated text on the first byte (no flash, no hydration mismatch — verified via `curl` in all three languages plus `Accept-Language` fallback). A globe switcher in the top bar changes language instantly (no reload) and persists the choice.
+
+- **Coverage:** all user-facing surfaces — shell/nav, home map (stats via `Intl`), detail panel, list view, plant/care/fire forms (fire disclaimer translated, not softened), location/photo inputs, receipt link, feedback dialog, emergency contacts, about, receipt page, auth, activity, and the moderation + admin dashboards.
+- **RTL:** built on CSS logical properties; the shared Dialog and remaining physical utilities were fixed; directional arrows mirror with `rtl:-scale-x-100`; the map canvas is deliberately not flipped.
+- **Type safety:** English is the catalogue type authority; AR/FR are typed against it, so a missing key fails `tsc`.
+- **Verified:** `tsc` clean, unit 97/97, public surfaces confirmed via SSR. Staff dashboards compile and follow the same wiring but are behind auth (`ssr:false`) — not runtime-verified without a session. `<head>` meta copy stays English (SEO) — possible later pass.

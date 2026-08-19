@@ -67,6 +67,7 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `PrecisionPicker.tsx` | MapLibre GL + OpenFreeMap picker for exact pin drops inside forms. Draws an amber accuracy-radius circle from the GPS fix. |
 | `LocationField.tsx` | Wilaya-first location: wilaya/commune selects first (works without GPS), then an optional "Exact location" card — GPS button with privacy line, MapLibre picker behind a toggle, Google Maps link input, remove-pin action. |
 | `EmergencyContacts.tsx` | SOS pill + popover in the top bar: Protection Civile 14/1021, Police 17, Gendarmerie Nationale 1055, SAMU 16, `tel:` links. |
+| `LanguageSwitcher.tsx` | Globe control in the top bar switching AR/FR/EN. Instant (no reload); persists the choice to the `ga-locale` cookie via `useI18n().setLocale`. |
 | `home/HomeBits.tsx` | Home helpers: `Stat`, `Chip`, `HomeCtas`. |
 | `map/HeroMap.tsx` | The hero map: MapLibre GL + OpenFreeMap, mount/theme/data/toggle effects. No clustering — every tree/care/fire is its own dot at every zoom. |
 | `map/map-style.ts` | Map style constants, theme-aware colors, the RTL text plugin call (browser-guarded), and the RecenterControl. |
@@ -107,6 +108,20 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `error-capture.ts`, `error-page.ts` | Platform error plumbing. |
 | `utils.ts` | `cn()` class merge helper. |
 | `__tests__/` | 5 files, **91 unit tests** (2026-08-18 run): abuse gate, Zod schemas, wilaya derivation/geometry, Google Maps link parsing, `needsWater` boundaries. |
+
+## `src/i18n/` (internationalization — AR / FR / EN)
+
+| Path | Purpose |
+|---|---|
+| `config.ts` | Supported locales, default (`en`), RTL set (`ar`), `ga-locale` cookie name + max-age, BCP-47 map, and isomorphic helpers: `dirFor`, `normalizeLocale`, `parseLocaleCookie`, `localeFromAcceptLanguage`. No dependencies. |
+| `locale.server.ts` | Server-only `readRequestLocale()` — reads the request's locale from cookie then `Accept-Language`. Loaded inside a server-fn handler, never in a component/loader. |
+| `detect.ts` | `detectServerLocale` (`createServerFn`, wraps `locale.server`) + `resolveInitialLocale()` — isomorphic resolver used by the root loader (client reads `document.cookie`, server calls the server fn). |
+| `index.tsx` | `I18nProvider` (React context, per-request safe — seeded from the root loader so SSR and hydration match) + `useI18n()` → `{ locale, dir, t, setLocale, formatNumber, formatDate }`. `t` is the active catalogue, read as `t.nav.map`. |
+| `format.ts` | `format(template, vars)` — fills `{placeholder}` runtime values (locale-independent). |
+| `messages/en/*.ts` | English catalogue in namespace slices (`shell`, `content`, `forms`, `account`, `staff`) merged in `index.ts`; `Messages = typeof en` is the type authority. |
+| `messages/ar/*.ts`, `messages/fr/*.ts` | Arabic / French catalogues, each slice typed against its English counterpart so a missing key fails `tsc`. |
+
+Locale wiring lives in `src/routes/__root.tsx`: a root `loader` resolves the locale, the shell renders `<html lang dir>`, and `I18nProvider` wraps the app.
 
 ## `src/hooks/`, `src/data/`, `src/integrations/`
 

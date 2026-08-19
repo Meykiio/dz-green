@@ -59,12 +59,3 @@ export const fireReportsQuery = queryOptions({
   },
   staleTime: 15_000,
 });
-
-export function formatDate(value: string | null | undefined): string {
-  if (!value) return "";
-  return new Date(value).toLocaleDateString(undefined, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}

@@ -13,7 +13,7 @@ Status: **2026-08-18.** The pre-viral and post-viral sprint plans (previously `R
 ## Open decisions (owner call)
 
 - **Alerting: wire or drop.** `alert_contacts` has a moderator management screen but nothing sends alerts. Wire it (real emergency value for fires) or drop the table.
-- **Arabic/French UI.** The data layer carries Arabic wilaya names; the interface is English-only. Research says translate before beta — Algeria's audience is Arabic/French-first. Translation scope does not exist until the owner calls it.
+- ~~**Arabic/French UI.**~~ **Shipped 2026-08-18** (sixteenth pass): full AR/FR/EN i18n with RTL, cookie-persisted, SSR-correct. See `src/i18n/` and the CHANGELOG. Remaining follow-up (not blocking): localize `<head>` meta titles/descriptions per locale for SEO.
 - **Vendored UI prune.** `src/components/ui/chart.tsx` + `sidebar.tsx` (zero consumers, ~1000 lines) — delete or keep as vendored.
 - **Moderator onboarding.** Promotion is admin-driven via `/admin`. Recruiting 58 wilaya moderators is then a people problem, not code — plan it separately.
 
