@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { AdminOverview } from "@/components/admin/AdminOverview";
 import { AssignWilayasDialog } from "@/components/admin/AssignWilayasDialog";
+import { FeedbackPanel } from "@/components/admin/FeedbackPanel";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -85,6 +86,12 @@ function AdminPage() {
         <div className="mt-6">
           <AdminOverview />
         </div>
+
+        <h2 className="mt-10 text-2xl font-semibold tracking-tight">Feedback</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Messages from the Feedback button, newest first.
+        </p>
+        <FeedbackPanel />
 
         <h2 className="mt-10 text-2xl font-semibold tracking-tight">Moderators &amp; roles</h2>
         <p className="mt-1 text-sm text-muted-foreground">

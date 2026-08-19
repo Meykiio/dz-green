@@ -212,7 +212,7 @@ RLS **enabled with zero client policies** — deny-all for `anon`/`authenticated
 
 ### `public.feedback` (2026-08-18)
 
-Visitor feedback box (home page "Feedback" button). Writes come from the `submitFeedback` server function; reads are service-role only (the owner queries directly — no UI exists).
+Visitor feedback box (home page "Feedback" button). Writes come from the `submitFeedback` server function; reads are service-role only, surfaced to admins via the read-only Feedback panel on `/admin` (`adminListFeedback`, latest 100).
 
 | Column | Type | Null | Default | Purpose |
 |---|---|---|---|---|

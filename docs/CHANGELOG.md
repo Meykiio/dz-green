@@ -5,6 +5,7 @@ Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the 
 ## 2026-08-19 (seventeenth pass) — Feedback box actually works now
 
 - **Live bug: feedback submissions failed with 42501.** A real user reported the Feedback dialog erroring out. Root cause: the feedback migration revoked anon/authenticated grants but never granted DML to `service_role` — and RLS bypass does not imply table privileges, so `supabaseAdmin.from("feedback").insert(...)` returned `permission denied for table feedback`. Every other app table already had `SELECT, INSERT, UPDATE, DELETE` for service_role; feedback was the odd one out. It slipped through because the feedback tests only covered the zod schema — no live end-to-end insert was ever run (a "not verified" gap, owned). Fix: `GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.feedback TO service_role` applied live; migration file, `FULL_SCHEMA_EXPORT.sql` §18 and `DATABASE.md` updated to match. **Verified end-to-end on the live site:** Playwright drove the real dialog on `green-dz.vercel.app`, success toast shown, row confirmed in the table, probe row deleted.
+- **Feedback is now readable in-app.** Until today the only way to see messages was the Supabase dashboard. New `adminListFeedback` server fn (admin-gated, service-role read, latest 100) + a read-only `FeedbackPanel` on `/admin` between Overview and Moderators & roles. `DATABASE.md` updated (it previously said "no UI exists").
 
 ## 2026-08-19 (sixteenth pass) — Vercel Web Analytics
 

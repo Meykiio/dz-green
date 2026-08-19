@@ -138,6 +138,26 @@ export const adminSignOutUser = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export interface AdminFeedback {
+  id: string;
+  message: string;
+  page: string | null;
+  created_at: string;
+}
+
+export const adminListFeedback = createServerFn({ method: "GET" }).handler(
+  async (): Promise<AdminFeedback[]> => {
+    await requireAdmin();
+    const { data, error } = await supabaseAdmin
+      .from("feedback")
+      .select("id, message, page, created_at")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) throw error;
+    return data ?? [];
+  },
+);
+
 export interface AdminStats {
   users: number;
   sites: { pending: number; approved: number; rejected: number };
