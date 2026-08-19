@@ -64,6 +64,10 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
     // it here would open the map in the light style even in dark mode.
     const initialDark = document.documentElement.classList.contains("dark");
     const isRtl = document.documentElement.dir === "rtl";
+    // On phones the action card overlays the bottom of the map, so frame
+    // Algeria in the band above it (extra bottom padding) — otherwise the
+    // southern half sits hidden behind the card on first load.
+    const isMobile = window.innerWidth < 768;
     const initialStyle = initialDark ? DARK_STYLE : LIGHT_STYLE;
     themeRef.current = initialDark ? "dark" : "light";
     styleRef.current = initialStyle;
@@ -71,13 +75,17 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
       container: container.current,
       style: initialStyle,
       bounds: ALGERIA_BOUNDS,
-      fitBoundsOptions: { padding: 24 },
-      minZoom: 4,
-      maxZoom: 16,
-      // Keep Algeria framed — no getting lost in the whole globe.
+      fitBoundsOptions: isMobile
+        ? { padding: { top: 48, bottom: 300, left: 16, right: 16 } }
+        : { padding: 24 },
+      // Wide zoom range so users can pull back to the whole region or zoom
+      // right down to a street; generous maxBounds so panning feels free
+      // (the recenter control snaps back to Algeria).
+      minZoom: 2.5,
+      maxZoom: 18,
       maxBounds: [
-        [-14, 14],
-        [17, 42],
+        [-30, 4],
+        [45, 48],
       ],
       attributionControl: { compact: true },
     });
