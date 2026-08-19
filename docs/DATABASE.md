@@ -40,7 +40,7 @@ One row per auth user, created automatically by the `on_auth_user_created` trigg
 |---|---|---|---|---|
 | `id` | uuid PK | no | — | Same id as `auth.users.id`. FK → `auth.users(id) ON DELETE CASCADE`. |
 | `display_name` | text | yes | — | Shown name; seeded from user metadata or the email local part. |
-| `avatar_url` | text | yes | — | Unused by the current UI. |
+| `avatar_url` | text | yes | — | Storage **path** in the private `photos` bucket (`avatars/...`), written by `updateMyProfile` and served through `/api/public/photo/*`. Shown on `/profile` and public `/u/<id>` profiles (2026-08-18). |
 | `is_moderator` | boolean | no | `false` | **Denormalized flag** (2026-08-17): kept in sync with `user_roles` by the `user_roles_sync_profile` trigger — `true` when the user holds any staff role. Do not write it directly; change roles instead. |
 | `created_at` | timestamptz | no | `now()` | — |
 

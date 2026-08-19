@@ -24,5 +24,6 @@ Status: **2026-08-18.** The pre-viral and post-viral sprint plans (previously `R
 - **Field performance data** (`AUDIT.md` P2 #10): PageSpeed Insights / RUM on the deployed URL post-launch.
 - **Commune auto-suggest**: no commune dataset exists; adding one is real scope.
 - **Photo CDN**: stay on Supabase storage + proxy + cache headers (current) or move to a dedicated CDN. Cost-vs-simplicity decision, only relevant at scale.
-- **Search, per-wilaya pages, user profiles, leaderboards, sharing cards**: ideas, not plans.
+- **User profiles** — **shipped 2026-08-18** (eighteenth pass): own `/profile` (edit name + avatar, stats) and public `/u/<userId>` via read-only server functions (no schema change). Open follow-up: deep-link map plantings to their author (needs `user_id` in public `sites` columns).
+- **Search, per-wilaya pages, leaderboards, sharing cards**: ideas, not plans.
 - **Scale revisit**: the no-auth-hook RLS design (live reads of `user_roles`) is the right call today; revisit if RLS checks ever become a hot path. Same for the 50k-row / 200-concurrent-realtime threshold on the home query.

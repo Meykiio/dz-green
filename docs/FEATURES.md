@@ -96,7 +96,7 @@ The gate is four layers, all server-side, no third-party dependency:
 ## 10. Not built at all
 
 - Alerting (email/SMS) — nothing sends alerts; `alert_contacts` now has a moderator management screen (storage only, persistent notice).
-- Search, per-wilaya pages, user profiles, leaderboards, sharing cards.
+- Search, per-wilaya pages, leaderboards, sharing cards.
 
 ## 11. Automated tests (2026-08-18)
 
@@ -125,6 +125,14 @@ Done in code/schema:
 - Auth: staff can now sign out from the header (was missing — there was no logout path at all).
 
 Owner actions before launch (not code): Supabase Pro ($25/mo), Vercel Pro + Firewall rules on the public POST endpoints (defense-in-depth on top of the gate), the 1k-concurrent load test against the deployed URL (needs the deploy target and a stable route to supabase.co — the local route was down during this sprint), and the spam-flood rerun at scale. Alerting on rate-limit spikes: wire or drop `alert_contacts` — owner decision, flagged.
+
+## 15. User profiles + password reset (2026-08-18)
+
+- **Own profile (`/profile`, authenticated):** edit display name + avatar, view email (private, self-only), join date, and contribution stats; links to `/activity` and the public view. Edits go through `updateMyProfile` (service role verifies the caller's uid, writes only `display_name`/`avatar_url`, uploads avatars via the existing private `photos` pipeline under `avatars/`). Own-row edits are still protected by the existing `profiles_update_own` RLS.
+- **Public profile (`/u/<userId>`):** name/avatar/join-date + public aggregate stats via `getPublicProfile` — a read-only server function returning a fixed public-safe shape (never email or `is_moderator`). **No schema change** — chosen over opening public RLS on `profiles` for lower risk and zero live-DB changes.
+- **Password reset:** "Forgot your password?" → Supabase reset email; the return link triggers `PASSWORD_RECOVERY` → set-new-password form.
+- **Not runtime-verified here:** auth, RLS enforcement, avatar upload and live counts need a real Supabase session (placeholder env in this environment). `tsc` clean, unit 97/97, routes render (AR/EN).
+- **Discovery gap (honest):** public profiles are reachable by direct URL and from your own profile's "View public profile" link. Deep-linking map plantings to their author's profile is not wired — public `sites` columns deliberately exclude `user_id`, so that would be a separate, larger change.
 
 ## 14. Internationalization — AR / FR / EN + RTL (2026-08-18)
 

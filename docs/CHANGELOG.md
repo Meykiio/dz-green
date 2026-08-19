@@ -2,6 +2,15 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-18 (eighteenth pass) — User profiles (own + public) + password reset
+
+- **Own profile at `/profile`** (authenticated): edit display name and avatar, see your email (private, self-only), join date, and contribution stats (plantings, trees, care logs, fire reports), with links to `/activity` and your public profile.
+- **Public profiles at `/u/<userId>`**: avatar or initial, display name (or "Anonymous contributor"), member-since, and public aggregate stats. Not-found state for unknown ids.
+- **No schema change.** `profiles` already existed with own-row RLS. Rather than open public RLS on the table, public profiles and aggregate counts are served through **read-only server functions** (`getPublicProfile`, `getMyProfile`) using the established service-role pattern (same as `myFireReports` / `getReceipt` / the admin fns). This returns a fixed public-safe shape — name, avatar, join date, counts — and never the email or `is_moderator`; it needs nothing applied to the live database. `avatar_url` (previously unused) is now written by `updateMyProfile`, which uploads through the existing private `photos` pipeline (`avatars/` prefix) and never touches `is_moderator`.
+- **Password reset:** "Forgot your password?" on the sign-in form sends a Supabase reset email; arriving back via the link fires `PASSWORD_RECOVERY` and switches to a set-new-password form (`updateUser`). Logout already existed.
+- **i18n:** `profile`, `publicProfile`, and the auth-reset strings added in all three locales; a Profile link added to the drawer for signed-in users.
+- **Verification:** `tsc` clean; unit 97/97; `/u/<uuid>` renders in AR (RTL) and EN, `/auth` shows the reset link in AR and EN, `/profile` gates via `ssr:false`. Auth, RLS enforcement, avatar upload and live stat counts require a real Supabase session — **not runtime-verified in this environment** (placeholder env); owner device/live testing needed.
+
 ## 2026-08-18 (seventeenth pass) — Mobile UX pass (320–768px) + RTL drawer
 
 Audited every target width (320 / 375 / 390 / 414 / 768) in both LTR and RTL by measuring the live DOM (bounding rects, computed font sizes) — the preview pane can't screenshot in this environment.

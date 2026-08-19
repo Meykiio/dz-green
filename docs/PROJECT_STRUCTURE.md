@@ -53,6 +53,8 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `_authenticated/moderate.tsx` | `/moderate` | Moderation dashboard: stats strip, segmented tab bar (`ModTabs`), pending queue, fire triage, alert contacts. Wilaya-scoped by RLS. `noindex`. |
 | `_authenticated/admin.tsx` | `/admin` | Admin dashboard: Overview (platform stats + wilaya oversight) and Moderators & roles (user list, role actions, assign-wilayas dialog). Admin-only guard. `noindex`. |
 | `_authenticated/activity.tsx` | `/activity` | User dashboard: own plantings (with review status), care logs, fire reports; loading/empty/error states. `noindex`. |
+| `_authenticated/profile.tsx` | `/profile` | Own profile: edit display name + avatar, email (private), join date, contribution stats; links to `/activity` and the public view. `noindex`. |
+| `u/$userId.tsx` | `/u/<userId>` | Public profile: avatar/initial, display name (or "Anonymous contributor"), member-since, public aggregate stats. |
 | `api/public/photo/$.ts` | `/api/public/photo/*` | Server route streaming objects out of the private `photos` bucket with long cache headers. The only public read path for images. |
 | `README.md` | — | Notes on the file-based routing conventions. |
 
@@ -105,6 +107,7 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `receipts.server.ts` | Receipt links: `mintReceipt` (stores only the token hash) and `getReceiptStatus` (token → public-safe status snapshot). |
 | `admin.functions.ts` | Admin-only server functions: `adminListUsers`, `adminSetRole`, `adminSetWilayas`, `adminSignOutUser`, `adminStats`. Every call re-checks the caller's admin role live from the request token. |
 | `activity.functions.ts` | `myFireReports`: a signed-in user's own fire reports — `fire_reports.user_id` is not column-granted to clients, so the server filters by the caller's token. |
+| `profile.functions.ts` | Profile server functions: `getMyProfile` (own, incl. email — self only), `updateMyProfile` (display_name + avatar via the `photos` pipeline; never `is_moderator`), `getPublicProfile` (public-safe DTO + aggregate stats). Service-role reads, caller verified by token — no schema change, no public RLS on `profiles`. |
 | `error-capture.ts`, `error-page.ts` | Platform error plumbing. |
 | `utils.ts` | `cn()` class merge helper. |
 | `__tests__/` | 5 files, **91 unit tests** (2026-08-18 run): abuse gate, Zod schemas, wilaya derivation/geometry, Google Maps link parsing, `needsWater` boundaries. |
