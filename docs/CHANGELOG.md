@@ -2,6 +2,16 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-18 (seventeenth pass) — Mobile UX pass (320–768px) + RTL drawer
+
+Audited every target width (320 / 375 / 390 / 414 / 768) in both LTR and RTL by measuring the live DOM (bounding rects, computed font sizes) — the preview pane can't screenshot in this environment.
+
+- **Top bar fits at 320px.** Adding the language globe made the five-control cluster overflow the bar on the narrowest phones; the "Green Algeria" wordmark is now icon-only below `sm` (returns on tablet/desktop), and the control gap tightens on phones. Verified: header right edge 308px ≤ 320.
+- **Home action-card footer wraps** (layer chips + "How it works") instead of spilling ~33px past the card at 320px.
+- **No iOS focus-zoom:** the Google Maps link input in `LocationField` was 14px (inherited) → bumped to 16px. All other inputs were already 16px on mobile (`text-base md:text-sm`).
+- **RTL drawer fix:** the mobile nav drawer hid with a physical `-translate-x-full`, which doesn't flip for RTL — in Arabic it left a 32px sliver on screen. Now `-translate-x-full rtl:translate-x-full` hides it fully off the inline-start edge in both directions.
+- Verified: zero horizontal overflow on home at 320 (LTR + RTL) and 375; forms clean at 375; `tsc` clean; unit 97/97.
+
 ## 2026-08-18 (sixteenth pass) — Internationalization: Arabic, French, English + RTL
 
 - **The interface is now trilingual.** A dependency-free i18n system (`src/i18n/`) built on the existing stack — no new libraries. Locale is resolved server-side from a `ga-locale` cookie, then `Accept-Language`, then the English default, so SSR emits the correct `<html lang dir>` and translated text on the first byte (no flash, no hydration mismatch). Verified with `curl`: `ga-locale=ar` → `<html lang="ar" dir="rtl">`, `fr` → French LTR, no cookie → English; `Accept-Language: ar-DZ` with no cookie also resolves to Arabic.
