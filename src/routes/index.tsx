@@ -95,9 +95,12 @@ function HomePage() {
               <SiteList sites={siteList} careLogs={logList} onSelectFeature={setFeature} />
             </div>
           </div>
-        ) : sites.isLoading ? (
-          <div className="h-full w-full animate-pulse bg-card" aria-label={t.home.loadingMap} />
         ) : (
+          // The base map (geography + tiles) is independent of the sites data:
+          // mount it immediately and let the tree/care/fire dots populate when
+          // the queries resolve. (Previously gated behind sites.isLoading, which
+          // left the whole map hidden behind a skeleton whenever the data query
+          // was slow or unreachable.)
           <HeroMap
             sites={siteList}
             careLogs={logList}
