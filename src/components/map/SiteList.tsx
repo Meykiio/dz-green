@@ -1,5 +1,7 @@
 import { Droplets } from "lucide-react";
 
+import { useI18n } from "@/i18n";
+import { format } from "@/i18n/format";
 import { needsWater, type CareLog, type Site } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
 import type { MapFeature } from "@/lib/types";
@@ -15,14 +17,13 @@ interface Props {
  * the map frustrates (NNGroup: users reach for a list when a map gets hard).
  */
 export function SiteList({ sites, careLogs, onSelectFeature }: Props) {
-  const recent = [...sites]
-    .sort((a, b) => b.created_at.localeCompare(a.created_at))
-    .slice(0, 30);
+  const { t, formatDate } = useI18n();
+  const recent = [...sites].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 30);
 
   if (recent.length === 0) {
     return (
       <p className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
-        Nothing planted yet — be the first.
+        {t.list.empty}
       </p>
     );
   }
@@ -43,16 +44,18 @@ export function SiteList({ sites, careLogs, onSelectFeature }: Props) {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium">
-                  {site.species || "Trees"} in {wilayaName(site.wilaya_code)}
+                  {site.species || t.list.trees}{" "}
+                  {format(t.list.inWilaya, { wilaya: wilayaName(site.wilaya_code) })}
                 </span>
                 <span className="block text-xs text-muted-foreground">
-                  {site.commune ? `${site.commune} · ` : ""}planted {site.planted_date}
-                  {site.location_approximate ? " · wilaya-level" : ""}
+                  {site.commune ? `${site.commune} · ` : ""}
+                  {format(t.list.planted, { date: formatDate(site.planted_date) })}
+                  {site.location_approximate ? ` · ${t.list.wilayaLevel}` : ""}
                 </span>
               </span>
               {thirsty && (
                 <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-care/15 px-2.5 py-1 text-xs font-medium text-care">
-                  <Droplets className="size-3.5" /> Needs water
+                  <Droplets className="size-3.5" /> {t.list.needsWater}
                 </span>
               )}
             </button>

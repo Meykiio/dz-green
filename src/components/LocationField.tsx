@@ -3,6 +3,8 @@ import { Crosshair, Link2, Loader2 } from "lucide-react";
 import { Suspense, lazy, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/i18n";
+import { format } from "@/i18n/format";
 import { wilayaCodeForPoint } from "@/lib/geo";
 import { isShortMapsLink, parseGoogleMapsLink } from "@/lib/maps-link";
 import { resolveMapsLink } from "@/lib/maps.functions";
@@ -23,11 +25,13 @@ interface Props {
   showMapByDefault?: boolean;
 }
 
-function accuracyTone(accuracy: number): { label: string; tone: string } {
-  if (accuracy < 50) return { label: "excellent", tone: "text-plant" };
-  if (accuracy < 300) return { label: "good", tone: "text-foreground" };
-  if (accuracy < 1000) return { label: "rough", tone: "text-care" };
-  return { label: "poor", tone: "text-fire" };
+type AccuracyQuality = "excellent" | "good" | "rough" | "poor";
+
+function accuracyTone(accuracy: number): { quality: AccuracyQuality; tone: string } {
+  if (accuracy < 50) return { quality: "excellent", tone: "text-plant" };
+  if (accuracy < 300) return { quality: "good", tone: "text-foreground" };
+  if (accuracy < 1000) return { quality: "rough", tone: "text-care" };
+  return { quality: "poor", tone: "text-fire" };
 }
 
 /**
@@ -48,6 +52,7 @@ export function LocationField({
   onCommune,
   showMapByDefault = false,
 }: Props) {
+  const { t } = useI18n();
   const [showMap, setShowMap] = useState(showMapByDefault);
   const [locating, setLocating] = useState(false);
   const [mapsLink, setMapsLink] = useState("");
@@ -114,7 +119,10 @@ export function LocationField({
     <div className="space-y-3">
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block">
-          <span className="eyebrow">Wilaya *</span>
+          <span className="eyebrow">
+            {t.location.wilaya}
+            {t.field.requiredMark}
+          </span>
           <select
             required
             value={wilaya}
@@ -125,7 +133,7 @@ export function LocationField({
             }}
             className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"
           >
-            <option value="">Choose a wilaya</option>
+            <option value="">{t.location.chooseWilaya}</option>
             {WILAYAS.map((w) => (
               <option key={w.code} value={w.code}>
                 {w.code} — {w.name}
@@ -134,12 +142,15 @@ export function LocationField({
           </select>
           {autoFilled && (
             <span className="mt-1 block text-xs text-muted-foreground">
-              Detected from your pin — change it here if it's wrong.
+              {t.location.autoFilled}
             </span>
           )}
         </label>
         <label className="block">
-          <span className="eyebrow">Commune (optional)</span>
+          <span className="eyebrow">
+            {t.location.commune}
+            {t.field.optionalSuffix}
+          </span>
           <input
             value={commune}
             maxLength={120}
@@ -150,11 +161,8 @@ export function LocationField({
       </div>
 
       <div className="rounded-lg border border-border bg-card/50 p-3">
-        <p className="text-sm font-medium">Exact location (optional)</p>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          Used once to place your pin — never stored, never tracked. Skip it and the report is
-          marked as wilaya-level.
-        </p>
+        <p className="text-sm font-medium">{t.location.exactTitle}</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">{t.location.exactHint}</p>
         <div className="mt-2.5 flex flex-wrap items-center gap-2">
           <Button type="button" variant="secondary" onClick={useMyLocation} className="tap-target">
             {locating ? (
@@ -162,7 +170,7 @@ export function LocationField({
             ) : (
               <Crosshair className="size-4" />
             )}
-            Use my location
+            {t.location.useMyLocation}
           </Button>
           <Button
             type="button"
@@ -170,11 +178,11 @@ export function LocationField({
             onClick={() => setShowMap((v) => !v)}
             className="tap-target"
           >
-            {showMap ? "Hide map" : "Adjust on map"}
+            {showMap ? t.location.hideMap : t.location.adjustOnMap}
           </Button>
           {hasPin && onClearLocation && (
             <Button type="button" variant="ghost" onClick={onClearLocation} className="tap-target">
-              Remove pin
+              {t.location.removePin}
             </Button>
           )}
         </div>
@@ -185,32 +193,30 @@ export function LocationField({
             <input
               value={mapsLink}
               onChange={(e) => void applyMapsLink(e.target.value)}
-              placeholder="Or paste a Google Maps link"
+              placeholder={t.location.pasteLink}
               inputMode="url"
               className="w-full bg-transparent outline-none placeholder:text-muted-foreground"
             />
-            {linkState === "busy" && <Loader2 className="size-4 animate-spin text-muted-foreground" />}
+            {linkState === "busy" && (
+              <Loader2 className="size-4 animate-spin text-muted-foreground" />
+            )}
           </label>
-          {linkState === "ok" && (
-            <p className="mt-1 text-xs text-plant">Pin set from the link — adjust it below if needed.</p>
-          )}
-          {linkState === "bad" && (
-            <p className="mt-1 text-xs text-fire">
-              Couldn't read coordinates from that link. Open the place in Google Maps, copy the
-              full URL from the address bar, and paste that.
-            </p>
-          )}
+          {linkState === "ok" && <p className="mt-1 text-xs text-plant">{t.location.linkOk}</p>}
+          {linkState === "bad" && <p className="mt-1 text-xs text-fire">{t.location.linkBad}</p>}
         </div>
 
         {hasPin && (
           <p className="mt-2.5 text-sm text-muted-foreground">
-            Pin at {lat!.toFixed(5)}, {lng!.toFixed(5)}
+            {format(t.location.pinAt, { lat: lat!.toFixed(5), lng: lng!.toFixed(5) })}
             {tone && (
               <span className={tone.tone}>
-                {" "}
-                · accuracy ±{Math.round(accuracy ?? 0)} m ({tone.label})
-                {tone.label !== "excellent" && tone.label !== "good" && (
-                  <span className="text-muted-foreground"> — adjust the pin if needed</span>
+                {" · "}
+                {format(t.location.accuracy, {
+                  meters: Math.round(accuracy ?? 0),
+                  quality: t.location[tone.quality],
+                })}
+                {tone.quality !== "excellent" && tone.quality !== "good" && (
+                  <span className="text-muted-foreground"> {t.location.adjustPinHint}</span>
                 )}
               </span>
             )}
@@ -219,9 +225,7 @@ export function LocationField({
 
         {showMap && (
           <div className="mt-2.5">
-            <ClientOnly
-              fallback={<div className="h-64 w-full animate-pulse rounded-xl bg-card" />}
-            >
+            <ClientOnly fallback={<div className="h-64 w-full animate-pulse rounded-xl bg-card" />}>
               <Suspense fallback={<div className="h-64 w-full animate-pulse rounded-xl bg-card" />}>
                 <PrecisionPicker
                   lat={lat}

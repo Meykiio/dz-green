@@ -10,6 +10,8 @@ import { FormShell, Honeypot } from "@/components/FormShell";
 import { PhotoInput } from "@/components/PhotoInput";
 import { ReceiptLink } from "@/components/ReceiptLink";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/i18n";
+import { format } from "@/i18n/format";
 import { sitesQuery } from "@/lib/data";
 import { getDeviceSecret } from "@/lib/device";
 import { submitCare } from "@/lib/submissions.functions";
@@ -36,13 +38,14 @@ export const Route = createFileRoute("/care")({
 });
 
 const ACTIONS = [
-  { value: "watered", label: "Watered" },
-  { value: "checked", label: "Checked on it" },
-  { value: "needs_attention", label: "Needs attention" },
-  { value: "other", label: "Other" },
+  { value: "watered", key: "actionWatered" },
+  { value: "checked", key: "actionChecked" },
+  { value: "needs_attention", key: "actionNeedsAttention" },
+  { value: "other", key: "actionOther" },
 ] as const;
 
 function CarePage() {
+  const { t } = useI18n();
   const router = useRouter();
   const { site: initialSite } = Route.useSearch();
   const sites = useQuery(sitesQuery);
@@ -76,22 +79,18 @@ function CarePage() {
         }),
       ),
     onSuccess: () => setDone(true),
-    onError: (error: Error) => toast.error(error.message || "Could not submit. Try again."),
+    onError: (error: Error) => toast.error(error.message || t.errGeneric),
   });
 
   if (done) {
     return (
       <AppShell>
-        <FormShell
-          title="Care logged"
-          intro="Thank you — it's on the map straight away. Care logs don't need review."
-          accent="care"
-        >
+        <FormShell title={t.care.doneTitle} intro={t.care.doneIntro} accent="care">
           <div className="space-y-4">
             {mutation.data && mutation.data !== "queued" && mutation.data.receipt && (
               <ReceiptLink token={mutation.data.receipt} />
             )}
-            <Button onClick={() => router.navigate({ to: "/" })}>Back to the map</Button>
+            <Button onClick={() => router.navigate({ to: "/" })}>{t.common.backToMap}</Button>
           </div>
         </FormShell>
       </AppShell>
@@ -100,17 +99,13 @@ function CarePage() {
 
   return (
     <AppShell>
-      <FormShell
-        title="Log care"
-        intro="Anyone can care for any site — no ownership, no assignment. Publishes immediately."
-        accent="care"
-      >
+      <FormShell title={t.care.title} intro={t.care.intro} accent="care">
         <form
           className="relative space-y-5"
           onSubmit={(e) => {
             e.preventDefault();
             if (!siteId) {
-              toast.error("Choose the site you cared for.");
+              toast.error(t.care.errChooseSite);
               return;
             }
             mutation.mutate();
@@ -119,30 +114,35 @@ function CarePage() {
           <Honeypot value={hp} onChange={setHp} />
 
           <label className="block">
-            <span className="eyebrow">Site *</span>
+            <span className="eyebrow">
+              {t.care.site}
+              {t.field.requiredMark}
+            </span>
             <select
               required
               value={siteId}
               onChange={(e) => setSiteId(e.target.value)}
               className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"
             >
-              <option value="">Choose a planting site</option>
+              <option value="">{t.care.chooseSite}</option>
               {(sites.data ?? []).map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.species || `${s.tree_count} trees`} · {wilayaName(s.wilaya_code)}
+                  {s.species || format(t.care.optionTrees, { count: s.tree_count })} ·{" "}
+                  {wilayaName(s.wilaya_code)}
                   {s.commune ? ` · ${s.commune}` : ""}
                 </option>
               ))}
             </select>
             {sites.data?.length === 0 && (
-              <span className="mt-1 block text-sm text-muted-foreground">
-                No approved sites yet — add a planting first.
-              </span>
+              <span className="mt-1 block text-sm text-muted-foreground">{t.care.noSites}</span>
             )}
           </label>
 
           <div>
-            <span className="eyebrow">What did you do? *</span>
+            <span className="eyebrow">
+              {t.care.whatDidYouDo}
+              {t.field.requiredMark}
+            </span>
             <div className="mt-2 grid grid-cols-2 gap-2">
               {ACTIONS.map((a) => (
                 <button
@@ -156,14 +156,17 @@ function CarePage() {
                       : "border-border bg-card text-muted-foreground"
                   }`}
                 >
-                  {a.label}
+                  {t.care[a.key]}
                 </button>
               ))}
             </div>
           </div>
 
           <label className="block">
-            <span className="eyebrow">Date *</span>
+            <span className="eyebrow">
+              {t.care.date}
+              {t.field.requiredMark}
+            </span>
             <input
               type="date"
               required
@@ -174,10 +177,13 @@ function CarePage() {
             />
           </label>
 
-          <PhotoInput value={photo} onChange={setPhoto} label="Photo" />
+          <PhotoInput value={photo} onChange={setPhoto} label={t.care.photoLabel} />
 
           <label className="block">
-            <span className="eyebrow">Notes (optional)</span>
+            <span className="eyebrow">
+              {t.care.notes}
+              {t.field.optionalSuffix}
+            </span>
             <textarea
               value={notes}
               maxLength={1000}
@@ -188,7 +194,10 @@ function CarePage() {
           </label>
 
           <label className="block">
-            <span className="eyebrow">Your name (optional)</span>
+            <span className="eyebrow">
+              {t.care.yourName}
+              {t.field.optionalSuffix}
+            </span>
             <input
               value={name}
               maxLength={80}
@@ -198,7 +207,7 @@ function CarePage() {
           </label>
 
           <Button type="submit" size="lg" className="w-full" disabled={mutation.isPending}>
-            {mutation.isPending ? "Sending…" : "Log care"}
+            {mutation.isPending ? t.common.sending : t.care.submit}
           </Button>
         </form>
       </FormShell>

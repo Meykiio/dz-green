@@ -1,7 +1,6 @@
-import type { Messages } from "./en";
+import type { ShellMessages } from "../en/shell";
 
-/** French (Français) — Algerian audience. */
-export const fr: Messages = {
+export const shell: ShellMessages = {
   lang: {
     label: "Langue",
     english: "English",
@@ -37,11 +36,15 @@ export const fr: Messages = {
   common: {
     loading: "Chargement…",
     pleaseWait: "Veuillez patienter…",
+    sending: "Envoi…",
     retry: "Réessayer",
     goHome: "Accueil",
+    backToMap: "Retour à la carte",
     cancel: "Annuler",
     save: "Enregistrer",
     saving: "Enregistrement…",
+    close: "Fermer",
+    optional: "facultatif",
   },
   notFound: {
     title: "Page introuvable",
@@ -51,5 +54,22 @@ export const fr: Messages = {
   error: {
     title: "Cette page n'a pas pu se charger",
     body: "Une erreur s'est produite de notre côté. Réessayez ou revenez à l'accueil.",
+  },
+  emergency: {
+    open: "Numéros d'urgence",
+    close: "Fermer les numéros d'urgence",
+    heading: "Appelez d'abord — aucun secours envoyé d'ici",
+  },
+  feedback: {
+    trigger: "Retour",
+    send: "Envoyer un retour",
+    title: "Votre retour",
+    description:
+      "Un bug, une idée de fonctionnalité, ou juste un mot ? Dites-le clairement — cela va directement aux mainteneurs.",
+    placeholder: "Votre message…",
+    submit: "Envoyer",
+    sending: "Envoi…",
+    success: "Bien reçu — merci. Chaque message est lu.",
+    error: "Échec de l'envoi. Réessayez.",
   },
 };

@@ -5,9 +5,10 @@ import { Droplets, Flame, Sprout } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useI18n } from "@/i18n";
+import { format } from "@/i18n/format";
 import { supabase } from "@/integrations/supabase/client";
 import { myFireReports } from "@/lib/activity.functions";
-import { formatDate } from "@/lib/data";
 import type { CareLog, FireReport, Site } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
 
@@ -24,28 +25,39 @@ export const Route = createFileRoute("/_authenticated/activity")({
   component: ActivityPage,
 });
 
-const SITE_STATUS: Record<string, { label: string; tone: string }> = {
-  pending: { label: "Under review", tone: "text-amber-400" },
-  approved: { label: "On the map", tone: "text-plant" },
-  rejected: { label: "Not approved", tone: "text-fire" },
+const SITE_TONE: Record<string, string> = {
+  pending: "text-amber-400",
+  approved: "text-plant",
+  rejected: "text-fire",
 };
 
-const FIRE_STATUS: Record<string, { label: string; tone: string }> = {
-  active: { label: "Active", tone: "text-fire" },
-  resolved: { label: "Resolved", tone: "text-care" },
-  false_alarm: { label: "False alarm", tone: "text-muted-foreground" },
-};
-
-const CARE_LABEL: Record<string, string> = {
-  watered: "Watered",
-  checked: "Checked on it",
-  needs_attention: "Reported needs attention",
-  other: "Update",
+const FIRE_TONE: Record<string, string> = {
+  active: "text-fire",
+  resolved: "text-care",
+  false_alarm: "text-muted-foreground",
 };
 
 function ActivityPage() {
+  const { t, formatDate } = useI18n();
   const { user } = useAuth();
   const userId = user?.id;
+
+  const siteStatusLabel: Record<string, string> = {
+    pending: t.activity.siteStatusPending,
+    approved: t.activity.siteStatusApproved,
+    rejected: t.activity.siteStatusRejected,
+  };
+  const fireStatusLabel: Record<string, string> = {
+    active: t.activity.fireStatusActive,
+    resolved: t.activity.fireStatusResolved,
+    false_alarm: t.activity.fireStatusFalseAlarm,
+  };
+  const careLabel: Record<string, string> = {
+    watered: t.activity.careWatered,
+    checked: t.activity.careChecked,
+    needs_attention: t.activity.careNeedsAttention,
+    other: t.activity.careOther,
+  };
 
   const sites = useQuery({
     queryKey: ["activity", "sites", userId],
@@ -93,13 +105,9 @@ function ActivityPage() {
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-3xl px-4 py-8">
-        <p className="eyebrow">My activity</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-          Everything you've added to the map
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Your plantings, care logs and fire reports — including the ones still in review.
-        </p>
+        <p className="eyebrow">{t.activity.eyebrow}</p>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight">{t.activity.heading}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t.activity.subtitle}</p>
 
         {loading && (
           <div className="mt-8 space-y-3">
@@ -111,7 +119,7 @@ function ActivityPage() {
 
         {failed && (
           <p className="mt-8 rounded-lg border border-fire/40 bg-fire/10 px-4 py-3 text-sm">
-            Couldn't load your activity — check your connection and refresh.
+            {t.activity.failed}
           </p>
         )}
 
@@ -120,32 +128,38 @@ function ActivityPage() {
             <section>
               <SectionHeader
                 icon={<Sprout className="size-4 text-plant" />}
-                title="Plantings"
+                title={t.activity.plantings}
                 count={sites.data?.length ?? 0}
               />
               {(sites.data ?? []).length === 0 ? (
-                <Empty text="No plantings yet." cta={{ to: "/plant", label: "Plant your first tree" }} />
+                <Empty
+                  text={t.activity.emptyPlantings}
+                  cta={{ to: "/plant", label: t.activity.ctaPlant }}
+                />
               ) : (
                 <ul className="mt-3 space-y-2">
                   {sites.data!.map((s) => {
-                    const st = SITE_STATUS[s.status] ?? { label: s.status, tone: "" };
+                    const label = siteStatusLabel[s.status] ?? s.status;
+                    const tone = SITE_TONE[s.status] ?? "";
                     return (
                       <li key={s.id} className="rounded-lg border border-border bg-card px-4 py-3">
                         <div className="flex items-center justify-between gap-3">
                           <p className="text-sm font-medium">
-                            {s.tree_count} {s.tree_count > 1 ? "trees" : "tree"}
-                            {s.species ? ` · ${s.species}` : ""} in {wilayaName(s.wilaya_code)}
+                            {s.tree_count}{" "}
+                            {s.tree_count > 1 ? t.activity.treePlural : t.activity.treeSingular}
+                            {s.species ? ` · ${s.species}` : ""}{" "}
+                            {format(t.activity.inWilaya, { wilaya: wilayaName(s.wilaya_code) })}
                           </p>
-                          <span className={`text-xs font-semibold ${st.tone}`}>{st.label}</span>
+                          <span className={`text-xs font-semibold ${tone}`}>{label}</span>
                         </div>
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          planted {formatDate(s.planted_date)}
-                          {s.location_approximate ? " · wilaya-level" : ""}
+                          {format(t.activity.plantedOn, { date: formatDate(s.planted_date) })}
+                          {s.location_approximate ? ` · ${t.activity.wilayaLevel}` : ""}
                           {s.commune ? ` · ${s.commune}` : ""}
                         </p>
                         {s.status === "rejected" && s.moderator_notes && (
                           <p className="mt-1.5 text-xs text-muted-foreground">
-                            Moderator note: {s.moderator_notes}
+                            {format(t.activity.moderatorNote, { note: s.moderator_notes })}
                           </p>
                         )}
                       </li>
@@ -158,16 +172,19 @@ function ActivityPage() {
             <section>
               <SectionHeader
                 icon={<Droplets className="size-4 text-care" />}
-                title="Care logs"
+                title={t.activity.careLogs}
                 count={care.data?.length ?? 0}
               />
               {(care.data ?? []).length === 0 ? (
-                <Empty text="No care logged yet." cta={{ to: "/care", label: "Log care for a site" }} />
+                <Empty
+                  text={t.activity.emptyCare}
+                  cta={{ to: "/care", label: t.activity.ctaCare }}
+                />
               ) : (
                 <ul className="mt-3 space-y-2">
                   {care.data!.map((l) => (
                     <li key={l.id} className="rounded-lg border border-border bg-card px-4 py-3">
-                      <p className="text-sm font-medium">{CARE_LABEL[l.action] ?? l.action}</p>
+                      <p className="text-sm font-medium">{careLabel[l.action] ?? l.action}</p>
                       <p className="mt-0.5 text-xs text-muted-foreground">
                         {formatDate(l.logged_date)}
                         {l.notes ? ` · ${l.notes}` : ""}
@@ -181,15 +198,19 @@ function ActivityPage() {
             <section>
               <SectionHeader
                 icon={<Flame className="size-4 text-fire" />}
-                title="Fire reports"
+                title={t.activity.fireReports}
                 count={fires.data?.length ?? 0}
               />
               {(fires.data ?? []).length === 0 ? (
-                <Empty text="No fire reports." cta={{ to: "/fire", label: "Report a fire" }} />
+                <Empty
+                  text={t.activity.emptyFire}
+                  cta={{ to: "/fire", label: t.activity.ctaFire }}
+                />
               ) : (
                 <ul className="mt-3 space-y-2">
                   {fires.data!.map((f) => {
-                    const st = FIRE_STATUS[f.status] ?? { label: f.status, tone: "" };
+                    const label = fireStatusLabel[f.status] ?? f.status;
+                    const tone = FIRE_TONE[f.status] ?? "";
                     return (
                       <li key={f.id} className="rounded-lg border border-border bg-card px-4 py-3">
                         <div className="flex items-center justify-between gap-3">
@@ -197,11 +218,11 @@ function ActivityPage() {
                             {wilayaName(f.wilaya_code)}
                             {f.severity ? ` · ${f.severity}` : ""}
                           </p>
-                          <span className={`text-xs font-semibold ${st.tone}`}>{st.label}</span>
+                          <span className={`text-xs font-semibold ${tone}`}>{label}</span>
                         </div>
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          reported {formatDate(f.created_at)}
-                          {f.location_approximate ? " · wilaya-level" : ""}
+                          {format(t.activity.reportedOn, { date: formatDate(f.created_at) })}
+                          {f.location_approximate ? ` · ${t.activity.wilayaLevel}` : ""}
                         </p>
                       </li>
                     );

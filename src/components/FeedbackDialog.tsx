@@ -15,11 +15,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { useI18n } from "@/i18n";
 import { submitFeedback } from "@/lib/feedback.functions";
 
 const MAX_LENGTH = 2000;
 
 export function FeedbackDialog() {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [hp, setHp] = useState("");
   const [message, setMessage] = useState("");
@@ -35,12 +37,12 @@ export function FeedbackDialog() {
         },
       }),
     onSuccess: () => {
-      toast.success("Received — thanks. Every message is read.");
+      toast.success(t.feedback.success);
       setMessage("");
       setHp("");
       setOpen(false);
     },
-    onError: (error: Error) => toast.error(error.message || "Could not send. Try again."),
+    onError: (error: Error) => toast.error(error.message || t.feedback.error),
   });
 
   return (
@@ -48,20 +50,17 @@ export function FeedbackDialog() {
       <DialogTrigger asChild>
         <button
           type="button"
-          aria-label="Send feedback"
+          aria-label={t.feedback.send}
           className="tap-target inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-semibold text-muted-foreground transition-transform active:scale-[0.97]"
         >
           <MessageSquareText className="size-3.5" />
-          <span className="hidden sm:inline">Feedback</span>
+          <span className="hidden sm:inline">{t.feedback.trigger}</span>
         </button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Feedback</DialogTitle>
-          <DialogDescription>
-            Found a bug, want a feature, or just have something to say? Say it plainly — it goes
-            straight to the maintainers.
-          </DialogDescription>
+          <DialogTitle>{t.feedback.title}</DialogTitle>
+          <DialogDescription>{t.feedback.description}</DialogDescription>
         </DialogHeader>
         <form
           className="space-y-4"
@@ -75,7 +74,7 @@ export function FeedbackDialog() {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             maxLength={MAX_LENGTH}
-            placeholder="Your message…"
+            placeholder={t.feedback.placeholder}
             rows={4}
             autoFocus
             required
@@ -85,7 +84,7 @@ export function FeedbackDialog() {
               {message.length}/{MAX_LENGTH}
             </span>
             <Button type="submit" size="sm" disabled={mutation.isPending || message.length === 0}>
-              {mutation.isPending ? "Sending…" : "Send"}
+              {mutation.isPending ? t.feedback.sending : t.feedback.submit}
             </Button>
           </div>
         </form>

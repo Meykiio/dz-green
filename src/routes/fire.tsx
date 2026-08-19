@@ -10,6 +10,7 @@ import { LocationField } from "@/components/LocationField";
 import { PhotoInput } from "@/components/PhotoInput";
 import { ReceiptLink } from "@/components/ReceiptLink";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/i18n";
 import { getDeviceSecret } from "@/lib/device";
 import { submitFire } from "@/lib/submissions.functions";
 import { submitResilient } from "@/lib/offline";
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/fire")({
 });
 
 function FirePage() {
+  const { t } = useI18n();
   const router = useRouter();
   const startedAt = useState(() => Date.now())[0];
   const [hp, setHp] = useState("");
@@ -68,26 +70,19 @@ function FirePage() {
         }),
       ),
     onSuccess: () => setDone(true),
-    onError: (error: Error) => toast.error(error.message || "Could not submit. Try again."),
+    onError: (error: Error) => toast.error(error.message || t.errGeneric),
   });
 
   if (done) {
     return (
       <AppShell>
-        <FormShell
-          title="Report posted"
-          intro="Your report is live on the map now. If there is danger to people, call Protection Civile on 14 or 1021 — this platform does not dispatch help."
-          accent="fire"
-        >
+        <FormShell title={t.fire.doneTitle} intro={t.fire.doneIntro} accent="fire">
           <div className="space-y-4">
             {mutation.data && mutation.data !== "queued" && mutation.data.receipt && (
               <ReceiptLink token={mutation.data.receipt} />
             )}
-            <p className="text-xs text-muted-foreground">
-              Public on the map: location, wilaya, severity, description and photo. Never public:
-              your name and phone number — they stay on the server, unreachable from the map.
-            </p>
-            <Button onClick={() => router.navigate({ to: "/" })}>Back to the map</Button>
+            <p className="text-xs text-muted-foreground">{t.fire.donePrivacy}</p>
+            <Button onClick={() => router.navigate({ to: "/" })}>{t.common.backToMap}</Button>
           </div>
         </FormShell>
       </AppShell>
@@ -96,14 +91,9 @@ function FirePage() {
 
   return (
     <AppShell>
-      <FormShell
-        title="Report a fire"
-        intro="Just the wilaya is enough — everything else is optional. Reports publish immediately."
-        accent="fire"
-      >
-        <div className="mb-5 rounded-xl border border-fire/40 bg-fire/10 p-4 text-sm">
-          <strong>Call Protection Civile first: 14 or 1021.</strong> Green Algeria
-          is a community map, not an emergency service.
+      <FormShell title={t.fire.title} intro={t.fire.intro} accent="fire">
+        <div className="mb-5 rounded-xl border border-fire/40 bg-fire/10 p-4 text-sm font-semibold">
+          {t.fire.disclaimer}
         </div>
 
         <form
@@ -111,7 +101,7 @@ function FirePage() {
           onSubmit={(e) => {
             e.preventDefault();
             if (!wilaya) {
-              toast.error("Choose a wilaya first.");
+              toast.error(t.fire.errWilaya);
               return;
             }
             mutation.mutate();
@@ -139,7 +129,10 @@ function FirePage() {
           />
 
           <div>
-            <span className="eyebrow">How big? (optional)</span>
+            <span className="eyebrow">
+              {t.fire.howBig}
+              {t.field.optionalSuffix}
+            </span>
             <div className="mt-2 flex gap-2">
               {(["small", "large"] as const).map((value) => (
                 <button
@@ -153,14 +146,17 @@ function FirePage() {
                       : "border-border bg-card text-muted-foreground"
                   }`}
                 >
-                  {value === "small" ? "Small / starting" : "Large / spreading"}
+                  {value === "small" ? t.fire.small : t.fire.large}
                 </button>
               ))}
             </div>
           </div>
 
           <label className="block">
-            <span className="eyebrow">What do you see? (optional)</span>
+            <span className="eyebrow">
+              {t.fire.whatYouSee}
+              {t.field.optionalSuffix}
+            </span>
             <textarea
               value={description}
               maxLength={600}
@@ -170,11 +166,14 @@ function FirePage() {
             />
           </label>
 
-          <PhotoInput value={photo} onChange={setPhoto} label="Photo" />
+          <PhotoInput value={photo} onChange={setPhoto} label={t.fire.photoLabel} />
 
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block">
-              <span className="eyebrow">Your name (optional)</span>
+              <span className="eyebrow">
+                {t.fire.yourName}
+                {t.field.optionalSuffix}
+              </span>
               <input
                 value={name}
                 maxLength={80}
@@ -183,7 +182,10 @@ function FirePage() {
               />
             </label>
             <label className="block">
-              <span className="eyebrow">Phone for moderators (optional, private)</span>
+              <span className="eyebrow">
+                {t.fire.phone}
+                {t.field.optionalSuffix}
+              </span>
               <input
                 type="tel"
                 value={phone}
@@ -194,8 +196,14 @@ function FirePage() {
             </label>
           </div>
 
-          <Button type="submit" size="lg" variant="destructive" className="w-full" disabled={mutation.isPending}>
-            {mutation.isPending ? "Sending…" : "Post fire report"}
+          <Button
+            type="submit"
+            size="lg"
+            variant="destructive"
+            className="w-full"
+            disabled={mutation.isPending}
+          >
+            {mutation.isPending ? t.common.sending : t.fire.submit}
           </Button>
         </form>
       </FormShell>

@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { useI18n } from "@/i18n";
+
 export function FormShell({
   title,
   intro,
@@ -13,22 +15,20 @@ export function FormShell({
   accent: "plant" | "care" | "fire";
   children: ReactNode;
 }) {
-  const bar =
-    accent === "plant" ? "bg-plant" : accent === "care" ? "bg-care" : "bg-fire";
+  const { t } = useI18n();
+  const bar = accent === "plant" ? "bg-plant" : accent === "care" ? "bg-care" : "bg-fire";
   return (
     <div className="mx-auto w-full max-w-xl px-4 py-8">
       <Link
         to="/"
         className="tap-target inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
-        <ArrowLeft className="size-4" /> Map
+        <ArrowLeft className="size-4 rtl:-scale-x-100" /> {t.nav.map}
       </Link>
       <div className={`mt-4 h-1 w-16 rounded-full ${bar}`} />
       <h1 className="mt-3 text-2xl font-semibold tracking-tight">{title}</h1>
       <p className="mt-1 text-sm text-muted-foreground">{intro}</p>
-      <div className="mt-6 rounded-2xl border border-border bg-card p-4 md:p-6">
-        {children}
-      </div>
+      <div className="mt-6 rounded-2xl border border-border bg-card p-4 md:p-6">{children}</div>
     </div>
   );
 }

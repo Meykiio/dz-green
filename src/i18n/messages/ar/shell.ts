@@ -1,7 +1,6 @@
-import type { Messages } from "./en";
+import type { ShellMessages } from "../en/shell";
 
-/** Arabic (العربية) — Algerian audience, Modern Standard Arabic. */
-export const ar: Messages = {
+export const shell: ShellMessages = {
   lang: {
     label: "اللغة",
     english: "English",
@@ -37,11 +36,15 @@ export const ar: Messages = {
   common: {
     loading: "جارٍ التحميل…",
     pleaseWait: "يرجى الانتظار…",
+    sending: "جارٍ الإرسال…",
     retry: "إعادة المحاولة",
     goHome: "الصفحة الرئيسية",
+    backToMap: "العودة إلى الخريطة",
     cancel: "إلغاء",
     save: "حفظ",
     saving: "جارٍ الحفظ…",
+    close: "إغلاق",
+    optional: "اختياري",
   },
   notFound: {
     title: "الصفحة غير موجودة",
@@ -51,5 +54,22 @@ export const ar: Messages = {
   error: {
     title: "تعذّر تحميل هذه الصفحة",
     body: "حدث خطأ من جانبنا. يمكنك إعادة تحميل الصفحة أو العودة إلى الرئيسية.",
+  },
+  emergency: {
+    open: "أرقام الطوارئ",
+    close: "إغلاق أرقام الطوارئ",
+    heading: "اتصل أولاً — لا إرسال نجدة من هنا",
+  },
+  feedback: {
+    trigger: "ملاحظات",
+    send: "إرسال ملاحظة",
+    title: "ملاحظات",
+    description:
+      "وجدت خللاً، أو تريد ميزة، أو لديك ما تقوله؟ قله بوضوح — يصل مباشرةً إلى القائمين على المشروع.",
+    placeholder: "رسالتك…",
+    submit: "إرسال",
+    sending: "جارٍ الإرسال…",
+    success: "وصلت — شكراً لك. كل رسالة تُقرأ.",
+    error: "تعذّر الإرسال. حاول مرة أخرى.",
   },
 };

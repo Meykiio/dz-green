@@ -1,11 +1,5 @@
-/**
- * English message catalogue — the source of truth for the message shape.
- * `Messages` is derived from this object, so every other locale is checked
- * against it at compile time (a missing or misspelled key fails `tsc`).
- *
- * Keys are grouped by surface. Add new keys here first, then to ar.ts / fr.ts.
- */
-export const en = {
+/** App chrome: language/theme/nav, shared actions, error pages, emergency, feedback. */
+export const shell = {
   lang: {
     label: "Language",
     english: "English",
@@ -41,11 +35,15 @@ export const en = {
   common: {
     loading: "Loading…",
     pleaseWait: "Please wait…",
+    sending: "Sending…",
     retry: "Try again",
     goHome: "Go home",
+    backToMap: "Back to the map",
     cancel: "Cancel",
     save: "Save",
     saving: "Saving…",
+    close: "Close",
+    optional: "optional",
   },
   notFound: {
     title: "Page not found",
@@ -56,6 +54,23 @@ export const en = {
     title: "This page didn't load",
     body: "Something went wrong on our end. You can try refreshing or head back home.",
   },
+  emergency: {
+    open: "Emergency contacts",
+    close: "Close emergency contacts",
+    heading: "Call first — no dispatch here",
+  },
+  feedback: {
+    trigger: "Feedback",
+    send: "Send feedback",
+    title: "Feedback",
+    description:
+      "Found a bug, want a feature, or just have something to say? Say it plainly — it goes straight to the maintainers.",
+    placeholder: "Your message…",
+    submit: "Send",
+    sending: "Sending…",
+    success: "Received — thanks. Every message is read.",
+    error: "Could not send. Try again.",
+  },
 };
 
-export type Messages = typeof en;
+export type ShellMessages = typeof shell;
