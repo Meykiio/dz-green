@@ -10,7 +10,9 @@ Audited every target width (320 / 375 / 390 / 414 / 768) in both LTR and RTL by 
 - **Home action-card footer wraps** (layer chips + "How it works") instead of spilling ~33px past the card at 320px.
 - **No iOS focus-zoom:** the Google Maps link input in `LocationField` was 14px (inherited) → bumped to 16px. All other inputs were already 16px on mobile (`text-base md:text-sm`).
 - **RTL drawer fix:** the mobile nav drawer hid with a physical `-translate-x-full`, which doesn't flip for RTL — in Arabic it left a 32px sliver on screen. Now `-translate-x-full rtl:translate-x-full` hides it fully off the inline-start edge in both directions.
-- Verified: zero horizontal overflow on home at 320 (LTR + RTL) and 375; forms clean at 375; `tsc` clean; unit 97/97.
+- **Map view-toggle touch target:** the Map/List toggle was 28px tall → ~36px, comfortably tappable in the map corner.
+- **Map hidden behind the data-loading gate (real bug found while testing).** `index.tsx` rendered the map only after `sites.isLoading` became false (`sites.isLoading ? <skeleton> : <HeroMap>`), so whenever the sites query was slow or unreachable the whole map stayed behind a pulsing skeleton (a dark card that reads as a black area) and `HeroMap` never mounted — no MapLibre, no tiles. The base map is independent of the sites data, so it now mounts immediately and the dots populate when the queries resolve. **Proven in a real headless Chromium** (the embedded preview can't composite WebGL): before → map never mounts, 0 tile requests; after → map mounts, `styleLoaded` true, 63 tile requests to `tiles.openfreemap.org` (all 200), Algeria + wilaya borders render in both LTR and RTL, map geometry not mirrored.
+- Verified: zero horizontal overflow on home at 320 (LTR + RTL) and 375; forms clean at 375; `tsc` clean; unit 97/97; production `build` ok.
 
 ## 2026-08-18 (sixteenth pass) — Internationalization: Arabic, French, English + RTL
 
