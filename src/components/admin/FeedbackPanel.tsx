@@ -33,6 +33,11 @@ export function FeedbackPanel() {
             {formatDate(f.created_at)}
             {f.page ? ` · from ${f.page}` : ""}
           </p>
+          {f.device ? (
+            <p className="mt-1 truncate font-mono text-[11px] text-muted-foreground/70" title={f.device}>
+              {f.device}
+            </p>
+          ) : null}
         </div>
       ))}
     </div>
