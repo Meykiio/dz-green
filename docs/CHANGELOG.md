@@ -2,6 +2,10 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-20 (twenty-sixth pass) — Issue #8 replied (mobile app)
+
+- **Posted the approved reply** to the issue #8 thread (comment `5350062315`, Meykiio account, 2026-08-20 01:29Z): framed as **Ground rules vs. Your call** — the three fixed items (write path through the existing server gate, v1 ships after the PR queue #9→#10→#11 + wilayas update, append-only outbox) each with its "why", and everything else explicitly delegated to the contributor (code structure incl. the separate-repo call, libraries, screen order, pace, UI). Addresses both `laidanimounir` (the proposal) and `morch23mj` (the monorepo comment).
+
 ## 2026-08-20 (twenty-fourth pass) — PR #9 rebase deadline posted
 
 - **PR #9 (i18n/RTL): deadline comment posted** (`5349625809`, Meykiio account): rebase onto main **by 2026-08-25** or we take over the branch (copy into repo, apply required changes incl. the client-side locale fix, open replacement PR). Verified before posting: repo `Meykiio/dz-green`, PR #9 open, head `2c6c3daa73` unchanged, 7 behind main and diverged, `mergeable_state: unknown`; only prior comment was the 2026-08-19 rebase request (no deadline).
