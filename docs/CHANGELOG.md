@@ -2,6 +2,10 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-19 (twenty-third pass) — Mobile dev onboarding note
+
+- **`docs/MOBILE_HANDOFF.md` written** — handoff note for the mobile developer: required reading (`MOBILE_RESEARCH.md`, `PRE_MOBILE_BLOCKERS.md`), the write path (API route into `submissions.server.ts`) and the offline outbox design marked as decided (don't re-litigate), and a plan-first requirement for the two highest-risk pieces (auth flow, offline queue) before building. Everything else is free to build.
+
 ## 2026-08-19 (twenty-second pass) — Pre-mobile blocker resolution (research + planning only)
 
 No code written, fixed, or merged — owner brief: four separate investigations (PRs #9/#10/#11, wilayas 58→69), each with an explicit verdict, plus flag-only items. Every fact re-verified against the actual code and the live schema (nothing taken from ROADMAP titles). Deliverable: `docs/PRE_MOBILE_BLOCKERS.md`.
