@@ -2,6 +2,10 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-20 (twenty-fourth pass) — PR #9 rebase deadline posted
+
+- **PR #9 (i18n/RTL): deadline comment posted** (`5349625809`, Meykiio account): rebase onto main **by 2026-08-25** or we take over the branch (copy into repo, apply required changes incl. the client-side locale fix, open replacement PR). Verified before posting: repo `Meykiio/dz-green`, PR #9 open, head `2c6c3daa73` unchanged, 7 behind main and diverged, `mergeable_state: unknown`; only prior comment was the 2026-08-19 rebase request (no deadline).
+
 ## 2026-08-19 (twenty-third pass) — Mobile dev onboarding note
 
 - **`docs/MOBILE_HANDOFF.md` written** — handoff note for the mobile developer: required reading (`MOBILE_RESEARCH.md`, `PRE_MOBILE_BLOCKERS.md`), the write path (API route into `submissions.server.ts`) and the offline outbox design marked as decided (don't re-litigate), and a plan-first requirement for the two highest-risk pieces (auth flow, offline queue) before building. Everything else is free to build.
