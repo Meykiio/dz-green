@@ -14,33 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      alert_contacts: {
-        Row: {
-          active: boolean
-          created_at: string
-          id: string
-          region_filter: Json
-          type: string
-          value: string
-        }
-        Insert: {
-          active?: boolean
-          created_at?: string
-          id?: string
-          region_filter?: Json
-          type: string
-          value: string
-        }
-        Update: {
-          active?: boolean
-          created_at?: string
-          id?: string
-          region_filter?: Json
-          type?: string
-          value?: string
-        }
-        Relationships: []
-      }
       care_logs: {
         Row: {
           action: Database["public"]["Enums"]["care_action"]

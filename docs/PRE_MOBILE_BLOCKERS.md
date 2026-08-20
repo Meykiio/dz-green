@@ -145,5 +145,6 @@ mobile v1 must not ship before:** the PR queue (#9 → #10 → #11, in that orde
 currently waiting on the author), the wilayas update (or mobile inherits a stale list and
 silent misfiling), and the 2-minute auth dashboard check. Items that can run **in
 parallel** with mobile scaffolding: wilayas (data files + `.max(48)` — pure additive),
-alerting decision, load test, and PR #9's fix IF the author stalls and we take over the
-branch.
+load test, and PR #9's fix IF the author stalls and we take over the
+branch. (Alerting decision resolved 2026-08-20 — **dropped**, storage-only, never wired;
+rebuild parked in `ROADMAP.md`.)

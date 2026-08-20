@@ -6,7 +6,6 @@ export interface ModerationStats {
   pending: number;
   approvedToday: number;
   activeFires: number;
-  contacts: number;
   totalSubmissions: number;
 }
 
@@ -19,7 +18,7 @@ export function useModerationStats(enabled: boolean) {
     queryFn: async (): Promise<ModerationStats> => {
       const start = new Date();
       start.setHours(0, 0, 0, 0);
-      const [pending, today, total, activeFires, contacts] = await Promise.all([
+      const [pending, today, total, activeFires] = await Promise.all([
         supabase.from("sites").select("id", { count: "exact", head: true }).eq("status", "pending"),
         supabase
           .from("sites")
@@ -28,16 +27,14 @@ export function useModerationStats(enabled: boolean) {
           .gte("created_at", start.toISOString()),
         supabase.from("sites").select("id", { count: "exact", head: true }),
         supabase.from("fire_reports").select("id", { count: "exact", head: true }).eq("status", "active"),
-        supabase.from("alert_contacts").select("id", { count: "exact", head: true }),
       ]);
-      for (const r of [pending, today, total, activeFires, contacts]) {
+      for (const r of [pending, today, total, activeFires]) {
         if (r.error) throw r.error;
       }
       return {
         pending: pending.count ?? 0,
         approvedToday: today.count ?? 0,
         activeFires: activeFires.count ?? 0,
-        contacts: contacts.count ?? 0,
         totalSubmissions: total.count ?? 0,
       };
     },

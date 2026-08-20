@@ -48,15 +48,6 @@ export interface FireReport {
   resolved_at: string | null;
 }
 
-export interface AlertContact {
-  id: string;
-  type: "email" | "phone";
-  value: string;
-  region_filter: { wilayas: string[] };
-  active: boolean;
-  created_at: string;
-}
-
 /** A selectable thing on the hero map. */
 export type MapFeature =
   | { kind: "site"; site: Site }

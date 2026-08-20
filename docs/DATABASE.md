@@ -4,7 +4,7 @@ Verified directly against the **live** database via `psql` and the platform MCP 
 
 **2026-08-17 project migration.** The app moved to a new, empty Supabase project (`jnunqilxiajinylgehuh`); this exact schema was re-applied there from `FULL_SCHEMA_EXPORT.sql` and re-verified table-by-table via MCP (same policies, grants, functions, bucket, realtime publication). Row counts are deliberately **not** in this file — they change daily. Verify against the live project.
 
-**2026-08-17 roles rework (Sprint 3).** Privilege no longer lives in `profiles.is_moderator` alone: `public.user_roles` + `public.moderator_wilayas` are the source of truth, with `admin` (everything) and `moderator` (wilaya-scoped) roles. All moderator policies now call `private.can_moderate` / `private.can_manage_contact`; `profiles.is_moderator` is a denormalized flag kept in sync by the `user_roles_sync_profile` trigger. Grants on app tables were tightened in the same migration (the "broad default privileges" caveat below is resolved).
+**2026-08-17 roles rework (Sprint 3).** Privilege no longer lives in `profiles.is_moderator` alone: `public.user_roles` + `public.moderator_wilayas` are the source of truth, with `admin` (everything) and `moderator` (wilaya-scoped) roles. All moderator policies now call `private.can_moderate`; `profiles.is_moderator` is a denormalized flag kept in sync by the `user_roles_sync_profile` trigger. Grants on app tables were tightened in the same migration (the "broad default privileges" caveat below is resolved). (`alert_contacts` and its `private.can_manage_contact` helper were dropped 2026-08-20 — the alerting feature was storage-only and never wired to send anything; see `ROADMAP.md` "Parked".)
 
 Postgres: Supabase managed. Schema documented here: `public` (+ relevant `storage` and `auth` touchpoints).
 
@@ -143,21 +143,6 @@ No INSERT/DELETE policies; inserts go through the service-role server function.
 
 **Column-level grants (this is what actually hides the PII):** table-level SELECT was revoked from `anon` and `authenticated`; SELECT is granted per column on `id, lat, lng, location, wilaya_code, commune, severity, description, photo_url, status, created_at, resolved_at` only. A client that does `select *` gets a permission error — client queries must list columns explicitly, which `src/lib/data.ts` does.
 
-### `public.alert_contacts`
-
-Schema-ready for future alerting. Nothing sends alerts; no UI manages this table.
-
-| Column | Type | Null | Default | Purpose |
-|---|---|---|---|---|
-| `id` | uuid PK | no | `gen_random_uuid()` | |
-| `type` | text | no | — | CHECK `IN ('email','phone')`. |
-| `value` | text | no | — | Address or number. |
-| `region_filter` | jsonb | no | `'{"wilayas": []}'` | Intended wilaya scoping. |
-| `active` | boolean | no | `true` | |
-| `created_at` | timestamptz | no | `now()` | |
-
-RLS **enabled**. Policy `alert_contacts_moderator_all` — `FOR ALL TO authenticated USING/WITH CHECK (private.can_manage_contact(auth.uid(), region_filter))`: admins manage everything; moderators manage only contacts whose `region_filter.wilayas` are all inside their assignment (global contacts are admin-only). Everyone else: nothing (2026-08-17).
-
 ### `public.submission_meta`
 
 Abuse ledger for the rate limiter. Never exposed to clients.
@@ -266,11 +251,7 @@ Returns the caller's role. **Hardened 2026-08-18:** `order by role asc limit 1` 
 
 `is_admin(_user_id) OR (_wilaya_code = any(user_wilayas(_user_id)))`. Backs every moderator read/update policy on `sites` and `fire_reports`.
 
-### `private.can_manage_contact(_user_id uuid, _filter jsonb) → boolean` (2026-08-17)
-
-`is_admin(_user_id) OR (every wilaya in _filter->'wilayas' is in user_wilayas(_user_id))`. Backs `alert_contacts_moderator_all`; global contacts (empty wilaya list) are admin-only.
-
-All six are `SECURITY DEFINER`, `STABLE`, `SET search_path = public`, EXECUTE granted to `authenticated, service_role` only. Live reads mean revocation takes effect on the next request — no JWT staleness window, and no dependency on an auth hook.
+All five are `SECURITY DEFINER`, `STABLE`, `SET search_path = public`, EXECUTE granted to `authenticated, service_role` only. Live reads mean revocation takes effect on the next request — no JWT staleness window, and no dependency on an auth hook.
 
 ### `private.sync_profile_moderator_flag() → trigger` (2026-08-17)
 
