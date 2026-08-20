@@ -2,6 +2,16 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-20 (twenty-seventh pass) — Map "disappears" fix + feedback device capture
+
+- **Investigation first (owner-mandated standard):** the feedback report "MapLibre GL has a bug where sometimes it disappears completely" was investigated before any code. Ruled out with evidence: the context-lost blank-map bugs (#6398, #6935) merged pre-v6.0.0 and can't affect 6.4.0; v6.4.1 (2 days old) fixes an unrelated XSS sanitize bug. Root cause path confirmed in the shipped 6.4.0 bundle: WebGL2 context creation failure fires `error` + `GPUInitializationError` synchronously inside the Map constructor, and Evented drops errors with no listeners — so the map died with only a `console.error`. Confidence stated honestly: medium-high for context creation/loss failure, not confirmed (the reporter left no device data).
+- **HeroMap defensive handling (part 1):** pre-construction `webgl2` probe, bubbling `webglcontextcreationerror` listener on the container (catches the constructor-time failure `map.on("error")` would miss), `map.on("error")` branch on `instanceof GPUInitializationError`, `webglcontextlost`/`webglcontextrestored` handling with `redraw()` on restore, and a clear overlay (two variants: no-WebGL2 vs. lost-connection) with a reload fallback.
+- **Feedback device capture (part 2, schema change approved for this specific case):** migration `add_feedback_device` (applied live, verified): `public.feedback.device text` (nullable, no constraint). Client sends `navigator.userAgent` capped at 300 chars (zod); admin panel renders it (truncated, mono); `AdminFeedback` + supabase types updated; 2 new schema tests.
+
+## 2026-08-20 (twenty-sixth pass) — Issue #8 replied (mobile app)
+
+- **Posted the approved reply** to the issue #8 thread (comment `5350062315`, Meykiio account, 2026-08-20 01:29Z): framed as **Ground rules vs. Your call** — the three fixed items (write path through the existing server gate, v1 ships after the PR queue #9→#10→#11 + wilayas update, append-only outbox) each with its "why", and everything else explicitly delegated to the contributor (code structure incl. the separate-repo call, libraries, screen order, pace, UI). Addresses both `laidanimounir` (the proposal) and `morch23mj` (the monorepo comment).
+
 ## 2026-08-20 (twenty-fifth pass) — Alerting feature removed (owner decision)
 
 The "wire or drop" open decision is resolved: **drop**. The feature was storage-only — nothing ever sent an alert.

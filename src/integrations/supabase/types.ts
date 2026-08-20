@@ -118,18 +118,21 @@ export type Database = {
       feedback: {
         Row: {
           created_at: string
+          device: string | null
           id: string
           message: string
           page: string | null
         }
         Insert: {
           created_at?: string
+          device?: string | null
           id?: string
           message: string
           page?: string | null
         }
         Update: {
           created_at?: string
+          device?: string | null
           id?: string
           message?: string
           page?: string | null

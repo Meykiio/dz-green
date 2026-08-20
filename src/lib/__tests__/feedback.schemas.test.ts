@@ -12,6 +12,21 @@ describe("feedbackSchema", () => {
     ).toBe(true);
   });
 
+  it("accepts an optional device user-agent", () => {
+    const parsed = feedbackSchema.safeParse({
+      message: "Map disappeared",
+      device: "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36",
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.device).toBe("Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36");
+  });
+
+  it("rejects a device string over 300 chars", () => {
+    expect(feedbackSchema.safeParse({ message: "x", device: "x".repeat(301) }).success).toBe(
+      false,
+    );
+  });
+
   it("trims whitespace-only messages to empty and rejects them", () => {
     expect(feedbackSchema.safeParse({ message: "   " }).success).toBe(false);
   });
