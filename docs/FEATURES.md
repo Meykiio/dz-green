@@ -45,11 +45,10 @@ Smoke check performed: `GET /`, `/about`, `/plant`, `/care`, `/fire`, `/auth`, `
 
 - Behind the platform-managed `_authenticated` gate; the page additionally checks `isModerator` before running any query.
 - **Wilaya scoping (2026-08-17):** every queue, triage and contact query is scoped by RLS — admins see everything, moderators only their assigned wilayas (`private.can_moderate`). A moderator with no assignments sees an empty queue. **Verified live:** the E2E admin round-trip seeds pending rows in Alger and Oran, assigns Oran to a moderator, and that moderator sees and approves only the Oran row.
-- **Section navigation is a segmented tab bar** (`ModTabs`, 2026-08-18) — the old second sidebar is gone (the app shell already provides one; the double sidebar was an owner-flagged bug). Tabs carry live count badges: Pending plantings, Fire reports, Alert contacts.
+- **Section navigation is a segmented tab bar** (`ModTabs`, 2026-08-18) — the old second sidebar is gone (the app shell already provides one; the double sidebar was an owner-flagged bug). Tabs carry live count badges: Pending plantings, Fire reports.
 - Stats strip: pending, approved today, active fires, total submissions — head-count queries (`head: true`), no row fetches.
 - Pending plantings: oldest-first list with photo, approve/reject via direct RLS-scoped `sites` update (`sites_moderator_update`), writing `status`, `reviewed_by`, `reviewed_at` and an optional `moderator_notes`. **Verified live by the E2E suite (approve with note, fields asserted via REST).**
 - Fire report triage: list with status badge (active/resolved/false alarm), severity, photo, dates; actions Mark resolved / False alarm / Reopen, writing `status` + `resolved_at` under `fire_moderator_update`. **Verified live 2026-08-13: the one live fire report round-tripped Active → Resolved → Active with zero console errors.**
-- Alert contacts: add (email/phone segmented control), pause/resume, delete, plus a persistent "nothing is sent yet" notice. `alert_contacts_moderator_all` RLS — moderators manage only contacts fully inside their assigned wilayas; global contacts are admin-only. **Verified live: add + delete round-tripped cleanly.**
 
 ## 5b. Admin dashboard (`/admin`) — verified end to end (2026-08-17, extended 2026-08-18)
 
@@ -95,7 +94,7 @@ The gate is four layers, all server-side, no third-party dependency:
 
 ## 10. Not built at all
 
-- Alerting (email/SMS) — nothing sends alerts; `alert_contacts` now has a moderator management screen (storage only, persistent notice).
+- Alerting (email/SMS) — the storage-only `alert_contacts` table and its moderator screen were **dropped 2026-08-20** (never wired to send anything; rebuild planned after the mobile phase and PR queue — see `ROADMAP.md` "Parked").
 - Any Arabic/French UI translation. Wilaya Arabic names exist in data; the interface itself is English only.
 - Search, per-wilaya pages, user profiles, leaderboards, sharing cards.
 
@@ -125,4 +124,4 @@ Done in code/schema:
 - Photos are immutable UUID paths uploaded with `cacheControl: 31536000` and served through the proxy with long cache headers — CDN-safe as-is.
 - Auth: staff can now sign out from the header (was missing — there was no logout path at all).
 
-Owner actions before launch (not code): Supabase Pro ($25/mo), Vercel Pro + Firewall rules on the public POST endpoints (defense-in-depth on top of the gate), the 1k-concurrent load test against the deployed URL (needs the deploy target and a stable route to supabase.co — the local route was down during this sprint), and the spam-flood rerun at scale. Alerting on rate-limit spikes: wire or drop `alert_contacts` — owner decision, flagged.
+Owner actions before launch (not code): Supabase Pro ($25/mo), Vercel Pro + Firewall rules on the public POST endpoints (defense-in-depth on top of the gate), the 1k-concurrent load test against the deployed URL (needs the deploy target and a stable route to supabase.co — the local route was down during this sprint), and the spam-flood rerun at scale.

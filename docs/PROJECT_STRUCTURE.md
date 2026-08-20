@@ -77,7 +77,6 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `moderator/ModTabs.tsx` | Segmented tab bar for the moderation sections, with live count badges. |
 | `moderator/PendingQueue.tsx` | Pending plantings with approve/reject under `sites_moderator_update`; writes `reviewed_by`, `reviewed_at`, `moderator_notes`. |
 | `moderator/FireTriage.tsx` | Fire report list with status badges and resolved / false-alarm / reopen actions (writes `status` + `resolved_at`). |
-| `moderator/ContactsPanel.tsx` | `alert_contacts` management: add, pause/resume, delete, "nothing is sent yet" notice. |
 | `moderator/StatusBadge.tsx` | Pill status badge (tone variants: plant/care/fire/muted). |
 | `admin/AdminOverview.tsx` | Admin stats strip + per-wilaya moderation load. |
 | `admin/AssignWilayasDialog.tsx` | The assign-wilayas dialog (58 wilayas grouped under the 48 historic parents). |
@@ -87,9 +86,9 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 
 | Path | Purpose |
 |---|---|
-| `types.ts` | App-level `Site`, `CareLog`, `FireReport`, `AlertContact` types (client-safe shapes: no reporter PII) + `needsWater()` 14-day derived flag. |
+| `types.ts` | App-level `Site`, `CareLog`, `FireReport` types (client-safe shapes: no reporter PII) + `needsWater()` 14-day derived flag. |
 | `data.ts` | TanStack Query `queryOptions` for sites/care logs/fire reports with explicit safe column lists (bounds 2000/3000/1000), and `photoUrl()` mapping a storage path to `/api/public/photo/...`. |
-| `moderation.ts` | `useModerationStats()` — exact head-count queries (pending, approved today, active fires, contacts, total submissions). |
+| `moderation.ts` | `useModerationStats()` — exact head-count queries (pending, approved today, active fires, total submissions). |
 | `wilayas.ts` | The 58 wilayas (code, Latin + Arabic name) and the mapping to the 48 historic map polygons. |
 | `geo.ts` | Mercator projection helpers, bounding-box math, `wilayaCodeForPoint` point-in-polygon derivation (historic wilayas only), `wilayaCenterLatLng` display centres, `parseRings`, `ALGERIA_CENTER`. |
 | `wilaya-geo.ts` | Wilaya boundaries as GeoJSON (converted from the projected path data back to lat/lng) + `wilayaBounds` — the hero map's border layers and wilaya zoom. |

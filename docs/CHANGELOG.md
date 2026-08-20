@@ -12,6 +12,15 @@ Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the 
 
 - **Posted the approved reply** to the issue #8 thread (comment `5350062315`, Meykiio account, 2026-08-20 01:29Z): framed as **Ground rules vs. Your call** — the three fixed items (write path through the existing server gate, v1 ships after the PR queue #9→#10→#11 + wilayas update, append-only outbox) each with its "why", and everything else explicitly delegated to the contributor (code structure incl. the separate-repo call, libraries, screen order, pace, UI). Addresses both `laidanimounir` (the proposal) and `morch23mj` (the monorepo comment).
 
+## 2026-08-20 (twenty-fifth pass) — Alerting feature removed (owner decision)
+
+The "wire or drop" open decision is resolved: **drop**. The feature was storage-only — nothing ever sent an alert.
+
+- **Schema (migration `drop_alert_contacts`, applied live + mirrored in `supabase/migrations/20260820000000_c3b7bda7-….sql`):** dropped `public.alert_contacts` (0 rows), its `alert_contacts_moderator_all` RLS policy, and `private.can_manage_contact` (existed only to back that policy; its EXECUTE grant went with it). Verified live: table and function both gone. No other schema references (no publication membership, no indexes elsewhere).
+- **Code:** deleted `src/components/moderator/ContactsPanel.tsx`; removed the "Alert contacts" tab from `ModTabs` (`Section` is now `queue | fires`), the ContactsPanel render + tab count from `moderate.tsx` (page description updated), the `contacts` head-count query from `moderation.ts`, the `AlertContact` interface from `src/lib/types.ts`, and the `alert_contacts` block from `src/integrations/supabase/types.ts` (regenerated types confirmed clean — the file was also stale on `feedback`/`receipts`, now accurate).
+- **Docs:** `ROADMAP.md` — moved under "Parked" with the full story (what it was, why dropped, rebuild after mobile + PR queue settle); `DATABASE.md` — sections removed, helper count six → five; `FULL_SCHEMA_EXPORT.sql` — table/policy/function/grant blocks removed, sections renumbered 1–17; `PROJECT_STRUCTURE.md` + `FEATURES.md` + `PRE_MOBILE_BLOCKERS.md` — references removed/updated.
+- **Delivered as a PR** (not a direct push).
+
 ## 2026-08-20 (twenty-fourth pass) — PR #9 rebase deadline posted
 
 - **PR #9 (i18n/RTL): deadline comment posted** (`5349625809`, Meykiio account): rebase onto main **by 2026-08-25** or we take over the branch (copy into repo, apply required changes incl. the client-side locale fix, open replacement PR). Verified before posting: repo `Meykiio/dz-green`, PR #9 open, head `2c6c3daa73` unchanged, 7 behind main and diverged, `mergeable_state: unknown`; only prior comment was the 2026-08-19 rebase request (no deadline).

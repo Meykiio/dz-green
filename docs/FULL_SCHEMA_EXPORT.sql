@@ -1,5 +1,5 @@
 -- =====================================================================
--- Green Algeria — full schema export
+-- Green Algeria â€” full schema export
 -- Generated 2026-08-13 from the LIVE database (psql introspection),
 -- not from supabase/migrations/*.sql.
 --
@@ -242,29 +242,7 @@ CREATE POLICY fire_moderator_update ON public.fire_reports
   WITH CHECK (private.is_moderator(auth.uid()));
 
 -- ---------------------------------------------------------------------
--- 8. alert_contacts (schema-ready, nothing sends alerts)
--- ---------------------------------------------------------------------
-CREATE TABLE public.alert_contacts (
-  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  type          text NOT NULL CONSTRAINT alert_contacts_type_check CHECK (type IN ('email','phone')),
-  value         text NOT NULL,
-  region_filter jsonb NOT NULL DEFAULT '{"wilayas": []}'::jsonb,
-  active        boolean NOT NULL DEFAULT true,
-  created_at    timestamptz NOT NULL DEFAULT now()
-);
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.alert_contacts TO authenticated;
-GRANT ALL ON public.alert_contacts TO service_role;
-
-ALTER TABLE public.alert_contacts ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY alert_contacts_moderator_all ON public.alert_contacts
-  FOR ALL TO authenticated
-  USING (private.is_moderator(auth.uid()))
-  WITH CHECK (private.is_moderator(auth.uid()));
-
--- ---------------------------------------------------------------------
--- 9. submission_meta (abuse ledger — deny-all by design)
+-- 8. submission_meta (abuse ledger â€” deny-all by design)
 -- ---------------------------------------------------------------------
 CREATE TABLE public.submission_meta (
   id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -282,14 +260,14 @@ GRANT ALL ON public.submission_meta TO service_role;
 ALTER TABLE public.submission_meta ENABLE ROW LEVEL SECURITY;
 
 -- ---------------------------------------------------------------------
--- 10. Realtime publication
+-- 9. Realtime publication
 -- ---------------------------------------------------------------------
 ALTER PUBLICATION supabase_realtime ADD TABLE public.sites;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.care_logs;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.fire_reports;
 
 -- ---------------------------------------------------------------------
--- 11. Storage: private `photos` bucket, no client policies
+-- 10. Storage: private `photos` bucket, no client policies
 -- ---------------------------------------------------------------------
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES ('photos', 'photos', false, NULL, NULL)
@@ -300,20 +278,20 @@ ON CONFLICT (id) DO NOTHING;
 -- Size (<= 900000 bytes) and mime type (jpeg/png/webp) are enforced in app code.
 
 -- ---------------------------------------------------------------------
--- 12. Notes on things this file cannot recreate
+-- 11. Notes on things this file cannot recreate
 -- ---------------------------------------------------------------------
 -- * public.spatial_ref_sys ships with PostGIS. On the source project RLS is
 --   OFF on it and cannot be enabled (extension-owned). Same will be true here.
 -- * Supabase applies its own default privileges on the `public` schema, so the
 --   target project may end up granting anon/authenticated more table-level
 --   privileges than the GRANTs above. RLS is what actually blocks writes.
---   The 2026-08-17 roles migration (section 13) revokes the excess — run it
+--   The 2026-08-17 roles migration (section 13) revokes the excess â€” run it
 --   to match intent.
 -- * Auth providers, email templates, JWT settings and secrets are project
 --   configuration, not SQL.
 
 -- ---------------------------------------------------------------------
--- 13. Roles (2026-08-17) — admin + wilaya-scoped moderators
+-- 12. Roles (2026-08-17) â€” admin + wilaya-scoped moderators
 -- ---------------------------------------------------------------------
 -- Source of truth: public.user_roles + public.moderator_wilayas.
 -- profiles.is_moderator is a denormalized flag synced by trigger.
@@ -371,22 +349,10 @@ returns boolean language sql stable security definer set search_path = ''public'
   select private.is_admin(_user_id) or (_wilaya_code = any(private.user_wilayas(_user_id)))
 $$;
 
-create or replace function private.can_manage_contact(_user_id uuid, _filter jsonb)
-returns boolean language sql stable security definer set search_path = ''public'' as $$
-  select
-    private.is_admin(_user_id)
-    or (
-      (select count(*) from jsonb_array_elements_text(coalesce(_filter -> ''wilayas'', ''[]''::jsonb))) > 0
-      and (select bool_and(w = any(private.user_wilayas(_user_id)))
-           from jsonb_array_elements_text(coalesce(_filter -> ''wilayas'', ''[]''::jsonb)) w)
-    )
-$$;
-
 grant execute on function private.user_role(uuid) to authenticated, service_role;
 grant execute on function private.is_admin(uuid) to authenticated, service_role;
 grant execute on function private.user_wilayas(uuid) to authenticated, service_role;
 grant execute on function private.can_moderate(uuid, text) to authenticated, service_role;
-grant execute on function private.can_manage_contact(uuid, jsonb) to authenticated, service_role;
 grant execute on function private.is_moderator(uuid) to authenticated, service_role;
 
 create or replace function private.sync_profile_moderator_flag()
@@ -423,19 +389,13 @@ create policy fire_moderator_update on public.fire_reports
   using (private.can_moderate(auth.uid(), wilaya_code))
   with check (private.can_moderate(auth.uid(), wilaya_code));
 
-drop policy if exists alert_contacts_moderator_all on public.alert_contacts;
-create policy alert_contacts_moderator_all on public.alert_contacts
-  for all to authenticated
-  using (private.can_manage_contact(auth.uid(), region_filter))
-  with check (private.can_manage_contact(auth.uid(), region_filter));
-
 revoke insert, update, delete, truncate, references, trigger
-  on public.sites, public.care_logs, public.fire_reports, public.alert_contacts,
+  on public.sites, public.care_logs, public.fire_reports,
      public.submission_meta, public.profiles
   from anon;
 
 revoke truncate, references, trigger
-  on public.sites, public.care_logs, public.fire_reports, public.alert_contacts,
+  on public.sites, public.care_logs, public.fire_reports,
      public.submission_meta, public.profiles
   from authenticated;
 
@@ -445,7 +405,7 @@ select id, ''admin'' from public.profiles where is_moderator = true
 on conflict do nothing;
 
 -- ---------------------------------------------------------------------
--- 14. Receipt links (2026-08-17, Sprint 4)
+-- 13. Receipt links (2026-08-17, Sprint 4)
 -- ---------------------------------------------------------------------
 -- Anonymous submitters check status via /my/<token>; only the token hash is
 -- stored. Same content as migration 20260817190000.
@@ -466,7 +426,7 @@ alter table public.receipts enable row level security;
 grant select, insert, delete on public.receipts to service_role;
 
 -- ---------------------------------------------------------------------
--- 15. Wilaya-level submissions (2026-08-18, Sprint 6)
+-- 14. Wilaya-level submissions (2026-08-18, Sprint 6)
 -- ---------------------------------------------------------------------
 -- Submissions may carry only a wilaya (no exact pin); the server stores the
 -- wilaya''s display centre and marks the row location_approximate = true.
@@ -479,7 +439,7 @@ alter table public.fire_reports add column location_approximate boolean not null
 grant select (location_approximate) on public.fire_reports to anon, authenticated;
 
 -- ---------------------------------------------------------------------
--- 16. Scale indexes (2026-08-18, Sprint 8)
+-- 15. Scale indexes (2026-08-18, Sprint 8)
 -- ---------------------------------------------------------------------
 -- Composite indexes for the queue read paths and the gate''s two rate-limit
 -- queries. Same content as migration 20260818010000.
@@ -497,7 +457,7 @@ create index if not exists submission_meta_device_kind_created_idx
   on public.submission_meta (device_fingerprint, kind, created_at desc);
 
 -- ---------------------------------------------------------------------
--- 17. Role-read hardening (2026-08-18)
+-- 16. Role-read hardening (2026-08-18)
 -- ---------------------------------------------------------------------
 -- The (user_id, role) PK allows stacked rows; make user_role deterministic
 -- (admin wins). Same content as migration 20260818040000.
@@ -511,7 +471,7 @@ as $$
 $$;
 
 -- ---------------------------------------------------------------------
--- 18. Feedback box (2026-08-18)
+-- 17. Feedback box (2026-08-18)
 -- ---------------------------------------------------------------------
 -- Visitor feedback (home "Feedback" button). Service-role writes only:
 -- anon/authenticated grants revoked; RLS on with no policies. Same

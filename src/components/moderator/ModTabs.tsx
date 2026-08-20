@@ -1,12 +1,11 @@
-import { Bell, Flame, Sprout } from "lucide-react";
+import { Flame, Sprout } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type Section = "queue" | "fires" | "contacts";
+export type Section = "queue" | "fires";
 
 const SECTIONS: { id: Section; label: string; icon: typeof Sprout }[] = [
   { id: "queue", label: "Pending plantings", icon: Sprout },
   { id: "fires", label: "Fire reports", icon: Flame },
-  { id: "contacts", label: "Alert contacts", icon: Bell },
 ];
 
 interface Props {

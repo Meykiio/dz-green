@@ -3,7 +3,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
-import { ContactsPanel } from "@/components/moderator/ContactsPanel";
 import { FireTriage } from "@/components/moderator/FireTriage";
 import { ModTabs, type Section } from "@/components/moderator/ModTabs";
 import { PendingQueue } from "@/components/moderator/PendingQueue";
@@ -11,13 +10,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { useModerationStats } from "@/lib/moderation";
 
 const TITLE = "Moderation — Green Algeria";
-const DESCRIPTION =
-  "Review pending plantings, triage fire reports and manage alert contacts.";
+const DESCRIPTION = "Review pending plantings and triage fire reports.";
 
 const SECTION_TITLES: Record<Section, string> = {
   queue: "Pending plantings",
   fires: "Fire reports",
-  contacts: "Alert contacts",
 };
 
 export const Route = createFileRoute("/_authenticated/moderate")({
@@ -56,7 +53,6 @@ function ModeratePage() {
   const counts = {
     queue: stats.data?.pending ?? 0,
     fires: stats.data?.activeFires ?? 0,
-    contacts: stats.data?.contacts ?? 0,
   };
 
   return (
@@ -79,7 +75,6 @@ function ModeratePage() {
         <main className="mt-6">
           {section === "queue" && <PendingQueue />}
           {section === "fires" && <FireTriage />}
-          {section === "contacts" && <ContactsPanel />}
         </main>
       </div>
     </AppShell>
