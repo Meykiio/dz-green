@@ -32,6 +32,8 @@ export function FeedbackDialog() {
           hp,
           message,
           page: typeof window !== "undefined" ? window.location.pathname : null,
+          device:
+            typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 300) : null,
         },
       }),
     onSuccess: () => {

@@ -11,7 +11,7 @@ export async function submitFeedbackImpl(
 
   const { error } = await supabaseAdmin
     .from("feedback")
-    .insert({ message: data.message, page: data.page ?? null });
+    .insert({ message: data.message, page: data.page ?? null, device: data.device ?? null });
 
   if (error) {
     console.error("[feedback] insert failed:", error.message);

@@ -521,6 +521,7 @@ create table public.feedback (
   id uuid primary key default gen_random_uuid(),
   message text not null check (char_length(message) between 1 and 2000),
   page text,
+  device text,
   created_at timestamptz not null default now()
 );
 

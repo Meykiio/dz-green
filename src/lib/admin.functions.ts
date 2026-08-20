@@ -142,6 +142,7 @@ export interface AdminFeedback {
   id: string;
   message: string;
   page: string | null;
+  device: string | null;
   created_at: string;
 }
 
@@ -150,7 +151,7 @@ export const adminListFeedback = createServerFn({ method: "GET" }).handler(
     await requireAdmin();
     const { data, error } = await supabaseAdmin
       .from("feedback")
-      .select("id, message, page, created_at")
+      .select("id, message, page, device, created_at")
       .order("created_at", { ascending: false })
       .limit(100);
     if (error) throw error;
