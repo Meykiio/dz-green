@@ -14,6 +14,7 @@ import { ALGERIA_BOUNDS, DARK_STYLE, LIGHT_STYLE, RecenterControl } from "./map-
 import { featureCollection, onlyKind, withoutKind } from "./map-data";
 import {
   addDataLayers,
+  applyAlgeriaLabelFilter,
   applyLayerVisibility,
   startPulse,
   wireInteractions,
@@ -144,6 +145,7 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
 
     const init = () => {
       if (cancelled) return;
+      applyAlgeriaLabelFilter(map);
       addDataLayers(map, refs);
       wireInteractions(map, refs);
       startPulse(map, pulseRef, cancelledRef);
@@ -196,6 +198,7 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
     if (style === styleRef.current) return;
     styleRef.current = style;
     const once = () => {
+      applyAlgeriaLabelFilter(map);
       addDataLayers(map, refs);
       wireInteractions(map, refs);
     };
