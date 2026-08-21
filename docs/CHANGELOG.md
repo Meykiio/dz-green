@@ -2,6 +2,15 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-21 (thirty-first pass) — Open-source infrastructure
+
+- **CI:** `.github/workflows/ci.yml` — on every PR and push to `main`: `bun install --frozen-lockfile`, `tsc --noEmit`, unit tests, build (placeholder `VITE_*` env so the bundle inlines harmless values). E2E stays out of CI — it needs the live database, as documented.
+- **Templates:** bug + feature issue forms (the structure Ahmeddsssscd used by hand in #13/#14 is now the template) and a PR template with the verification checklist ("not verified" is acceptable, a false "done" is not).
+- **`SECURITY.md`:** private reporting via GitHub advisories + the posture (service-role key never client-side, fire PII column-grant protected, IP hashes only, private photo bucket).
+- **README:** the live app link (`green-dz.vercel.app`) was missing entirely — now at the top next to the repo link, plus the CI badge.
+- **CONTRIBUTING:** fixed a real bug — it said "branch off `master`" (the default branch is `main`); added the CI line to the checks section.
+- Docs: PROJECT_STRUCTURE (.github/ + SECURITY.md entries).
+
 ## 2026-08-21 (thirtieth pass) — Chrome fixes: bottom bar removed, GitHub link, Algeria dim mask
 
 - **Test data cleaned (live DB, owner-approved):** the "Test the app" site row (10 Pine, wilaya 33) deleted along with its storage photo; the map now shows only real submissions (2 sites, 4 trees).

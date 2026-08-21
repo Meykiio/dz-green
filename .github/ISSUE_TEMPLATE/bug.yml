@@ -1,0 +1,32 @@
+name: Bug report
+description: Something isn't working
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you saw, and the exact page or flow.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: Page or flow — e.g. /plant, the home map, /moderate.
+  - type: input
+    id: device
+    attributes:
+      label: Device + browser
+      description: e.g. Samsung A32, Chrome 126. This matters — most of our users are on phones.
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Console errors, screenshots, wilaya if location-related. Code paths beat guesses — if you read the source, say what you found.
