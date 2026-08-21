@@ -81,7 +81,7 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `map/map-data.ts` | GeoJSON builders (feature collection, kind filters, feature lookup). |
 | `map/map-layers.ts` | Source/layer setup (wilaya borders, per-kind points, fire pulse), layer visibility, the pulse rAF loop, click/hover interactions. |
 | `map/DetailPanel.tsx` | Side panel (bottom sheet on mobile) showing feature details, the care timeline, and a Google Maps Directions link. Images capped; no horizontal overflow. |
-| `map/SiteList.tsx` | List view behind the Map/List toggle: recent plantings **and fire reports** (respecting the same layer toggles as the map), with needs-water and fire-status badges. |
+| `map/SiteList.tsx` | List view behind the Map/List toggle: plantings + fire reports **grouped by wilaya** (section headers with per-wilaya totals, photo-thumb rows, needs-water and fire-status badges). Rebuilt 2026-08-21. |
 | `moderator/ModTabs.tsx` | Segmented tab bar for the moderation sections, with live count badges. |
 | `moderator/PendingQueue.tsx` | Pending plantings with approve/reject under `sites_moderator_update`; writes `reviewed_by`, `reviewed_at`, `moderator_notes`. Shows exact submitted-at time and the wilaya-level badge. |
 | `moderator/FireTriage.tsx` | Fire report list with status badges and resolved / false-alarm / reopen actions (writes `status` + `resolved_at`). Exact reported/resolved times. |
