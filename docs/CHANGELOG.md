@@ -2,6 +2,10 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-20 (twenty-ninth pass) — Photo size checked before decode (issue #13)
+
+- `storePhoto` decoded the whole base64 payload before the 900 KB check, so a direct API caller's oversized payload was fully allocated before rejection (the client compresses to ~400 KB, so only direct calls hit this). Now rejects on the base64 string length first (`floor(len * 0.75) > MAX_PHOTO_BYTES`); the exact post-decode check stays as a second guard. 3 new `storePhoto` tests: oversized never reaches the storage upload, exactly-at-limit uploads, bad format rejected. PR #16. tsc clean, 102/102 unit.
+
 ## 2026-08-20 (twenty-seventh pass) — Map "disappears" fix + feedback device capture
 
 - **Investigation first (owner-mandated standard):** the feedback report "MapLibre GL has a bug where sometimes it disappears completely" was investigated before any code. Ruled out with evidence: the context-lost blank-map bugs (#6398, #6935) merged pre-v6.0.0 and can't affect 6.4.0; v6.4.1 (2 days old) fixes an unrelated XSS sanitize bug. Root cause path confirmed in the shipped 6.4.0 bundle: WebGL2 context creation failure fires `error` + `GPUInitializationError` synchronously inside the Map constructor, and Evented drops errors with no listeners — so the map died with only a `console.error`. Confidence stated honestly: medium-high for context creation/loss failure, not confirmed (the reporter left no device data).
