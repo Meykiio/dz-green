@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { formatDate, photoUrl, SITE_COLUMNS } from "@/lib/data";
+import { formatDate, formatDateTime, photoUrl, SITE_COLUMNS } from "@/lib/data";
 import type { Site } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
+import { ContactReveal } from "./ContactReveal";
 
 export function PendingQueue() {
   const queryClient = useQueryClient();
@@ -85,12 +86,17 @@ export function PendingQueue() {
             </p>
             <p className="text-sm text-muted-foreground">
               {wilayaName(site.wilaya_code)}
-              {site.commune ? ` · ${site.commune}` : ""} · {formatDate(site.planted_date)}
+              {site.commune ? ` · ${site.commune}` : ""} · planted {formatDate(site.planted_date)}
+              {site.location_approximate ? " · wilaya-level" : ""}
             </p>
             <p className="text-sm text-muted-foreground">
-              {site.lat.toFixed(5)}, {site.lng.toFixed(5)}
+              {site.lat.toFixed(5)}, {site.lng.toFixed(5)} · submitted{" "}
+              {formatDateTime(site.created_at)}
             </p>
             {site.notes && <p className="text-sm">{site.notes}</p>}
+            <div className="pt-1">
+              <ContactReveal kind="site" id={site.id} />
+            </div>
             <div className="pt-3">
               <label
                 htmlFor={`note-${site.id}`}
