@@ -2,6 +2,11 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-21 (thirty-eighth pass) — List view rebuilt (PR F)
+
+- **Wilaya-grouped list (owner: "not the perfect UI/UX — rethink and rebuild"):** the flat 30-row wall is gone. Reports (plantings + fires, same layer filters as the map) are now grouped by wilaya — section headers with per-wilaya totals ("Oran · 12 trees · 1 fire"), groups ordered by most recent activity, photo-thumb rows for plantings (private-bucket proxy URLs, lazy-loaded) with the needs-water badge, fire rows with severity + status. 181 lines, under the cap.
+- Verified: tsc clean, 105/105 unit, build green; headless render check passes (empty state — the DB is intentionally empty after the data reset; grouped rendering verified structurally).
+
 ## 2026-08-21 (thirty-seventh pass) — Map starts on the populated north + full data reset
 
 - **Test data fully cleaned (owner decision):** everything remaining was from the testing window — 4 sites (one literally noted "Test"), 5 fire reports (three submitted within one minute), their receipts and storage photos. Deleted via SQL + per-object Storage API deletes; verified zero across `sites`, `care_logs`, `fire_reports`, `receipts` and the `photos` bucket. The map now starts truly empty for real users.
