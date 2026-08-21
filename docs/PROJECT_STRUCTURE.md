@@ -18,7 +18,9 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `AGENTS.md` | Standing rules for AI agents / contributors working in this repo. |
 | `CONTRIBUTING.md` | Setup, checks, branch/PR conventions, binding rules for contributors. |
 | `CODE_OF_CONDUCT.md` | Contributor Covenant v2.1. |
-| `README.md` | Project intro, status, local setup. |
+| `SECURITY.md` | Vulnerability reporting (private GitHub advisories) + the project's security posture. |
+| `.github/` | `workflows/ci.yml` (tsc + unit + build on PRs and main), `ISSUE_TEMPLATE/` (bug + feature forms), `PULL_REQUEST_TEMPLATE.md`. |
+| `README.md` | Project intro, live app link, status, local setup. |
 | `LICENSE` | AGPL-3.0 (owner decision 2026-08-18), copyright Sifeddine Mebarki. |
 | `supabase/config.toml` | Platform-managed Supabase project config. Do not hand-edit. |
 | `supabase/migrations/*.sql` + `README.md` | Chronological **change record** (9 files, 2026-08-12 → 2026-08-18). NOT a bootstrap path — the canonical schema source is `docs/FULL_SCHEMA_EXPORT.sql`. |

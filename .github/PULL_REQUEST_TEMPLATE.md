@@ -1,19 +1,22 @@
-## What & why
+## What
 
-<!-- One paragraph. Link the issue if there is one. -->
 
-## Verification
+## Why
 
-<!-- What you actually ran: tsc / unit / build / E2E / manual device check.
-     "Not verified" is an acceptable line item; a false "done" is not. -->
+
+## How tested
 
 - [ ] `bunx tsc --noEmit`
 - [ ] `bun run test`
 - [ ] `bun run build`
-- [ ] E2E run (or noted why not)
+- [ ] Docs updated in the same change (FEATURES / DATABASE / PROJECT_STRUCTURE / CHANGELOG as applicable)
 
-## Docs
+"Not verified" is an acceptable line; a false "done" is not.
 
-- [ ] `/docs` updated in this change if anything it covers moved
-- [ ] No file over 250 lines (generated files exempt)
-- [ ] No schema change without an explicit request
+## Migrations
+
+None / yes — dated file in `supabase/migrations/` + matching numbered section in `docs/FULL_SCHEMA_EXPORT.sql`, in the same commit.
+
+## Breaking changes
+
+None

@@ -33,9 +33,12 @@ rules). Read both before your first change.
   (seed, run, read the contract, clean up) is in
   `docs/SYSTEM_INSTRUCTIONS.md` §RLS audit battery.
 
+CI runs the first three on every PR and push to `main`
+(`.github/workflows/ci.yml`). E2E stays local — it needs the live database.
+
 ## Branch and PR conventions
 
-- Work on a short-lived branch off `master`, one logical change per PR.
+- Work on a short-lived branch off `main`, one logical change per PR.
 - Commit message: `type(scope): summary` — e.g. `feat(map): …`,
   `fix(auth): …`, `docs: …`. Types: feat, fix, docs, chore, test, refactor.
 - Fill the PR template's verification checklist honestly — "not verified"

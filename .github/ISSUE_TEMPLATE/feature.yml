@@ -1,0 +1,21 @@
+name: Feature idea
+description: Propose an improvement
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: Describe the problem, not the solution. Unrequested features get built by nobody, including us.
+    validations:
+      required: true
+  - type: textarea
+    id: direction
+    attributes:
+      label: A possible direction
+      description: Optional — how you might solve it.
+  - type: textarea
+    id: decisions
+    attributes:
+      label: Decisions to make
+      description: Optional — open questions the maintainers would need to answer.

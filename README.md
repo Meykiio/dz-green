@@ -1,10 +1,11 @@
 # Green Algeria
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
+[![CI](https://github.com/Meykiio/dz-green/actions/workflows/ci.yml/badge.svg)](https://github.com/Meykiio/dz-green/actions/workflows/ci.yml)
 
 A community-run live map of Algeria's tree planting, tree care, and wildfire reports — every tree on one map, so the next person plants one too.
 
-**[github.com/Meykiio/dz-green](https://github.com/Meykiio/dz-green)**
+**[green-dz.vercel.app](https://green-dz.vercel.app)** — use the app · **[github.com/Meykiio/dz-green](https://github.com/Meykiio/dz-green)** — the code
 
 ![Green Algeria home](public/og.png)
 
