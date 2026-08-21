@@ -492,3 +492,23 @@ revoke all on table public.feedback from anon, authenticated;
 grant select, insert, update, delete on table public.feedback to service_role;
 
 comment on table public.feedback is 'Visitor feedback from the home page Feedback dialog; service-role write and read only.';
+
+-- ---------------------------------------------------------------------
+-- 18. Planting contact phone (2026-08-21)
+-- ---------------------------------------------------------------------
+-- Optional phone so a moderator can call to verify a planting. PII: never
+-- granted to client roles — moderators read it through a service-role
+-- server function only. Same content as migration 20260821180000.
+
+alter table public.sites add column contact_phone text;
+
+-- sites used table-level SELECT for clients until now; switch to explicit
+-- column-level grants so contact_phone stays server-only — the same posture
+-- fire_reports uses for reporter PII. Do NOT replace this with a
+-- table-level GRANT SELECT.
+revoke select on public.sites from anon, authenticated;
+grant select (
+  id, lat, lng, location, wilaya_code, commune, photo_url, species,
+  tree_count, planted_date, notes, planter_display_name, user_id, status,
+  created_at, reviewed_by, reviewed_at, moderator_notes, location_approximate
+) on public.sites to anon, authenticated;

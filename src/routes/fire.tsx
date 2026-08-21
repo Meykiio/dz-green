@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -188,9 +188,17 @@ function FirePage() {
                 type="tel"
                 value={phone}
                 maxLength={40}
+                placeholder="05 XX XX XX XX"
                 onChange={(e) => setPhone(e.target.value)}
                 className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"
               />
+              <span className="mt-1 block text-xs text-muted-foreground">
+                Optional, but it helps a lot — a moderator may call to verify the report. Never
+                public, never shared.{" "}
+                <Link to="/privacy" className="underline">
+                  Why we ask
+                </Link>
+              </span>
             </label>
           </div>
 

@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -45,6 +45,7 @@ function PlantPage() {
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState("");
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [done, setDone] = useState(false);
 
   const submit = useServerFn(submitPlanting);
@@ -66,6 +67,7 @@ function PlantPage() {
             planted_date: date,
             notes: notes || null,
             planter_display_name: name || null,
+            contact_phone: phone || null,
           },
         }),
       ),
@@ -87,7 +89,7 @@ function PlantPage() {
             )}
             <p className="text-xs text-muted-foreground">
               Public on the map: your photo, wilaya, commune, species, tree count, date and display
-              name. Never public: your IP or device (stored only as hashes).
+              name. Never public: your phone number, IP or device (stored only as hashes).
             </p>
             <div className="flex gap-2">
               <Button onClick={() => router.navigate({ to: "/" })}>Back to the map</Button>
@@ -199,6 +201,25 @@ function PlantPage() {
               onChange={(e) => setName(e.target.value)}
               className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"
             />
+          </label>
+
+          <label className="block">
+            <span className="eyebrow">Phone number (optional)</span>
+            <input
+              type="tel"
+              value={phone}
+              maxLength={40}
+              placeholder="05 XX XX XX XX"
+              onChange={(e) => setPhone(e.target.value)}
+              className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"
+            />
+            <span className="mt-1 block text-xs text-muted-foreground">
+              Optional, but it helps a lot — a moderator may call to verify the planting before
+              approving it. Never public, never shared.{" "}
+              <Link to="/privacy" className="underline">
+                Why we ask
+              </Link>
+            </span>
           </label>
 
           <Button type="submit" size="lg" className="w-full" disabled={mutation.isPending}>

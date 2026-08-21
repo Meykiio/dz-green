@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 import type { CareLog, FireReport, Site } from "./types";
 
-const SITE_COLUMNS =
+export const SITE_COLUMNS =
   "id,lat,lng,wilaya_code,location_approximate,commune,photo_url,species,tree_count,planted_date,notes,planter_display_name,status,created_at";
 const CARE_COLUMNS = "id,site_id,action,submitter_name,photo_url,notes,logged_date,created_at";
 const FIRE_COLUMNS =
