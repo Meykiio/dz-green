@@ -120,6 +120,7 @@ export type Database = {
           created_at: string
           device: string | null
           id: string
+          kind: string
           message: string
           page: string | null
         }
@@ -127,6 +128,7 @@ export type Database = {
           created_at?: string
           device?: string | null
           id?: string
+          kind?: string
           message: string
           page?: string | null
         }
@@ -134,6 +136,7 @@ export type Database = {
           created_at?: string
           device?: string | null
           id?: string
+          kind?: string
           message?: string
           page?: string | null
         }

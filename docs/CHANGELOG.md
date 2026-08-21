@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-21 (thirty-fifth pass) — Structured feedback kinds (PR D)
+
+- **Schema (applied live):** `feedback.kind text not null default 'other' check (kind in ('bug','idea','other'))` — existing rows become 'other'. Mirrored as `supabase/migrations/20260821190000_*.sql`; `FULL_SCHEMA_EXPORT.sql` §17 and `DATABASE.md` updated.
+- **Dialog:** a Bug / Feature idea / Other segmented selector (radiogroup, plant-toned when active) above the message; resets to 'other' after send. Zod: `kind` enum defaulting to 'other'; 3 new schema tests (default, bug/idea accepted, unknown rejected) — 105 total.
+- **Admin panel:** each message now carries a kind badge (bug=fire, idea=care, other=muted) so feature propositions are separable from bug reports at a glance.
+- Verified: tsc clean, 105/105 unit, build green.
+
 ## 2026-08-21 (thirty-fourth pass) — Moderation decision data (PR B)
 
 - **Exact times where decisions happen:** new `formatDateTime` (date + time). PendingQueue now shows the submission's `created_at` (it previously showed only the planted date — the "not enough data about time" owner complaint) plus the wilaya-level badge; FireTriage shows exact reported/resolved times.

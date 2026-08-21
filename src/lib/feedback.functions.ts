@@ -10,6 +10,7 @@ import { z } from "zod";
  */
 export const feedbackSchema = z.object({
   hp: z.string().max(100).optional().nullable(),
+  kind: z.enum(["bug", "idea", "other"]).default("other"),
   message: z.string().trim().min(1).max(2000),
   page: z.string().trim().max(200).optional().nullable(),
   device: z.string().trim().max(300).optional().nullable(),

@@ -205,6 +205,7 @@ Visitor feedback box (home page "Feedback" button). Writes come from the `submit
 | Column | Type | Null | Default | Purpose |
 |---|---|---|---|---|
 | `id` | uuid PK | no | `gen_random_uuid()` | |
+| `kind` | text | no | `'other'` | CHECK `kind IN ('bug','idea','other')` — structured feedback (2026-08-21): the dialog offers Bug / Feature idea / Other; the admin panel badges each message. |
 | `message` | text | no | — | CHECK `char_length(message) BETWEEN 1 AND 2000` (mirrors the client-side zod rule). |
 | `page` | text | yes | — | Path the feedback was sent from (e.g. `/about`); informational. |
 | `device` | text | yes | — | User-agent snapshot (≤300 chars, client-capped) so bug reports are diagnosable — added 2026-08-20. |
