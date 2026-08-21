@@ -16,6 +16,7 @@ interface PlantingInput extends GateInput {
   planted_date: string;
   notes?: string | null | undefined;
   planter_display_name?: string | null | undefined;
+  contact_phone?: string | null | undefined;
 }
 
 interface CareInput extends GateInput {
@@ -122,6 +123,7 @@ export async function submitPlantingImpl(data: PlantingInput) {
         planted_date: data.planted_date,
         notes: data.notes ?? null,
         planter_display_name: data.planter_display_name ?? null,
+        contact_phone: data.contact_phone ?? null,
         user_id: userId,
       })
       .select("id")

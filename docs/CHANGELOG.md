@@ -2,6 +2,15 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-21 (thirty-third pass) — Optional contact phone + privacy/terms pages (PR C)
+
+- **Schema (applied live, verified):** `sites.contact_phone text` (nullable). Grants swapped from table-level to **column-level SELECT** on `sites` for `anon`/`authenticated` (19 columns, excluding `contact_phone`) — the same posture `fire_reports` uses for reporter PII; `select *` now fails on purpose here too. Migration mirrored as `supabase/migrations/20260821180000_*.sql` and `FULL_SCHEMA_EXPORT.sql` §18; `DATABASE.md` updated.
+- **Owner decision: optional, not required.** The plant form gains a phone field and the fire form's existing phone field gets the same treatment: a verification nudge under the field ("a moderator may call to verify before approving — never public, never shared") with a "Why we ask" link to `/privacy`. Success screens now list the phone under "never public".
+- **Client fix forced by the grant swap:** `PendingQueue` used `select("*")` on sites — now the shared explicit `SITE_COLUMNS` list (exported from `data.ts`). Every other client select was already explicit and within the granted columns (verified by grep: data.ts, moderation.ts, activity.tsx).
+- **Legal pages:** `/privacy` (what's collected, why, public vs never, Law 18-07 rights, hosting, who runs it) and `/terms` (honest submissions, volunteer moderation, not-an-emergency-service, no warranty), plain language, linked from the drawer nav and the phone fields.
+- Types: `contact_phone` added to the sites block (surgical edit, matching the live schema). Zod: `contact_phone` max 40 on the planting schema; `PlantingInput` extended.
+- Verified: tsc clean, 102/102 unit, build green. Grant verification via `information_schema.role_column_grants` (19 columns, no `contact_phone`).
+
 ## 2026-08-21 (thirty-second pass) — Algeria-only map labels
 
 - **Owner request:** drop the names of other countries and their regions — only Algeria-related place names should render. Implementation: `algeriaMultiPolygon()` (one MultiPolygon from the wilaya shapes, 3,142 points) + `applyAlgeriaLabelFilter(map)` which scans the active style's symbol layers with a `text-field` and composes `["all", existingFilter, ["within", algeria]]` on each — style-agnostic, so liberty and dark both work; runs on init and on every theme switch. Cities, villages, POIs, road names/shields and water labels outside Algeria no longer render; Algerian labels keep working.

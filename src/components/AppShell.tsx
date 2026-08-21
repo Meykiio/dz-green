@@ -1,6 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Droplets,
+  FileText,
   Flame,
   Github,
   Info,
@@ -10,6 +11,7 @@ import {
   Map as MapIcon,
   Menu,
   Moon,
+  ScrollText,
   ShieldCheck,
   Sprout,
   Sun,
@@ -65,6 +67,8 @@ function Shell({
     { to: "/care", label: "Log care", icon: Droplets, show: true, tone: "text-care" },
     { to: "/fire", label: "Report a fire", icon: Flame, show: true, tone: "text-fire" },
     { to: "/about", label: "About", icon: Info, show: true },
+    { to: "/privacy", label: "Privacy", icon: ScrollText, show: true },
+    { to: "/terms", label: "Terms", icon: FileText, show: true },
     { to: "/activity", label: "My activity", icon: ListChecks, show: !!user },
     { to: "/moderate", label: "Moderate", icon: ShieldCheck, show: isModerator },
     { to: "/admin", label: "Admin", icon: LayoutDashboard, show: isAdmin },

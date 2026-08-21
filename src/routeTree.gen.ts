@@ -16,6 +16,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CareRouteImport } from './routes/care'
 import { Route as FireRouteImport } from './routes/fire'
 import { Route as PlantRouteImport } from './routes/plant'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedModerateRouteImport } from './routes/_authenticated/moderate'
@@ -56,6 +58,16 @@ const PlantRoute = PlantRouteImport.update({
   path: '/plant',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
   id: '/activity',
   path: '/activity',
@@ -89,6 +101,8 @@ export interface FileRoutesByFullPath {
   '/care': typeof CareRoute
   '/fire': typeof FireRoute
   '/plant': typeof PlantRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/moderate': typeof AuthenticatedModerateRoute
@@ -102,6 +116,8 @@ export interface FileRoutesByTo {
   '/care': typeof CareRoute
   '/fire': typeof FireRoute
   '/plant': typeof PlantRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/moderate': typeof AuthenticatedModerateRoute
@@ -117,6 +133,8 @@ export interface FileRoutesById {
   '/care': typeof CareRoute
   '/fire': typeof FireRoute
   '/plant': typeof PlantRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/moderate': typeof AuthenticatedModerateRoute
@@ -132,6 +150,8 @@ export interface FileRouteTypes {
     | '/care'
     | '/fire'
     | '/plant'
+    | '/privacy'
+    | '/terms'
     | '/activity'
     | '/admin'
     | '/moderate'
@@ -145,6 +165,8 @@ export interface FileRouteTypes {
     | '/care'
     | '/fire'
     | '/plant'
+    | '/privacy'
+    | '/terms'
     | '/activity'
     | '/admin'
     | '/moderate'
@@ -159,6 +181,8 @@ export interface FileRouteTypes {
     | '/care'
     | '/fire'
     | '/plant'
+    | '/privacy'
+    | '/terms'
     | '/_authenticated/activity'
     | '/_authenticated/admin'
     | '/_authenticated/moderate'
@@ -174,6 +198,8 @@ export interface RootRouteChildren {
   CareRoute: typeof CareRoute
   FireRoute: typeof FireRoute
   PlantRoute: typeof PlantRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
   MyTokenRoute: typeof MyTokenRoute
   ApiPublicPhotoSplatRoute: typeof ApiPublicPhotoSplatRoute
 }
@@ -227,6 +253,20 @@ declare module '@tanstack/react-router' {
       path: '/plant'
       fullPath: '/plant'
       preLoaderRoute: typeof PlantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/activity': {
@@ -290,6 +330,8 @@ const rootRouteChildren: RootRouteChildren = {
   CareRoute: CareRoute,
   FireRoute: FireRoute,
   PlantRoute: PlantRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
   MyTokenRoute: MyTokenRoute,
   ApiPublicPhotoSplatRoute: ApiPublicPhotoSplatRoute,
 }

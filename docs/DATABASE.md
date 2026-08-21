@@ -76,8 +76,11 @@ Tree planting submissions; the anchor record for care logs.
 | `reviewed_by` | uuid | yes | — | FK → `auth.users(id) ON DELETE SET NULL`. Written by the moderator queue on approve/reject (2026-08-16). |
 | `reviewed_at` | timestamptz | yes | — | Same: unused by current code. |
 | `moderator_notes` | text | yes | — | Optional note typed by the moderator when approving/rejecting; `null` when left blank. |
+| `contact_phone` | text | yes | — | **PII (2026-08-21).** Optional phone so a moderator can call to verify. **Column-grant protected like fire reporter PII:** `SELECT` on `sites` for `anon`/`authenticated` is now an explicit column list that excludes it — client queries must list columns and `select *` fails on purpose. Moderators read it through a service-role server function only. |
 
 Indexes: `sites_pkey` (btree id), `sites_location_gix` (GiST location), `sites_status_idx`, `sites_wilaya_idx`, `sites_created_at_idx` (created_at DESC), `sites_status_created_idx` (status, created_at DESC — 2026-08-18, queue read path).
+
+Grants (updated 2026-08-21): `SELECT` on `sites` for `anon`/`authenticated` is **column-level** (19 columns, excluding `contact_phone`) — previously table-level. `UPDATE` stays table-level for `authenticated` (narrowed by the moderator policy). All writes otherwise go through the service role.
 
 RLS **enabled**. Policies:
 

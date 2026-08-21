@@ -208,6 +208,7 @@ export type Database = {
       sites: {
         Row: {
           commune: string | null
+          contact_phone: string | null
           created_at: string
           id: string
           lat: number
@@ -229,6 +230,7 @@ export type Database = {
         }
         Insert: {
           commune?: string | null
+          contact_phone?: string | null
           created_at?: string
           id?: string
           lat: number
@@ -250,6 +252,7 @@ export type Database = {
         }
         Update: {
           commune?: string | null
+          contact_phone?: string | null
           created_at?: string
           id?: string
           lat?: number

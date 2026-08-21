@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { formatDate, photoUrl } from "@/lib/data";
+import { formatDate, photoUrl, SITE_COLUMNS } from "@/lib/data";
 import type { Site } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
 
@@ -20,7 +20,9 @@ export function PendingQueue() {
     queryFn: async (): Promise<Site[]> => {
       const { data, error } = await supabase
         .from("sites")
-        .select("*")
+        // Explicit list: contact_phone is column-grant protected — select("*")
+        // fails on purpose, same posture as fire reporter PII.
+        .select(SITE_COLUMNS)
         .eq("status", "pending")
         .order("created_at", { ascending: true })
         .limit(200);

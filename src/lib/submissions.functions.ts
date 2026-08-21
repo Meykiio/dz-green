@@ -39,6 +39,8 @@ export const plantingSchema = z.object({
   planted_date: pastDate,
   notes: z.string().trim().max(1000).optional().nullable(),
   planter_display_name: z.string().trim().max(80).optional().nullable(),
+  // PII: stored server-only (column grants), never returned to clients.
+  contact_phone: z.string().trim().max(40).optional().nullable(),
 }).refine(...pairRefinement);
 
 export const careSchema = z.object({

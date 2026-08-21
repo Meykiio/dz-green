@@ -46,6 +46,8 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `__root.tsx` | — | HTML document shell, head defaults, QueryClientProvider, `<Toaster />`, 404 component, root error boundary, no-flash theme script. |
 | `index.tsx` | `/` | Map-first home: `HeroMap` fills the viewport under the top bar, action card (hero copy, stats, layer chips, hide button — hidden by default on phones, pulsing reveal button), Map/List toggle, detail panel, realtime subscriptions. |
 | `about.tsx` | `/about` | What the project is, how moderation works, the "not an emergency service" disclaimer. |
+| `privacy.tsx` | `/privacy` | Plain-language data policy: public vs never-public, Law 18-07 rights, hosting. |
+| `terms.tsx` | `/terms` | Plain-language terms: honest submissions, moderation, not an emergency service, no warranty. |
 | `plant.tsx` | `/plant` | Planting submission form → `submitPlanting` server fn. Result is `pending`. |
 | `care.tsx` | `/care` | Care log form (site picker, action, date, optional photo/notes/name) → `submitCare`. Publishes immediately. Accepts `?site=<uuid>`. |
 | `fire.tsx` | `/fire` | Fire report form → `submitFire`. Publishes immediately; Protection Civile disclaimer on form + success screen. |
