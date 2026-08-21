@@ -19,6 +19,7 @@ export interface ThemeColors {
   fires: string;
   wilayaLine: string;
   wilayaFill: string;
+  mask: string;
 }
 
 export function colorsFor(theme: "light" | "dark"): ThemeColors {
@@ -29,6 +30,7 @@ export function colorsFor(theme: "light" | "dark"): ThemeColors {
         fires: "#ff6b6b",
         wilayaLine: "#7ee2a8",
         wilayaFill: "#4ade80",
+        mask: "#0e0f0c",
       }
     : {
         trees: "#2ead4b",
@@ -36,6 +38,7 @@ export function colorsFor(theme: "light" | "dark"): ThemeColors {
         fires: "#d03238",
         wilayaLine: "#2ead4b",
         wilayaFill: "#2ead4b",
+        mask: "#e8ebe6",
       };
 }
 

@@ -14,6 +14,42 @@ export interface WilayaBoundaryProperties {
 }
 
 let cache: FeatureCollection | null = null;
+let maskCache: FeatureCollection | null = null;
+
+/**
+ * World polygon with every wilaya's outer ring cut out as a hole — the dim
+ * mask that fades neighbouring countries so Algeria reads first. The holes
+ * reuse the same simplified shapes as the boundary layers, so the dim edge
+ * matches the green wilaya borders exactly.
+ */
+export function wilayaMaskGeoJSON(): FeatureCollection {
+  if (maskCache) return maskCache;
+  const world: [number, number][] = [
+    [-180, -85],
+    [180, -85],
+    [180, 85],
+    [-180, 85],
+    [-180, -85],
+  ];
+  const holes = WILAYA_SHAPES.map((shape) => {
+    const outer = parseRings(shape.d)[0]!;
+    return outer.map((p) => {
+      const { lat, lng } = unprojectToLatLng(p.x, p.y);
+      return [lng, lat] as [number, number];
+    });
+  });
+  maskCache = {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        properties: {},
+        geometry: { type: "Polygon", coordinates: [world, ...holes] },
+      },
+    ],
+  };
+  return maskCache;
+}
 
 export function wilayaBoundariesGeoJSON(): FeatureCollection {
   if (cache) return cache;
