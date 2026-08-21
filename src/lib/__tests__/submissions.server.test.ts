@@ -21,14 +21,17 @@ const mocks = vi.hoisted(() => {
     return { error: null };
   });
   const from = vi.fn(() => ({ select, insert }));
-  return { state, headers, gte, eq, select, insert, from };
+  const upload = vi.fn(async () => ({ error: null }));
+  return { state, headers, gte, eq, select, insert, from, upload };
 });
 
 vi.mock("@/integrations/supabase/client.server", () => ({
   supabaseAdmin: {
     from: mocks.from,
     auth: { getUser: vi.fn() },
-    storage: { from: vi.fn() },
+    storage: {
+      from: vi.fn(() => ({ upload: mocks.upload })),
+    },
   },
 }));
 
@@ -36,7 +39,7 @@ vi.mock("@tanstack/react-start/server", () => ({
   getRequest: () => ({ headers: mocks.headers }),
 }));
 
-import { GateError, verifyGate } from "@/lib/submissions.server";
+import { GateError, storePhoto, verifyGate } from "@/lib/submissions.server";
 
 async function sha256Hex(text: string): Promise<string> {
   const bytes = new TextEncoder().encode(text);
@@ -183,5 +186,37 @@ describe("verifyGate", () => {
     mocks.state.error = { message: "connection refused" };
     await expect(verifyGate("planting", { elapsedMs: 5000 })).resolves.toBe("ok");
     expect(mocks.state.inserted).toHaveLength(1);
+  });
+});
+
+describe("storePhoto", () => {
+  const upload = mocks.upload;
+
+  beforeEach(() => {
+    upload.mockClear();
+  });
+
+  it("rejects an unsupported format", async () => {
+    await expect(storePhoto("data:image/gif;base64,AAAA", "plantings")).rejects.toBeInstanceOf(
+      GateError,
+    );
+    expect(upload).not.toHaveBeenCalled();
+  });
+
+  it("rejects an oversized payload before decoding (no upload attempt)", async () => {
+    // 900_000 bytes of base64 = exactly 1_200_000 chars; one more char pushes
+    // the pre-decode estimate over the limit.
+    const b64 = "A".repeat(1_200_002);
+    await expect(storePhoto(`data:image/jpeg;base64,${b64}`, "plantings")).rejects.toBeInstanceOf(
+      GateError,
+    );
+    expect(upload).not.toHaveBeenCalled();
+  });
+
+  it("accepts a payload exactly at the limit and uploads it", async () => {
+    const b64 = "A".repeat(1_200_000);
+    const path = await storePhoto(`data:image/jpeg;base64,${b64}`, "plantings");
+    expect(path).toMatch(/^plantings\/.+\.jpg$/);
+    expect(upload).toHaveBeenCalledTimes(1);
   });
 });
