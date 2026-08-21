@@ -2,6 +2,14 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-21 (twenty-ninth pass) — Mobile UX owner pass
+
+- **Action card hidden by default on phones** (≤767px, `useLayoutEffect` + `matchMedia`, runs pre-paint so no flash) — the map gets the space; the reveal button pulses with a soft plant ring until used (`motion-reduce` respected). Desktop unchanged.
+- **Top bar brand hidden on phones** (logo + "Green Algeria") — the hamburger already carries Home; the drawer keeps the brand.
+- **Real logo in the chrome:** `public/logo.png` (128px, converted from `favicon.ico`) replaces the TreePine icon in the top bar and drawer.
+- **Feedback pill is plant-green** (`border-plant/30 bg-plant/10 text-plant`) instead of muted gray.
+- Verified: tsc clean, 99/99 unit, build green. Owner device check pending.
+
 ## 2026-08-20 (twenty-eighth pass) — Photo size checked before decode (issue #13)
 
 - `storePhoto` decoded the whole base64 payload before the 900 KB check, so a direct API caller's oversized payload was fully allocated before rejection (the client compresses to ~400 KB, so only direct calls hit this). Now rejects on the base64 string length first (`floor(len * 0.75) > MAX_PHOTO_BYTES`); the exact post-decode check stays as a second guard. 3 new `storePhoto` tests: oversized never reaches the storage upload, exactly-at-limit uploads, bad format rejected. PR #16. tsc clean, 102/102 unit.
