@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-21 (thirty-second pass) — Algeria-only map labels
+
+- **Owner request:** drop the names of other countries and their regions — only Algeria-related place names should render. Implementation: `algeriaMultiPolygon()` (one MultiPolygon from the wilaya shapes, 3,142 points) + `applyAlgeriaLabelFilter(map)` which scans the active style's symbol layers with a `text-field` and composes `["all", existingFilter, ["within", algeria]]` on each — style-agnostic, so liberty and dark both work; runs on init and on every theme switch. Cities, villages, POIs, road names/shields and water labels outside Algeria no longer render; Algerian labels keep working.
+- **Verified in a real headless Chromium** (temp Playwright spec, deleted after): all 23 basemap text layers carry the `within` filter, correctly composed onto the existing filters; `ga-mask` present; no page errors. tsc clean, 102/102 unit, build green.
+- **Incident (owned):** while clearing zombie headless-browser processes for the verification, the cleanup matched the owner's real Chrome windows too and killed them. Tabs restore on reopen. The filter was too broad; noted for future verification runs.
+
 ## 2026-08-21 (thirty-first pass) — Open-source infrastructure
 
 - **CI:** `.github/workflows/ci.yml` — on every PR and push to `main`: `bun install --frozen-lockfile`, `tsc --noEmit`, unit tests, build (placeholder `VITE_*` env so the bundle inlines harmless values). E2E stays out of CI — it needs the live database, as documented.

@@ -1,8 +1,13 @@
-import type { Map as MapLibreMap, MapLayerMouseEvent } from "maplibre-gl";
+import type {
+  FilterSpecification,
+  Map as MapLibreMap,
+  MapLayerMouseEvent,
+  SymbolLayerSpecification,
+} from "maplibre-gl";
 import type { FeatureCollection } from "geojson";
 import type { MutableRefObject } from "react";
 
-import { wilayaBoundariesGeoJSON, wilayaBounds, wilayaMaskGeoJSON } from "@/lib/wilaya-geo";
+import { algeriaMultiPolygon, wilayaBoundariesGeoJSON, wilayaBounds, wilayaMaskGeoJSON } from "@/lib/wilaya-geo";
 import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
 import { colorsFor } from "./map-style";
 import { featureFor, onlyKind, withoutKind } from "./map-data";
@@ -17,6 +22,27 @@ interface LayerRefs {
   sites: Site[];
   careLogs: CareLog[];
   fires: FireReport[];
+}
+
+/**
+ * Keep only Algeria-related place names: every basemap text label (cities,
+ * villages, POIs, road names, water) gets a `within` filter against the
+ * Algeria polygon. Style-agnostic — it scans whatever symbol layers the
+ * active style has, so liberty and dark both work. Runs on every style
+ * load, after the basemap layers exist.
+ */
+export function applyAlgeriaLabelFilter(map: MapLibreMap) {
+  const algeria = algeriaMultiPolygon();
+  for (const layer of map.getStyle().layers) {
+    if (layer.type !== "symbol") continue;
+    const textField = (layer as SymbolLayerSpecification).layout?.["text-field"];
+    if (!textField) continue;
+    const existing = (layer as { filter?: unknown[] }).filter;
+    const filter = (
+      existing ? ["all", existing, ["within", algeria]] : ["within", algeria]
+    ) as unknown as FilterSpecification;
+    map.setFilter(layer.id, filter);
+  }
 }
 
 export function addDataLayers(map: MapLibreMap, refs: LayerRefs) {

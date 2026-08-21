@@ -1,4 +1,4 @@
-import type { Feature, FeatureCollection, Polygon } from "geojson";
+import type { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 
 import { WILAYA_SHAPES } from "@/data/algeria-wilayas";
 import { parseRings, unprojectToLatLng } from "@/lib/geo";
@@ -15,6 +15,20 @@ export interface WilayaBoundaryProperties {
 
 let cache: FeatureCollection | null = null;
 let maskCache: FeatureCollection | null = null;
+let algeriaCache: MultiPolygon | null = null;
+
+/**
+ * Algeria as one MultiPolygon (every wilaya's rings). Used by the basemap
+ * label filter so only Algeria-related place names render.
+ */
+export function algeriaMultiPolygon(): MultiPolygon {
+  if (algeriaCache) return algeriaCache;
+  const polygons = wilayaBoundariesGeoJSON().features.map(
+    (f) => (f.geometry as Polygon).coordinates,
+  );
+  algeriaCache = { type: "MultiPolygon", coordinates: polygons };
+  return algeriaCache;
+}
 
 /**
  * World polygon with every wilaya's outer ring cut out as a hole — the dim
