@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-21 (thirty-sixth pass) — Leaderboard view + activity ticker (PR H)
+
+- **Leaderboard (owner-requested, reordered up):** the home toggle is now Map / List / **Board** (`ViewToggle.tsx`, trophy icon). The Board view (`Leaderboard.tsx`) is this month's wilaya race: approved plantings only, summed per wilaya from the already-loaded sites (no schema, no new query), resets on the 1st. Leading-wilaya highlight card + ranked list with proportional bars + empty state with a plant CTA.
+- **Activity ticker:** an anonymous pill on the map ("2 trees just planted in Oran", "Fire just reported in…", "Trees just watered in…") fed by the realtime inserts on the existing subscription; auto-dismisses after 6s, re-mounts per event.
+- **Extraction to stay under the 250-line cap:** the realtime channel moved out of the home route into `useMapRealtime.ts` (it also emits the ticker messages), and the toggle into `ViewToggle.tsx`. `index.tsx` is 234 lines.
+- **Verified in a real headless Chromium** (temp Playwright spec, deleted after): Board button switches to the leaderboard with this month's real data (leading wilaya + ranked second), toggle round-trips back to the map. Found and worked around the known SSR hydration timing (clicks before hydration attach no handlers — the suite's documented gotcha). tsc clean, 105/105 unit, build green.
+
 ## 2026-08-21 (thirty-fifth pass) — Structured feedback kinds (PR D)
 
 - **Schema (applied live):** `feedback.kind text not null default 'other' check (kind in ('bug','idea','other'))` — existing rows become 'other'. Mirrored as `supabase/migrations/20260821190000_*.sql`; `FULL_SCHEMA_EXPORT.sql` §17 and `DATABASE.md` updated.

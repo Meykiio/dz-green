@@ -1,25 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  Droplets,
-  Flame,
-  List,
-  Map as MapIcon,
-  Sprout,
-  X,
-} from "lucide-react";
-import { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { ArrowRight, Droplets, Flame, Sprout, X } from "lucide-react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { ActivityTicker } from "@/components/home/ActivityTicker";
 import { Chip } from "@/components/home/HomeBits";
+import { Leaderboard } from "@/components/home/Leaderboard";
+import { useMapRealtime } from "@/components/home/useMapRealtime";
+import { ViewToggle, type HomeView } from "@/components/home/ViewToggle";
 import { DetailPanel } from "@/components/map/DetailPanel";
 import { HeroMap, type Layer } from "@/components/map/HeroMap";
 import { SiteList } from "@/components/map/SiteList";
 import { careLogsQuery, fireReportsQuery, sitesQuery } from "@/lib/data";
-import { needsWater, type MapFeature } from "@/lib/types";
-import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
+import { needsWater, type MapFeature, type Site } from "@/lib/types";
 
 const TITLE = "Green Algeria — the live map of Algeria's tree planting";
 const DESCRIPTION =
@@ -43,7 +37,6 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const queryClient = useQueryClient();
   const sites = useQuery(sitesQuery);
   const careLogs = useQuery(careLogsQuery);
   const fires = useQuery(fireReportsQuery);
@@ -53,9 +46,10 @@ function HomePage() {
     care: true,
     fires: true,
   });
-  const [view, setView] = useState<"map" | "list">("map");
+  const [view, setView] = useState<HomeView>("map");
   const [feature, setFeature] = useState<MapFeature | null>(null);
   const [cardHidden, setCardHidden] = useState(false);
+  const [ticker, setTicker] = useState<{ id: number; text: string } | null>(null);
 
   // Phones get the map first: the action card starts hidden under md and the
   // reveal button pulses until it's used. Runs pre-paint, so no flash.
@@ -63,30 +57,21 @@ function HomePage() {
     if (window.matchMedia("(max-width: 767px)").matches) setCardHidden(true);
   }, []);
 
-  // Live map: filtered channels only (approved plantings, all fire reports).
-  useEffect(() => {
-    const channel = supabase
-      .channel("green-algeria-map")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "sites", filter: "status=eq.approved" },
-        () => void queryClient.invalidateQueries({ queryKey: ["sites"] }),
-      )
-      .on("postgres_changes", { event: "*", schema: "public", table: "fire_reports" }, () =>
-        queryClient.invalidateQueries({ queryKey: ["fire_reports"] }),
-      )
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "care_logs" }, () =>
-        queryClient.invalidateQueries({ queryKey: ["care_logs"] }),
-      )
-      .subscribe();
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
   const siteList = sites.data ?? [];
   const logList = careLogs.data ?? [];
   const fireList = fires.data ?? [];
+
+  // Live map subscription + anonymous activity ticker ("2 trees just planted
+  // in Oran") fed by the same realtime events.
+  const sitesRef = useRef<Site[]>([]);
+  sitesRef.current = siteList;
+  useMapRealtime(sitesRef, (text) => setTicker({ id: Date.now(), text }));
+
+  useEffect(() => {
+    if (!ticker) return;
+    const timeout = setTimeout(() => setTicker(null), 6000);
+    return () => clearTimeout(timeout);
+  }, [ticker]);
 
   const stats = useMemo(
     () => ({
@@ -111,6 +96,12 @@ function HomePage() {
                 layers={layers}
                 onSelectFeature={setFeature}
               />
+            </div>
+          </div>
+        ) : view === "board" ? (
+          <div className="h-full overflow-y-auto bg-background p-3 md:p-6">
+            <div className="mx-auto max-w-2xl">
+              <Leaderboard sites={siteList} />
             </div>
           </div>
         ) : sites.isLoading ? (
@@ -138,25 +129,10 @@ function HomePage() {
               <span className="size-2 rounded-full bg-fire" /> Fires
             </span>
           </div>
-          <div className="flex rounded-full border border-border bg-card/90 p-0.5 text-xs font-medium backdrop-blur">
-            <button
-              type="button"
-              onClick={() => setView("map")}
-              aria-pressed={view === "map"}
-              className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 transition-colors ${view === "map" ? "bg-accent text-foreground" : "text-muted-foreground"}`}
-            >
-              <MapIcon className="size-3.5" /> Map
-            </button>
-            <button
-              type="button"
-              onClick={() => setView("list")}
-              aria-pressed={view === "list"}
-              className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 transition-colors ${view === "list" ? "bg-accent text-foreground" : "text-muted-foreground"}`}
-            >
-              <List className="size-3.5" /> List
-            </button>
-          </div>
+          <ViewToggle view={view} onChange={setView} />
         </div>
+
+        {view === "map" && <ActivityTicker message={ticker} />}
 
         {/* The action card — compact, hideable for a clean map view. */}
         {cardHidden ? (
