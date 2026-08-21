@@ -134,7 +134,14 @@ export async function storePhoto(dataUrl: string, folder: string): Promise<strin
   const match = /^data:(image\/(jpeg|png|webp));base64,(.+)$/.exec(dataUrl);
   if (!match) throw new GateError("Unsupported image format.");
   const contentType = match[1]!;
-  const binary = Uint8Array.from(atob(match[3]!), (c) => c.charCodeAt(0));
+  // Reject before decoding: base64 length maps to byte length at ~3/4, so an
+  // oversized payload is refused without ever allocating the decoded buffer
+  // (issue #13 — the gate was the first place a large direct API call landed).
+  const b64 = match[3]!;
+  if (Math.floor(b64.length * 0.75) > MAX_PHOTO_BYTES) {
+    throw new GateError("Photo is too large.");
+  }
+  const binary = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
   if (binary.byteLength > MAX_PHOTO_BYTES) throw new GateError("Photo is too large.");
 
   const ext = contentType.split("/")[1]!.replace("jpeg", "jpg");
