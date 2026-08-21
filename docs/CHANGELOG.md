@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-21 (thirty-ninth pass) — og.png retaken from a populated home + showcase seed/cleanup
+
+- **Showcase seed (temporary, owner-requested):** 24 approved plantings across 20 wilayas (1,218 trees, all this month so the leaderboard race was full), 8 care logs, 4 fire reports — inserted with generated UUIDs, `photo_url = ''`, `location_approximate = true` at wilaya centres. Used to review the populated app (map, Board view, grouped list) and to retake the README/og screenshot. **Cleaned back to zero afterwards** (delete by saved ID list; verified zero across sites, care_logs, fire_reports, receipts, photos).
+- **`public/og.png` retaken:** 1200×630 Playwright capture of the production home with the showcase data live ("1,218 trees" visible in the stats line) and the new north framing. Verified non-blank (67 sampled color buckets), replaces the old cut-off screenshot the owner flagged.
+- PRs merged in this window: #25 (north initial view), #26 (list view rebuild).
+
 ## 2026-08-21 (thirty-eighth pass) — List view rebuilt (PR F)
 
 - **Wilaya-grouped list (owner: "not the perfect UI/UX — rethink and rebuild"):** the flat 30-row wall is gone. Reports (plantings + fires, same layer filters as the map) are now grouped by wilaya — section headers with per-wilaya totals ("Oran · 12 trees · 1 fire"), groups ordered by most recent activity, photo-thumb rows for plantings (private-bucket proxy URLs, lazy-loaded) with the needs-water badge, fire rows with severity + status. 181 lines, under the cap.
