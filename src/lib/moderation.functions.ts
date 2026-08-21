@@ -34,7 +34,7 @@ export interface ContactInfo {
 
 const idShape = z.object({ id: z.string().uuid() });
 
-export const getSiteContact = createServerFn({ method: "GET" })
+export const getSiteContact = createServerFn({ method: "POST" })
   .validator((data: unknown) => idShape.parse(data))
   .handler(async ({ data }): Promise<ContactInfo> => {
     await requireStaff();
@@ -47,7 +47,7 @@ export const getSiteContact = createServerFn({ method: "GET" })
     return { name: row.planter_display_name, phone: row.contact_phone };
   });
 
-export const getFireContact = createServerFn({ method: "GET" })
+export const getFireContact = createServerFn({ method: "POST" })
   .validator((data: unknown) => idShape.parse(data))
   .handler(async ({ data }): Promise<ContactInfo> => {
     await requireStaff();
