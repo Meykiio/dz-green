@@ -44,4 +44,19 @@ describe("feedbackSchema", () => {
   it("rejects an empty message", () => {
     expect(feedbackSchema.safeParse({ message: "" }).success).toBe(false);
   });
+
+  it("defaults kind to other when omitted", () => {
+    const parsed = feedbackSchema.safeParse({ message: "Nice map" });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.kind).toBe("other");
+  });
+
+  it("accepts bug and idea kinds", () => {
+    expect(feedbackSchema.safeParse({ message: "x", kind: "bug" }).success).toBe(true);
+    expect(feedbackSchema.safeParse({ message: "x", kind: "idea" }).success).toBe(true);
+  });
+
+  it("rejects an unknown kind", () => {
+    expect(feedbackSchema.safeParse({ message: "x", kind: "praise" }).success).toBe(false);
+  });
 });

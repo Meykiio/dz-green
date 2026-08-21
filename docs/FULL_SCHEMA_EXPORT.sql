@@ -479,6 +479,8 @@ $$;
 
 create table public.feedback (
   id uuid primary key default gen_random_uuid(),
+  -- bug / idea / other (added 2026-08-21, migration 20260821190000)
+  kind text not null default 'other' check (kind in ('bug', 'idea', 'other')),
   message text not null check (char_length(message) between 1 and 2000),
   page text,
   device text,

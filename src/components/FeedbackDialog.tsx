@@ -22,6 +22,7 @@ const MAX_LENGTH = 2000;
 export function FeedbackDialog() {
   const [open, setOpen] = useState(false);
   const [hp, setHp] = useState("");
+  const [kind, setKind] = useState<"bug" | "idea" | "other">("other");
   const [message, setMessage] = useState("");
 
   const submit = useServerFn(submitFeedback);
@@ -30,6 +31,7 @@ export function FeedbackDialog() {
       submit({
         data: {
           hp,
+          kind,
           message,
           page: typeof window !== "undefined" ? window.location.pathname : null,
           device:
@@ -40,6 +42,7 @@ export function FeedbackDialog() {
       toast.success("Received — thanks. Every message is read.");
       setMessage("");
       setHp("");
+      setKind("other");
       setOpen(false);
     },
     onError: (error: Error) => toast.error(error.message || "Could not send. Try again."),
@@ -73,6 +76,30 @@ export function FeedbackDialog() {
           }}
         >
           <Honeypot value={hp} onChange={setHp} />
+          <div className="flex gap-2" role="radiogroup" aria-label="Feedback type">
+            {(
+              [
+                { value: "bug", label: "Bug" },
+                { value: "idea", label: "Feature idea" },
+                { value: "other", label: "Other" },
+              ] as const
+            ).map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                role="radio"
+                aria-checked={kind === option.value}
+                onClick={() => setKind(option.value)}
+                className={`tap-target flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                  kind === option.value
+                    ? "border-plant/50 bg-plant/10 text-plant"
+                    : "border-border bg-card text-muted-foreground"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
           <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}

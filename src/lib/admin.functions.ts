@@ -140,6 +140,7 @@ export const adminSignOutUser = createServerFn({ method: "POST" })
 
 export interface AdminFeedback {
   id: string;
+  kind: "bug" | "idea" | "other";
   message: string;
   page: string | null;
   device: string | null;
@@ -151,11 +152,12 @@ export const adminListFeedback = createServerFn({ method: "GET" }).handler(
     await requireAdmin();
     const { data, error } = await supabaseAdmin
       .from("feedback")
-      .select("id, message, page, device, created_at")
+      .select("id, kind, message, page, device, created_at")
       .order("created_at", { ascending: false })
       .limit(100);
     if (error) throw error;
-    return data ?? [];
+    // kind is a check-constrained column; the generated types only know string.
+    return (data ?? []) as AdminFeedback[];
   },
 );
 
