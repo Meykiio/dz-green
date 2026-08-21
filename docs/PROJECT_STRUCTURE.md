@@ -72,6 +72,10 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `LocationField.tsx` | Wilaya-first location: wilaya/commune selects first (works without GPS), then an optional "Exact location" card — GPS button with privacy line, MapLibre picker behind a toggle, Google Maps link input, remove-pin action. |
 | `EmergencyContacts.tsx` | SOS pill + popover in the top bar: Protection Civile 14/1021, Police 17, Gendarmerie Nationale 1055, SAMU 16, `tel:` links. |
 | `home/HomeBits.tsx` | Home helpers: `Stat`, `Chip`, `HomeCtas`. |
+| `home/ViewToggle.tsx` | Map / List / Board switch (floats top-right over the home view). |
+| `home/Leaderboard.tsx` | Monthly wilaya race — approved plantings summed per wilaya, resets on the 1st, client-computed. |
+| `home/ActivityTicker.tsx` | Anonymous live-activity pill on the map, auto-dismissed. |
+| `home/useMapRealtime.ts` | The realtime subscription (query invalidation + ticker messages), extracted from the home route. |
 | `map/HeroMap.tsx` | The hero map: MapLibre GL + OpenFreeMap, mount/theme/data/toggle effects. No clustering — every tree/care/fire is its own dot at every zoom. |
 | `map/map-style.ts` | Map style constants, theme-aware colors, the RTL text plugin call (browser-guarded), and the RecenterControl. |
 | `map/map-data.ts` | GeoJSON builders (feature collection, kind filters, feature lookup). |
