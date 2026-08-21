@@ -10,7 +10,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useTheme } from "@/hooks/useTheme";
 import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
-import { ALGERIA_BOUNDS, DARK_STYLE, LIGHT_STYLE, RecenterControl } from "./map-style";
+import { DARK_STYLE, LIGHT_STYLE, NORTH_BOUNDS, RecenterControl } from "./map-style";
 import { featureCollection, onlyKind, withoutKind } from "./map-data";
 import {
   addDataLayers,
@@ -123,7 +123,7 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
     const map = new MapLibreMap({
       container: container.current,
       style: theme === "dark" ? DARK_STYLE : LIGHT_STYLE,
-      bounds: ALGERIA_BOUNDS,
+      bounds: NORTH_BOUNDS,
       fitBoundsOptions: { padding: 24 },
       minZoom: 4,
       maxZoom: 16,

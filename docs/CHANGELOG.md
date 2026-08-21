@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-21 (thirty-seventh pass) — Map starts on the populated north + full data reset
+
+- **Test data fully cleaned (owner decision):** everything remaining was from the testing window — 4 sites (one literally noted "Test"), 5 fire reports (three submitted within one minute), their receipts and storage photos. Deleted via SQL + per-object Storage API deletes; verified zero across `sites`, `care_logs`, `fire_reports`, `receipts` and the `photos` bucket. The map now starts truly empty for real users.
+- **Initial map view starts from the top (owner complaint):** the whole-country `fitBounds` framed the geographic centre, cutting the northern coast — where most people (and future plantings) are — off the top edge. New `NORTH_BOUNDS` ([-2.6, 33.2] → [10.2, 37.4]: Oran to Annaba, High Plateaus to the sea) drives both the constructor `bounds` and the Recenter control; the rest of the country remains a scroll away inside `maxBounds`. Verified headlessly: the loaded view spans ~32.5°N–38.1°N.
+- Verified: tsc clean, 105/105 unit, build green. Follow-up queued: retake `og.png`/README screenshot later with showcase data populated.
+
 ## 2026-08-21 (thirty-sixth pass) — Leaderboard view + activity ticker (PR H)
 
 - **Leaderboard (owner-requested, reordered up):** the home toggle is now Map / List / **Board** (`ViewToggle.tsx`, trophy icon). The Board view (`Leaderboard.tsx`) is this month's wilaya race: approved plantings only, summed per wilaya from the already-loaded sites (no schema, no new query), resets on the 1st. Leading-wilaya highlight card + ranked list with proportional bars + empty state with a plant CTA.
