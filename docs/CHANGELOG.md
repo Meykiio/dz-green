@@ -2,6 +2,14 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-21 (twenty-eighth pass) — Mobile UX owner pass
+
+- **Action card hidden by default on phones** (≤767px, `useLayoutEffect` + `matchMedia`, runs pre-paint so no flash) — the map gets the space; the reveal button pulses with a soft plant ring until used (`motion-reduce` respected). Desktop unchanged.
+- **Top bar brand hidden on phones** (logo + "Green Algeria") — the hamburger already carries Home; the drawer keeps the brand.
+- **Real logo in the chrome:** `public/logo.png` (128px, converted from `favicon.ico`) replaces the TreePine icon in the top bar and drawer.
+- **Feedback pill is plant-green** (`border-plant/30 bg-plant/10 text-plant`) instead of muted gray.
+- Verified: tsc clean, 99/99 unit, build green. Owner device check pending.
+
 ## 2026-08-20 (twenty-seventh pass) — Map "disappears" fix + feedback device capture
 
 - **Investigation first (owner-mandated standard):** the feedback report "MapLibre GL has a bug where sometimes it disappears completely" was investigated before any code. Ruled out with evidence: the context-lost blank-map bugs (#6398, #6935) merged pre-v6.0.0 and can't affect 6.4.0; v6.4.1 (2 days old) fixes an unrelated XSS sanitize bug. Root cause path confirmed in the shipped 6.4.0 bundle: WebGL2 context creation failure fires `error` + `GPUInitializationError` synchronously inside the Map constructor, and Evented drops errors with no listeners — so the map died with only a `console.error`. Confidence stated honestly: medium-high for context creation/loss failure, not confirmed (the reporter left no device data).

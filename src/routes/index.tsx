@@ -9,7 +9,7 @@ import {
   Sprout,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { Chip } from "@/components/home/HomeBits";
@@ -56,6 +56,12 @@ function HomePage() {
   const [view, setView] = useState<"map" | "list">("map");
   const [feature, setFeature] = useState<MapFeature | null>(null);
   const [cardHidden, setCardHidden] = useState(false);
+
+  // Phones get the map first: the action card starts hidden under md and the
+  // reveal button pulses until it's used. Runs pre-paint, so no flash.
+  useLayoutEffect(() => {
+    if (window.matchMedia("(max-width: 767px)").matches) setCardHidden(true);
+  }, []);
 
   // Live map: filtered channels only (approved plantings, all fire reports).
   useEffect(() => {
@@ -160,6 +166,10 @@ function HomePage() {
             aria-label="Show the action card"
             className="tap-target absolute bottom-3 start-3 grid size-12 place-items-center rounded-full border border-border bg-card/95 text-plant shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] backdrop-blur transition-transform active:scale-[0.96] md:bottom-6 md:start-6"
           >
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 animate-ping rounded-full border-2 border-plant/60 [animation-duration:2s] motion-reduce:animate-none"
+            />
             <Sprout className="size-5" />
           </button>
         ) : (

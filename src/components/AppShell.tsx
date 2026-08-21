@@ -12,7 +12,6 @@ import {
   ShieldCheck,
   Sprout,
   Sun,
-  TreePine,
   X,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
@@ -138,8 +137,9 @@ function Shell({
           >
             <Menu className="size-5" />
           </button>
-          <Link to="/" className="flex items-center gap-2 px-1">
-            <TreePine className="size-5 text-plant" />
+          {/* Brand hidden on phones — the hamburger already carries Home. */}
+          <Link to="/" className="hidden items-center gap-2 px-1 sm:flex">
+            <img src="/logo.png" alt="" className="size-5" />
             <span className="text-base font-semibold tracking-tight">Green Algeria</span>
           </Link>
         </div>
@@ -169,7 +169,7 @@ function Shell({
       >
         <div className="flex items-center justify-between px-4 py-3.5">
           <span className="flex items-center gap-2">
-            <TreePine className="size-5 text-plant" />
+            <img src="/logo.png" alt="" className="size-5" />
             <span className="text-base font-semibold tracking-tight">Green Algeria</span>
           </span>
           <button

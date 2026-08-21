@@ -22,7 +22,7 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `LICENSE` | AGPL-3.0 (owner decision 2026-08-18), copyright Sifeddine Mebarki. |
 | `supabase/config.toml` | Platform-managed Supabase project config. Do not hand-edit. |
 | `supabase/migrations/*.sql` + `README.md` | Chronological **change record** (9 files, 2026-08-12 → 2026-08-18). NOT a bootstrap path — the canonical schema source is `docs/FULL_SCHEMA_EXPORT.sql`. |
-| `public/` | `favicon.ico`, `og.png`, `robots.txt` (allows all). |
+| `public/` | `favicon.ico`, `logo.png` (128px brand mark used in the chrome), `og.png`, `robots.txt` (allows all). |
 | `docs/` | `AUDIT.md`, `CHANGELOG.md`, `DATABASE.md`, `DESIGN.md` (active design system), `FEATURES.md`, `FULL_SCHEMA_EXPORT.sql`, `PROJECT_STRUCTURE.md`, `ROADMAP.md`, `SYSTEM_INSTRUCTIONS.md`. |
 | `e2e/` | 4 Playwright specs, 16 tests total (see below). |
 | `src/` | Application source (below). |
@@ -42,7 +42,7 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | Route file | URL | Purpose |
 |---|---|---|
 | `__root.tsx` | — | HTML document shell, head defaults, QueryClientProvider, `<Toaster />`, 404 component, root error boundary, no-flash theme script. |
-| `index.tsx` | `/` | Map-first home: `HeroMap` fills the viewport under the top bar, action card (hero copy, stats, layer chips, hide button), Map/List toggle, detail panel, realtime subscriptions. |
+| `index.tsx` | `/` | Map-first home: `HeroMap` fills the viewport under the top bar, action card (hero copy, stats, layer chips, hide button — hidden by default on phones, pulsing reveal button), Map/List toggle, detail panel, realtime subscriptions. |
 | `about.tsx` | `/about` | What the project is, how moderation works, the "not an emergency service" disclaimer. |
 | `plant.tsx` | `/plant` | Planting submission form → `submitPlanting` server fn. Result is `pending`. |
 | `care.tsx` | `/care` | Care log form (site picker, action, date, optional photo/notes/name) → `submitCare`. Publishes immediately. Accepts `?site=<uuid>`. |
