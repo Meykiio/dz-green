@@ -2,7 +2,7 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
-## 2026-08-21 (twenty-eighth pass) — Mobile UX owner pass
+## 2026-08-21 (twenty-ninth pass) — Mobile UX owner pass
 
 - **Action card hidden by default on phones** (≤767px, `useLayoutEffect` + `matchMedia`, runs pre-paint so no flash) — the map gets the space; the reveal button pulses with a soft plant ring until used (`motion-reduce` respected). Desktop unchanged.
 - **Top bar brand hidden on phones** (logo + "Green Algeria") — the hamburger already carries Home; the drawer keeps the brand.
