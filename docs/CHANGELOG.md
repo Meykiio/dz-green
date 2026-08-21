@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-21 (thirty-fourth pass) — Moderation decision data (PR B)
+
+- **Exact times where decisions happen:** new `formatDateTime` (date + time). PendingQueue now shows the submission's `created_at` (it previously showed only the planted date — the "not enough data about time" owner complaint) plus the wilaya-level badge; FireTriage shows exact reported/resolved times.
+- **Contact reveal:** new `getSiteContact` / `getFireContact` server functions (`moderation.functions.ts`) — service-role, live `user_roles` check per call (admin or moderator; a demoted moderator loses access next request). Until now even moderators could not read reporter PII (column grants block every client) — these are the only read path. UI: a "Show contact" button per card (`ContactReveal.tsx`) fetches on demand only; shows name + tel-linked phone, or "no contact info left".
+- Verified: tsc clean, 102/102 unit, build green. Note: PR C's grant swap briefly broke the production pending queue between the live migration and the PR #21 deploy (the `select("*")` fix shipped in the same PR) — sequencing lesson recorded: client fixes ride with or before their grant changes.
+
 ## 2026-08-21 (thirty-third pass) — Optional contact phone + privacy/terms pages (PR C)
 
 - **Schema (applied live, verified):** `sites.contact_phone text` (nullable). Grants swapped from table-level to **column-level SELECT** on `sites` for `anon`/`authenticated` (19 columns, excluding `contact_phone`) — the same posture `fire_reports` uses for reporter PII; `select *` now fails on purpose here too. Migration mirrored as `supabase/migrations/20260821180000_*.sql` and `FULL_SCHEMA_EXPORT.sql` §18; `DATABASE.md` updated.

@@ -68,3 +68,15 @@ export function formatDate(value: string | null | undefined): string {
     year: "numeric",
   });
 }
+
+/** Date + exact time — for moderation decisions, where "when" matters. */
+export function formatDateTime(value: string | null | undefined): string {
+  if (!value) return "";
+  return new Date(value).toLocaleString(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}

@@ -3,9 +3,10 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { fireReportsQuery, formatDate, photoUrl } from "@/lib/data";
+import { fireReportsQuery, formatDateTime, photoUrl } from "@/lib/data";
 import type { FireReport, FireStatus } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
+import { ContactReveal } from "./ContactReveal";
 import { StatusBadge } from "./StatusBadge";
 
 const STATUS_META: Record<FireStatus, { label: string; tone: "fire" | "plant" | "muted" }> = {
@@ -74,21 +75,25 @@ export function FireTriage() {
                 <StatusBadge>Small</StatusBadge>
               ) : null}
               <span className="text-xs text-muted-foreground">
-                Reported {formatDate(fire.created_at)}
+                Reported {formatDateTime(fire.created_at)}
               </span>
             </div>
             <p className="font-medium">
               {wilayaName(fire.wilaya_code)}
               {fire.commune ? ` · ${fire.commune}` : ""} · {fire.lat.toFixed(4)},{" "}
               {fire.lng.toFixed(4)}
+              {fire.location_approximate ? " · wilaya-level" : ""}
             </p>
             {fire.description && <p className="text-sm">{fire.description}</p>}
             {fire.resolved_at && (
               <p className="text-xs text-muted-foreground">
                 {fire.status === "false_alarm" ? "Marked false alarm" : "Resolved"} on{" "}
-                {formatDate(fire.resolved_at)}
+                {formatDateTime(fire.resolved_at)}
               </p>
             )}
+            <div className="pt-1">
+              <ContactReveal kind="fire" id={fire.id} />
+            </div>
             <div className="flex flex-wrap gap-2 pt-3">
               {fire.status === "active" ? (
                 <>
