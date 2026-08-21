@@ -2,6 +2,14 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-21 (thirtieth pass) — Chrome fixes: bottom bar removed, GitHub link, Algeria dim mask
+
+- **Test data cleaned (live DB, owner-approved):** the "Test the app" site row (10 Pine, wilaya 33) deleted along with its storage photo; the map now shows only real submissions (2 sites, 4 trees).
+- **Mobile bottom action bar removed** (`AppShell.tsx`): it duplicated the action card's three CTAs and covered the card's reveal button. The `pb-20` compensation and the now-unused `ACTIONS` const went with it.
+- **GitHub repo link in the top bar** next to SOS/Feedback (icon button, opens in a new tab).
+- **Non-Algeria dim mask:** new `wilayaMaskGeoJSON()` (world polygon with the 58 wilaya outer rings as holes, same simplified shapes as the boundary layers so the dim edge matches the green borders exactly) + a `ga-mask` fill layer below every custom layer (`colors.mask` per theme: sage `#e8ebe6` light, ink `#0e0f0c` dark, 55% opacity). Neighbouring countries and their labels fade; Algeria stays crisp.
+- Verified: tsc clean, 102/102 unit, build green.
+
 ## 2026-08-21 (twenty-ninth pass) — Mobile UX owner pass
 
 - **Action card hidden by default on phones** (≤767px, `useLayoutEffect` + `matchMedia`, runs pre-paint so no flash) — the map gets the space; the reveal button pulses with a soft plant ring until used (`motion-reduce` respected). Desktop unchanged.

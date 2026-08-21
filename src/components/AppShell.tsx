@@ -2,6 +2,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Droplets,
   Flame,
+  Github,
   Info,
   LayoutDashboard,
   ListChecks,
@@ -22,12 +23,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { EmergencyContacts } from "@/components/EmergencyContacts";
 import { FeedbackDialog } from "@/components/FeedbackDialog";
-
-const ACTIONS = [
-  { to: "/plant", label: "Plant", icon: Sprout, tone: "text-plant" },
-  { to: "/care", label: "Care", icon: Droplets, tone: "text-care" },
-  { to: "/fire", label: "Fire", icon: Flame, tone: "text-fire" },
-] as const;
 
 const APP_PATHS = ["/moderate", "/admin", "/activity"];
 
@@ -146,6 +141,15 @@ function Shell({
         <div className="flex items-center gap-1">
           <EmergencyContacts />
           <FeedbackDialog />
+          <a
+            href="https://github.com/Meykiio/dz-green"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="GitHub repository"
+            className="tap-target grid size-10 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.96]"
+          >
+            <Github className="size-5" />
+          </a>
           {themeButton}
         </div>
       </header>
@@ -202,29 +206,7 @@ function Shell({
         </aside>
       )}
 
-      <main
-        className={cn(
-          "flex-1 pt-14",
-          isAppPage && "md:ms-60",
-          !isAppPage && "pb-20 md:pb-0",
-        )}
-      >
-        {children}
-      </main>
-
-      {/* Sticky one-tap actions on mobile */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-3 gap-2 border-t border-border bg-card/95 p-2 backdrop-blur md:hidden">
-        {ACTIONS.map(({ to, label, icon: Icon, tone }) => (
-          <Link
-            key={to}
-            to={to}
-            className="tap-target flex flex-col items-center justify-center gap-1 rounded-lg bg-background py-2 text-xs font-medium transition-transform active:scale-[0.97]"
-          >
-            <Icon className={`size-5 ${tone}`} />
-            {label}
-          </Link>
-        ))}
-      </nav>
+      <main className={cn("flex-1 pt-14", isAppPage && "md:ms-60")}>{children}</main>
     </div>
   );
 }

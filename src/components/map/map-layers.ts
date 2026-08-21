@@ -2,7 +2,7 @@ import type { Map as MapLibreMap, MapLayerMouseEvent } from "maplibre-gl";
 import type { FeatureCollection } from "geojson";
 import type { MutableRefObject } from "react";
 
-import { wilayaBoundariesGeoJSON, wilayaBounds } from "@/lib/wilaya-geo";
+import { wilayaBoundariesGeoJSON, wilayaBounds, wilayaMaskGeoJSON } from "@/lib/wilaya-geo";
 import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
 import { colorsFor } from "./map-style";
 import { featureFor, onlyKind, withoutKind } from "./map-data";
@@ -21,6 +21,14 @@ interface LayerRefs {
 
 export function addDataLayers(map: MapLibreMap, refs: LayerRefs) {
   const colors = colorsFor(refs.themeRef.current);
+  // Dim everything that is not Algeria, below every other custom layer.
+  map.addSource("ga-mask", { type: "geojson", data: wilayaMaskGeoJSON() });
+  map.addLayer({
+    id: "ga-mask",
+    type: "fill",
+    source: "ga-mask",
+    paint: { "fill-color": colors.mask, "fill-opacity": 0.55 },
+  });
   map.addSource("ga-wilayas", { type: "geojson", data: wilayaBoundariesGeoJSON() });
   map.addLayer({
     id: "ga-wilaya-fill",
