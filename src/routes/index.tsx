@@ -10,14 +10,15 @@ import { Leaderboard } from "@/components/home/Leaderboard";
 import { useMapRealtime } from "@/components/home/useMapRealtime";
 import { ViewToggle, type HomeView } from "@/components/home/ViewToggle";
 import { DetailPanel } from "@/components/map/DetailPanel";
-import { HeroMap, type Layer } from "@/components/map/HeroMap";
+import { type Layer } from "@/components/map/HeroMap";
+import { SchematicMap } from "@/components/map/SchematicMap";
 import { SiteList } from "@/components/map/SiteList";
 import { careLogsQuery, fireReportsQuery, sitesQuery } from "@/lib/data";
 import { needsWater, type MapFeature, type Site } from "@/lib/types";
 
 const TITLE = "Green Algeria — the live map of Algeria's tree planting";
 const DESCRIPTION =
-  "See every tree planted across Algeria's 58 wilayas, log care for sites near you, and report wildfires on one community-run map.";
+  "See every tree planted across Algeria's 69 wilayas, log care for sites near you, and report wildfires on one community-run map.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -107,7 +108,7 @@ function HomePage() {
         ) : sites.isLoading ? (
           <div className="h-full w-full animate-pulse bg-card" aria-label="Loading the map" />
         ) : (
-          <HeroMap
+          <SchematicMap
             sites={siteList}
             careLogs={logList}
             fires={fireList}

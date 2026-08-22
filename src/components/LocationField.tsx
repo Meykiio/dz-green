@@ -1,6 +1,6 @@
 import { ClientOnly } from "@tanstack/react-router";
 import { Crosshair, Link2, Loader2 } from "lucide-react";
-import { Suspense, lazy, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { wilayaCodeForPoint } from "@/lib/geo";
@@ -50,12 +50,40 @@ export function LocationField({
 }: Props) {
   const [showMap, setShowMap] = useState(showMapByDefault);
   const [locating, setLocating] = useState(false);
+  const [bestAccuracy, setBestAccuracy] = useState<number | null>(null);
   const [mapsLink, setMapsLink] = useState("");
   const [linkState, setLinkState] = useState<"idle" | "busy" | "ok" | "bad">("idle");
   const [wilayaTouched, setWilayaTouched] = useState(false);
   const [autoFilled, setAutoFilled] = useState(false);
   const wilayaRef = useRef(wilaya);
   wilayaRef.current = wilaya;
+  const watchIdRef = useRef<number | null>(null);
+  const watchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const bestFixRef = useRef<{ lat: number; lng: number; accuracy: number } | null>(null);
+
+  // GPS best-fix watch: the first answer is usually a coarse network fix
+  // (±50–500 m); the phone refines toward true GPS over the next seconds.
+  // Watch for up to 12 s, keep the best reading, stop early at ±15 m.
+  const GOOD_ENOUGH_M = 15;
+  const WATCH_BUDGET_MS = 12000;
+
+  function stopWatch() {
+    if (watchIdRef.current != null) navigator.geolocation.clearWatch(watchIdRef.current);
+    watchIdRef.current = null;
+    if (watchTimeoutRef.current) clearTimeout(watchTimeoutRef.current);
+    watchTimeoutRef.current = null;
+  }
+
+  useEffect(() => () => stopWatch(), []);
+
+  function finishWatch() {
+    stopWatch();
+    const best = bestFixRef.current;
+    if (best) handleLocation(best.lat, best.lng, best.accuracy);
+    bestFixRef.current = null;
+    setLocating(false);
+    setBestAccuracy(null);
+  }
 
   function handleLocation(nextLat: number, nextLng: number, nextAccuracy: number | null) {
     onLocation(nextLat, nextLng, nextAccuracy);
@@ -70,14 +98,25 @@ export function LocationField({
   function useMyLocation() {
     if (typeof navigator === "undefined" || !navigator.geolocation) return;
     setLocating(true);
-    navigator.geolocation.getCurrentPosition(
+    setBestAccuracy(null);
+    bestFixRef.current = null;
+    watchIdRef.current = navigator.geolocation.watchPosition(
       (pos) => {
-        handleLocation(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy ?? null);
-        setLocating(false);
+        const acc = pos.coords.accuracy ?? Infinity;
+        if (!bestFixRef.current || acc < bestFixRef.current.accuracy) {
+          bestFixRef.current = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            accuracy: acc,
+          };
+          setBestAccuracy(acc);
+        }
+        if (acc <= GOOD_ENOUGH_M) finishWatch();
       },
-      () => setLocating(false),
-      { enableHighAccuracy: true, timeout: 10000 },
+      () => finishWatch(),
+      { enableHighAccuracy: true, maximumAge: 0 },
     );
+    watchTimeoutRef.current = setTimeout(finishWatch, WATCH_BUDGET_MS);
   }
 
   /** Paste-a-Maps-link fallback: GPS failed or the pin is wrong. */
@@ -155,28 +194,54 @@ export function LocationField({
           Used once, never stored. Skip it and the report is wilaya-level.
         </p>
         <div className="mt-2.5 flex flex-wrap items-center gap-2">
-          <Button type="button" variant="secondary" onClick={useMyLocation} className="tap-target">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={useMyLocation}
+            disabled={locating}
+            className="tap-target"
+          >
             {locating ? (
               <Loader2 className="size-4 animate-spin" />
             ) : (
               <Crosshair className="size-4" />
             )}
-            Use my location
+            {locating ? "Improving…" : "Use my location"}
           </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => setShowMap((v) => !v)}
-            className="tap-target"
-          >
-            {showMap ? "Hide map" : "Adjust on map"}
-          </Button>
-          {hasPin && onClearLocation && (
+          {locating && (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={finishWatch}
+              disabled={bestAccuracy == null}
+              className="tap-target"
+            >
+              Use this now
+            </Button>
+          )}
+          {hasPin && !locating && onClearLocation && (
             <Button type="button" variant="ghost" onClick={onClearLocation} className="tap-target">
               Remove pin
             </Button>
           )}
+          {!locating && (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setShowMap((v) => !v)}
+              className="tap-target"
+            >
+              {showMap ? "Hide map" : "Adjust on map"}
+            </Button>
+          )}
         </div>
+        {locating && (
+          <p className="mt-1 text-xs text-muted-foreground" aria-live="polite">
+            {bestAccuracy != null
+              ? `Best fix so far: ±${Math.round(bestAccuracy)} m — stops automatically at ±${GOOD_ENOUGH_M} m or 12 s.`
+              : "Waiting for the first fix…"}
+          </p>
+        )}
 
         <div className="mt-2.5">
           <label className="flex items-center gap-2 rounded-md border border-input bg-card px-3 py-2 text-sm focus-within:ring-1 focus-within:ring-ring">
