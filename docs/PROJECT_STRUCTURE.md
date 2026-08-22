@@ -89,7 +89,7 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `moderation.functions.ts` | `getSiteContact` / `getFireContact` — service-role, live role check per call; the only read path for reporter/planter PII. |
 | `moderator/StatusBadge.tsx` | Pill status badge (tone variants: plant/care/fire/muted). |
 | `admin/AdminOverview.tsx` | Admin stats strip + per-wilaya moderation load. |
-| `admin/AssignWilayasDialog.tsx` | The assign-wilayas dialog (58 wilayas grouped under the 48 historic parents). |
+| `admin/AssignWilayasDialog.tsx` | The assign-wilayas dialog (all 69 wilayas). |
 | `ui/*` | Unmodified shadcn/ui primitives. Most are unused by this app; they ship with the template (vendored — see note below). |
 
 ## `src/lib/`
@@ -99,7 +99,7 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `types.ts` | App-level `Site`, `CareLog`, `FireReport` types (client-safe shapes: no reporter PII) + `needsWater()` 14-day derived flag. |
 | `data.ts` | TanStack Query `queryOptions` for sites/care logs/fire reports with explicit safe column lists (bounds 2000/3000/1000), and `photoUrl()` mapping a storage path to `/api/public/photo/...`. |
 | `moderation.ts` | `useModerationStats()` — exact head-count queries (pending, approved today, active fires, total submissions). |
-| `wilayas.ts` | The 58 wilayas (code, Latin + Arabic name) and the mapping to the 48 historic map polygons. |
+| `wilayas.ts` | The 69 wilayas (code, Latin + Arabic name); every wilaya maps to its own polygon. |
 | `geo.ts` | Mercator projection helpers, bounding-box math, `wilayaCodeForPoint` point-in-polygon derivation (historic wilayas only), `wilayaCenterLatLng` display centres, `parseRings`, `ALGERIA_CENTER`. |
 | `wilaya-geo.ts` | Wilaya boundaries as GeoJSON (converted from the projected path data back to lat/lng) + `wilayaBounds` — the hero map's border layers and wilaya zoom. |
 | `image.ts` | Client-side image compression (max 1024px longest edge, WebP/JPEG, target <400KB). |
@@ -124,7 +124,7 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `hooks/useAuth.tsx` | Supabase session state + `role`/`isModerator`/`isAdmin` read live from the caller's `user_roles` row. `loading` stays true until the role query settles. |
 | `hooks/useTheme.tsx` | Shared light/dark theme store: one module-level value + listeners so every consumer (shell AND map) flips together. localStorage-persisted, `.dark` on `<html>`. |
 | `hooks/use-mobile.tsx` | Viewport breakpoint hook (template). |
-| `data/algeria-wilayas.ts` | Auto-generated from Natural Earth 10m admin-1 boundaries (public domain): Mercator-projected SVG path data for the 48 historic wilaya polygons. Do not hand-edit. |
+| `data/algeria-wilayas.ts` | Auto-generated from the 69-wilaya SVG by chemsallioua/Algeria69WilayaMap (MIT): Mercator-projected polygons for all 69 wilayas. Do not hand-edit. |
 | `integrations/supabase/client.ts` | Browser client (publishable key). Auto-generated — never edit. |
 | `integrations/supabase/client.server.ts` | Service-role admin client. Server-only. Auto-generated. |
 | `integrations/supabase/auth-attacher.ts` | Client middleware attaching the bearer token to server-fn calls. Auto-generated. |

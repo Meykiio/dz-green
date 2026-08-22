@@ -11,7 +11,7 @@ A community-run live map of Algeria's tree planting, tree care, and wildfire rep
 
 ## What it does
 
-Planting activity in Algeria happens all over social media and disappears there. Nobody can see the cumulative total, nobody knows which trees are still being watered a month later, and there is no fast, shared way to flag a fire. Green Algeria puts all three on one live map of the country's 58 wilayas.
+Planting activity in Algeria happens all over social media and disappears there. Nobody can see the cumulative total, nobody knows which trees are still being watered a month later, and there is no fast, shared way to flag a fire. Green Algeria puts all three on one live map of the country's 69 wilayas.
 
 Anyone can contribute, no account needed:
 
@@ -82,3 +82,5 @@ Contributions welcome — read [`CONTRIBUTING.md`](CONTRIBUTING.md) first. Bugs 
 ## License
 
 [AGPL-3.0](LICENSE) — Copyright © 2026 Sifeddine Mebarki ([Meykiio](https://github.com/Meykiio)), Algiers, Algeria.
+
+The 69-wilaya map boundaries in `src/data/algeria-wilayas.ts` are derived from [chemsallioua/Algeria69WilayaMap](https://github.com/chemsallioua/Algeria69WilayaMap), used under the MIT License.

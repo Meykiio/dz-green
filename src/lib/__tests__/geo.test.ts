@@ -9,7 +9,10 @@ import {
 import { WILAYAS } from "@/lib/wilayas";
 
 const cases: Array<[number, number, string | null, string]> = [
-  [36.7538, 3.0588, "16", "Algiers"],
+  // 36.73, 3.08 — inside the Algiers wilaya in the 69-wilaya boundaries; the
+  // generic city coordinate (36.7538, 3.0588) sits just outside the polygon
+  // in the source data (bay edge).
+  [36.73, 3.08, "16", "Algiers"],
   [35.6969, -0.6331, "31", "Oran"],
   [22.785, 5.5228, "11", "Tamanrasset"],
   [36.9, 7.767, "23", "Annaba"],
@@ -37,7 +40,7 @@ describe("mapCodeForPoint", () => {
   });
 
   it("keeps a correct stored code", () => {
-    expect(mapCodeForPoint(36.7538, 3.0588, "16")).toBe("16");
+    expect(mapCodeForPoint(36.73, 3.08, "16")).toBe("16");
   });
 
   it("falls back to the stored code when the point is outside every polygon", () => {

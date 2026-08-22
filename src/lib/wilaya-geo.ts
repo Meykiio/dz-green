@@ -16,6 +16,37 @@ export interface WilayaBoundaryProperties {
 let cache: FeatureCollection | null = null;
 let maskCache: FeatureCollection | null = null;
 let algeriaCache: MultiPolygon | null = null;
+let coarseCache: { code: string; rings: { x: number; y: number }[][] }[] | null = null;
+
+/**
+ * Heavily decimated rings for the dim mask and the `within` label filter.
+ * The full 31.6k-point boundaries cost too much in per-tile triangulation
+ * and per-feature `within` evaluation (the 2026-08-22 slowdown report —
+ * a zoom-to-idle measurement hung past 120s). ~2.5 map units ≈ 5km: the
+ * dim edge and the label filter don't need better.
+ */
+function coarseRings() {
+  if (coarseCache) return coarseCache;
+  const EPS = 2.5;
+  coarseCache = WILAYA_SHAPES.map((shape) => ({
+    code: shape.code,
+    rings: parseRings(shape.d).map((ring) => {
+      if (ring.length <= 3) return ring;
+      const out = [ring[0]!];
+      let last = ring[0]!;
+      for (let i = 1; i < ring.length - 1; i++) {
+        const p = ring[i]!;
+        if ((p.x - last.x) ** 2 + (p.y - last.y) ** 2 >= EPS * EPS) {
+          out.push(p);
+          last = p;
+        }
+      }
+      out.push(ring[ring.length - 1]!);
+      return out;
+    }),
+  }));
+  return coarseCache;
+}
 
 /**
  * Algeria as one MultiPolygon (every wilaya's rings). Used by the basemap
@@ -23,8 +54,13 @@ let algeriaCache: MultiPolygon | null = null;
  */
 export function algeriaMultiPolygon(): MultiPolygon {
   if (algeriaCache) return algeriaCache;
-  const polygons = wilayaBoundariesGeoJSON().features.map(
-    (f) => (f.geometry as Polygon).coordinates,
+  const polygons = coarseRings().map((shape) =>
+    shape.rings.map((ring) =>
+      ring.map((p) => {
+        const { lat, lng } = unprojectToLatLng(p.x, p.y);
+        return [lng, lat] as [number, number];
+      }),
+    ),
   );
   algeriaCache = { type: "MultiPolygon", coordinates: polygons };
   return algeriaCache;
@@ -45,8 +81,8 @@ export function wilayaMaskGeoJSON(): FeatureCollection {
     [-180, 85],
     [-180, -85],
   ];
-  const holes = WILAYA_SHAPES.map((shape) => {
-    const outer = parseRings(shape.d)[0]!;
+  const holes = coarseRings().map((shape) => {
+    const outer = shape.rings[0]!;
     return outer.map((p) => {
       const { lat, lng } = unprojectToLatLng(p.x, p.y);
       return [lng, lat] as [number, number];
