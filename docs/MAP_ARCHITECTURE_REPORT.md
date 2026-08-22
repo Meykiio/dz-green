@@ -31,9 +31,11 @@ measurements on the dev server and the local production build, and web checks
 | geoBoundaries gbOpen (API check) | **48** (year represented 2017) | polygons | ODbL | Outdated |
 | Natural Earth 10m | **48** | polygons | public domain | Outdated (our old file) |
 
-Legal note: the 69-wilaya state took effect via the November 2025 decrees
-(council of ministers 16/11/2025, per the APS reference in issue #6). Our reply
-on issue #6 promised the update; it is now delivered.
+Legal note: the 69-wilaya state took effect via **Law No. 26-06 of April 4,
+2026, published in Official Journal No. 25 on April 5, 2026** (corrected
+citation — an earlier draft of this report repeated issue #6's November 2025
+date, which was wrong). Our reply on issue #6 promised the update; it is now
+delivered.
 
 Decision: **stay with the MIT SVG** (already shipped). One line why: same
 wilaya count as OSM but a one-file MIT download vs an ODbL relation-assembly
@@ -133,3 +135,103 @@ pipeline.
 Merge the coarse-polygon fix + `maximumAge` GPS tweak, then the owner
 re-checks load and pan on his phone on a non-congested connection and reports
 the numbers for §7.
+
+---
+
+## §8 Boundary verification (appended 2026-08-22)
+
+Direct answers, with methods — not restated conclusions.
+
+### 8.1 SVG → lat/lng conversion method
+
+**Transform:** a 4-parameter affine fit (independent scale + offset per axis),
+x_svg → longitude linear, y_svg → **Mercator Y** linear (the source SVG is
+Mercator-projected, confirmed by anchor analysis: Tindouf westmost, In Guezzam
+southmost, coastal wilayas northmost, and the x/y scale ratio matching
+Mercator at mid-latitude within ~3%).
+
+**Control points:** the country extremes, taken from the *measured* bounds of
+the old data file's own shapes (west −8.682385°E, east 11.968861°E, north
+37.093940°N, south 18.975561°N) — not guessed constants. An earlier attempt
+with guessed extremes (37.0936/18.9636) failed the Algiers check; a 48-point
+least-squares fit against the old Natural Earth shapes was measurably worse
+(1.35° max residual) and was rejected.
+
+**Pipeline:** browser `getPointAtLength` flattening of the SVG's relative
+Bézier/arc path data (every 3 SVG units, chunked per 6 paths), uniform
+`translate(-862.86, −943.66)` applied, subpaths split at sampling jumps (>3.5
+units — any jump beyond the sampling step is a subpath teleport), affine fit,
+decimation to 31.6k points, re-projection into the existing data-file format.
+
+**Measured error margin** (distance from known coordinates to their wilaya
+polygon, computed on the converted output):
+
+| Point | Result |
+|---|---|
+| Oran, Annaba, Constantine, Béchar, Tamanrasset, Tindouf, In Guezzam | inside (2–170 km from boundary) |
+| Algiers center (36.7538, 3.0588) | **0.39 km outside** — the generic city coordinate sits in the bay just off the source polygon's coast edge; a point 500 m south-east (36.73, 3.08) is inside. Data property of the source, not a transform error (verified by backward-mapping into raw SVG units). |
+
+### 8.2 What "city-validated" actually means
+
+Method: point-in-polygon containment + distance-to-boundary for known
+coordinates against the converted rings. **Two different scopes, stated
+plainly:**
+
+- **Pre-existing wilayas (8 checked):** Algiers, Oran, Annaba, Constantine,
+  Béchar, Tamanrasset, Tindouf, In Guezzam — all pass (see table above).
+- **The 11 new wilayas (59–69):** checked the same way against their namesake
+  towns (coordinates from Wikipedia/Nominatim). 10 of 11 pass: Aflou, El
+  Abiodh Sidi Cheikh, El Kantara, Barika, Bou Saâda, Bir El Ater, Ksar El
+  Boukhari, Ksar Chellala, Aïn Oussara, Messaad — all inside (0.4–25 km from
+  the boundary). Three initial "failures" were *my wrong test coordinates*
+  (Aïn Oussera is at 2.90°E not 1.57°E; El Abiodh Sidi Cheikh at 32.90°N not
+  33.88°N), corrected and re-passed.
+- **One real discrepancy found:** the town of **El Aricha** (34.2240°N,
+  −1.2577°E, Nominatim-confirmed) lands **~5 km outside** the SVG's path-61
+  polygon — inside Naâma's (45) polygon instead. Tlemcen's (13) polygon
+  correctly excludes it. So the source SVG's new 61/45 boundary near El Aricha
+  town is off by ~5 km in the source data itself.
+- **What was NOT validated:** the exact course of the 11 new boundary *lines*
+  against the legal texts — no authoritative geometry for the new lines exists
+  anywhere to compare against (that is the whole dataset problem). The
+  validation proves the transform is sound and the polygons contain their
+  towns; it does not prove the new lines match the legal boundaries. The
+  El Aricha case shows at least one local ~5 km error. Say it plainly: **the
+  11 new boundaries are the best available geometry, not verified-accurate
+  geometry.**
+
+### 8.3 OSM 69-relations claim — live re-check (2026-08-22, Overpass)
+
+Done live, not from cache: `rel[boundary=administrative][admin_level=4]
+['ISO3166-2'~'^DZ']` then closed-ring assembly on the outer ways
+(`out body` for relations + `out skel` for ways; ways chained by shared
+endpoint node ids).
+
+- **68 relations** tagged `ISO3166-2=DZ-*` — **DZ-63 is missing** (no
+  properly-tagged Barika relation).
+- **All 68 have fully closed outer rings** (68/68 pass, 0 open chains) — the
+  geometry itself is complete and valid.
+- **But the new-wilaya tagging is buggy, confirmed live:**
+  - "Barika" is coded **DZ-60** (should be 63)
+  - "El Abiodh Sidi Cheikh Province" is coded **DZ-69** (should be 60)
+  - "El Aricha Province" is **double-coded**: proper DZ-61 exists, plus a
+    duplicate relation (20815946) carrying a lowercase `iso3166-2=DZ-63` tag
+- Verdict: OSM has valid geometry for the 69 wilayas but with 3 mis-codings
+  among the new ones and one missing code — usable only with a manual code
+  remap, under ODbL. The MIT SVG stays the better source even with its
+  documented El Aricha edge error.
+
+### 8.4 Law/date citation (corrected)
+
+**Law No. 26-06 of April 4, 2026, published in Official Journal No. 25 on
+April 5, 2026** — replaces the wrong November-2025 date repeated from issue
+#6. Fixed in §2 of this report, `src/lib/wilayas.ts`, and the roadmap.
+
+### 8.5 Merge recommendation
+
+The conversion method is verified sound (17/19 known points inside, both
+outside cases explained by source-data properties, not transform error). The
+dataset is the best available for all 69 wilayas. Merge with the El Aricha
+~5 km source discrepancy documented (here) and an upstream issue to the
+source repo recommended — but the final call on the 11 new lines' look is the
+owner's visual gate, as before.

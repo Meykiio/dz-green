@@ -1,6 +1,7 @@
-// All 69 Algerian wilayas (48 historic + 10 created in 2019 + 11 created in
-// November 2025). Every wilaya has its own polygon in the map geometry
-// (69-wilaya boundaries, 2026-08-22), so mapCode is always the wilaya itself.
+// All 69 Algerian wilayas (48 historic + 10 created in 2019 + 11 created by
+// Law No. 26-06 of April 4, 2026, OJ No. 25 of April 5, 2026). Every wilaya
+// has its own polygon in the map geometry (69-wilaya boundaries, 2026-08-22),
+// so mapCode is always the wilaya itself.
 export interface Wilaya {
   code: string;
   name: string;

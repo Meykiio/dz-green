@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-22 (forty-third pass) — Boundary verification (§8) + law citation fix
+
+- **Full verification pass on the boundary claims before merge** (owner-mandated): `docs/MAP_ARCHITECTURE_REPORT.md` gains §8 with methods, not restated conclusions. Conversion: 4-parameter affine (Mercator fit on the old file's *measured* extremes) — 17/19 known points land inside their polygons; both outside cases are source-data properties, not transform error (Algiers center 0.39 km into the bay; El Aricha town ~5 km inside Naâma's polygon — a real source discrepancy on the new 61/45 line, documented plainly). Three initial "failures" were wrong test coordinates (Wikipedia-corrected), not polygon errors.
+- **OSM live re-check (Overpass, 2026-08-22):** 68 `ISO3166-2=DZ-*` relations (DZ-63 missing), **all 68 with fully closed outer rings** (ring assembly verified on the outer ways). But the new-wilaya tagging is buggy: Barika coded DZ-60, El Abiodh Sidi Cheikh coded DZ-69, El Aricha Province double-coded (proper DZ-61 + a lowercase `iso3166-2=DZ-63` duplicate). OSM stays the fallback, not the source.
+- **Law citation corrected everywhere:** **Law No. 26-06 of April 4, 2026, OJ No. 25 of April 5, 2026** — replaces the wrong November-2025 date repeated from issue #6 (report §2 + new §8.4, `wilayas.ts`, ROADMAP).
+- Honest merge recommendation in §8.5: the transform is verified sound; the 11 new boundary *lines* are the best available geometry, not ground-truth-verified (no authoritative reference exists); the El Aricha caveat is documented.
+
 ## 2026-08-22 (forty-second pass) — Map performance investigation + coarse-polygon fix
 
 - **Owner report: map loading very slowly after the boundary swap.** Full investigation in `docs/MAP_ARCHITECTURE_REPORT.md` (codebase scan + live measurements + dataset checks per the owner's research prompt). Honest findings: the production app payload is only **685 KB** (the 22 MB first seen was dev-server bloat, not representative); the real first-load weight is **vector tiles at ~0.9 MB each** (measured z4 tile from OpenFreeMap), i.e. several MB at the national view — worst on a congested connection (the owner's link was saturated at report time). The `idle`-event "hang" that first looked like render catastrophe was a measurement artifact: the pulse animation's rAF loop means the map never fires `idle`.
