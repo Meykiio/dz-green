@@ -104,7 +104,7 @@ export const adminSetWilayas = createServerFn({ method: "POST" })
   .validator(
     z.object({
       userId: z.string().uuid(),
-      wilayas: z.array(z.string().regex(/^\d{2}$/)).max(48),
+      wilayas: z.array(z.string().regex(/^\d{2}$/)).max(69),
     }),
   )
   .handler(async ({ data }) => {
