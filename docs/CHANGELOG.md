@@ -2,6 +2,14 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-22 (forty-first pass) — Real 69-wilaya boundaries (Phase 2)
+
+- **The map outline complaint is fixed at the root.** The old shapes were Natural Earth 10m (coarsest public-domain scale, 48 polygons for 58 wilayas). Replaced with the 69-wilaya boundaries from `chemsallioua/Algeria69WilayaMap` (MIT) — every wilaya including the 11 created in November 2025 now has its own accurate polygon. `wilayas.ts` lists all 69 with official Latin + Arabic names; every `mapCode` is the wilaya itself (the parent-polygon workaround is gone).
+- **Conversion (one-off browser script, deleted after):** the SVG's relative Bézier/arc path data was flattened with the browser's own geometry engine (`getPointAtLength`, chunked), subpaths split at sampling jumps (> step), calibrated SVG→lat/lng with a Mercator fit on the measured country extremes, decimated to 31.6k points (399KB, ~10× the old detail), and emitted in the exact existing data-file format — so `geo.ts`, `wilaya-geo.ts`, the mask and the label filter all work unchanged.
+- **Calibration gates (automated):** 8 city point-in-polygon checks (Algiers, Oran, Annaba, Tamanrasset, Tindouf, Béchar, Constantine, In Guezzam). Two false alarms solved honestly: the generic Algiers city coordinate sits ~500m *outside the source polygon* (bay edge — the data, not the transform; verified by backward-mapping into raw SVG units), and a 48-point least-squares fit against the old NE shapes was measurably worse (1.35° residual) than the extremes fit. One geo test expectation updated to a point inside the new Algiers polygon, with the reason recorded in the test.
+- **Verified:** tsc clean, 105/105 unit, build green; headless Chromium confirms 69 wilaya features render, the dim mask is intact, and all 23 basemap label layers keep the Algeria-only `within` filter. No DB migration needed (no CHECK constraint on `wilaya_code` — verified live).
+- Closes the wilaya-count promise from issue #6 (58 → 69).
+
 ## 2026-08-22 (fortieth pass) — Phase 1 quick wins: mobile legend fix + /plant trims
 
 - **Mobile legend cutoff fixed (owner-reported):** the Trees/Care/Fires legend pill next to the Map/List/Board toggle overflowed small screens. The text labels are now `hidden sm:inline` — dots stay visible on phones (the color key survives), the full legend returns at ≥sm.

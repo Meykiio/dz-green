@@ -1,6 +1,6 @@
-// All 58 Algerian wilayas (48 historic + 10 created in 2019).
-// Map geometry only covers the 48 historic polygons; the newer wilayas are
-// listed here so people can still label a submission accurately.
+// All 69 Algerian wilayas (48 historic + 10 created in 2019 + 11 created in
+// November 2025). Every wilaya has its own polygon in the map geometry
+// (69-wilaya boundaries, 2026-08-22), so mapCode is always the wilaya itself.
 export interface Wilaya {
   code: string;
   name: string;
@@ -58,16 +58,27 @@ export const WILAYAS: Wilaya[] = [
   { code: "46", name: "Aïn Témouchent", nameAr: "عين تموشنت", mapCode: "46" },
   { code: "47", name: "Ghardaïa", nameAr: "غرداية", mapCode: "47" },
   { code: "48", name: "Relizane", nameAr: "غليزان", mapCode: "48" },
-  { code: "49", name: "Timimoun", nameAr: "تيميمون", mapCode: "01" },
-  { code: "50", name: "Bordj Badji Mokhtar", nameAr: "برج باجي مختار", mapCode: "01" },
-  { code: "51", name: "Ouled Djellal", nameAr: "أولاد جلال", mapCode: "07" },
-  { code: "52", name: "Béni Abbès", nameAr: "بني عباس", mapCode: "08" },
-  { code: "53", name: "In Salah", nameAr: "عين صالح", mapCode: "11" },
-  { code: "54", name: "In Guezzam", nameAr: "عين قزام", mapCode: "11" },
-  { code: "55", name: "Touggourt", nameAr: "تقرت", mapCode: "30" },
-  { code: "56", name: "Djanet", nameAr: "جانت", mapCode: "33" },
-  { code: "57", name: "El M'Ghair", nameAr: "المغير", mapCode: "39" },
-  { code: "58", name: "El Meniaa", nameAr: "المنيعة", mapCode: "47" },
+  { code: "49", name: "Timimoun", nameAr: "تيميمون", mapCode: "49" },
+  { code: "50", name: "Bordj Badji Mokhtar", nameAr: "برج باجي مختار", mapCode: "50" },
+  { code: "51", name: "Ouled Djellal", nameAr: "أولاد جلال", mapCode: "51" },
+  { code: "52", name: "Béni Abbès", nameAr: "بني عباس", mapCode: "52" },
+  { code: "53", name: "In Salah", nameAr: "عين صالح", mapCode: "53" },
+  { code: "54", name: "In Guezzam", nameAr: "عين قزام", mapCode: "54" },
+  { code: "55", name: "Touggourt", nameAr: "تقرت", mapCode: "55" },
+  { code: "56", name: "Djanet", nameAr: "جانت", mapCode: "56" },
+  { code: "57", name: "El M'Ghair", nameAr: "المغير", mapCode: "57" },
+  { code: "58", name: "El Meniaa", nameAr: "المنيعة", mapCode: "58" },
+  { code: "59", name: "Aflou", nameAr: "أفلو", mapCode: "59" },
+  { code: "60", name: "El Abiodh Sidi Cheikh", nameAr: "الأبيض سيدي الشيخ", mapCode: "60" },
+  { code: "61", name: "El Aricha", nameAr: "العريشة", mapCode: "61" },
+  { code: "62", name: "El Kantara", nameAr: "القنطرة", mapCode: "62" },
+  { code: "63", name: "Barika", nameAr: "بريكة", mapCode: "63" },
+  { code: "64", name: "Bou Saâda", nameAr: "بوسعادة", mapCode: "64" },
+  { code: "65", name: "Bir El Ater", nameAr: "بئر العاتر", mapCode: "65" },
+  { code: "66", name: "Ksar El Boukhari", nameAr: "قصر البخاري", mapCode: "66" },
+  { code: "67", name: "Ksar Chellala", nameAr: "قصر الشلالة", mapCode: "67" },
+  { code: "68", name: "Aïn Oussara", nameAr: "عين وسارة", mapCode: "68" },
+  { code: "69", name: "M'saâd", nameAr: "مسعد", mapCode: "69" },
 ];
 
 export const WILAYA_BY_CODE: Record<string, Wilaya> = Object.fromEntries(
