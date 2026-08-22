@@ -152,8 +152,7 @@ export function LocationField({
       <div className="rounded-lg border border-border bg-card/50 p-3">
         <p className="text-sm font-medium">Exact location (optional)</p>
         <p className="mt-0.5 text-xs text-muted-foreground">
-          Used once to place your pin — never stored, never tracked. Skip it and the report is
-          marked as wilaya-level.
+          Used once, never stored. Skip it and the report is wilaya-level.
         </p>
         <div className="mt-2.5 flex flex-wrap items-center gap-2">
           <Button type="button" variant="secondary" onClick={useMyLocation} className="tap-target">

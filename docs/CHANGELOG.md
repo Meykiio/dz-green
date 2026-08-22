@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-22 (fortieth pass) — Phase 1 quick wins: mobile legend fix + /plant trims
+
+- **Mobile legend cutoff fixed (owner-reported):** the Trees/Care/Fires legend pill next to the Map/List/Board toggle overflowed small screens. The text labels are now `hidden sm:inline` — dots stay visible on phones (the color key survives), the full legend returns at ≥sm.
+- **/plant trims (owner-delegated decision, response to the "too much text on phone" feedback):** intro drops "No account needed." (the form makes it obvious); the GPS helper shortens to "Used once, never stored. Skip it and the report is wilaya-level." The trust-bearing lines (phone nudge, never-public) stay.
+- Verified: tsc clean, 105/105 unit, build green.
+
 ## 2026-08-21 (thirty-ninth pass) — og.png retaken from a populated home + showcase seed/cleanup
 
 - **Showcase seed (temporary, owner-requested):** 24 approved plantings across 20 wilayas (1,218 trees, all this month so the leaderboard race was full), 8 care logs, 4 fire reports — inserted with generated UUIDs, `photo_url = ''`, `location_approximate = true` at wilaya centres. Used to review the populated app (map, Board view, grouped list) and to retake the README/og screenshot. **Cleaned back to zero afterwards** (delete by saved ID list; verified zero across sites, care_logs, fire_reports, receipts, photos).

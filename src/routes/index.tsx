@@ -120,13 +120,16 @@ function HomePage() {
         <div className="absolute end-3 top-3 flex items-center gap-2">
           <div className="flex items-center gap-3 rounded-full border border-border bg-card/90 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur">
             <span className="inline-flex items-center gap-1.5">
-              <span className="size-2 rounded-full bg-plant" /> Trees
+              <span className="size-2 rounded-full bg-plant" />{" "}
+              <span className="hidden sm:inline">Trees</span>
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="size-2 rounded-full bg-care" /> Care
+              <span className="size-2 rounded-full bg-care" />{" "}
+              <span className="hidden sm:inline">Care</span>
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="size-2 rounded-full bg-fire" /> Fires
+              <span className="size-2 rounded-full bg-fire" />{" "}
+              <span className="hidden sm:inline">Fires</span>
             </span>
           </div>
           <ViewToggle view={view} onChange={setView} />

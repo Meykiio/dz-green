@@ -109,7 +109,7 @@ function PlantPage() {
     <AppShell>
       <FormShell
         title="I planted a tree"
-        intro="Photo and location are required so the record can be trusted. No account needed."
+        intro="Photo and location are required so the record can be trusted."
         accent="plant"
       >
         <form
