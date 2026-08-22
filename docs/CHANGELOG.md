@@ -2,6 +2,11 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-22 (forty-fifth pass) — GPS best-fix watch + seed cleanup
+
+- **GPS accuracy fix (owner-approved after discussion):** the "Use my location" button no longer grabs the first fix (usually a coarse network/WiFi guess at ±50–500 m). It now runs a 12 s `watchPosition`, keeps the best reading, shows "Best fix so far: ±X m" live, stops early at ±15 m, and offers "Use this now" to accept the current best — typically ±5–20 m instead of ±50–100 m, same hardware. `maximumAge: 0` on the watch so fixes are fresh. Verified headlessly with a mocked ±10 m fix: pin sets, improving state clears.
+- **Seed data cleaned (owner-requested):** all 73 SEED-marked plantings + 10 care logs + 6 fires deleted via the marker (`contact_phone='SEED'` / `reporter_phone='SEED'` — third live proof of the strategy), plus the owner's own test post (row, receipt, and its storage photo). All tables verified zero.
+
 ## 2026-08-22 (forty-fourth pass) — 11-town verification + tile-free home map preview
 
 - **Definitive new-wilaya town check (owner-mandated, Nominatim/Wikipedia-verified coordinates):** **9 of 11 pass cleanly** (El Abiodh Sidi Cheikh, El Kantara, Barika, Bou Saâda, Bir El Ater, Ksar El Boukhari, Ksar Chellala, Aïn Oussera, Messaad — all inside, 4–25 km from the boundary). **Aflou is a 180 m edge case** (same class as the Algiers bay point — the town coordinate sits right on the polygon edge). **El Aricha is the one real source error** (~5 km, lands in Naâma's polygon — documented in §8.2).
