@@ -2,6 +2,17 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-24 (forty-sixth pass) — Map direction: the live look is the look (boundary swap reverted)
+
+- **Owner verdict after the side-by-side:** he prefers the **map look of the live version** — the original Natural Earth wilaya boundaries on the real basemap. The 69-wilaya boundary swap (detailed SVG shapes) was **evaluated, verified (11-town check, 9/11 + Aflou edge + El Aricha source error), and reverted** — the map keeps its original boundaries. The verification research stays documented in `docs/MAP_ARCHITECTURE_REPORT.md` §8 (and in git history) for a future revisit.
+- **Kept from the review cycle:** GPS best-fix watch (see the next pass), the picker slow-tile feedback, and all previously shipped features. No map data changed in the shipped state; the dim mask, Algeria-only label filter, north framing and leaderboard stay as live.
+- The tile-free schematic map experiment was also dropped (owner: prefers the real basemap).
+
+## 2026-08-22 (forty-fifth pass) — GPS best-fix watch
+
+- **GPS accuracy fix (owner-approved after discussion):** the "Use my location" button no longer grabs the first fix (usually a coarse network/WiFi guess at ±50–500 m). It now runs a 12 s `watchPosition`, keeps the best reading, shows "Best fix so far: ±X m" live, stops early at ±15 m, and offers "Use this now" to accept the current best — typically ±5–20 m instead of ±50–100 m, same hardware. `maximumAge: 0` on the watch so fixes are fresh. Verified headlessly with a mocked ±10 m fix: pin sets, improving state clears.
+- **Seed data cleaned (owner-requested):** all SEED-marked plantings + care logs + fires deleted via the marker, plus the owner's own test post (row, receipt, photo). All tables verified zero.
+
 ## 2026-08-22 (fortieth pass) — Phase 1 quick wins: mobile legend fix + /plant trims
 
 - **Mobile legend cutoff fixed (owner-reported):** the Trees/Care/Fires legend pill next to the Map/List/Board toggle overflowed small screens. The text labels are now `hidden sm:inline` — dots stay visible on phones (the color key survives), the full legend returns at ≥sm.
