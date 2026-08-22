@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-22 (forty-seventh pass) — PrecisionPicker slow-tile feedback + sdk2627 reply
+
+- **Owner report: the pin-adjust map shows blank with only the green pin.** Investigated in dev AND production headlessly: the picker mounts and loads tiles fine (production tile responses all HTTP 200) — **no code bug**; the blank map was the owner's saturated connection stalling the tile fetch (the DOM pin renders regardless, which is why it looked broken). The real gap was UX: the picker said nothing when tiles stall.
+- **Fix:** `PrecisionPicker` now shows an honest state — after 8 s without the style load, a "Map is loading slowly — weak connection. You can still drag the pin, or paste a Google Maps link instead" note; on style error, a "couldn't load (connection issue)" note pointing at the same fallback. Small, no dependencies.
+- **sdk2627 replied on issue #5** (taking the PR #9 translation review + ticket #4). Replied in French: welcomed the native AR/FR review, clarified #4's reduced scope (clickable floating legend + list filtering), and pointed him at §8's El Aricha source error with a suggestion to file it upstream.
+- Verified: tsc clean, 105/105 unit, build green.
+
 ## 2026-08-24 (forty-sixth pass) — Map direction: the live look is the look (boundary swap reverted)
 
 - **Owner verdict after the side-by-side:** he prefers the **map look of the live version** — the original Natural Earth wilaya boundaries on the real basemap. The 69-wilaya boundary swap (detailed SVG shapes) was **evaluated, verified (11-town check, 9/11 + Aflou edge + El Aricha source error), and reverted** — the map keeps its original boundaries. The verification research stays documented in `docs/MAP_ARCHITECTURE_REPORT.md` §8 (and in git history) for a future revisit.
