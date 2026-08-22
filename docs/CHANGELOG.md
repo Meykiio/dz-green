@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-22 (forty-second pass) — Map performance investigation + coarse-polygon fix
+
+- **Owner report: map loading very slowly after the boundary swap.** Full investigation in `docs/MAP_ARCHITECTURE_REPORT.md` (codebase scan + live measurements + dataset checks per the owner's research prompt). Honest findings: the production app payload is only **685 KB** (the 22 MB first seen was dev-server bloat, not representative); the real first-load weight is **vector tiles at ~0.9 MB each** (measured z4 tile from OpenFreeMap), i.e. several MB at the national view — worst on a congested connection (the owner's link was saturated at report time). The `idle`-event "hang" that first looked like render catastrophe was a measurement artifact: the pulse animation's rAF loop means the map never fires `idle`.
+- **Fix shipped in the same PR:** the dim mask and the `within` label filter now use a runtime-decimated ~8.1k-point polygon (`coarseRings` in `wilaya-geo.ts`, ~5 km) instead of the full 31.6k — 4× cheaper per-tile triangulation and filter evaluation, zero visual change; boundaries keep full detail. Note the `within` filter is net-positive: removing it made pan FPS *worse* (10.8 vs 19.6 headless) because every foreign label renders.
+- **GPS tweak:** `maximumAge: 60000` on the one-shot `getCurrentPosition` — a recent cached fix is allowed instead of forcing a fresh 5–10 s GPS acquisition every tap.
+- **Dataset landscape verified for the report:** OSM has all 69 Algeria admin_level=4 relations (live Overpass check, ODbL) as the validated alternative; GADM 4.1 and geoBoundaries are both stuck at 48 (verified by download + API). The shipped MIT SVG stays the right pick.
+
 ## 2026-08-22 (forty-first pass) — Real 69-wilaya boundaries (Phase 2)
 
 - **The map outline complaint is fixed at the root.** The old shapes were Natural Earth 10m (coarsest public-domain scale, 48 polygons for 58 wilayas). Replaced with the 69-wilaya boundaries from `chemsallioua/Algeria69WilayaMap` (MIT) — every wilaya including the 11 created in November 2025 now has its own accurate polygon. `wilayas.ts` lists all 69 with official Latin + Arabic names; every `mapCode` is the wilaya itself (the parent-polygon workaround is gone).
