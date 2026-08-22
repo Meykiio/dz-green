@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-22 (forty-fourth pass) — 11-town verification + tile-free home map preview
+
+- **Definitive new-wilaya town check (owner-mandated, Nominatim/Wikipedia-verified coordinates):** **9 of 11 pass cleanly** (El Abiodh Sidi Cheikh, El Kantara, Barika, Bou Saâda, Bir El Ater, Ksar El Boukhari, Ksar Chellala, Aïn Oussera, Messaad — all inside, 4–25 km from the boundary). **Aflou is a 180 m edge case** (same class as the Algiers bay point — the town coordinate sits right on the polygon edge). **El Aricha is the one real source error** (~5 km, lands in Naâma's polygon — documented in §8.2).
+- **Tile-free home map (owner suggestion, hybrid decision):** new `SchematicMap.tsx` — no basemap at all: a themed canvas + our own Algeria outline, wilaya borders, wilaya name labels (glyph PBFs only, tiny on-demand ranges), the dim mask, and the tree/care/fire dots. The real basemap stays where pins are placed (PrecisionPicker). **Verified headlessly: wilaya labels + mask + fill render with ZERO vector-tile requests** — the home page's multi-MB tile payload is gone. Wired as the home map on this preview branch for the owner's side-by-side comparison.
+- Verified: tsc clean, 105/105 unit, build green.
+
 ## 2026-08-22 (forty-third pass) — Boundary verification (§8) + law citation fix
 
 - **Full verification pass on the boundary claims before merge** (owner-mandated): `docs/MAP_ARCHITECTURE_REPORT.md` gains §8 with methods, not restated conclusions. Conversion: 4-parameter affine (Mercator fit on the old file's *measured* extremes) — 17/19 known points land inside their polygons; both outside cases are source-data properties, not transform error (Algiers center 0.39 km into the bay; El Aricha town ~5 km inside Naâma's polygon — a real source discrepancy on the new 61/45 line, documented plainly). Three initial "failures" were wrong test coordinates (Wikipedia-corrected), not polygon errors.

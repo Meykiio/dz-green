@@ -5,23 +5,23 @@ import {
   NavigationControl,
   type ErrorEvent,
   type GeoJSONSource,
+  type StyleSpecification,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useTheme } from "@/hooks/useTheme";
+import { WILAYA_SHAPES } from "@/data/algeria-wilayas";
+import { unprojectToLatLng } from "@/lib/geo";
 import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
-import { DARK_STYLE, LIGHT_STYLE, NORTH_BOUNDS, RecenterControl } from "./map-style";
+import { MapFailureOverlay, webgl2Available, type Layer } from "./HeroMap";
 import { featureCollection, onlyKind, withoutKind } from "./map-data";
 import {
   addDataLayers,
-  applyAlgeriaLabelFilter,
   applyLayerVisibility,
   startPulse,
   wireInteractions,
-  type Layer,
 } from "./map-layers";
-
-export type { Layer };
+import { NORTH_BOUNDS, RecenterControl } from "./map-style";
 
 interface Props {
   sites: Site[];
@@ -33,53 +33,66 @@ interface Props {
 
 type MapFailure = "webgl2" | "lost";
 
-/** Same probe the browser uses for any WebGL canvas — cheap and side-effect free. */
-export function webgl2Available(): boolean {
-  try {
-    const canvas = document.createElement("canvas");
-    const gl = canvas.getContext("webgl2");
-    const ok = gl !== null;
-    if (gl && "getExtension" in gl) gl.getExtension("WEBGL_lose_context")?.loseContext();
-    return ok;
-  } catch {
-    return false;
-  }
+/** Theme surfaces for the schematic — Algeria pops against a dimmed outside. */
+const SURFACES = {
+  light: { background: "#f1f4ee", outside: "#dfe5da", label: "#5b6b5c" },
+  dark: { background: "#0e0f0c", outside: "#050605", label: "#8fa593" },
+} as const;
+
+function styleFor(theme: "light" | "dark"): StyleSpecification {
+  const s = SURFACES[theme];
+  return {
+    version: 8,
+    glyphs: "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
+    sources: {},
+    layers: [
+      { id: "background", type: "background", paint: { "background-color": s.background } },
+    ],
+  };
 }
 
-export function MapFailureOverlay({ kind }: { kind: MapFailure }) {
-  return (
-    <div
-      role="alert"
-      className="absolute inset-0 z-10 flex items-center justify-center bg-card/95 p-4 text-center"
-    >
-      <div className="max-w-sm">
-        <p className="text-base font-semibold">
-          {kind === "webgl2" ? "This browser can't draw the map" : "The map lost its connection"}
-        </p>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          {kind === "webgl2"
-            ? "The map needs WebGL2 (3D graphics), which this browser or device doesn't provide. Try updating your browser or enabling hardware acceleration."
-            : "The graphics connection dropped. If it doesn't come back, reload the page."}
-        </p>
-        <button
-          type="button"
-          onClick={() => window.location.reload()}
-          className="mt-3 rounded-full border border-border bg-card px-4 py-1.5 text-sm font-semibold text-foreground transition-transform active:scale-[0.97]"
-        >
-          Reload map
-        </button>
-      </div>
-    </div>
-  );
+/** Wilaya name labels at the shape centres (Latin names for the preview). */
+function wilayaLabelPoints() {
+  return {
+    type: "FeatureCollection" as const,
+    features: WILAYA_SHAPES.map((shape) => {
+      const { lat, lng } = unprojectToLatLng(shape.cx, shape.cy);
+      return {
+        type: "Feature" as const,
+        properties: { code: shape.code, name: shape.name },
+        geometry: { type: "Point" as const, coordinates: [lng, lat] },
+      };
+    }),
+  };
+}
+
+function addWilayaLabels(map: MapLibreMap, theme: "light" | "dark") {
+  map.addSource("ga-wilaya-labels", { type: "geojson", data: wilayaLabelPoints() });
+  map.addLayer({
+    id: "ga-wilaya-labels",
+    type: "symbol",
+    source: "ga-wilaya-labels",
+    layout: {
+      "text-field": ["get", "name"],
+      "text-size": 11,
+      "text-font": ["Noto Sans Regular"],
+      "text-transform": "uppercase",
+      "text-letter-spacing": 0.08,
+    },
+    paint: {
+      "text-color": SURFACES[theme].label,
+      "text-halo-color": SURFACES[theme].background,
+      "text-halo-width": 1.2,
+    },
+  });
 }
 
 /**
- * The hero map: MapLibre GL + OpenFreeMap vector tiles (open-source, no API
- * key). WebGL-smooth pan/zoom, wilaya boundaries, individual dots for every
- * tree/care/fire, and real geography underneath. Light/dark via OpenFreeMap
- * styles.
+ * The tile-free home map (preview): no basemap at all — just our own Algeria
+ * outline, wilaya borders and names, and the tree/care/fire dots on a themed
+ * canvas. Zero tile downloads; the dim mask still fades the outside world.
  */
-export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Props) {
+export function SchematicMap({ sites, careLogs, fires, layers, onSelectFeature }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const pulseRef = useRef(0);
@@ -98,36 +111,26 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
 
   const refs = { dataRef, layersRef, themeRef, selectRef, sites, careLogs, fires };
 
-  // Mount once.
   useEffect(() => {
     if (!container.current || mapRef.current) return;
-    // GPU failure modes (v6 is WebGL2-only): creation failure fires
-    // "error" with GPUInitializationError *synchronously inside the Map
-    // constructor*, before any map.on("error") can be attached — Evented
-    // drops listener-less errors. So: probe first, and listen for
-    // webglcontextcreationerror on the container (it bubbles) as backup.
     if (!webgl2Available()) {
       setFailure("webgl2");
       return;
     }
-    let creationError: WebGLContextEvent | null = null;
+    let creationError: ErrorEvent["error"] | null = null;
     const onCreationError = (e: Event) => {
-      creationError = e as WebGLContextEvent;
+      creationError = (e as unknown as ErrorEvent).error;
     };
     container.current.addEventListener("webglcontextcreationerror", onCreationError);
-    // Per-instance cancellation: in StrictMode the first map's style.load can
-    // fire after its cleanup; a shared flag would then gate off the second
-    // map's init entirely (the no-layers bug).
     let cancelled = false;
     cancelledRef.current = false;
     const map = new MapLibreMap({
       container: container.current,
-      style: theme === "dark" ? DARK_STYLE : LIGHT_STYLE,
+      style: styleFor(themeRef.current),
       bounds: NORTH_BOUNDS,
       fitBoundsOptions: { padding: 24 },
       minZoom: 4,
       maxZoom: 16,
-      // Keep Algeria framed — no getting lost in the whole globe.
       maxBounds: [
         [-14, 14],
         [17, 42],
@@ -145,25 +148,21 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
 
     const init = () => {
       if (cancelled) return;
-      applyAlgeriaLabelFilter(map);
       addDataLayers(map, refs);
+      // The mask color was tuned to blend with the basemap; on the schematic
+      // it must contrast with our own canvas instead.
+      map.setPaintProperty("ga-mask", "fill-color", SURFACES[themeRef.current].outside);
+      addWilayaLabels(map, themeRef.current);
       wireInteractions(map, refs);
       startPulse(map, pulseRef, cancelledRef);
     };
-    // "load" can stall forever when a sub-resource (sprite/glyphs) is
-    // blocked; "style.load" fires as soon as the style JSON parses, which is
-    // early enough to add our sources and layers.
     if (map.loaded()) init();
     else map.once("style.load", init);
 
     map.on("error", (e: ErrorEvent) => {
       if (e.error instanceof GPUInitializationError) setFailure("webgl2");
-      else console.error("[map] non-fatal error:", e.error);
+      else console.error("[schematic-map] non-fatal error:", e.error);
     });
-
-    // Mid-session context loss (GPU process crash, memory pressure, driver
-    // reset): the canvas goes blank. 6.4.0 recovers internally on restore;
-    // we surface the state and only reload as a last resort.
     map.on("webglcontextlost", () => setFailure("lost"));
     map.on("webglcontextrestored", () => {
       setFailure(null);
@@ -188,34 +187,30 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Theme switch: setStyle wipes custom layers, so re-add on style load.
-  // Skip the first run — the mount effect already set the right style.
-  const styleRef = useRef(theme === "dark" ? DARK_STYLE : LIGHT_STYLE);
+  // Theme switch: rebuild the minimal style and re-add everything.
+  const styleRef = useRef(theme);
   useEffect(() => {
     const map = mapRef.current;
-    if (!map) return;
-    const style = theme === "dark" ? DARK_STYLE : LIGHT_STYLE;
-    if (style === styleRef.current) return;
-    styleRef.current = style;
+    if (!map || theme === styleRef.current) return;
+    styleRef.current = theme;
     const once = () => {
-      applyAlgeriaLabelFilter(map);
       addDataLayers(map, refs);
+      map.setPaintProperty("ga-mask", "fill-color", SURFACES[themeRef.current].outside);
+      addWilayaLabels(map, themeRef.current);
       wireInteractions(map, refs);
     };
     map.once("style.load", once);
-    map.setStyle(style);
+    map.setStyle(styleFor(theme));
   }, [theme]);
 
-  // Data updates.
   useEffect(() => {
     const map = mapRef.current;
     const points = map?.getSource("ga-points") as GeoJSONSource | undefined;
     points?.setData(withoutKind(data, "fires"));
-    const fires = map?.getSource("ga-fires") as GeoJSONSource | undefined;
-    fires?.setData(onlyKind(data, "fires"));
+    const firesSrc = map?.getSource("ga-fires") as GeoJSONSource | undefined;
+    firesSrc?.setData(onlyKind(data, "fires"));
   }, [data]);
 
-  // Layer toggles.
   useEffect(() => {
     const map = mapRef.current;
     if (map) applyLayerVisibility(map, layersRef);
@@ -226,7 +221,7 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
       ref={container}
       className="relative h-full w-full"
       role="img"
-      aria-label="Interactive map of Algeria showing tree plantings, care updates and fire reports"
+      aria-label="Schematic map of Algeria showing tree plantings, care updates and fire reports"
     >
       {failure ? <MapFailureOverlay kind={failure} /> : null}
     </div>
