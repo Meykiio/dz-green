@@ -22,7 +22,6 @@ import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedModerateRouteImport } from './routes/_authenticated/moderate'
 import { Route as MyTokenRouteImport } from './routes/my/$token'
-import { Route as ApiMobileSubmissionsRouteImport } from './routes/api/mobile/submissions'
 import { Route as ApiPublicPhotoSplatRouteImport } from './routes/api/public/photo/$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -89,11 +88,6 @@ const MyTokenRoute = MyTokenRouteImport.update({
   path: '/my/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiMobileSubmissionsRoute = ApiMobileSubmissionsRouteImport.update({
-  id: '/api/mobile/submissions',
-  path: '/api/mobile/submissions',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiPublicPhotoSplatRoute = ApiPublicPhotoSplatRouteImport.update({
   id: '/api/public/photo/$',
   path: '/api/public/photo/$',
@@ -113,7 +107,6 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/moderate': typeof AuthenticatedModerateRoute
   '/my/$token': typeof MyTokenRoute
-  '/api/mobile/submissions': typeof ApiMobileSubmissionsRoute
   '/api/public/photo/$': typeof ApiPublicPhotoSplatRoute
 }
 export interface FileRoutesByTo {
@@ -129,7 +122,6 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/moderate': typeof AuthenticatedModerateRoute
   '/my/$token': typeof MyTokenRoute
-  '/api/mobile/submissions': typeof ApiMobileSubmissionsRoute
   '/api/public/photo/$': typeof ApiPublicPhotoSplatRoute
 }
 export interface FileRoutesById {
@@ -147,7 +139,6 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/moderate': typeof AuthenticatedModerateRoute
   '/my/$token': typeof MyTokenRoute
-  '/api/mobile/submissions': typeof ApiMobileSubmissionsRoute
   '/api/public/photo/$': typeof ApiPublicPhotoSplatRoute
 }
 export interface FileRouteTypes {
@@ -165,7 +156,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/moderate'
     | '/my/$token'
-    | '/api/mobile/submissions'
     | '/api/public/photo/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -181,7 +171,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/moderate'
     | '/my/$token'
-    | '/api/mobile/submissions'
     | '/api/public/photo/$'
   id:
     | '__root__'
@@ -198,7 +187,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/moderate'
     | '/my/$token'
-    | '/api/mobile/submissions'
     | '/api/public/photo/$'
   fileRoutesById: FileRoutesById
 }
@@ -213,7 +201,6 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   MyTokenRoute: typeof MyTokenRoute
-  ApiMobileSubmissionsRoute: typeof ApiMobileSubmissionsRoute
   ApiPublicPhotoSplatRoute: typeof ApiPublicPhotoSplatRoute
 }
 
@@ -310,13 +297,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/mobile/submissions': {
-      id: '/api/mobile/submissions'
-      path: '/api/mobile/submissions'
-      fullPath: '/api/mobile/submissions'
-      preLoaderRoute: typeof ApiMobileSubmissionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/photo/$': {
       id: '/api/public/photo/$'
       path: '/api/public/photo/$'
@@ -353,7 +333,6 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   MyTokenRoute: MyTokenRoute,
-  ApiMobileSubmissionsRoute: ApiMobileSubmissionsRoute,
   ApiPublicPhotoSplatRoute: ApiPublicPhotoSplatRoute,
 }
 export const routeTree = rootRouteImport
