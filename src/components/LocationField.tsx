@@ -113,13 +113,8 @@ export function LocationField({
         }
         if (acc <= GOOD_ENOUGH_M) finishWatch();
       },
-<<<<<<< HEAD
-      () => setLocating(false),
-      { enableHighAccuracy: true, timeout: 10000 },
-=======
       () => finishWatch(),
       { enableHighAccuracy: true, maximumAge: 0 },
->>>>>>> 7995aa9 (feat: GPS best-fix watch with live accuracy (Use my location))
     );
     watchTimeoutRef.current = setTimeout(finishWatch, WATCH_BUDGET_MS);
   }
