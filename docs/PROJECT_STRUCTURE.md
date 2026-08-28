@@ -59,6 +59,7 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `_authenticated/admin.tsx` | `/admin` | Admin dashboard: Overview (platform stats + wilaya oversight) and Moderators & roles (user list, role actions, assign-wilayas dialog). Admin-only guard. `noindex`. |
 | `_authenticated/activity.tsx` | `/activity` | User dashboard: own plantings (with review status), care logs, fire reports; loading/empty/error states. `noindex`. |
 | `api/public/photo/$.ts` | `/api/public/photo/*` | Server route streaming objects out of the private `photos` bucket with long cache headers. The only public read path for images. |
+| `api/mobile/submissions.ts` | `/api/mobile/submissions` | POST — mobile submissions endpoint (issue #8): Bearer session verified, existing zod schemas, same abuse gate + impls as the web forms. |
 | `README.md` | — | Notes on the file-based routing conventions. |
 
 ## `src/components/`

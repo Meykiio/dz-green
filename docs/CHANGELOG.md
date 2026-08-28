@@ -2,6 +2,7 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+<<<<<<< HEAD
 ## 2026-08-28 (forty-ninth pass) — Arabic-first interface
 
 Owner request: the whole platform in Arabic (default), with English one click away. Phased on `feat/ar-i18n`, each phase verified + committed separately: i18n core → chrome/home → forms → info pages → moderation/admin → feedback/offline/tooltips.
@@ -39,6 +40,12 @@ Owner request: the whole platform in Arabic (default), with English one click aw
 
 - **GPS accuracy fix (owner-approved after discussion):** the "Use my location" button no longer grabs the first fix (usually a coarse network/WiFi guess at ±50–500 m). It now runs a 12 s `watchPosition`, keeps the best reading, shows "Best fix so far: ±X m" live, stops early at ±15 m, and offers "Use this now" to accept the current best — typically ±5–20 m instead of ±50–100 m, same hardware. `maximumAge: 0` on the watch so fixes are fresh. Verified headlessly with a mocked ±10 m fix: pin sets, improving state clears. (Localized in the Arabic-first merge — same behavior, both languages.)
 - **Seed data cleaned (owner-requested):** all SEED-marked plantings + care logs + fires deleted via the marker, plus the owner's own test post (row, receipt, photo). All tables verified zero.
+
+## 2026-08-24 (forty-seventh pass) — Mobile submissions API route (issue #8)
+
+- **Contract, now real:** `POST /api/mobile/submissions` — one endpoint for the mobile app (laidanimounir's `dz-green-mobile`), per the agreed contract on issue #8. Body: `{ kind: "plant" | "care" | "fire", data: <same fields as the web form> }`. Auth: `Authorization: Bearer <supabase access token>` — verified live server-side via `supabaseAdmin.auth.getUser`; invalid/missing token → 401 (no JWT staleness window). The route then validates with the *existing* zod schemas and dispatches to the same impls — abuse gate (timing floor, device + IP hash), service-role inserts, receipts — all unchanged. The service-role key never ships in the app.
+- **Contract pinning:** exact JSON schema posted on the issue #8 thread for the mobile side.
+- Verified: tsc clean, 105/105 unit, build green; headless route check — no token → 401, bad token → 401, invalid body → 400.
 
 ## 2026-08-22 (fortieth pass) — Phase 1 quick wins: mobile legend fix + /plant trims
 
