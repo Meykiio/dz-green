@@ -96,13 +96,17 @@ The gate is four layers, all server-side, no third-party dependency:
 
 `submitResilient()` retries a submission once connectivity returns. Not tested under real network loss.
 
-## 10. Not built at all
+## 10. Volunteer recruitment (`/volunteer`) — built 2026-08-28, live
+
+A warm, civic ask for wilaya-moderator candidates: hero ("Every green dot starts with a person"), what volunteers do / what we ask / what we never ask (money, equipment, **firefighting** — "we are a community map, not an emergency service; call Protection Civile 14/1021"). Form: name/email/phone-whatsapp/wilaya (58)/extra-wilayas/intent chips/availability/message (honeypot) → `public.volunteers` via service role. Admin sees applications on `/admin` (status new → contacted → onboarded); onboarding = link the vol's account + assign moderator role + wilaya in "Moderators & roles". **Live:** migration applied 2026-08-28 via MCP; shape verified against the live table (constraint proof insert accepted). Note: the first form attempt failed until the table existed — fixed.
+
+## 11. Not built at all
 
 - Alerting (email/SMS) — the storage-only `alert_contacts` table and its moderator screen were **dropped 2026-08-20** (never wired to send anything; rebuild planned after the mobile phase and PR queue — see `ROADMAP.md` "Parked").
 - Any Arabic/French UI translation. Wilaya Arabic names exist in data; the interface itself is English only.
 - Search, per-wilaya pages, user profiles, leaderboards, sharing cards.
 
-## 11. Automated tests (2026-08-18)
+## 12. Automated tests (2026-08-18)
 
 - `bun run test`: 91 unit tests (geometry, wilayas, abuse gate incl. silent-drop + device-hash, submissions validation, Google Maps link parsing).
 - `bunx playwright test`: 16 live E2E tests — `e2e/flows.spec.ts` (5 core flows), `e2e/admin.spec.ts` (3 role-management flows), `e2e/receipts.spec.ts` (receipt round-trip, unknown-token, silent drop, wilaya-only), `e2e/activity.spec.ts` (4 dashboard flows: auth redirect, own activity, empty states, admin overview). Fixtures are SQL-seeded per the recipe in `SYSTEM_INSTRUCTIONS.md` and cleaned up after.

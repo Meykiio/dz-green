@@ -8,6 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { AdminOverview } from "@/components/admin/AdminOverview";
 import { AssignWilayasDialog } from "@/components/admin/AssignWilayasDialog";
 import { FeedbackPanel } from "@/components/admin/FeedbackPanel";
+import { VolunteerPanel } from "@/components/admin/VolunteerPanel";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -86,6 +87,13 @@ function AdminPage() {
         <div className="mt-6">
           <AdminOverview />
         </div>
+
+        <h2 className="mt-10 text-2xl font-semibold tracking-tight">Volunteers</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          People who offered to help their wilaya. When the time comes, create their account
+          match and assign a role under “Moderators & roles”.
+        </p>
+        <VolunteerPanel />
 
         <h2 className="mt-10 text-2xl font-semibold tracking-tight">Feedback</h2>
         <p className="mt-1 text-sm text-muted-foreground">

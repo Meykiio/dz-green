@@ -18,6 +18,7 @@ import { Route as FireRouteImport } from './routes/fire'
 import { Route as PlantRouteImport } from './routes/plant'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as VolunteerRouteImport } from './routes/volunteer'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedModerateRouteImport } from './routes/_authenticated/moderate'
@@ -68,6 +69,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VolunteerRoute = VolunteerRouteImport.update({
+  id: '/volunteer',
+  path: '/volunteer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
   id: '/activity',
   path: '/activity',
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/plant': typeof PlantRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/volunteer': typeof VolunteerRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/moderate': typeof AuthenticatedModerateRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/plant': typeof PlantRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/volunteer': typeof VolunteerRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/moderate': typeof AuthenticatedModerateRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/plant': typeof PlantRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/volunteer': typeof VolunteerRoute
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/moderate': typeof AuthenticatedModerateRoute
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
     | '/plant'
     | '/privacy'
     | '/terms'
+    | '/volunteer'
     | '/activity'
     | '/admin'
     | '/moderate'
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
     | '/plant'
     | '/privacy'
     | '/terms'
+    | '/volunteer'
     | '/activity'
     | '/admin'
     | '/moderate'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/plant'
     | '/privacy'
     | '/terms'
+    | '/volunteer'
     | '/_authenticated/activity'
     | '/_authenticated/admin'
     | '/_authenticated/moderate'
@@ -200,6 +212,7 @@ export interface RootRouteChildren {
   PlantRoute: typeof PlantRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
+  VolunteerRoute: typeof VolunteerRoute
   MyTokenRoute: typeof MyTokenRoute
   ApiPublicPhotoSplatRoute: typeof ApiPublicPhotoSplatRoute
 }
@@ -269,6 +282,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/volunteer': {
+      id: '/volunteer'
+      path: '/volunteer'
+      fullPath: '/volunteer'
+      preLoaderRoute: typeof VolunteerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/activity': {
       id: '/_authenticated/activity'
       path: '/activity'
@@ -332,6 +352,7 @@ const rootRouteChildren: RootRouteChildren = {
   PlantRoute: PlantRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
+  VolunteerRoute: VolunteerRoute,
   MyTokenRoute: MyTokenRoute,
   ApiPublicPhotoSplatRoute: ApiPublicPhotoSplatRoute,
 }

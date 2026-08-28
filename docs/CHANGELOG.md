@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-28 (forty-eighth pass) — Volunteer recruitment (wilaya moderators)
+
+- **Owner request, urgent — recruit wilaya moderators while the country watches the fires** (Aug 26–27: 12+ dead, 54 injured across Jijel/Béjaïa/Tizi Ouzou; 154 fires in a day). New `/volunteer` page: warm, civic hero ("Every green dot starts with a person"), what volunteers do (review plantings / triage fire reports / rally your area), what we ask (a few minutes, honesty), what we never ask — money, equipment, **firefighting** (we are not an emergency service; Protection Civile 14/1021 stays prominent). Simple form: name, email, phone/WhatsApp, wilaya dropdown (all 58), extra wilayas, intent chips (preselects "Review plantings"), availability, message, honeypot.
+- **Schema:** `public.volunteers` — PII-heavy, same posture as feedback: RLS on, **zero client grants**, service-role only; `status` track (new → contacted → onboarded). Migration mirrored in `supabase/migrations/20260828120000_*.sql`; **applied via the dashboard SQL editor** (MCP SQL tools unavailable in session).
+- **Admin:** `VolunteerPanel` on `/admin` (intent chips, status select, onboard hint). Server fns: `adminListVolunteers`, `adminSetVolunteerStatus` (requireAdmin). Drawer nav gets a "Volunteer" row (HandHeart).
+- Verified: tsc clean, 113/113 unit (8 new zod tests), build green; SSR-rendered page verified headlessly (dev verification on :8090 — an unrelated Expo app squats on :8081 in this environment).
+
 ## 2026-08-22 (fortieth pass) — Phase 1 quick wins: mobile legend fix + /plant trims
 
 - **Mobile legend cutoff fixed (owner-reported):** the Trees/Care/Fires legend pill next to the Map/List/Board toggle overflowed small screens. The text labels are now `hidden sm:inline` — dots stay visible on phones (the color key survives), the full legend returns at ≥sm.

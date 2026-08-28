@@ -161,6 +161,47 @@ export const adminListFeedback = createServerFn({ method: "GET" }).handler(
   },
 );
 
+export interface AdminVolunteer {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  wilaya_code: string;
+  extra_wilayas: string | null;
+  intents: string;
+  availability: string | null;
+  message: string | null;
+  status: "new" | "contacted" | "onboarded";
+  created_at: string;
+}
+
+export const adminListVolunteers = createServerFn({ method: "GET" }).handler(
+  async (): Promise<AdminVolunteer[]> => {
+    await requireAdmin();
+    const { data, error } = await supabaseAdmin
+      .from("volunteers")
+      .select("id, name, email, phone, wilaya_code, extra_wilayas, intents, availability, message, status, created_at")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error) throw error;
+    // status is check-constrained; the generated types only know string.
+    return (data ?? []) as AdminVolunteer[];
+  },
+);
+
+export const adminSetVolunteerStatus = createServerFn({ method: "POST" })
+  .validator((data: unknown) =>
+    z.object({ id: z.string().uuid(), status: z.enum(["new", "contacted", "onboarded"]) }).parse(data),
+  )
+  .handler(async ({ data }) => {
+    await requireAdmin();
+    const { error } = await supabaseAdmin
+      .from("volunteers")
+      .update({ status: data.status })
+      .eq("id", data.id);
+    if (error) throw error;
+  });
+
 export interface AdminStats {
   users: number;
   sites: { pending: number; approved: number; rejected: number };
