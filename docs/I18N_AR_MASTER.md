@@ -594,10 +594,7 @@ React: hovering (desktop) or tap-hold (mobile). Radix tooltip is already a depen
 
 ## Open questions for Mekhi
 
-1. **Default language:** Arabic default with an EN toggle (recommended — the audience is Algerian; EN stays one click away), or English default with an AR toggle?
-2. **Brand treatment in AR mode:** keep the Latin "Green Algeria" wordmark with Arabic below it (recommended — recognizable), or switch fully to «الجزائر الخضراء»?
-3. **Wilaya names in AR UI:** keep Latin names first with Arabic in parentheses (e.g. "16 — Alger — الجزائر"), or Arabic first? (Recommend Arabic first in AR mode.)
-4. Anything in this table that reads wrong to you — mark it and I'll adjust (this is the review gate).
+**RESOLVED 2026-08-28** — Arabic default ✅; brand switches to «الجزائر الخضراء» in AR mode ✅ (Latin wordmark in EN); wilaya names in Arabic in AR mode ✅. Question 4 stays open forever: anything in this table that reads wrong to you — mark it and it gets fixed in one place (the dict), not across files.
 
 ---
 

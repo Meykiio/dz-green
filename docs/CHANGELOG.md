@@ -2,6 +2,18 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-28 (forty-ninth pass) — Arabic-first interface
+
+Owner request: the whole platform in Arabic (default), with English one click away. Phased on `feat/ar-i18n`, each phase verified + committed separately: i18n core → chrome/home → forms → info pages → moderation/admin → feedback/offline/tooltips.
+
+- **Core** (`src/i18n/`): typed dictionaries en/ar (key parity enforced by tsc — a missing translation is a compile error), `pluralAr` numeral agreement (1/2/3–10/11+ with Western digits), Arabic dates via `ar-DZ` + Latin digits, singleton locale + no-flash script (default `ar`, EN users set `ga-locale` pre-paint), RTL `html lang/dir`, Noto Sans Arabic + Noto Kufi Arabic self-hosted (display-hero swaps per direction).
+- **Owner decisions applied:** Arabic default; brand text «الجزائر الخضراء» in AR mode (Latin wordmark in EN); wilaya names shown in Arabic (data `nameAr`) everywhere.
+- **Surfaces migrated:** AppShell (nav/brand/locale toggle English⇄عربي), EmergencyContacts, home (hero/stats/CTAs/chips/ticker/board/leaderboard), SiteList, DetailPanel (incl. fire disclaimer kept intact), plant/care/fire flows, LocationField (wilaya dropdown Arabic), PhotoInput, ReceiptLink, PrecisionPicker, about/privacy/terms (Law 18-07 cited by its official Arabic name; Protection Civile lines bold and untouched), auth, receipt page, 404/error boundary, moderation (queue, triage, contact reveal), activity, admin (roles, wilaya assignment in Arabic), AdminOverview, FeedbackPanel, FeedbackDialog, offline toasts. Server error strings are rewritten locally via a known-message map.
+- **RTL fixes:** drawer slides the correct way, map zoom/recenter move to the corner opposite the action card, arrows mirror, inline `text-left` → `rtl:text-right` where needed, hero width.
+- **Tooltips (first batch):** legend dots, leaderboard toggle, Needs-water chip, receipt copy button — EN + AR. Radix Tooltip already installed.
+- **Verified:** tsc clean after every phase; 105/105 unit tests; `bun run build` green; headless Playwright smoke (home/plant/fire default-Arabic) passed. Screenshot review loop with the owner (drawer placement, hero width, control overlap caught and fixed).
+- **Known limitation (honest):** route `head()` uses the singleton locale — a returning EN visitor gets Arabic meta on first SSR until a client nav; default-language visitors (the target majority) are exact. Documented, accepted, fixable later via cookie-aware head if needed.
+
 ## 2026-08-22 (fortieth pass) — Phase 1 quick wins: mobile legend fix + /plant trims
 
 - **Mobile legend cutoff fixed (owner-reported):** the Trees/Care/Fires legend pill next to the Map/List/Board toggle overflowed small screens. The text labels are now `hidden sm:inline` — dots stay visible on phones (the color key survives), the full legend returns at ≥sm.

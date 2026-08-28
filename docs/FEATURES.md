@@ -104,7 +104,11 @@ The gate is four layers, all server-side, no third-party dependency:
 
 ## 11. Automated tests (2026-08-18)
 
-- `bun run test`: 91 unit tests (geometry, wilayas, abuse gate incl. silent-drop + device-hash, submissions validation, Google Maps link parsing).
+- `bun run test`: 105 unit tests (geometry, wilayas, abuse gate incl. silent-drop + device-hash, submissions validation, Google Maps link parsing, feedback schemas) — 2026-08-28 run.
+
+## 11b. Arabic interface (2026-08-28) — implemented
+
+Arabic is the default UI language; English is one toggle away (top bar «عربي / English», persisted in `ga-locale`). Everything is translated from the reviewed master table in `docs/I18N_AR_MASTER.md` — warm-plain MSA, official terms verified against Algerian authorities («الحماية المدنية» 14/1021, Law 18-07 official title), wilaya names in Arabic, full RTL layout with self-hosted Noto Sans/Kufi Arabic, locale-aware dates and numeral agreement. Tooltips added for the less obvious bits (legend, leaderboard, needs-water, receipt link). See `CHANGELOG.md` forty-ninth pass for the phased list.
 - `bunx playwright test`: 16 live E2E tests — `e2e/flows.spec.ts` (5 core flows), `e2e/admin.spec.ts` (3 role-management flows), `e2e/receipts.spec.ts` (receipt round-trip, unknown-token, silent drop, wilaya-only), `e2e/activity.spec.ts` (4 dashboard flows: auth redirect, own activity, empty states, admin overview). Fixtures are SQL-seeded per the recipe in `SYSTEM_INSTRUCTIONS.md` and cleaned up after.
 - RLS battery: `rls-audit3.mjs` role-matrix (anon / regular / wilaya-moderator / admin) — 40/40 checks green on 2026-08-17, including cross-wilaya write no-ops, contact scoping, self-promotion denial and trigger sync.
 
