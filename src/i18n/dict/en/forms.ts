@@ -81,6 +81,11 @@ export const forms = {
     exact: "Exact location (optional)",
     helper: "Used once, never stored. Skip it and the report is wilaya-level.",
     useLocation: "Use my location",
+    improving: "Improving…",
+    useNow: "Use this now",
+    bestFix:
+      "Best fix so far: ±{m} m — stops automatically at ±{good} m or {s} s.",
+    waitingFirstFix: "Waiting for the first fix…",
     hideMap: "Hide map",
     adjust: "Adjust on map",
     removePin: "Remove pin",

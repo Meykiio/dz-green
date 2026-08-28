@@ -2,7 +2,6 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
-<<<<<<< HEAD
 ## 2026-08-28 (forty-ninth pass) — Arabic-first interface
 
 Owner request: the whole platform in Arabic (default), with English one click away. Phased on `feat/ar-i18n`, each phase verified + committed separately: i18n core → chrome/home → forms → info pages → moderation/admin → feedback/offline/tooltips.
@@ -14,14 +13,25 @@ Owner request: the whole platform in Arabic (default), with English one click aw
 - **Tooltips (first batch):** legend dots, leaderboard toggle, Needs-water chip, receipt copy button — EN + AR. Radix Tooltip already installed.
 - **Verified:** tsc clean after every phase; 105/105 unit tests; `bun run build` green; headless Playwright smoke (home/plant/fire default-Arabic) passed. Screenshot review loop with the owner (drawer placement, hero width, control overlap caught and fixed).
 - **Known limitation (honest):** route `head()` uses the singleton locale — a returning EN visitor gets Arabic meta on first SSR until a client nav; default-language visitors (the target majority) are exact. Documented, accepted, fixable later via cookie-aware head if needed.
-=======
+
 ## 2026-08-28 (forty-eighth pass) — Volunteer recruitment (wilaya moderators)
 
 - **Owner request, urgent — recruit wilaya moderators while the country watches the fires** (Aug 26–27: 12+ dead, 54 injured across Jijel/Béjaïa/Tizi Ouzou; 154 fires in a day). New `/volunteer` page: warm, civic hero ("Every green dot starts with a person"), what volunteers do (review plantings / triage fire reports / rally your area), what we ask (a few minutes, honesty), what we never ask — money, equipment, **firefighting** (we are not an emergency service; Protection Civile 14/1021 stays prominent). Simple form: name, email, phone/WhatsApp, wilaya dropdown (all 58), extra wilayas, intent chips (preselects "Review plantings"), availability, message, honeypot.
-- **Schema:** `public.volunteers` — PII-heavy, same posture as feedback: RLS on, **zero client grants**, service-role only; `status` track (new → contacted → onboarded). Migration mirrored in `supabase/migrations/20260828120000_*.sql`; **applied via the dashboard SQL editor** (MCP SQL tools unavailable in session).
+- **Schema:** `public.volunteers` — PII-heavy, same posture as feedback: RLS on, **zero client grants**, service-role only; `status` track (new → contacted → onboarded). Migration applied live (2026-08-28, MCP); shape verified after apply.
 - **Admin:** `VolunteerPanel` on `/admin` (intent chips, status select, onboard hint). Server fns: `adminListVolunteers`, `adminSetVolunteerStatus` (requireAdmin). Drawer nav gets a "Volunteer" row (HandHeart).
-- Verified: tsc clean, 113/113 unit (8 new zod tests), build green; SSR-rendered page verified headlessly (dev verification on :8090 — an unrelated Expo app squats on :8081 in this environment).
->>>>>>> origin/feat/volunteers
+- **Merged into the Arabic-first main; all volunteer surfaces localized** in the merge (route, form, admin panel — dictionary keys, no hard-coded strings).
+- Verified: tsc clean, 113/113 unit (8 new zod tests), build green.
+
+## 2026-08-24 (forty-sixth pass) — Map direction: the live look is the look (boundary swap reverted)
+
+- **Owner verdict after the side-by-side:** he prefers the **map look of the live version** — the original Natural Earth wilaya boundaries on the real basemap. The 69-wilaya boundary swap (detailed SVG shapes) was **evaluated, verified (11-town check, 9/11 + Aflou edge + El Aricha source error), and reverted** — the map keeps its original boundaries. The verification research stays documented in `docs/MAP_ARCHITECTURE_REPORT.md` §8 (and in git history) for a future revisit.
+- **Kept from the review cycle:** GPS best-fix watch (see the next pass), the picker slow-tile feedback, and all previously shipped features. No map data changed in the shipped state; the dim mask, Algeria-only label filter, north framing and leaderboard stay as live.
+- The tile-free schematic map experiment was also dropped (owner: prefers the real basemap).
+
+## 2026-08-22 (forty-fifth pass) — GPS best-fix watch
+
+- **GPS accuracy fix (owner-approved after discussion):** the "Use my location" button no longer grabs the first fix (usually a coarse network/WiFi guess at ±50–500 m). It now runs a 12 s `watchPosition`, keeps the best reading, shows "Best fix so far: ±X m" live, stops early at ±15 m, and offers "Use this now" to accept the current best — typically ±5–20 m instead of ±50–100 m, same hardware. `maximumAge: 0` on the watch so fixes are fresh. Verified headlessly with a mocked ±10 m fix: pin sets, improving state clears. (Localized in the Arabic-first merge — same behavior, both languages.)
+- **Seed data cleaned (owner-requested):** all SEED-marked plantings + care logs + fires deleted via the marker, plus the owner's own test post (row, receipt, photo). All tables verified zero.
 
 ## 2026-08-22 (fortieth pass) — Phase 1 quick wins: mobile legend fix + /plant trims
 
