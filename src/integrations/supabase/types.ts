@@ -343,6 +343,48 @@ export type Database = {
         }
         Relationships: []
       }
+      volunteers: {
+        Row: {
+          created_at: string
+          email: string
+          extra_wilayas: string | null
+          id: string
+          intents: string
+          message: string | null
+          name: string
+          phone: string | null
+          status: string
+          wilaya_code: string
+          availability: string | null
+        }
+        Insert: {
+          availability?: string | null
+          created_at?: string
+          email: string
+          extra_wilayas?: string | null
+          id?: string
+          intents: string
+          message?: string | null
+          name: string
+          phone?: string | null
+          status?: string
+          wilaya_code: string
+        }
+        Update: {
+          availability?: string | null
+          created_at?: string
+          email?: string
+          extra_wilayas?: string | null
+          id?: string
+          intents?: string
+          message?: string | null
+          name?: string
+          phone?: string | null
+          status?: string
+          wilaya_code?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       geography_columns: {

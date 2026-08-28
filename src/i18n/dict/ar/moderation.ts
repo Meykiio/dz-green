@@ -150,6 +150,7 @@ export const moderation: typeof import("../en/moderation").moderation = {
       other: "شيء آخر",
     },
     applied: " · أرسل في {date}",
+    wilayaSuffix: " · {wilaya}",
     statusAria: "وضع المتطوع",
     also: "أيضًا: {extra}",
     time: "الوقت: {availability}",

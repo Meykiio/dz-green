@@ -8,6 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { AdminOverview } from "@/components/admin/AdminOverview";
 import { AssignWilayasDialog } from "@/components/admin/AssignWilayasDialog";
 import { FeedbackPanel } from "@/components/admin/FeedbackPanel";
+import { VolunteerPanel } from "@/components/admin/VolunteerPanel";
 import { Button } from "@/components/ui/button";
 import { ssrT, useI18n } from "@/i18n";
 import { useAuth } from "@/hooks/useAuth";
@@ -81,6 +82,10 @@ function AdminPage() {
         <div className="mt-6">
           <AdminOverview />
         </div>
+
+        <h2 className="mt-10 text-2xl font-semibold tracking-tight">{t("moderation.adm.volunteers")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("moderation.adm.volunteersLead")}</p>
+        <VolunteerPanel />
 
         <h2 className="mt-10 text-2xl font-semibold tracking-tight">{t("moderation.adm.feedback")}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{t("moderation.adm.feedbackLead")}</p>

@@ -53,6 +53,7 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `fire.tsx` | `/fire` | Fire report form → `submitFire`. Publishes immediately; Protection Civile disclaimer on form + success screen. |
 | `my/$token.tsx` | `/my/<token>` | Public receipt page: kind, moderation status, date, wilaya for an anonymous submission. No PII. `noindex`. |
 | `auth.tsx` | `/auth` | Email/password sign-in and sign-up. |
+| `volunteer.tsx` | `/volunteer` | Big warm ask: `VolunteerForm` (name/email/phone/wilaya/intents/availability/message, honeypot) → `submitVolunteer`; "not an emergency service; call Protection Civile 14/1021" stays visible. Admin-only: `VolunteerPanel` lists applications (status new→contacted→onboarded). |
 | `_authenticated/route.tsx` | — | Auth gate (`ssr: false`), redirects signed-out users to `/auth`. |
 | `_authenticated/moderate.tsx` | `/moderate` | Moderation dashboard: stats strip, segmented tab bar (`ModTabs`), pending queue, fire triage, alert contacts. Wilaya-scoped by RLS. `noindex`. |
 | `_authenticated/admin.tsx` | `/admin` | Admin dashboard: Overview (platform stats + wilaya oversight) and Moderators & roles (user list, role actions, assign-wilayas dialog). Admin-only guard. `noindex`. |
@@ -64,7 +65,9 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 
 | Path | Purpose |
 |---|---|
-| `AppShell.tsx` | Global chrome, split by route: public pages get a top nav-bar (hamburger drawer, `inert` when closed); app pages (`/moderate`, `/admin`, `/activity`) get the sidebar shell. The mobile bottom action bar was removed 2026-08-21. |
+| `AppShell.tsx` | Global chrome, split by route: public pages get a top nav-bar (hamburger drawer, `inert` when closed); app pages (`/moderate`, `/admin`, `/activity`) get the sidebar shell. The mobile bottom action bar was removed 2026-08-21. Drawer contains the Volunteer row (HandHeart). |
+| `volunteer/VolunteerForm.tsx` | The `/volunteer` form: name/email/phone-whatsapp/wilaya dropdown (58)/extra-wilayas/intent chips (preselected "Review plantings")/availability/message, honeypot, success state. |
+| `admin/VolunteerPanel.tsx` | Admin-only list of volunteer applications: info + intent chips + status select (new/contacted/onboarded) + onboard hint (moderator role + wilaya). |
 | `FormShell.tsx` | Card-wrapped form container (rounded-2xl family) + the `Honeypot` hidden-field component. |
 | `PhotoInput.tsx` | Camera-capable file input; compresses on-device (max 1024px, WebP/JPEG) before base64 handoff. |
 | `ReceiptLink.tsx` | Success-screen receipt link: copyable `/my/<token>` URL, the only status lookup for anonymous submitters. |
@@ -115,7 +118,11 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `activity.functions.ts` | `myFireReports`: a signed-in user's own fire reports — `fire_reports.user_id` is not column-granted to clients, so the server filters by the caller's token. |
 | `error-capture.ts`, `error-page.ts` | Platform error plumbing. |
 | `utils.ts` | `cn()` class merge helper. |
+<<<<<<< HEAD
 | `__tests__/` | 6 files, **105 unit tests** (2026-08-28 run): abuse gate, Zod schemas, wilaya derivation/geometry, Google Maps link parsing, `needsWater` boundaries, feedback schemas. |
+=======
+| `__tests__/` | 7 files, **113 unit tests** (2026-08-28 run): abuse gate, Zod schemas, wilaya derivation/geometry, Google Maps link parsing, `needsWater` boundaries, feedback + volunteer schemas. |
+>>>>>>> origin/feat/volunteers
 
 ## `src/hooks/`, `src/data/`, `src/integrations/`
 

@@ -150,6 +150,7 @@ export const moderation = {
       other: "Other",
     },
     applied: " · applied {date}",
+    wilayaSuffix: " · {wilaya}",
     statusAria: "Volunteer status",
     also: "Also: {extra}",
     time: "Time: {availability}",
