@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   GeolocateControl,
   Map as MapLibreMap,
@@ -39,6 +39,9 @@ export default function PrecisionPicker({ lat, lng, accuracy, onChange }: Props)
   const markerRef = useRef<Marker | null>(null);
   const onChangeRef = useRef(onChange);
   const accuracyRef = useRef(accuracy);
+  // Tiles can stall on weak networks: the pin (a DOM element) still renders,
+  // so a blank map looks broken with no explanation. Say what's happening.
+  const [tileState, setTileState] = useState<"loading" | "slow" | "failed" | "ok">("loading");
   onChangeRef.current = onChange;
   accuracyRef.current = accuracy;
 
@@ -55,6 +58,16 @@ export default function PrecisionPicker({ lat, lng, accuracy, onChange }: Props)
     });
     map.addControl(new NavigationControl({ showCompass: false }), "top-right");
     map.addControl(new GeolocateControl({ trackUserLocation: false }), "top-right");
+
+    const slowTimer = setTimeout(() => setTileState((s) => (s === "loading" ? "slow" : s)), 8000);
+    map.on("load", () => {
+      clearTimeout(slowTimer);
+      setTileState("ok");
+    });
+    map.on("error", (e) => {
+      console.error("[picker] map error:", e.error);
+      setTileState((s) => (s === "ok" ? s : "failed"));
+    });
 
     const marker = new Marker({ color: "#4ade80", draggable: true })
       .setLngLat(start)
@@ -119,6 +132,7 @@ export default function PrecisionPicker({ lat, lng, accuracy, onChange }: Props)
     markerRef.current = marker;
 
     return () => {
+      clearTimeout(slowTimer);
       map.remove();
       mapRef.current = null;
       markerRef.current = null;
@@ -135,10 +149,22 @@ export default function PrecisionPicker({ lat, lng, accuracy, onChange }: Props)
   }, [lat, lng]);
 
   return (
-    <div
-      ref={container}
-      className="h-64 w-full overflow-hidden rounded-xl border border-border"
-      aria-label={t("forms.location.pickerAria")}
-    />
+    <div className="relative">
+      <div
+        ref={container}
+        className="h-64 w-full overflow-hidden rounded-xl border border-border"
+        aria-label={t("forms.location.pickerAria")}
+      />
+      {tileState === "slow" && (
+        <p className="absolute inset-x-2 top-2 rounded-lg border border-border bg-card/95 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur">
+          {t("forms.location.tileSlow")}
+        </p>
+      )}
+      {tileState === "failed" && (
+        <p className="absolute inset-x-2 top-2 rounded-lg border border-fire/40 bg-fire/10 px-3 py-1.5 text-xs">
+          {t("forms.location.tileFailed")}
+        </p>
+      )}
+    </div>
   );
 }

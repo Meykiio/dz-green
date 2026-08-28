@@ -103,6 +103,10 @@ export const forms = {
     },
     adjustSuffix: "— adjust the pin if needed",
     pickerAria: "Drag the pin to the exact location",
+    tileSlow:
+      "Map is loading slowly — weak connection. You can still drag the pin, or paste a Google Maps link instead.",
+    tileFailed:
+      "The map couldn't load (connection issue). The pin still works — or paste a Google Maps link instead.",
   },
   photo: {
     error: "Could not read that photo. Try another one.",
