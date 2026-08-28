@@ -71,6 +71,13 @@ export const moderation = {
       fire: "Report a fire",
     },
     note: "Moderator note: {note}",
+    inWilaya: "in {wilaya}",
+    care: {
+      watered: "Watered",
+      checked: "Checked on it",
+      needsAttention: "Reported needs attention",
+      update: "Update",
+    },
     status: {
       pending: "Under review",
       approved: "On the map",

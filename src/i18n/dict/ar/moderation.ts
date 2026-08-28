@@ -71,6 +71,13 @@ export const moderation: typeof import("../en/moderation").moderation = {
       fire: "أبلغ عن حريق",
     },
     note: "ملاحظة المشرف: {note}",
+    inWilaya: "في {wilaya}",
+    care: {
+      watered: "سقيتها",
+      checked: "تابعتها",
+      needsAttention: "أبلغتُ أنها تحتاج عناية",
+      update: "تحديث",
+    },
     status: {
       pending: "قيد المراجعة",
       approved: "في الخريطة",

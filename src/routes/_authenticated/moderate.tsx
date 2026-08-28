@@ -6,24 +6,22 @@ import { AppShell } from "@/components/AppShell";
 import { FireTriage } from "@/components/moderator/FireTriage";
 import { ModTabs, type Section } from "@/components/moderator/ModTabs";
 import { PendingQueue } from "@/components/moderator/PendingQueue";
+import { ssrT, useI18n } from "@/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useModerationStats } from "@/lib/moderation";
 
-const TITLE = "Moderation — Green Algeria";
-const DESCRIPTION = "Review pending plantings and triage fire reports.";
-
-const SECTION_TITLES: Record<Section, string> = {
-  queue: "Pending plantings",
-  fires: "Fire reports",
+const SECTION_KEY: Record<Section, string> = {
+  queue: "mod.headingQueue",
+  fires: "mod.headingFires",
 };
 
 export const Route = createFileRoute("/_authenticated/moderate")({
   head: () => ({
     meta: [
-      { title: TITLE },
-      { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESCRIPTION },
+      { title: ssrT("meta.moderationTitle") },
+      { name: "description", content: ssrT("meta.moderationDesc") },
+      { property: "og:title", content: ssrT("meta.moderationTitle") },
+      { property: "og:description", content: ssrT("meta.moderationDesc") },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -31,6 +29,7 @@ export const Route = createFileRoute("/_authenticated/moderate")({
 });
 
 function ModeratePage() {
+  const { t } = useI18n();
   const { isModerator, loading } = useAuth();
   const navigate = useNavigate();
   const stats = useModerationStats(isModerator);
@@ -43,7 +42,7 @@ function ModeratePage() {
   if (loading) {
     return (
       <AppShell>
-        <p className="p-8 text-muted-foreground">Checking your access…</p>
+        <p className="p-8 text-muted-foreground">{t("mod.mod.checking")}</p>
       </AppShell>
     );
   }
@@ -59,17 +58,15 @@ function ModeratePage() {
     <AppShell>
       <div className="mx-auto w-full max-w-6xl px-4 py-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {SECTION_TITLES[section]}
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{t(SECTION_KEY[section])}</h1>
           <ModTabs section={section} onSelect={setSection} counts={counts} />
         </div>
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat label="Pending" value={stats.data?.pending} tone="text-plant" />
-          <Stat label="Approved today" value={stats.data?.approvedToday} />
-          <Stat label="Active fires" value={stats.data?.activeFires} tone="text-fire" />
-          <Stat label="Total submissions" value={stats.data?.totalSubmissions} />
+          <Stat label={t("mod.mod.statPending")} value={stats.data?.pending} tone="text-plant" />
+          <Stat label={t("mod.mod.statApprovedToday")} value={stats.data?.approvedToday} />
+          <Stat label={t("mod.mod.statActiveFires")} value={stats.data?.activeFires} tone="text-fire" />
+          <Stat label={t("mod.mod.statTotal")} value={stats.data?.totalSubmissions} />
         </div>
 
         <main className="mt-6">

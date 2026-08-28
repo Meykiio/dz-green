@@ -9,6 +9,7 @@ import { AdminOverview } from "@/components/admin/AdminOverview";
 import { AssignWilayasDialog } from "@/components/admin/AssignWilayasDialog";
 import { FeedbackPanel } from "@/components/admin/FeedbackPanel";
 import { Button } from "@/components/ui/button";
+import { ssrT, useI18n } from "@/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import {
   adminListUsers,
@@ -18,25 +19,19 @@ import {
 } from "@/lib/admin.functions";
 import { wilayaName } from "@/lib/wilayas";
 
-const TITLE = "Admin — Green Algeria";
-
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: TITLE },
-      { property: "og:title", content: TITLE },
+      { title: ssrT("meta.adminTitle") },
+      { property: "og:title", content: ssrT("meta.adminTitle") },
       { name: "robots", content: "noindex" },
     ],
   }),
   component: AdminPage,
 });
 
-const ROLE_LABEL: Record<"admin" | "moderator", string> = {
-  admin: "Admin",
-  moderator: "Moderator",
-};
-
 function AdminPage() {
+  const { t } = useI18n();
   const { isAdmin, loading, user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -53,7 +48,7 @@ function AdminPage() {
   const setRole = useMutation({
     mutationFn: adminSetRole,
     onSuccess: () => {
-      toast.success("Role updated");
+      toast.success(t("moderation.adm.toastRole"));
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -62,7 +57,7 @@ function AdminPage() {
   const signOut = useMutation({
     mutationFn: adminSignOutUser,
     onSuccess: () => {
-      toast.success("User signed out");
+      toast.success(t("moderation.adm.toastSignout"));
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -71,7 +66,7 @@ function AdminPage() {
   if (loading) {
     return (
       <AppShell>
-        <p className="p-8 text-muted-foreground">Checking your access…</p>
+        <p className="p-8 text-muted-foreground">{t("moderation.adm.checking")}</p>
       </AppShell>
     );
   }
@@ -81,59 +76,60 @@ function AdminPage() {
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-5xl px-4 py-8">
-        <p className="eyebrow">Administration</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">Overview</h1>
+        <p className="eyebrow">{t("moderation.adm.eyebrow")}</p>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight">{t("moderation.adm.overview")}</h1>
         <div className="mt-6">
           <AdminOverview />
         </div>
 
-        <h2 className="mt-10 text-2xl font-semibold tracking-tight">Feedback</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Messages from the Feedback button, newest first.
-        </p>
+        <h2 className="mt-10 text-2xl font-semibold tracking-tight">{t("moderation.adm.feedback")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("moderation.adm.feedbackLead")}</p>
         <FeedbackPanel />
 
-        <h2 className="mt-10 text-2xl font-semibold tracking-tight">Moderators &amp; roles</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Admins control everything. Moderators act only inside their assigned wilayas.
-        </p>
+        <h2 className="mt-10 text-2xl font-semibold tracking-tight">{t("moderation.adm.roles")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("moderation.adm.rolesLead")}</p>
 
         {users.isError && (
           <p className="mt-6 rounded-lg border border-fire/40 bg-fire/10 px-4 py-3 text-sm">
-            Couldn't load the user list — refresh to try again.
+            {t("moderation.adm.errUsers")}
           </p>
         )}
-        {users.isLoading && <p className="mt-6 text-muted-foreground">Loading users…</p>}
+        {users.isLoading && <p className="mt-6 text-muted-foreground">{t("moderation.adm.loadingUsers")}</p>}
 
         <div className="mt-6 space-y-3">
           {(users.data ?? []).map((u) => (
             <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4">
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">
-                  {u.display_name || "No display name"}
-                  <span className="ml-2 text-xs font-normal text-muted-foreground">{u.email}</span>
+                  {u.display_name || t("moderation.adm.noName")}
+                  <span className="ms-2 text-xs font-normal text-muted-foreground">{u.email}</span>
                 </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   {u.role ? (
                     <>
-                      <span className="font-semibold text-foreground">{ROLE_LABEL[u.role]}</span>
+                      <span className="font-semibold text-foreground">
+                        {t(`moderation.adm.role.${u.role}`)}
+                      </span>
                       {u.role === "moderator" &&
                         (u.wilayas.length > 0
-                          ? ` · ${u.wilayas.length} wilaya${u.wilayas.length > 1 ? "s" : ""}: ${u.wilayas
-                              .slice(0, 4)
-                              .map(wilayaName)
-                              .join(", ")}${u.wilayas.length > 4 ? "…" : ""}`
-                          : " · no wilayas assigned yet")}
+                          ? t("moderation.adm.rolesWilayas", {
+                              n: u.wilayas.length,
+                              names: u.wilayas
+                                .slice(0, 4)
+                                .map(wilayaName)
+                                .join("، "),
+                            }) + (u.wilayas.length > 4 ? "…" : "")
+                          : t("moderation.adm.noWilayas"))}
                     </>
                   ) : (
-                    "No role"
+                    t("moderation.adm.noRole")
                   )}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {u.role !== "admin" && (
                   <Button size="sm" onClick={() => setRole.mutate({ data: { userId: u.id, role: "admin" } })}>
-                    Make admin
+                    {t("moderation.adm.makeAdmin")}
                   </Button>
                 )}
                 {u.role !== "moderator" && (
@@ -142,12 +138,12 @@ function AdminPage() {
                     variant="secondary"
                     onClick={() => setRole.mutate({ data: { userId: u.id, role: "moderator" } })}
                   >
-                    Make moderator
+                    {t("moderation.adm.makeModerator")}
                   </Button>
                 )}
                 {u.role === "moderator" && (
                   <Button size="sm" variant="outline" onClick={() => setAssigning(u)}>
-                    Assign wilayas
+                    {t("moderation.adm.assignWilayas")}
                   </Button>
                 )}
                 {u.role && u.id !== user?.id && (
@@ -158,7 +154,7 @@ function AdminPage() {
                     disabled={setRole.isPending}
                   >
                     <UserX className="size-4" />
-                    Remove role
+                    {t("moderation.adm.removeRole")}
                   </Button>
                 )}
                 {u.id !== user?.id && (
@@ -168,14 +164,14 @@ function AdminPage() {
                     onClick={() => signOut.mutate({ data: { userId: u.id } })}
                     disabled={signOut.isPending}
                   >
-                    Sign out
+                    {t("chrome.auth.signout")}
                   </Button>
                 )}
               </div>
             </div>
           ))}
           {users.data && users.data.length === 0 && (
-            <p className="text-muted-foreground">No users yet.</p>
+            <p className="text-muted-foreground">{t("moderation.adm.emptyUsers")}</p>
           )}
         </div>
       </div>
