@@ -10,15 +10,12 @@ import { FormShell, Honeypot } from "@/components/FormShell";
 import { PhotoInput } from "@/components/PhotoInput";
 import { ReceiptLink } from "@/components/ReceiptLink";
 import { Button } from "@/components/ui/button";
+import { localizeError, ssrT, useI18n } from "@/i18n";
 import { sitesQuery } from "@/lib/data";
 import { getDeviceSecret } from "@/lib/device";
 import { submitCare } from "@/lib/submissions.functions";
 import { submitResilient } from "@/lib/offline";
 import { wilayaName } from "@/lib/wilayas";
-
-const TITLE = "Log care for a planting — Green Algeria";
-const DESCRIPTION =
-  "Watered or checked on a planting site? Log it so everyone can see which trees are still being looked after.";
 
 const searchSchema = z.object({ site: z.string().uuid().optional() });
 
@@ -26,23 +23,24 @@ export const Route = createFileRoute("/care")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: TITLE },
-      { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESCRIPTION },
+      { title: ssrT("meta.careTitle") },
+      { name: "description", content: ssrT("meta.careDesc") },
+      { property: "og:title", content: ssrT("meta.careTitle") },
+      { property: "og:description", content: ssrT("meta.careDesc") },
     ],
   }),
   component: CarePage,
 });
 
 const ACTIONS = [
-  { value: "watered", label: "Watered" },
-  { value: "checked", label: "Checked on it" },
-  { value: "needs_attention", label: "Needs attention" },
-  { value: "other", label: "Other" },
+  { value: "watered", key: "watered" },
+  { value: "checked", key: "checked" },
+  { value: "needs_attention", key: "needsAttention" },
+  { value: "other", key: "other" },
 ] as const;
 
 function CarePage() {
+  const { t, count } = useI18n();
   const router = useRouter();
   const { site: initialSite } = Route.useSearch();
   const sites = useQuery(sitesQuery);
@@ -76,22 +74,24 @@ function CarePage() {
         }),
       ),
     onSuccess: () => setDone(true),
-    onError: (error: Error) => toast.error(error.message || "Could not submit. Try again."),
+    onError: (error: Error) => toast.error(localizeError(error.message ?? "")),
   });
 
   if (done) {
     return (
       <AppShell>
         <FormShell
-          title="Care logged"
-          intro="Thank you — it's on the map straight away. Care logs don't need review."
+          title={t("forms.care.doneTitle")}
+          intro={t("forms.care.doneIntro")}
           accent="care"
         >
           <div className="space-y-4">
             {mutation.data && mutation.data !== "queued" && mutation.data.receipt && (
               <ReceiptLink token={mutation.data.receipt} />
             )}
-            <Button onClick={() => router.navigate({ to: "/" })}>Back to the map</Button>
+            <Button onClick={() => router.navigate({ to: "/" })}>
+              {t("chrome.shell.backToMap")}
+            </Button>
           </div>
         </FormShell>
       </AppShell>
@@ -100,17 +100,13 @@ function CarePage() {
 
   return (
     <AppShell>
-      <FormShell
-        title="Log care"
-        intro="Anyone can care for any site — no ownership, no assignment. Publishes immediately."
-        accent="care"
-      >
+      <FormShell title={t("forms.care.title")} intro={t("forms.care.intro")} accent="care">
         <form
           className="relative space-y-5"
           onSubmit={(e) => {
             e.preventDefault();
             if (!siteId) {
-              toast.error("Choose the site you cared for.");
+              toast.error(t("forms.care.missing"));
               return;
             }
             mutation.mutate();
@@ -119,30 +115,30 @@ function CarePage() {
           <Honeypot value={hp} onChange={setHp} />
 
           <label className="block">
-            <span className="eyebrow">Site *</span>
+            <span className="eyebrow">{t("forms.care.site")}</span>
             <select
               required
               value={siteId}
               onChange={(e) => setSiteId(e.target.value)}
               className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"
             >
-              <option value="">Choose a planting site</option>
+              <option value="">{t("forms.care.chooseSite")}</option>
               {(sites.data ?? []).map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.species || `${s.tree_count} trees`} · {wilayaName(s.wilaya_code)}
+                  {s.species || count(s.tree_count, "tree")} · {wilayaName(s.wilaya_code)}
                   {s.commune ? ` · ${s.commune}` : ""}
                 </option>
               ))}
             </select>
             {sites.data?.length === 0 && (
               <span className="mt-1 block text-sm text-muted-foreground">
-                No approved sites yet — add a planting first.
+                {t("forms.care.noSites")}
               </span>
             )}
           </label>
 
           <div>
-            <span className="eyebrow">What did you do? *</span>
+            <span className="eyebrow">{t("forms.care.whatDidYouDo")}</span>
             <div className="mt-2 grid grid-cols-2 gap-2">
               {ACTIONS.map((a) => (
                 <button
@@ -156,14 +152,14 @@ function CarePage() {
                       : "border-border bg-card text-muted-foreground"
                   }`}
                 >
-                  {a.label}
+                  {t(`forms.care.action.${a.key}`)}
                 </button>
               ))}
             </div>
           </div>
 
           <label className="block">
-            <span className="eyebrow">Date *</span>
+            <span className="eyebrow">{t("forms.care.date")}</span>
             <input
               type="date"
               required
@@ -174,10 +170,10 @@ function CarePage() {
             />
           </label>
 
-          <PhotoInput value={photo} onChange={setPhoto} label="Photo" />
+          <PhotoInput value={photo} onChange={setPhoto} label={t("forms.care.photo")} />
 
           <label className="block">
-            <span className="eyebrow">Notes (optional)</span>
+            <span className="eyebrow">{t("forms.care.notes")}</span>
             <textarea
               value={notes}
               maxLength={1000}
@@ -188,7 +184,7 @@ function CarePage() {
           </label>
 
           <label className="block">
-            <span className="eyebrow">Your name (optional)</span>
+            <span className="eyebrow">{t("forms.care.name")}</span>
             <input
               value={name}
               maxLength={80}
@@ -198,7 +194,7 @@ function CarePage() {
           </label>
 
           <Button type="submit" size="lg" className="w-full" disabled={mutation.isPending}>
-            {mutation.isPending ? "Sending…" : "Log care"}
+            {mutation.isPending ? t("forms.plant.sending") : t("forms.care.submit")}
           </Button>
         </form>
       </FormShell>

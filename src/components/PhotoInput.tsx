@@ -1,6 +1,7 @@
 import { Camera, Loader2, X } from "lucide-react";
 import { useRef, useState } from "react";
 
+import { useI18n } from "@/i18n";
 import { compressImage } from "@/lib/image";
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 
 /** Camera-capable photo field. Compresses on-device before anything uploads. */
 export function PhotoInput({ value, onChange, label, required }: Props) {
+  const { t } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +25,7 @@ export function PhotoInput({ value, onChange, label, required }: Props) {
     try {
       onChange(await compressImage(file));
     } catch {
-      setError("Could not read that photo. Try another one.");
+      setError(t("forms.photo.error"));
     } finally {
       setBusy(false);
     }
@@ -45,11 +47,11 @@ export function PhotoInput({ value, onChange, label, required }: Props) {
       />
       {value ? (
         <div className="relative mt-2">
-          <img src={value} alt="Selected" className="aspect-[4/3] w-full rounded-xl object-cover" />
+          <img src={value} alt={t("forms.photo.selected")} className="aspect-[4/3] w-full rounded-xl object-cover" />
           <button
             type="button"
             onClick={() => onChange(null)}
-            aria-label="Remove photo"
+            aria-label={t("forms.photo.remove")}
             className="tap-target absolute top-2 end-2 grid place-items-center rounded-full bg-background/80 backdrop-blur"
           >
             <X className="size-5" />
@@ -62,7 +64,7 @@ export function PhotoInput({ value, onChange, label, required }: Props) {
           className="mt-2 flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-card/50 px-4 py-8 text-sm text-muted-foreground hover:border-primary/60 hover:text-foreground"
         >
           {busy ? <Loader2 className="size-7 animate-spin" /> : <Camera className="size-7" />}
-          <span>{busy ? "Preparing photo…" : "Take or choose a photo"}</span>
+          <span>{busy ? t("forms.photo.preparing") : t("forms.photo.take")}</span>
         </button>
       )}
       {error && <p className="mt-1 text-sm text-destructive">{error}</p>}

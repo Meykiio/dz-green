@@ -83,15 +83,16 @@ export function useI18n(): I18n {
   if (!ctx) throw new Error("useI18n must be used inside I18nProvider");
   return ctx;
 }
-
 /** Rewrite a known server error string into a localized message. */
-export function localizeError(raw: string, locale: Locale = getLocale()): string {  if (locale === "en") return raw;
+export function localizeError(raw: string, locale: Locale = getLocale()): string {
+  if (locale === "en") return raw;
   const entries = Object.entries(enErrors.mapServer);
   const found = entries.find(([, v]) => v === raw);
   if (found) {
     const target = (arErrors.mapServer as Record<string, string>)[found[0]];
     if (target) return target;
   }
+  if (raw === enErrors.toasts.generic) return arErrors.toasts.generic;
   return raw;
 }
 

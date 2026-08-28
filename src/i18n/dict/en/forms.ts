@@ -51,8 +51,9 @@ export const forms = {
     title: "Report a fire",
     intro:
       "Just the wilaya is enough — everything else is optional. Reports publish immediately.",
-    banner:
-      "Call Protection Civile first: 14 or 1021. Green Algeria is a community map, not an emergency service.",
+    bannerCall: "Call Protection Civile first: 14 or 1021.",
+    bannerBody:
+      "Green Algeria is a community map, not an emergency service.",
     doneTitle: "Report posted",
     doneIntro:
       "Your report is live on the map now. If there is danger to people, call Protection Civile on 14 or 1021 — this platform does not dispatch help.",

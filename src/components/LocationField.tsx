@@ -3,6 +3,7 @@ import { Crosshair, Link2, Loader2 } from "lucide-react";
 import { Suspense, lazy, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/i18n";
 import { wilayaCodeForPoint } from "@/lib/geo";
 import { isShortMapsLink, parseGoogleMapsLink } from "@/lib/maps-link";
 import { resolveMapsLink } from "@/lib/maps.functions";
@@ -23,11 +24,11 @@ interface Props {
   showMapByDefault?: boolean;
 }
 
-function accuracyTone(accuracy: number): { label: string; tone: string } {
-  if (accuracy < 50) return { label: "excellent", tone: "text-plant" };
-  if (accuracy < 300) return { label: "good", tone: "text-foreground" };
-  if (accuracy < 1000) return { label: "rough", tone: "text-care" };
-  return { label: "poor", tone: "text-fire" };
+function accuracyTone(accuracy: number): { key: "excellent" | "good" | "rough" | "poor"; tone: string } {
+  if (accuracy < 50) return { key: "excellent", tone: "text-plant" };
+  if (accuracy < 300) return { key: "good", tone: "text-foreground" };
+  if (accuracy < 1000) return { key: "rough", tone: "text-care" };
+  return { key: "poor", tone: "text-fire" };
 }
 
 /**
@@ -48,6 +49,7 @@ export function LocationField({
   onCommune,
   showMapByDefault = false,
 }: Props) {
+  const { t, locale } = useI18n();
   const [showMap, setShowMap] = useState(showMapByDefault);
   const [locating, setLocating] = useState(false);
   const [mapsLink, setMapsLink] = useState("");
@@ -114,7 +116,7 @@ export function LocationField({
     <div className="space-y-3">
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block">
-          <span className="eyebrow">Wilaya *</span>
+          <span className="eyebrow">{t("forms.location.wilaya")}</span>
           <select
             required
             value={wilaya}
@@ -125,21 +127,21 @@ export function LocationField({
             }}
             className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"
           >
-            <option value="">Choose a wilaya</option>
+            <option value="">{t("forms.location.chooseWilaya")}</option>
             {WILAYAS.map((w) => (
               <option key={w.code} value={w.code}>
-                {w.code} — {w.name}
+                {w.code} — {locale === "ar" ? w.nameAr : w.name}
               </option>
             ))}
           </select>
           {autoFilled && (
             <span className="mt-1 block text-xs text-muted-foreground">
-              Detected from your pin — change it here if it's wrong.
+              {t("forms.location.detected")}
             </span>
           )}
         </label>
         <label className="block">
-          <span className="eyebrow">Commune (optional)</span>
+          <span className="eyebrow">{t("forms.location.commune")}</span>
           <input
             value={commune}
             maxLength={120}
@@ -150,10 +152,8 @@ export function LocationField({
       </div>
 
       <div className="rounded-lg border border-border bg-card/50 p-3">
-        <p className="text-sm font-medium">Exact location (optional)</p>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          Used once, never stored. Skip it and the report is wilaya-level.
-        </p>
+        <p className="text-sm font-medium">{t("forms.location.exact")}</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">{t("forms.location.helper")}</p>
         <div className="mt-2.5 flex flex-wrap items-center gap-2">
           <Button type="button" variant="secondary" onClick={useMyLocation} className="tap-target">
             {locating ? (
@@ -161,7 +161,7 @@ export function LocationField({
             ) : (
               <Crosshair className="size-4" />
             )}
-            Use my location
+            {t("forms.location.useLocation")}
           </Button>
           <Button
             type="button"
@@ -169,11 +169,11 @@ export function LocationField({
             onClick={() => setShowMap((v) => !v)}
             className="tap-target"
           >
-            {showMap ? "Hide map" : "Adjust on map"}
+            {showMap ? t("forms.location.hideMap") : t("forms.location.adjust")}
           </Button>
           {hasPin && onClearLocation && (
             <Button type="button" variant="ghost" onClick={onClearLocation} className="tap-target">
-              Remove pin
+              {t("forms.location.removePin")}
             </Button>
           )}
         </div>
@@ -184,32 +184,33 @@ export function LocationField({
             <input
               value={mapsLink}
               onChange={(e) => void applyMapsLink(e.target.value)}
-              placeholder="Or paste a Google Maps link"
+              placeholder={t("forms.location.pasteLink")}
               inputMode="url"
               className="w-full bg-transparent outline-none placeholder:text-muted-foreground"
             />
             {linkState === "busy" && <Loader2 className="size-4 animate-spin text-muted-foreground" />}
           </label>
           {linkState === "ok" && (
-            <p className="mt-1 text-xs text-plant">Pin set from the link — adjust it below if needed.</p>
+            <p className="mt-1 text-xs text-plant">{t("forms.location.linkOk")}</p>
           )}
-          {linkState === "bad" && (
-            <p className="mt-1 text-xs text-fire">
-              Couldn't read coordinates from that link. Open the place in Google Maps, copy the
-              full URL from the address bar, and paste that.
-            </p>
-          )}
+          {linkState === "bad" && <p className="mt-1 text-xs text-fire">{t("forms.location.linkError")}</p>}
         </div>
 
         {hasPin && (
           <p className="mt-2.5 text-sm text-muted-foreground">
-            Pin at {lat!.toFixed(5)}, {lng!.toFixed(5)}
+            {t("forms.location.pinAt", {
+              lat: lat!.toFixed(5),
+              lng: lng!.toFixed(5),
+            })}
             {tone && (
               <span className={tone.tone}>
                 {" "}
-                · accuracy ±{Math.round(accuracy ?? 0)} m ({tone.label})
-                {tone.label !== "excellent" && tone.label !== "good" && (
-                  <span className="text-muted-foreground"> — adjust the pin if needed</span>
+                {t("forms.location.accuracy", {
+                  m: Math.round(accuracy ?? 0),
+                  tone: t(`forms.location.tone.${tone.key}`),
+                })}
+                {tone.key !== "excellent" && tone.key !== "good" && (
+                  <span className="text-muted-foreground"> {t("forms.location.adjustSuffix")}</span>
                 )}
               </span>
             )}
