@@ -93,8 +93,10 @@ export const info = {
     },
     emergency: {
       title: "Not an emergency service",
-      body:
-        "Fire reports on this map are community information, nothing more. In any danger, call Protection Civile on 14 or 1021 first. This platform does not dispatch help, does not alert authorities, and must never be your only call for help.",
+      emergencyLead: "Fire reports on this map are community information, nothing more.",
+      emergencyCall: "In any danger, call Protection Civile on 14 or 1021 first.",
+      emergencyTail:
+        "This platform does not dispatch help, does not alert authorities, and must never be your only call for help.",
     },
     warranty: {
       title: "No warranty",

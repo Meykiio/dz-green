@@ -5,25 +5,23 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { FormShell } from "@/components/FormShell";
 import { Button } from "@/components/ui/button";
+import { localizeError, ssrT, useI18n } from "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
-
-const TITLE = "Moderator sign in — Green Algeria";
-const DESCRIPTION =
-  "Sign in to review planting submissions for Green Algeria. Contributing to the map never requires an account.";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: TITLE },
-      { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESCRIPTION },
+      { title: ssrT("meta.authTitle") },
+      { name: "description", content: ssrT("meta.authDesc") },
+      { property: "og:title", content: ssrT("meta.authTitle") },
+      { property: "og:description", content: ssrT("meta.authDesc") },
     ],
   }),
   component: AuthPage,
 });
 
 function AuthPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
@@ -45,11 +43,11 @@ function AuthPage() {
           options: { emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
-        toast.success("Account created. You can sign in now.");
+        toast.success(t("info.auth.toastOk"));
         setMode("signin");
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong.");
+      toast.error(localizeError(error instanceof Error ? error.message : "") || t("info.auth.toastError"));
     } finally {
       setBusy(false);
     }
@@ -58,13 +56,13 @@ function AuthPage() {
   return (
     <AppShell>
       <FormShell
-        title={mode === "signin" ? "Sign in" : "Create an account"}
-        intro="Accounts are only for moderators and for keeping track of your own contributions. Planting, care and fire reports work without one."
+        title={mode === "signin" ? t("info.auth.titleSignin") : t("info.auth.titleSignup")}
+        intro={t("info.auth.intro")}
         accent="plant"
       >
         <form className="space-y-4" onSubmit={handleSubmit}>
           <label className="block">
-            <span className="eyebrow">Email</span>
+            <span className="eyebrow">{t("info.auth.email")}</span>
             <input
               type="email"
               required
@@ -75,7 +73,7 @@ function AuthPage() {
             />
           </label>
           <label className="block">
-            <span className="eyebrow">Password</span>
+            <span className="eyebrow">{t("info.auth.password")}</span>
             <input
               type="password"
               required
@@ -87,14 +85,18 @@ function AuthPage() {
             />
           </label>
           <Button type="submit" size="lg" className="w-full" disabled={busy}>
-            {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
+            {busy
+              ? t("info.auth.wait")
+              : mode === "signin"
+                ? t("info.auth.signin")
+                : t("info.auth.signup")}
           </Button>
           <button
             type="button"
             className="w-full text-sm text-muted-foreground hover:text-foreground"
             onClick={() => setMode((m) => (m === "signin" ? "signup" : "signin"))}
           >
-            {mode === "signin" ? "Need an account? Sign up" : "Already have an account? Sign in"}
+            {mode === "signin" ? t("info.auth.toggleSignup") : t("info.auth.toggleSignin")}
           </button>
         </form>
       </FormShell>
