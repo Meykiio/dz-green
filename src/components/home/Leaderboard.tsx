@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Sprout, Trophy } from "lucide-react";
 import { useMemo } from "react";
 
+import { useI18n } from "@/i18n";
 import type { Site } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
 
@@ -10,6 +11,7 @@ import { wilayaName } from "@/lib/wilayas";
  * reset on the 1st. No schema: computed from the already-loaded sites.
  */
 export function Leaderboard({ sites }: { sites: Site[] }) {
+  const { t, count } = useI18n();
   const ranked = useMemo(() => {
     const monthStart = new Date();
     monthStart.setDate(1);
@@ -26,42 +28,45 @@ export function Leaderboard({ sites }: { sites: Site[] }) {
     return (
       <div className="rounded-2xl border border-border bg-card p-8 text-center">
         <Trophy className="mx-auto size-8 text-muted-foreground" />
-        <p className="mt-3 font-semibold">No plantings this month yet.</p>
-        <p className="mt-1 text-sm text-muted-foreground">The first tree of the month could be yours.</p>
+        <p className="mt-3 font-semibold">{t("home.board.empty")}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{t("home.board.emptyCta")}</p>
         <Link
           to="/plant"
           className="tap-target mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 font-semibold text-primary-foreground transition-transform active:scale-[0.98]"
         >
-          <Sprout className="size-5" /> I planted a tree
+          <Sprout className="size-5" /> {t("home.cta.plant")}
         </Link>
       </div>
     );
   }
 
   const [first, ...rest] = ranked;
-  const total = ranked.reduce((sum, [, count]) => sum + count, 0);
+  const total = ranked.reduce((sum, [, c]) => sum + c, 0);
   const max = first![1];
 
   return (
     <div className="space-y-4">
       <div className="text-center">
-        <h2 className="display-hero text-2xl">This month's race</h2>
+        <h2 className="display-hero text-2xl">{t("home.board.heading")}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          {total} {total === 1 ? "tree" : "trees"} across {ranked.length}{" "}
-          {ranked.length === 1 ? "wilaya" : "wilayas"} — approved plantings only. Resets on the 1st.
+          {count(total, "tree")} {t("home.board.subtitle", { wilayas: count(ranked.length, "wilaya") })}
         </p>
       </div>
 
       <div className="rounded-2xl border border-plant/40 bg-plant/10 p-5 text-center">
-        <p className="text-xs font-semibold uppercase tracking-wide text-plant">Leading</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-plant">
+          {t("home.board.leading")}
+        </p>
         <p className="mt-1 text-xl font-bold">{wilayaName(first![0])}</p>
         <p className="text-3xl font-black tabular-nums text-plant">{first![1]}</p>
-        <p className="text-xs text-muted-foreground">{first![1] === 1 ? "tree" : "trees"} this month</p>
+        <p className="text-xs text-muted-foreground">
+          {count(first![1], "tree")} {t("home.board.thisMonth")}
+        </p>
       </div>
 
       {rest.length > 0 && (
         <ul className="space-y-2">
-          {rest.map(([code, count], index) => (
+          {rest.map(([code, c], index) => (
             <li
               key={code}
               className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3"
@@ -72,9 +77,9 @@ export function Leaderboard({ sites }: { sites: Site[] }) {
               <span className="min-w-0 flex-1 truncate font-medium">{wilayaName(code)}</span>
               <span
                 className="h-1.5 shrink-0 rounded-full bg-plant/60"
-                style={{ width: `${Math.max(8, (count / max) * 80)}px` }}
+                style={{ width: `${Math.max(8, (c / max) * 80)}px` }}
               />
-              <span className="shrink-0 text-sm font-semibold tabular-nums">{count}</span>
+              <span className="shrink-0 text-sm font-semibold tabular-nums">{c}</span>
             </li>
           ))}
         </ul>

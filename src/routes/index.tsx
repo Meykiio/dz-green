@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Droplets, Flame, Sprout, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Droplets, Flame, Sprout, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
@@ -12,20 +12,17 @@ import { ViewToggle, type HomeView } from "@/components/home/ViewToggle";
 import { DetailPanel } from "@/components/map/DetailPanel";
 import { HeroMap, type Layer } from "@/components/map/HeroMap";
 import { SiteList } from "@/components/map/SiteList";
+import { ssrT, useI18n } from "@/i18n";
 import { careLogsQuery, fireReportsQuery, sitesQuery } from "@/lib/data";
 import { needsWater, type MapFeature, type Site } from "@/lib/types";
-
-const TITLE = "Green Algeria — the live map of Algeria's tree planting";
-const DESCRIPTION =
-  "See every tree planted across Algeria's 58 wilayas, log care for sites near you, and report wildfires on one community-run map.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: TITLE },
-      { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESCRIPTION },
+      { title: ssrT("meta.homeTitle") },
+      { name: "description", content: ssrT("meta.homeDesc") },
+      { property: "og:title", content: ssrT("meta.homeTitle") },
+      { property: "og:description", content: ssrT("meta.homeDesc") },
       { property: "og:image", content: "/og.png" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
@@ -37,6 +34,7 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
+  const { t, count, isRtl } = useI18n();
   const sites = useQuery(sitesQuery);
   const careLogs = useQuery(careLogsQuery);
   const fires = useQuery(fireReportsQuery);
@@ -105,7 +103,7 @@ function HomePage() {
             </div>
           </div>
         ) : sites.isLoading ? (
-          <div className="h-full w-full animate-pulse bg-card" aria-label="Loading the map" />
+          <div className="h-full w-full animate-pulse bg-card" aria-label={t("chrome.browser.loadingMap")} />
         ) : (
           <HeroMap
             sites={siteList}
@@ -121,15 +119,15 @@ function HomePage() {
           <div className="flex items-center gap-3 rounded-full border border-border bg-card/90 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur">
             <span className="inline-flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-plant" />{" "}
-              <span className="hidden sm:inline">Trees</span>
+              <span className="hidden sm:inline">{t("home.layers.trees")}</span>
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-care" />{" "}
-              <span className="hidden sm:inline">Care</span>
+              <span className="hidden sm:inline">{t("home.layers.care")}</span>
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-fire" />{" "}
-              <span className="hidden sm:inline">Fires</span>
+              <span className="hidden sm:inline">{t("home.layers.fires")}</span>
             </span>
           </div>
           <ViewToggle view={view} onChange={setView} />
@@ -142,7 +140,7 @@ function HomePage() {
           <button
             type="button"
             onClick={() => setCardHidden(false)}
-            aria-label="Show the action card"
+            aria-label={t("home.aria.showCard")}
             className="tap-target absolute bottom-3 start-3 grid size-12 place-items-center rounded-full border border-border bg-card/95 text-plant shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] backdrop-blur transition-transform active:scale-[0.96] md:bottom-6 md:start-6"
           >
             <span
@@ -157,39 +155,50 @@ function HomePage() {
               <button
                 type="button"
                 onClick={() => setCardHidden(true)}
-                aria-label="Hide the action card"
+                aria-label={t("home.aria.hideCard")}
                 className="tap-target absolute end-3 top-3 grid place-items-center rounded-full text-muted-foreground transition-colors hover:text-foreground"
               >
                 <X className="size-4" />
               </button>
-              <h1 className="display-hero max-w-[16ch] text-xl md:text-2xl">
-                Every tree Algeria plants, on one living map.
+              <h1 className={`display-hero text-xl md:text-2xl ${isRtl ? "max-w-none" : "max-w-[16ch]"}`}>
+                {t("home.hero.title")}
               </h1>
               <p className="mt-1.5 text-sm text-muted-foreground">
-                <span className="font-semibold tabular-nums text-foreground">{stats.trees.toLocaleString()}</span> trees
-                · <span className="font-semibold tabular-nums text-foreground">{stats.wilayas}</span> wilayas
-                · <span className="font-semibold tabular-nums text-care">{stats.thirsty}</span> need water
-                · <span className="font-semibold tabular-nums text-fire">{stats.fires}</span> active fires
+                <span className="font-semibold tabular-nums text-foreground">
+                  {count(stats.trees, "tree")}
+                </span>
+                {" · "}
+                <span className="font-semibold tabular-nums text-foreground">
+                  {count(stats.wilayas, "wilaya")}
+                </span>
+                {" · "}
+                <span className="font-semibold tabular-nums text-care">
+                  {count(stats.thirsty, "treeNeed")}
+                </span>
+                {" · "}
+                <span className="font-semibold tabular-nums text-fire">
+                  {count(stats.fires, "activeFire")}
+                </span>
               </p>
               <div className="mt-3 flex flex-col gap-2">
                 <Link
                   to="/plant"
                   className="tap-target flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 font-semibold text-primary-foreground transition-transform active:scale-[0.98]"
                 >
-                  <Sprout className="size-5" /> I planted a tree
+                  <Sprout className="size-5" /> {t("home.cta.plant")}
                 </Link>
                 <div className="flex gap-2">
                   <Link
                     to="/care"
                     className="tap-target flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-input bg-card px-4 py-2.5 text-sm font-semibold text-care transition-transform active:scale-[0.98]"
                   >
-                    <Droplets className="size-4" /> Log care
+                    <Droplets className="size-4" /> {t("home.cta.care")}
                   </Link>
                   <Link
                     to="/fire"
                     className="tap-target flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-input bg-card px-4 py-2.5 text-sm font-semibold text-fire transition-transform active:scale-[0.98]"
                   >
-                    <Flame className="size-4" /> Report a fire
+                    <Flame className="size-4" /> {t("home.cta.fire")}
                   </Link>
                 </div>
               </div>
@@ -199,21 +208,21 @@ function HomePage() {
                     active={layers.trees}
                     tone="plant"
                     icon={<Sprout className="size-4" />}
-                    label="Trees"
+                    label={t("home.layers.trees")}
                     onClick={() => setLayers((l) => ({ ...l, trees: !l.trees }))}
                   />
                   <Chip
                     active={layers.care}
                     tone="care"
                     icon={<Droplets className="size-4" />}
-                    label="Care"
+                    label={t("home.layers.care")}
                     onClick={() => setLayers((l) => ({ ...l, care: !l.care }))}
                   />
                   <Chip
                     active={layers.fires}
                     tone="fire"
                     icon={<Flame className="size-4" />}
-                    label="Fires"
+                    label={t("home.layers.fires")}
                     onClick={() => setLayers((l) => ({ ...l, fires: !l.fires }))}
                   />
                 </div>
@@ -221,7 +230,12 @@ function HomePage() {
                   to="/about"
                   className="tap-target inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  How it works <ArrowRight className="size-3.5" />
+                  {t("home.hero.howItWorks")}{" "}
+                  {isRtl ? (
+                    <ArrowLeft className="size-3.5" />
+                  ) : (
+                    <ArrowRight className="size-3.5" />
+                  )}
                 </Link>
               </div>
             </div>

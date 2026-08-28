@@ -116,7 +116,7 @@ gate — everything can be edited here before code.
 
 | Key | EN | AR |
 |---|---|---|
-| home.title | Every tree Algeria plants, on one living map. | كل شجرة تُغرس في الجزائر، على خريطة واحدة حيّة. |
+| home.title | Every tree Algeria plants, on one living map. | خريطة واحدة لكل شجرة في الجزائر | Shorter for the compact card (2 lines max in AR). About's hero keeps the same phrase. |
 | home.stats | {trees} trees · {wilayas} wilayas · {thirsty} need water · {fires} active fires | {trees} شجرة · {wilayas} ولاية · {thirsty} تحتاج إلى سقاية · {fires} حريق نشط |
 | home.cta.plant | I planted a tree | أنا غرست شجرة |
 | home.cta.care | Log care | سجّل متابعة |

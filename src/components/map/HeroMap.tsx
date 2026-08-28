@@ -9,6 +9,7 @@ import {
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useTheme } from "@/hooks/useTheme";
+import { useI18n } from "@/i18n";
 import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
 import { DARK_STYLE, LIGHT_STYLE, NORTH_BOUNDS, RecenterControl } from "./map-style";
 import { featureCollection, onlyKind, withoutKind } from "./map-data";
@@ -47,6 +48,7 @@ function webgl2Available(): boolean {
 }
 
 function MapFailureOverlay({ kind }: { kind: MapFailure }) {
+  const { t } = useI18n();
   return (
     <div
       role="alert"
@@ -54,19 +56,17 @@ function MapFailureOverlay({ kind }: { kind: MapFailure }) {
     >
       <div className="max-w-sm">
         <p className="text-base font-semibold">
-          {kind === "webgl2" ? "This browser can't draw the map" : "The map lost its connection"}
+          {kind === "webgl2" ? t("home.mapFail.webglTitle") : t("home.mapFail.lostTitle")}
         </p>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          {kind === "webgl2"
-            ? "The map needs WebGL2 (3D graphics), which this browser or device doesn't provide. Try updating your browser or enabling hardware acceleration."
-            : "The graphics connection dropped. If it doesn't come back, reload the page."}
+          {kind === "webgl2" ? t("home.mapFail.webglBody") : t("home.mapFail.lostBody")}
         </p>
         <button
           type="button"
           onClick={() => window.location.reload()}
           className="mt-3 rounded-full border border-border bg-card px-4 py-1.5 text-sm font-semibold text-foreground transition-transform active:scale-[0.97]"
         >
-          Reload map
+          {t("home.mapFail.reload")}
         </button>
       </div>
     </div>
@@ -85,6 +85,7 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
   const pulseRef = useRef(0);
   const cancelledRef = useRef(false);
   const [failure, setFailure] = useState<MapFailure | null>(null);
+  const { t, isRtl } = useI18n();
   const { theme } = useTheme();
   const themeRef = useRef(theme);
   themeRef.current = theme;
@@ -95,6 +96,10 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
   layersRef.current = layers;
   const selectRef = useRef(onSelectFeature);
   selectRef.current = onSelectFeature;
+  // The action card anchors to `start` (bottom-right in RTL, bottom-left in
+  // LTR), so map controls must live in the opposite physical corner.
+  const ctrlPosRef = useRef<"bottom-right" | "bottom-left">(isRtl ? "bottom-left" : "bottom-right");
+  ctrlPosRef.current = isRtl ? "bottom-left" : "bottom-right";
 
   const refs = { dataRef, layersRef, themeRef, selectRef, sites, careLogs, fires };
 
@@ -140,8 +145,9 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
       setFailure("webgl2");
       return;
     }
-    map.addControl(new NavigationControl({ showCompass: false }), "bottom-right");
-    map.addControl(new RecenterControl(), "bottom-right");
+    const pos = ctrlPosRef.current;
+    map.addControl(new NavigationControl({ showCompass: false }), pos);
+    map.addControl(new RecenterControl(), pos);
 
     const init = () => {
       if (cancelled) return;
@@ -226,7 +232,7 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
       ref={container}
       className="relative h-full w-full"
       role="img"
-      aria-label="Interactive map of Algeria showing tree plantings, care updates and fire reports"
+      aria-label={t("home.aria.map")}
     >
       {failure ? <MapFailureOverlay kind={failure} /> : null}
     </div>

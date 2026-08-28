@@ -1,6 +1,6 @@
 export const home: typeof import("../en/home").home = {
   hero: {
-    title: "كل شجرة تُغرس في الجزائر، على خريطة واحدة حيّة.",
+    title: "خريطة واحدة لكل شجرة في الجزائر",
     howItWorks: "كيف تعمل الخريطة",
   },
   stats: {

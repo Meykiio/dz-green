@@ -6,7 +6,8 @@ export type CountKind =
   | "wilaya"
   | "site"
   | "submission"
-  | "activeFire";
+  | "activeFire"
+  | "treeNeed";
 
 const EN_UNIT: Record<CountKind, (n: number) => string> = {
   tree: (n) => (n === 1 ? "tree" : "trees"),
@@ -15,6 +16,7 @@ const EN_UNIT: Record<CountKind, (n: number) => string> = {
   site: (n) => (n === 1 ? "site" : "sites"),
   submission: (n) => (n === 1 ? "submission" : "submissions"),
   activeFire: (n) => (n === 1 ? "active fire" : "active fires"),
+  treeNeed: (n) => (n === 1 ? "tree needs water" : "trees need water"),
 };
 
 /**
@@ -28,6 +30,12 @@ const AR_UNIT: Record<CountKind, { one: string; two: string; few: string; many: 
   site: { one: "موقع", two: "موقعان", few: "مواقع", many: "موقعًا" },
   submission: { one: "بلاغ", two: "بلاغان", few: "بلاغات", many: "بلاغًا" },
   activeFire: { one: "حريق نشط", two: "حريقان نشطان", few: "حرائق نشطة", many: "حريقًا نشطًا" },
+  treeNeed: {
+    one: "شجرة تحتاج إلى سقاية",
+    two: "شجرتان تحتاجان إلى سقاية",
+    few: "أشجار تحتاج إلى سقاية",
+    many: "شجرة تحتاج إلى سقاية",
+  },
 };
 
 function arWord(kind: CountKind, n: number): string {

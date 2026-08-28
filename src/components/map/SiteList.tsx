@@ -1,13 +1,14 @@
 import { Droplets, Flame, Sprout } from "lucide-react";
 
-import { formatDate, photoUrl } from "@/lib/data";
+import { useI18n } from "@/i18n";
+import { photoUrl } from "@/lib/data";
 import { needsWater, type CareLog, type FireReport, type MapFeature, type Site } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
 
-const FIRE_STATUS: Record<FireReport["status"], string> = {
-  active: "Active",
-  resolved: "Resolved",
-  false_alarm: "False alarm",
+const FIRE_STATUS_KEY: Record<FireReport["status"], string> = {
+  active: "triage.badge.active",
+  resolved: "triage.badge.resolved",
+  false_alarm: "triage.badge.falseAlarm",
 };
 
 interface Props {
@@ -28,6 +29,7 @@ type Item =
  * hero; this is the scannable fallback for visitors the map frustrates.
  */
 export function SiteList({ sites, careLogs, fires, layers, onSelectFeature }: Props) {
+  const { t, count, formatDateShort } = useI18n();
   const items: Item[] = [
     ...(layers.trees
       ? sites.map((site) => ({ kind: "site" as const, date: site.created_at, site }))
@@ -40,7 +42,7 @@ export function SiteList({ sites, careLogs, fires, layers, onSelectFeature }: Pr
   if (items.length === 0) {
     return (
       <p className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
-        Nothing on the map yet — be the first.
+        {t("home.list.empty")}
       </p>
     );
   }
@@ -68,15 +70,17 @@ export function SiteList({ sites, careLogs, fires, layers, onSelectFeature }: Pr
           0,
         );
         const fireCount = list.filter((item) => item.kind === "fire").length;
+        const counts = [
+          trees > 0 ? count(trees, "tree") : "",
+          fireCount > 0 ? count(fireCount, "fire") : "",
+        ]
+          .filter(Boolean)
+          .join(" · ");
         return (
           <section key={code} className="overflow-hidden rounded-xl border border-border bg-canvas">
             <header className="flex items-center justify-between border-b border-border bg-card px-4 py-2.5">
               <h2 className="text-sm font-semibold">{wilayaName(code)}</h2>
-              <p className="text-xs text-muted-foreground">
-                {trees > 0 && `${trees} ${trees === 1 ? "tree" : "trees"}`}
-                {trees > 0 && fireCount > 0 && " · "}
-                {fireCount > 0 && `${fireCount} ${fireCount === 1 ? "fire" : "fires"}`}
-              </p>
+              <p className="text-xs text-muted-foreground">{counts}</p>
             </header>
             <ul className="divide-y divide-border">
               {list.map((item) => (
@@ -105,13 +109,14 @@ function SiteRow({
   careLogs: CareLog[];
   onSelectFeature: (feature: MapFeature) => void;
 }) {
+  const { t, count, formatDateShort } = useI18n();
   const thirsty = needsWater(site, careLogs);
   const photo = photoUrl(site.photo_url);
   return (
     <button
       type="button"
       onClick={() => onSelectFeature({ kind: "site", site })}
-      className="tap-target flex w-full items-center gap-3 bg-card px-4 py-3 text-left transition-colors hover:bg-plant/5"
+      className="tap-target flex w-full items-center gap-3 bg-card px-4 py-3 text-left transition-colors hover:bg-plant/5 rtl:text-right"
     >
       {photo ? (
         <img
@@ -127,17 +132,18 @@ function SiteRow({
       )}
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-medium">
-          {site.tree_count} {site.tree_count === 1 ? "tree" : "trees"}
+          {count(site.tree_count, "tree")}
           {site.species ? ` · ${site.species}` : ""}
         </span>
         <span className="block text-xs text-muted-foreground">
-          {site.commune ? `${site.commune} · ` : ""}planted {formatDate(site.planted_date)}
-          {site.location_approximate ? " · wilaya-level" : ""}
+          {site.commune ? `${site.commune} · ` : ""}
+          {t("home.list.planted", { date: formatDateShort(site.planted_date) })}
+          {site.location_approximate ? ` · ${t("home.list.wilayaLevel")}` : ""}
         </span>
       </span>
       {thirsty && (
         <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-care/15 px-2.5 py-1 text-xs font-medium text-care">
-          <Droplets className="size-3.5" /> Needs water
+          <Droplets className="size-3.5" /> {t("home.list.needsWater")}
         </span>
       )}
     </button>
@@ -151,22 +157,27 @@ function FireRow({
   fire: FireReport;
   onSelectFeature: (feature: MapFeature) => void;
 }) {
+  const { t, formatDateShort } = useI18n();
   return (
     <button
       type="button"
       onClick={() => onSelectFeature({ kind: "fire", fire })}
-      className="tap-target flex w-full items-center gap-3 bg-card px-4 py-3 text-left transition-colors hover:bg-fire/5"
+      className="tap-target flex w-full items-center gap-3 bg-card px-4 py-3 text-left transition-colors hover:bg-fire/5 rtl:text-right"
     >
       <span className="grid size-12 shrink-0 place-items-center rounded-lg bg-fire/15 text-fire">
         <Flame className="size-5" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-medium">
-          Fire{fire.severity ? ` · ${fire.severity}` : ""}
+          {t("home.list.fireTitle")}
+          {fire.severity
+            ? ` · ${fire.severity === "large" ? t("home.list.severityLarge") : t("home.list.severitySmall")}`
+            : ""}
         </span>
         <span className="block text-xs text-muted-foreground">
-          {fire.commune ? `${fire.commune} · ` : ""}reported {formatDate(fire.created_at)}
-          {fire.location_approximate ? " · wilaya-level" : ""}
+          {fire.commune ? `${fire.commune} · ` : ""}
+          {t("home.list.reported", { date: formatDateShort(fire.created_at) })}
+          {fire.location_approximate ? ` · ${t("home.list.wilayaLevel")}` : ""}
         </span>
       </span>
       <span
@@ -174,7 +185,7 @@ function FireRow({
           fire.status === "active" ? "bg-fire/15 text-fire" : "bg-muted text-muted-foreground"
         }`}
       >
-        {FIRE_STATUS[fire.status]}
+        {t(FIRE_STATUS_KEY[fire.status])}
       </span>
     </button>
   );

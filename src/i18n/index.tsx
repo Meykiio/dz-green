@@ -85,8 +85,7 @@ export function useI18n(): I18n {
 }
 
 /** Rewrite a known server error string into a localized message. */
-export function localizeError(raw: string, locale: Locale = getLocale()): string {
-  if (locale === "en") return raw;
+export function localizeError(raw: string, locale: Locale = getLocale()): string {  if (locale === "en") return raw;
   const entries = Object.entries(enErrors.mapServer);
   const found = entries.find(([, v]) => v === raw);
   if (found) {
@@ -99,4 +98,17 @@ export function localizeError(raw: string, locale: Locale = getLocale()): string
 /** No-flash script: apply saved locale before first paint (mirrors theme). */
 export function localeInitScript(): string {
   return `try{var l=localStorage.getItem("ga-locale");if(l==="en"){document.documentElement.lang="en";document.documentElement.dir="ltr"}if(l)window.__GA_LOCALE__=l}catch(e){}`;
+}
+
+/** Server-side-safe translate for route `head()` (uses the singleton locale). */
+export function ssrT(path: string, params?: Record<string, string | number>): string {
+  initLocale();
+  const dict = getLocale() === "ar" ? ar : en;
+  let raw = lookup(dict, path);
+  if (typeof raw !== "string") raw = lookup(en, path);
+  if (typeof raw !== "string") return path;
+  if (!params) return raw;
+  return raw.replace(/\{(\w+)\}/g, (_, name: string) =>
+    name in params ? String(params[name]) : `{${name}}`,
+  );
 }

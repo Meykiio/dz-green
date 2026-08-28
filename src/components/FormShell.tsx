@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
+
+import { useI18n } from "@/i18n";
 
 export function FormShell({
   title,
@@ -13,6 +15,7 @@ export function FormShell({
   accent: "plant" | "care" | "fire";
   children: ReactNode;
 }) {
+  const { t, isRtl } = useI18n();
   const bar =
     accent === "plant" ? "bg-plant" : accent === "care" ? "bg-care" : "bg-fire";
   return (
@@ -21,7 +24,8 @@ export function FormShell({
         to="/"
         className="tap-target inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
-        <ArrowLeft className="size-4" /> Map
+        {isRtl ? <ArrowRight className="size-4" /> : <ArrowLeft className="size-4" />}{" "}
+        {t("forms.backToMap")}
       </Link>
       <div className={`mt-4 h-1 w-16 rounded-full ${bar}`} />
       <h1 className="mt-3 text-2xl font-semibold tracking-tight">{title}</h1>

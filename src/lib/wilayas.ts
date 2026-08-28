@@ -1,6 +1,7 @@
 // All 58 Algerian wilayas (48 historic + 10 created in 2019).
 // Map geometry only covers the 48 historic polygons; the newer wilayas are
 // listed here so people can still label a submission accurately.
+import { getLocale } from "@/i18n/locale";
 export interface Wilaya {
   code: string;
   name: string;
@@ -74,9 +75,12 @@ export const WILAYA_BY_CODE: Record<string, Wilaya> = Object.fromEntries(
   WILAYAS.map((w) => [w.code, w]),
 );
 
+/** Display name for the current UI language (Arabic names in AR mode). */
 export function wilayaName(code: string | null | undefined): string {
-  if (!code) return "Unknown";
-  return WILAYA_BY_CODE[code]?.name ?? code;
+  if (!code) return getLocale() === "ar" ? "غير معروف" : "Unknown";
+  const w = WILAYA_BY_CODE[code];
+  if (!w) return code;
+  return getLocale() === "ar" ? w.nameAr : w.name;
 }
 
 export function mapCodeFor(code: string | null | undefined): string | null {
