@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, type MutableRefObject } from "react";
 
+import { useI18n } from "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import type { Site } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
@@ -15,8 +16,11 @@ export function useMapRealtime(
   onActivity: (text: string) => void,
 ) {
   const queryClient = useQueryClient();
+  const { t } = useI18n();
   const activityRef = useRef(onActivity);
   activityRef.current = onActivity;
+  const tRef = useRef(t);
+  tRef.current = t;
 
   useEffect(() => {
     const channel = supabase
@@ -31,7 +35,10 @@ export function useMapRealtime(
             if (row.wilaya_code) {
               const count = row.tree_count ?? 1;
               activityRef.current(
-                `${count} ${count === 1 ? "tree" : "trees"} just planted in ${wilayaName(row.wilaya_code)}`,
+                tRef.current("home.ticker.planted", {
+                  count,
+                  wilaya: wilayaName(row.wilaya_code),
+                }),
               );
             }
           }
@@ -42,7 +49,9 @@ export function useMapRealtime(
         if (payload.eventType === "INSERT") {
           const row = payload.new as { wilaya_code?: string };
           if (row.wilaya_code) {
-            activityRef.current(`Fire just reported in ${wilayaName(row.wilaya_code)}`);
+            activityRef.current(
+              tRef.current("home.ticker.fire", { wilaya: wilayaName(row.wilaya_code) }),
+            );
           }
         }
       })
@@ -54,7 +63,9 @@ export function useMapRealtime(
           const row = payload.new as { site_id?: string };
           const site = sitesRef.current.find((s) => s.id === row.site_id);
           if (site) {
-            activityRef.current(`Trees just watered in ${wilayaName(site.wilaya_code)}`);
+            activityRef.current(
+              tRef.current("home.ticker.care", { wilaya: wilayaName(site.wilaya_code) }),
+            );
           }
         },
       )
@@ -62,5 +73,6 @@ export function useMapRealtime(
     return () => {
       void supabase.removeChannel(channel);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryClient, sitesRef]);
 }

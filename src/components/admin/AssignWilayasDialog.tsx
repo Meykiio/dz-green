@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useI18n } from "@/i18n";
 import { adminSetWilayas, type AdminUser } from "@/lib/admin.functions";
 import { WILAYAS } from "@/lib/wilayas";
 
@@ -30,13 +31,14 @@ export function AssignWilayasDialog({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const { t, locale } = useI18n();
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState<Set<string>>(() => new Set(user.wilayas));
 
   const save = useMutation({
     mutationFn: () => adminSetWilayas({ data: { userId: user.id, wilayas: [...selected] } }),
     onSuccess: () => {
-      toast.success("Wilayas updated");
+      toast.success(t("moderation.assign.toast"));
       void queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
       onSaved();
     },
@@ -56,11 +58,10 @@ export function AssignWilayasDialog({
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Assign wilayas — {user.email ?? user.display_name ?? user.id}</DialogTitle>
-          <DialogDescription>
-            This moderator reviews submissions only in the selected wilayas. New wilayas share
-            their historic parent's territory.
-          </DialogDescription>
+          <DialogTitle>
+            {t("moderation.assign.title", { name: user.email ?? user.display_name ?? user.id })}
+          </DialogTitle>
+          <DialogDescription>{t("moderation.assign.desc")}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -71,7 +72,7 @@ export function AssignWilayasDialog({
                   checked={selected.has(parent.code)}
                   onCheckedChange={(v) => toggle(parent.code, v === true)}
                 />
-                {parent.name}
+                {parent.code} — {locale === "ar" ? parent.nameAr : parent.name}
               </label>
               {children.length > 0 && (
                 <div className="ms-7 mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
@@ -81,7 +82,7 @@ export function AssignWilayasDialog({
                         checked={selected.has(c.code)}
                         onCheckedChange={(v) => toggle(c.code, v === true)}
                       />
-                      {c.name}
+                      {c.code} — {locale === "ar" ? c.nameAr : c.name}
                     </label>
                   ))}
                 </div>
@@ -92,11 +93,11 @@ export function AssignWilayasDialog({
 
         <div className="flex justify-end gap-2">
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            {t("moderation.assign.cancel")}
           </Button>
           <Button onClick={() => save.mutate()} disabled={save.isPending}>
             <ShieldCheck className="size-4" />
-            Save
+            {t("moderation.assign.save")}
           </Button>
         </div>
       </DialogContent>

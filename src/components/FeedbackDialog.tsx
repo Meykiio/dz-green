@@ -15,11 +15,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { localizeError, useI18n } from "@/i18n";
 import { submitFeedback } from "@/lib/feedback.functions";
 
 const MAX_LENGTH = 2000;
 
 export function FeedbackDialog() {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [hp, setHp] = useState("");
   const [kind, setKind] = useState<"bug" | "idea" | "other">("other");
@@ -39,13 +41,14 @@ export function FeedbackDialog() {
         },
       }),
     onSuccess: () => {
-      toast.success("Received — thanks. Every message is read.");
+      toast.success(t("chrome.feedback.toastOk"));
       setMessage("");
       setHp("");
       setKind("other");
       setOpen(false);
     },
-    onError: (error: Error) => toast.error(error.message || "Could not send. Try again."),
+    onError: (error: Error) =>
+      toast.error(localizeError(error.message ?? "") || t("chrome.feedback.toastError")),
   });
 
   return (
@@ -53,20 +56,17 @@ export function FeedbackDialog() {
       <DialogTrigger asChild>
         <button
           type="button"
-          aria-label="Send feedback"
+          aria-label={t("chrome.feedback.aria")}
           className="tap-target inline-flex items-center gap-1.5 rounded-full border border-plant/30 bg-plant/10 px-3 py-1.5 text-sm font-semibold text-plant transition-transform active:scale-[0.97]"
         >
           <MessageSquareText className="size-3.5" />
-          <span className="hidden sm:inline">Feedback</span>
+          <span className="hidden sm:inline">{t("chrome.feedback.label")}</span>
         </button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Feedback</DialogTitle>
-          <DialogDescription>
-            Found a bug, want a feature, or just have something to say? Say it plainly — it goes
-            straight to the maintainers.
-          </DialogDescription>
+          <DialogTitle>{t("chrome.feedback.title")}</DialogTitle>
+          <DialogDescription>{t("chrome.feedback.desc")}</DialogDescription>
         </DialogHeader>
         <form
           className="space-y-4"
@@ -76,12 +76,12 @@ export function FeedbackDialog() {
           }}
         >
           <Honeypot value={hp} onChange={setHp} />
-          <div className="flex gap-2" role="radiogroup" aria-label="Feedback type">
+          <div className="flex gap-2" role="radiogroup" aria-label={t("chrome.feedback.kind")}>
             {(
               [
-                { value: "bug", label: "Bug" },
-                { value: "idea", label: "Feature idea" },
-                { value: "other", label: "Other" },
+                { value: "bug", key: "bug" },
+                { value: "idea", key: "idea" },
+                { value: "other", key: "other" },
               ] as const
             ).map((option) => (
               <button
@@ -96,7 +96,7 @@ export function FeedbackDialog() {
                     : "border-border bg-card text-muted-foreground"
                 }`}
               >
-                {option.label}
+                {t(`chrome.feedback.${option.key}`)}
               </button>
             ))}
           </div>
@@ -104,7 +104,7 @@ export function FeedbackDialog() {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             maxLength={MAX_LENGTH}
-            placeholder="Your message…"
+            placeholder={t("chrome.feedback.placeholder")}
             rows={4}
             autoFocus
             required
@@ -114,7 +114,7 @@ export function FeedbackDialog() {
               {message.length}/{MAX_LENGTH}
             </span>
             <Button type="submit" size="sm" disabled={mutation.isPending || message.length === 0}>
-              {mutation.isPending ? "Sending…" : "Send"}
+              {mutation.isPending ? t("chrome.feedback.sending") : t("chrome.feedback.send")}
             </Button>
           </div>
         </form>

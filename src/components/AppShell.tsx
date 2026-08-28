@@ -25,8 +25,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { EmergencyContacts } from "@/components/EmergencyContacts";
 import { FeedbackDialog } from "@/components/FeedbackDialog";
+import { useI18n } from "@/i18n";
 
 const APP_PATHS = ["/moderate", "/admin", "/activity"];
+
+const NAV_ITEMS = [
+  { to: "/", key: "map", icon: MapIcon },
+  { to: "/plant", key: "plant", icon: Sprout, tone: "text-plant" },
+  { to: "/care", key: "care", icon: Droplets, tone: "text-care" },
+  { to: "/fire", key: "fire", icon: Flame, tone: "text-fire" },
+  { to: "/about", key: "about", icon: Info },
+  { to: "/privacy", key: "privacy", icon: ScrollText },
+  { to: "/terms", key: "terms", icon: FileText },
+  { to: "/activity", key: "activity", icon: ListChecks, requires: "user" },
+  { to: "/moderate", key: "moderate", icon: ShieldCheck, requires: "moderator" },
+  { to: "/admin", key: "admin", icon: LayoutDashboard, requires: "admin" },
+] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -49,6 +63,7 @@ function Shell({
 }) {
   const { user, isModerator, isAdmin } = useAuth();
   const { theme, toggle } = useTheme();
+  const { t, locale, setLocale, isRtl } = useI18n();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -61,27 +76,38 @@ function Shell({
     void navigate({ to: "/" });
   }
 
-  const rows = [
-    { to: "/", label: "Map", icon: MapIcon, show: true },
-    { to: "/plant", label: "I planted a tree", icon: Sprout, show: true, tone: "text-plant" },
-    { to: "/care", label: "Log care", icon: Droplets, show: true, tone: "text-care" },
-    { to: "/fire", label: "Report a fire", icon: Flame, show: true, tone: "text-fire" },
-    { to: "/about", label: "About", icon: Info, show: true },
-    { to: "/privacy", label: "Privacy", icon: ScrollText, show: true },
-    { to: "/terms", label: "Terms", icon: FileText, show: true },
-    { to: "/activity", label: "My activity", icon: ListChecks, show: !!user },
-    { to: "/moderate", label: "Moderate", icon: ShieldCheck, show: isModerator },
-    { to: "/admin", label: "Admin", icon: LayoutDashboard, show: isAdmin },
-  ].filter((r) => r.show);
+  const rows = NAV_ITEMS.filter((r) => {
+    if (!("requires" in r)) return true;
+    const q = r.requires;
+    return q === "user" ? !!user : q === "moderator" ? isModerator : isAdmin;
+  }).map((r) => ({
+    to: r.to,
+    label: t(`chrome.nav.${r.key}`),
+    icon: r.icon,
+    tone: "tone" in r ? r.tone : undefined,
+  }));
+
+  const brandName = isRtl ? "الجزائر الخضراء" : "Green Algeria";
 
   const themeButton = (
     <button
       type="button"
       onClick={toggle}
-      aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+      aria-label={theme === "dark" ? t("chrome.aria.themeLight") : t("chrome.aria.themeDark")}
       className="tap-target grid size-10 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.96]"
     >
       {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+    </button>
+  );
+
+  const localeButton = (
+    <button
+      type="button"
+      onClick={() => setLocale(locale === "ar" ? "en" : "ar")}
+      aria-label={t("chrome.aria.switchLocale")}
+      className="tap-target inline-flex items-center rounded-full border border-border bg-card px-2.5 py-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+    >
+      {locale === "ar" ? "English" : "عربي"}
     </button>
   );
 
@@ -92,14 +118,14 @@ function Shell({
       className="tap-target inline-flex items-center gap-1.5 rounded-full px-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
     >
       <LogOut className="size-4" />
-      <span className="hidden sm:inline">Sign out</span>
+      <span className="hidden sm:inline">{t("chrome.auth.signout")}</span>
     </button>
   ) : (
     <Link
       to="/auth"
       className="tap-target inline-flex items-center rounded-full px-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
     >
-      Sign in
+      {t("chrome.auth.signin")}
     </Link>
   );
 
@@ -117,7 +143,7 @@ function Shell({
         )}
       >
         <span className={cn("size-1.5 rounded-full", active ? "bg-primary" : "bg-transparent")} />
-        <Icon className={cn("size-4", "tone" in rest && rest.tone)} />
+        <Icon className={cn("size-4", rest.tone)} />
         {label}
       </Link>
     );
@@ -131,7 +157,7 @@ function Shell({
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
-            aria-label="Open menu"
+            aria-label={t("chrome.aria.openMenu")}
             className="tap-target grid size-10 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.96]"
           >
             <Menu className="size-5" />
@@ -139,7 +165,7 @@ function Shell({
           {/* Brand hidden on phones — the hamburger already carries Home. */}
           <Link to="/" className="hidden items-center gap-2 px-1 sm:flex">
             <img src="/logo.png" alt="" className="size-5" />
-            <span className="text-base font-semibold tracking-tight">Green Algeria</span>
+            <span className="text-base font-semibold tracking-tight">{brandName}</span>
           </Link>
         </div>
         <div className="flex items-center gap-1">
@@ -149,11 +175,12 @@ function Shell({
             href="https://github.com/Meykiio/dz-green"
             target="_blank"
             rel="noreferrer"
-            aria-label="GitHub repository"
+            aria-label={t("chrome.aria.github")}
             className="tap-target grid size-10 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.96]"
           >
             <Github className="size-5" />
           </a>
+          {localeButton}
           {themeButton}
         </div>
       </header>
@@ -169,27 +196,29 @@ function Shell({
       <aside
         className={cn(
           "fixed inset-y-0 start-0 z-50 flex w-72 flex-col border-e border-border bg-card transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
-          drawerOpen ? "translate-x-0" : "-translate-x-full",
+          drawerOpen
+            ? "translate-x-0"
+            : "-translate-x-full rtl:translate-x-full",
         )}
-        aria-label="Menu"
+        aria-label={t("chrome.aria.menu")}
         aria-hidden={!drawerOpen}
         inert={!drawerOpen}
       >
         <div className="flex items-center justify-between px-4 py-3.5">
           <span className="flex items-center gap-2">
             <img src="/logo.png" alt="" className="size-5" />
-            <span className="text-base font-semibold tracking-tight">Green Algeria</span>
+            <span className="text-base font-semibold tracking-tight">{brandName}</span>
           </span>
           <button
             type="button"
             onClick={() => setDrawerOpen(false)}
-            aria-label="Close menu"
+            aria-label={t("chrome.aria.closeMenu")}
             className="tap-target grid size-10 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
           >
             <X className="size-5" />
           </button>
         </div>
-        <nav aria-label="Main" className="flex-1 space-y-1 overflow-y-auto px-3 py-2">
+        <nav aria-label={t("chrome.aria.main")} className="flex-1 space-y-1 overflow-y-auto px-3 py-2">
           {rows.map(navRow)}
         </nav>
         <div className="flex items-center gap-2 border-t border-border px-4 py-3">
@@ -201,7 +230,7 @@ function Shell({
       {/* Desktop static sidebar on app pages only. */}
       {isAppPage && (
         <aside className="fixed inset-y-0 start-0 z-30 hidden w-60 flex-col border-e border-sidebar-border bg-sidebar pt-14 md:flex">
-          <nav aria-label="Sections" className="mt-2 flex-1 space-y-1 px-3 py-2">
+          <nav aria-label={t("chrome.aria.sections")} className="mt-2 flex-1 space-y-1 px-3 py-2">
             {rows.map(navRow)}
           </nav>
           <div className="flex items-center gap-2 border-t border-sidebar-border px-4 py-3">

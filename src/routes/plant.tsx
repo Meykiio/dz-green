@@ -10,27 +10,25 @@ import { LocationField } from "@/components/LocationField";
 import { PhotoInput } from "@/components/PhotoInput";
 import { ReceiptLink } from "@/components/ReceiptLink";
 import { Button } from "@/components/ui/button";
+import { localizeError, ssrT, useI18n } from "@/i18n";
 import { getDeviceSecret } from "@/lib/device";
 import { submitPlanting } from "@/lib/submissions.functions";
 import { submitResilient } from "@/lib/offline";
 
-const TITLE = "Log a tree planting — Green Algeria";
-const DESCRIPTION =
-  "Add the trees you planted to Algeria's public map: photo, exact location, species and count. No account needed.";
-
 export const Route = createFileRoute("/plant")({
   head: () => ({
     meta: [
-      { title: TITLE },
-      { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESCRIPTION },
+      { title: ssrT("meta.plantTitle") },
+      { name: "description", content: ssrT("meta.plantDesc") },
+      { property: "og:title", content: ssrT("meta.plantTitle") },
+      { property: "og:description", content: ssrT("meta.plantDesc") },
     ],
   }),
   component: PlantPage,
 });
 
 function PlantPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const startedAt = useState(() => Date.now())[0];
   const [hp, setHp] = useState("");
@@ -72,29 +70,28 @@ function PlantPage() {
         }),
       ),
     onSuccess: () => setDone(true),
-    onError: (error: Error) => toast.error(error.message || "Could not submit. Try again."),
+    onError: (error: Error) => toast.error(localizeError(error.message ?? "")),
   });
 
   if (done) {
     return (
       <AppShell>
         <FormShell
-          title="Thank you — it's under review"
-          intro="A volunteer moderator will approve your planting shortly. Once approved it appears on the map for everyone."
+          title={t("forms.plant.doneTitle")}
+          intro={t("forms.plant.doneIntro")}
           accent="plant"
         >
           <div className="space-y-4">
             {mutation.data && mutation.data !== "queued" && mutation.data.receipt && (
               <ReceiptLink token={mutation.data.receipt} />
             )}
-            <p className="text-xs text-muted-foreground">
-              Public on the map: your photo, wilaya, commune, species, tree count, date and display
-              name. Never public: your phone number, IP or device (stored only as hashes).
-            </p>
+            <p className="text-xs text-muted-foreground">{t("forms.plant.donePublic")}</p>
             <div className="flex gap-2">
-              <Button onClick={() => router.navigate({ to: "/" })}>Back to the map</Button>
+              <Button onClick={() => router.navigate({ to: "/" })}>
+                {t("chrome.shell.backToMap")}
+              </Button>
               <Button variant="secondary" onClick={() => window.location.reload()}>
-                Log another
+                {t("forms.plant.doneAgain")}
               </Button>
             </div>
           </div>
@@ -107,24 +104,20 @@ function PlantPage() {
 
   return (
     <AppShell>
-      <FormShell
-        title="I planted a tree"
-        intro="Photo and location are required so the record can be trusted."
-        accent="plant"
-      >
+      <FormShell title={t("forms.plant.title")} intro={t("forms.plant.intro")} accent="plant">
         <form
           className="relative space-y-5"
           onSubmit={(e) => {
             e.preventDefault();
             if (!valid) {
-              toast.error("Add a photo and choose a wilaya first.");
+              toast.error(t("forms.plant.missing"));
               return;
             }
             mutation.mutate();
           }}
         >
           <Honeypot value={hp} onChange={setHp} />
-          <PhotoInput value={photo} onChange={setPhoto} label="Photo of the planting" required />
+          <PhotoInput value={photo} onChange={setPhoto} label={t("forms.plant.photoLabel")} required />
           <LocationField
             lat={lat}
             lng={lng}
@@ -147,7 +140,7 @@ function PlantPage() {
 
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block">
-              <span className="eyebrow">Number of trees *</span>
+              <span className="eyebrow">{t("forms.plant.treeCount")}</span>
               <input
                 type="number"
                 min={1}
@@ -159,7 +152,7 @@ function PlantPage() {
               />
             </label>
             <label className="block">
-              <span className="eyebrow">Date planted *</span>
+              <span className="eyebrow">{t("forms.plant.date")}</span>
               <input
                 type="date"
                 required
@@ -172,18 +165,18 @@ function PlantPage() {
           </div>
 
           <label className="block">
-            <span className="eyebrow">Species (optional)</span>
+            <span className="eyebrow">{t("forms.plant.species")}</span>
             <input
               value={species}
               maxLength={120}
-              placeholder="Aleppo pine, olive, eucalyptus…"
+              placeholder={t("forms.plant.speciesPlaceholder")}
               onChange={(e) => setSpecies(e.target.value)}
               className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"
             />
           </label>
 
           <label className="block">
-            <span className="eyebrow">Notes (optional)</span>
+            <span className="eyebrow">{t("forms.plant.notes")}</span>
             <textarea
               value={notes}
               maxLength={1000}
@@ -194,7 +187,7 @@ function PlantPage() {
           </label>
 
           <label className="block">
-            <span className="eyebrow">Your name or group (optional)</span>
+            <span className="eyebrow">{t("forms.plant.name")}</span>
             <input
               value={name}
               maxLength={80}
@@ -204,7 +197,7 @@ function PlantPage() {
           </label>
 
           <label className="block">
-            <span className="eyebrow">Phone number (optional)</span>
+            <span className="eyebrow">{t("forms.plant.phone")}</span>
             <input
               type="tel"
               value={phone}
@@ -214,20 +207,17 @@ function PlantPage() {
               className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"
             />
             <span className="mt-1 block text-xs text-muted-foreground">
-              Optional, but it helps a lot — a moderator may call to verify the planting before
-              approving it. Never public, never shared.{" "}
+              {t("forms.plant.phoneHelper")}{" "}
               <Link to="/privacy" className="underline">
-                Why we ask
+                {t("forms.plant.whyWeAsk")}
               </Link>
             </span>
           </label>
 
           <Button type="submit" size="lg" className="w-full" disabled={mutation.isPending}>
-            {mutation.isPending ? "Sending…" : "Submit planting"}
+            {mutation.isPending ? t("forms.plant.sending") : t("forms.plant.submit")}
           </Button>
-          <p className="text-xs text-muted-foreground">
-            Plantings are reviewed by volunteer moderators before appearing on the map.
-          </p>
+          <p className="text-xs text-muted-foreground">{t("forms.plant.reviewNote")}</p>
         </form>
       </FormShell>
     </AppShell>

@@ -10,6 +10,7 @@ import {
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { ALGERIA_CENTER } from "@/lib/geo";
+import { useI18n } from "@/i18n";
 
 interface Props {
   lat: number | null;
@@ -32,6 +33,7 @@ function accuracyRadiusPx(accuracy: number, lat: number, zoom: number): number {
  * (no API key, no rate-limit cliff). Used purely for dropping an accurate pin.
  */
 export default function PrecisionPicker({ lat, lng, accuracy, onChange }: Props) {
+  const { t } = useI18n();
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markerRef = useRef<Marker | null>(null);
@@ -136,7 +138,7 @@ export default function PrecisionPicker({ lat, lng, accuracy, onChange }: Props)
     <div
       ref={container}
       className="h-64 w-full overflow-hidden rounded-xl border border-border"
-      aria-label="Drag the pin to the exact location"
+      aria-label={t("forms.location.pickerAria")}
     />
   );
 }

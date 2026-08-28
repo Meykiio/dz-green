@@ -4,6 +4,7 @@ import { Droplets, Flame, Sprout } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
+import { ssrT, useI18n } from "@/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { myFireReports } from "@/lib/activity.functions";
@@ -11,39 +12,41 @@ import { formatDate } from "@/lib/data";
 import type { CareLog, FireReport, Site } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
 
-const TITLE = "My activity — Green Algeria";
-
 export const Route = createFileRoute("/_authenticated/activity")({
   head: () => ({
     meta: [
-      { title: TITLE },
-      { property: "og:title", content: TITLE },
+      { title: ssrT("meta.activityTitle") },
+      { property: "og:title", content: ssrT("meta.activityTitle") },
       { name: "robots", content: "noindex" },
     ],
   }),
   component: ActivityPage,
 });
 
-const SITE_STATUS: Record<string, { label: string; tone: string }> = {
-  pending: { label: "Under review", tone: "text-amber-400" },
-  approved: { label: "On the map", tone: "text-plant" },
-  rejected: { label: "Not approved", tone: "text-fire" },
+const SITE_STATUS_KEY: Record<string, "pending" | "approved" | "rejected"> = {
+  pending: "pending",
+  approved: "approved",
+  rejected: "rejected",
 };
 
-const FIRE_STATUS: Record<string, { label: string; tone: string }> = {
-  active: { label: "Active", tone: "text-fire" },
-  resolved: { label: "Resolved", tone: "text-care" },
-  false_alarm: { label: "False alarm", tone: "text-muted-foreground" },
+const STATUTS_TONE: Record<string, string> = {
+  pending: "text-amber-400",
+  approved: "text-plant",
+  rejected: "text-fire",
+  active: "text-fire",
+  resolved: "text-care",
+  false_alarm: "text-muted-foreground",
 };
 
-const CARE_LABEL: Record<string, string> = {
-  watered: "Watered",
-  checked: "Checked on it",
-  needs_attention: "Reported needs attention",
-  other: "Update",
+const CARE_ACTION_KEY: Record<string, "watered" | "checked" | "needsAttention" | "update"> = {
+  watered: "watered",
+  checked: "checked",
+  needs_attention: "needsAttention",
+  other: "update",
 };
 
 function ActivityPage() {
+  const { t, count, formatDateShort } = useI18n();
   const { user } = useAuth();
   const userId = user?.id;
 
@@ -93,13 +96,11 @@ function ActivityPage() {
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-3xl px-4 py-8">
-        <p className="eyebrow">My activity</p>
+        <p className="eyebrow">{t("moderation.act.eyebrow")}</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-          Everything you've added to the map
+          {t("moderation.act.heading")}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Your plantings, care logs and fire reports — including the ones still in review.
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">{t("moderation.act.intro")}</p>
 
         {loading && (
           <div className="mt-8 space-y-3">
@@ -111,7 +112,7 @@ function ActivityPage() {
 
         {failed && (
           <p className="mt-8 rounded-lg border border-fire/40 bg-fire/10 px-4 py-3 text-sm">
-            Couldn't load your activity — check your connection and refresh.
+            {t("moderation.act.error")}
           </p>
         )}
 
@@ -120,32 +121,41 @@ function ActivityPage() {
             <section>
               <SectionHeader
                 icon={<Sprout className="size-4 text-plant" />}
-                title="Plantings"
+                title={t("moderation.act.section.plantings")}
                 count={sites.data?.length ?? 0}
               />
               {(sites.data ?? []).length === 0 ? (
-                <Empty text="No plantings yet." cta={{ to: "/plant", label: "Plant your first tree" }} />
+                <Empty
+                  text={t("moderation.act.empty.plantings")}
+                  cta={{ to: "/plant", label: t("moderation.act.cta.plant") }}
+                />
               ) : (
                 <ul className="mt-3 space-y-2">
                   {sites.data!.map((s) => {
-                    const st = SITE_STATUS[s.status] ?? { label: s.status, tone: "" };
+                    const stKey = SITE_STATUS_KEY[s.status] ?? s.status;
+                    const stLabel = stKey
+                      ? t(`moderation.act.status.${stKey}`) || s.status
+                      : s.status;
                     return (
                       <li key={s.id} className="rounded-lg border border-border bg-card px-4 py-3">
                         <div className="flex items-center justify-between gap-3">
                           <p className="text-sm font-medium">
-                            {s.tree_count} {s.tree_count > 1 ? "trees" : "tree"}
-                            {s.species ? ` · ${s.species}` : ""} in {wilayaName(s.wilaya_code)}
+                            {count(s.tree_count, "tree")}
+                            {s.species ? ` · ${s.species}` : ""} ·{" "}
+                            {t("moderation.act.inWilaya", { wilaya: wilayaName(s.wilaya_code) })}
                           </p>
-                          <span className={`text-xs font-semibold ${st.tone}`}>{st.label}</span>
+                          <span className={`text-xs font-semibold ${STATUTS_TONE[s.status] ?? ""}`}>
+                            {stLabel}
+                          </span>
                         </div>
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          planted {formatDate(s.planted_date)}
-                          {s.location_approximate ? " · wilaya-level" : ""}
+                          {t("home.list.planted", { date: formatDateShort(s.planted_date) })}
+                          {s.location_approximate ? ` · ${t("home.list.wilayaLevel")}` : ""}
                           {s.commune ? ` · ${s.commune}` : ""}
                         </p>
                         {s.status === "rejected" && s.moderator_notes && (
                           <p className="mt-1.5 text-xs text-muted-foreground">
-                            Moderator note: {s.moderator_notes}
+                            {t("moderation.act.note", { note: s.moderator_notes })}
                           </p>
                         )}
                       </li>
@@ -158,18 +168,23 @@ function ActivityPage() {
             <section>
               <SectionHeader
                 icon={<Droplets className="size-4 text-care" />}
-                title="Care logs"
+                title={t("moderation.act.section.care")}
                 count={care.data?.length ?? 0}
               />
               {(care.data ?? []).length === 0 ? (
-                <Empty text="No care logged yet." cta={{ to: "/care", label: "Log care for a site" }} />
+                <Empty
+                  text={t("moderation.act.empty.care")}
+                  cta={{ to: "/care", label: t("moderation.act.cta.care") }}
+                />
               ) : (
                 <ul className="mt-3 space-y-2">
                   {care.data!.map((l) => (
                     <li key={l.id} className="rounded-lg border border-border bg-card px-4 py-3">
-                      <p className="text-sm font-medium">{CARE_LABEL[l.action] ?? l.action}</p>
+                      <p className="text-sm font-medium">
+                        {t(`moderation.act.care.${CARE_ACTION_KEY[l.action] ?? "other"}`)}
+                      </p>
                       <p className="mt-0.5 text-xs text-muted-foreground">
-                        {formatDate(l.logged_date)}
+                        {formatDateShort(l.logged_date)}
                         {l.notes ? ` · ${l.notes}` : ""}
                       </p>
                     </li>
@@ -181,27 +196,33 @@ function ActivityPage() {
             <section>
               <SectionHeader
                 icon={<Flame className="size-4 text-fire" />}
-                title="Fire reports"
+                title={t("moderation.act.section.fires")}
                 count={fires.data?.length ?? 0}
               />
               {(fires.data ?? []).length === 0 ? (
-                <Empty text="No fire reports." cta={{ to: "/fire", label: "Report a fire" }} />
+                <Empty
+                  text={t("moderation.act.empty.fires")}
+                  cta={{ to: "/fire", label: t("moderation.act.cta.fire") }}
+                />
               ) : (
                 <ul className="mt-3 space-y-2">
                   {fires.data!.map((f) => {
-                    const st = FIRE_STATUS[f.status] ?? { label: f.status, tone: "" };
                     return (
                       <li key={f.id} className="rounded-lg border border-border bg-card px-4 py-3">
                         <div className="flex items-center justify-between gap-3">
                           <p className="text-sm font-medium">
                             {wilayaName(f.wilaya_code)}
-                            {f.severity ? ` · ${f.severity}` : ""}
+                            {f.severity
+                              ? ` · ${f.severity === "large" ? t("moderation.triage.large") : t("moderation.triage.small")}`
+                              : ""}
                           </p>
-                          <span className={`text-xs font-semibold ${st.tone}`}>{st.label}</span>
+                          <span className={`text-xs font-semibold ${STATUTS_TONE[f.status] ?? ""}`}>
+                            {t(`moderation.triage.badge.${f.status === "false_alarm" ? "falseAlarm" : f.status}`)}
+                          </span>
                         </div>
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          reported {formatDate(f.created_at)}
-                          {f.location_approximate ? " · wilaya-level" : ""}
+                          {t("home.list.reported", { date: formatDateShort(f.created_at) })}
+                          {f.location_approximate ? ` · ${t("home.list.wilayaLevel")}` : ""}
                         </p>
                       </li>
                     );

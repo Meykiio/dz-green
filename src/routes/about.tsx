@@ -1,101 +1,97 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Map as MapIcon, Phone, ShieldCheck, Sprout } from "lucide-react";
+import { ArrowLeft, ArrowRight, Map as MapIcon, Phone, ShieldCheck, Sprout } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
-
-const TITLE = "About Green Algeria — a community map, not an emergency service";
-const DESCRIPTION =
-  "How Green Algeria works: open planting records reviewed before publishing, immediate care logs and fire reports, run by the community for the whole country.";
+import { ssrT, useI18n } from "@/i18n";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: TITLE },
-      { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESCRIPTION },
+      { title: ssrT("meta.aboutTitle") },
+      { name: "description", content: ssrT("meta.aboutDesc") },
+      { property: "og:title", content: ssrT("meta.aboutTitle") },
+      { property: "og:description", content: ssrT("meta.aboutDesc") },
     ],
   }),
   component: AboutPage,
 });
 
 function AboutPage() {
+  const { t, isRtl } = useI18n();
+  const Arrow = isRtl ? ArrowLeft : ArrowRight;
   return (
     <AppShell>
       <article className="mx-auto w-full max-w-2xl px-4 py-10">
-        <p className="text-xs text-muted-foreground">About</p>
-        <h1 className="display-hero mt-2 text-3xl sm:text-4xl">
-          One map for every tree in Algeria.
-        </h1>
-        <p className="mt-4 text-lg text-muted-foreground">
-          Planting in Algeria happens everywhere and is recorded almost nowhere.
-          Green Algeria is an open, community-run place to put it all on one
-          map: what was planted, where, and whether anyone is still looking
-          after it.
-        </p>
+        <p className="text-xs text-muted-foreground">{t("info.about.eyebrow")}</p>
+        <h1 className="display-hero mt-2 text-3xl sm:text-4xl">{t("info.about.hero")}</h1>
+        <p className="mt-4 text-lg text-muted-foreground">{t("info.about.lead")}</p>
 
         <div className="mt-8 rounded-2xl border border-border bg-card p-5">
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-            <span><span className="font-semibold">You report</span> — a planting, care, or a fire. No account.</span>
-            <ArrowRight className="size-3.5 shrink-0 text-muted-foreground" />
-            <span><span className="font-semibold">A volunteer reviews</span> — local moderators, per wilaya.</span>
-            <ArrowRight className="size-3.5 shrink-0 text-muted-foreground" />
-            <span><span className="font-semibold">It's on the map</span> — for everyone.</span>
+            <span>
+              <span className="font-semibold">{t("info.about.flow.youReport")}</span>
+              {t("info.about.flow.youReportBody")}
+            </span>
+            <Arrow className="size-3.5 shrink-0 text-muted-foreground" />
+            <span>
+              <span className="font-semibold">{t("info.about.flow.review")}</span>
+              {t("info.about.flow.reviewBody")}
+            </span>
+            <Arrow className="size-3.5 shrink-0 text-muted-foreground" />
+            <span>
+              <span className="font-semibold">{t("info.about.flow.map")}</span>
+              {t("info.about.flow.mapBody")}
+            </span>
           </p>
         </div>
 
         <div className="mt-10 space-y-10">
-          <Section icon={<Sprout className="size-5 text-plant" />} title="Independent">
-            This platform is not affiliated with any single page, association or
-            institution. It belongs to everyone planting in Algeria. Anyone can
-            contribute, with or without an account — and every tree on the map
-            nudges the next person to plant one.
+          <Section
+            icon={<Sprout className="size-5 text-plant" />}
+            title={t("info.about.independent.title")}
+          >
+            {t("info.about.independent.body")}
           </Section>
 
-          <Section icon={<ShieldCheck className="size-5 text-plant" />} title="Reviewed before it's public">
-            Planting submissions are reviewed by volunteer moderators in the
-            wilaya they were reported in. That keeps the tree counts honest.
-            Your receipt link shows the status the moment it changes — pending,
-            approved, or not approved, with the moderator's note when there is
-            one.
+          <Section
+            icon={<ShieldCheck className="size-5 text-plant" />}
+            title={t("info.about.reviewed.title")}
+          >
+            {t("info.about.reviewed.body")}
           </Section>
 
-          <Section icon={<ArrowRight className="size-5 text-care" />} title="Care and fire are immediate">
-            Anyone can log watering or a check-up on any approved site — no
-            ownership, no assignment. Fire reports skip review entirely and
-            appear on the map straight away, because speed matters more than
-            tidiness there.
+          <Section
+            icon={<Arrow className="size-5 text-care" />}
+            title={t("info.about.immediate.title")}
+          >
+            {t("info.about.immediate.body")}
           </Section>
 
           <div className="rounded-2xl border border-fire/30 bg-fire/5 p-5">
             <p className="flex items-center gap-2 font-semibold text-fire">
-              <Phone className="size-4" /> This is not an emergency service
+              <Phone className="size-4" /> {t("info.about.notEmergency.title")}
             </p>
-            <p className="mt-2 text-sm">
-              Green Algeria is a community map. Nobody is on duty here. If there
-              is immediate danger, contact Protection Civile directly on 14 or
-              1021. Reporting a fire here does not send help.
-            </p>
+            <p className="mt-2 text-sm">{t("info.about.notEmergency.body")}</p>
           </div>
 
-          <Section icon={<ShieldCheck className="size-5 text-muted-foreground" />} title="Privacy, in plain terms">
-            Submissions work without an account. We never store raw IP
-            addresses — only one-way hashes used to slow down spam. Your device
-            secret rotates daily and is never stored raw. Reporter name and
-            phone on fire reports stay on the server, unreachable from the map.
+          <Section
+            icon={<ShieldCheck className="size-5 text-muted-foreground" />}
+            title={t("info.about.privacy.title")}
+          >
+            {t("info.about.privacy.body")}
           </Section>
         </div>
 
         <div className="mt-12 flex flex-wrap gap-3">
           <Button asChild>
             <Link to="/">
-              <MapIcon className="size-4" /> Back to the map
+              <MapIcon className="size-4" /> {t("info.about.back")}
             </Link>
           </Button>
           <Button asChild variant="secondary">
             <Link to="/plant">
-              <Sprout className="size-4" /> Plant a tree
+              <Sprout className="size-4" /> {t("info.about.plantCta")}
             </Link>
           </Button>
         </div>

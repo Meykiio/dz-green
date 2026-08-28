@@ -1,33 +1,35 @@
 import { useQuery } from "@tanstack/react-query";
 
+import { useI18n } from "@/i18n";
 import { adminListFeedback } from "@/lib/admin.functions";
 import { formatDate } from "@/lib/data";
 
 const KIND_META = {
-  bug: { label: "Bug", classes: "bg-fire/15 text-fire" },
-  idea: { label: "Idea", classes: "bg-care/15 text-care" },
-  other: { label: "Other", classes: "bg-muted text-muted-foreground" },
+  bug: { classes: "bg-fire/15 text-fire" },
+  idea: { classes: "bg-care/15 text-care" },
+  other: { classes: "bg-muted text-muted-foreground" },
 } as const;
 
 /** Read-only visitor feedback list (admin page). Latest 100 messages. */
 export function FeedbackPanel() {
+  const { t, formatDateShort } = useI18n();
   const feedback = useQuery({
     queryKey: ["admin", "feedback"],
     queryFn: () => adminListFeedback(),
   });
 
   if (feedback.isLoading) {
-    return <p className="mt-6 text-muted-foreground">Loading feedback…</p>;
+    return <p className="mt-6 text-muted-foreground">{t("moderation.fb.loading")}</p>;
   }
   if (feedback.isError) {
     return (
       <p className="mt-6 rounded-lg border border-fire/40 bg-fire/10 px-4 py-3 text-sm">
-        Couldn't load feedback — refresh to try again.
+        {t("moderation.fb.error")}
       </p>
     );
   }
   if (!feedback.data?.length) {
-    return <p className="mt-6 text-muted-foreground">No feedback yet.</p>;
+    return <p className="mt-6 text-muted-foreground">{t("moderation.fb.empty")}</p>;
   }
 
   return (
@@ -39,12 +41,12 @@ export function FeedbackPanel() {
             <span
               className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${KIND_META[f.kind].classes}`}
             >
-              {KIND_META[f.kind].label}
+              {t(`moderation.fb.kind.${f.kind}`)}
             </span>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            {formatDate(f.created_at)}
-            {f.page ? ` · from ${f.page}` : ""}
+            {formatDateShort(f.created_at)}
+            {f.page ? t("moderation.fb.from", { page: f.page }) : ""}
           </p>
           {f.device ? (
             <p className="mt-1 truncate font-mono text-[11px] text-muted-foreground/70" title={f.device}>
