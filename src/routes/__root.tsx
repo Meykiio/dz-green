@@ -12,6 +12,9 @@ import { type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import { I18nProvider } from "@/i18n";
+import { localeInitScript } from "@/i18n";
+import { getLocale } from "@/i18n/locale";
 
 function NotFoundComponent() {
   return (
@@ -98,12 +101,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const locale = getLocale();
   return (
-    <html lang="en">
+    <html lang={locale === "ar" ? "ar" : "en"} dir={locale === "ar" ? "rtl" : "ltr"}>
       <head>
         <script
           dangerouslySetInnerHTML={{
             __html: `try{if(localStorage.getItem("ga-theme")==="dark")document.documentElement.classList.add("dark")}catch(e){}`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: localeInitScript(),
           }}
         />
         <HeadContent />
@@ -121,11 +130,13 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <Toaster position="top-center" richColors />
-      {/* Vercel Web Analytics — self-contained loader script; no-ops off-Vercel. */}
-      <Analytics />
+      <I18nProvider>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <Toaster position="top-center" richColors />
+        {/* Vercel Web Analytics — self-contained loader script; no-ops off-Vercel. */}
+        <Analytics />
+      </I18nProvider>
     </QueryClientProvider>
   );
 }

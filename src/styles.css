@@ -3,6 +3,8 @@
 @import "tw-animate-css";
 @import "@fontsource-variable/inter";
 @import "@fontsource-variable/manrope";
+@import "@fontsource-variable/noto-sans-arabic";
+@import "@fontsource-variable/noto-kufi-arabic";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -71,7 +73,13 @@
 
 @theme inline {
   --font-sans:
-    "Inter Variable", "Inter", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+    "Inter Variable", "Inter", "Noto Sans Arabic Variable", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  --font-sans-ar:
+    "Noto Sans Arabic Variable", "Noto Sans Arabic", "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display:
+    "Manrope Variable", "Inter Variable", "Inter", "Noto Sans Arabic Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display-ar:
+    "Noto Kufi Arabic Variable", "Noto Sans Arabic Variable", "Noto Sans Arabic", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --color-plant: var(--plant);
   --color-plant-foreground: var(--plant-foreground);
   --color-care: var(--care);
@@ -233,11 +241,22 @@
 }
 
 @utility display-hero {
-  font-family: "Manrope Variable", "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-display);
   font-weight: 900;
   letter-spacing: -0.02em;
   line-height: 0.95;
   text-wrap: balance;
+}
+
+[dir="rtl"] .display-hero {
+  font-family: var(--font-display-ar);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+[dir="rtl"] body {
+  font-family: var(--font-sans-ar);
 }
 
 @keyframes ga-fire-pulse {
