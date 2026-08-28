@@ -112,5 +112,6 @@ export const forms = {
       "No account, no email — this private link is the only way to check your submission's status later. Bookmark it or copy it somewhere safe.",
     copy: "Copy receipt link",
     copied: "Copied.",
+    tooltipCopy: "Save this link in your browser bookmarks.",
   },
 };

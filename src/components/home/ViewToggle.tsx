@@ -1,5 +1,6 @@
 import { List, Map as MapIcon, Trophy } from "lucide-react";
 
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useI18n } from "@/i18n";
 
 export type HomeView = "map" | "list" | "board";
@@ -24,18 +25,22 @@ export function ViewToggle({
       {OPTIONS.map(({ value, key, icon: Icon }) => {
         const label = t(`home.views.${key}`);
         return (
-          <button
-            key={value}
-            type="button"
-            onClick={() => onChange(value)}
-            aria-pressed={view === value}
-            aria-label={value === "board" ? t("home.aria.board") : t(`home.aria.${key}`)}
-            className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 transition-colors ${
-              view === value ? "bg-accent text-foreground" : "text-muted-foreground"
-            }`}
-          >
-            <Icon className="size-3.5" /> {label}
-          </button>
+          <Tooltip key={value}>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => onChange(value)}
+                aria-pressed={view === value}
+                aria-label={value === "board" ? t("home.aria.board") : t(`home.aria.${key}`)}
+                className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 transition-colors ${
+                  view === value ? "bg-accent text-foreground" : "text-muted-foreground"
+                }`}
+              >
+                <Icon className="size-3.5" /> {label}
+              </button>
+            </TooltipTrigger>
+            {value === "board" && <TooltipContent>{t("home.tooltip.board")}</TooltipContent>}
+          </Tooltip>
         );
       })}
     </div>

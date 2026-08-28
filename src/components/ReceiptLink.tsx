@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Copy } from "lucide-react";
 import { useState } from "react";
 
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useI18n } from "@/i18n";
 
 /**
@@ -27,19 +28,24 @@ export function ReceiptLink({ token }: { token: string }) {
         >
           {url}
         </Link>
-        <button
-          type="button"
-          onClick={() => {
-            void navigator.clipboard?.writeText(url).then(() => {
-              setCopied(true);
-              setTimeout(() => setCopied(false), 2000);
-            });
-          }}
-          className="tap-target grid size-10 shrink-0 place-items-center rounded-md border border-border text-muted-foreground hover:text-foreground"
-          aria-label={t("forms.receiptLink.copy")}
-        >
-          <Copy className="size-4" />
-        </button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              onClick={() => {
+                void navigator.clipboard?.writeText(url).then(() => {
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                });
+              }}
+              className="tap-target grid size-10 shrink-0 place-items-center rounded-md border border-border text-muted-foreground hover:text-foreground"
+              aria-label={t("forms.receiptLink.copy")}
+            >
+              <Copy className="size-4" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>{t("forms.receiptLink.tooltipCopy")}</TooltipContent>
+        </Tooltip>
       </div>
       {copied && <p className="mt-1.5 text-xs text-plant">{t("forms.receiptLink.copied")}</p>}
     </div>

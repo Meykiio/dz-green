@@ -1,5 +1,6 @@
 import { Droplets, Flame, Sprout } from "lucide-react";
 
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useI18n } from "@/i18n";
 import { photoUrl } from "@/lib/data";
 import { needsWater, type CareLog, type FireReport, type MapFeature, type Site } from "@/lib/types";
@@ -142,9 +143,14 @@ function SiteRow({
         </span>
       </span>
       {thirsty && (
-        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-care/15 px-2.5 py-1 text-xs font-medium text-care">
-          <Droplets className="size-3.5" /> {t("home.list.needsWater")}
-        </span>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-care/15 px-2.5 py-1 text-xs font-medium text-care">
+              <Droplets className="size-3.5" /> {t("home.list.needsWater")}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>{t("home.tooltip.needsWater")}</TooltipContent>
+        </Tooltip>
       )}
     </button>
   );

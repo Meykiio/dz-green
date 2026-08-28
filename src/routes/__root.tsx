@@ -12,6 +12,7 @@ import { type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider, useI18n } from "@/i18n";
 import { localeInitScript } from "@/i18n";
 import { getLocale } from "@/i18n/locale";
@@ -135,11 +136,13 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <Toaster position="top-center" richColors />
-        {/* Vercel Web Analytics — self-contained loader script; no-ops off-Vercel. */}
-        <Analytics />
+        <TooltipProvider delayDuration={300}>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <Toaster position="top-center" richColors />
+          {/* Vercel Web Analytics — self-contained loader script; no-ops off-Vercel. */}
+          <Analytics />
+        </TooltipProvider>
       </I18nProvider>
     </QueryClientProvider>
   );

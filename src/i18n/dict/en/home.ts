@@ -19,6 +19,17 @@ export const home = {
     care: "Care",
     fires: "Fires",
   },
+  tooltip: {
+    layers: {
+      trees: "Show or hide tree plantings",
+      care: "Show or hide care updates",
+      fires: "Show or hide fire reports",
+    },
+    board: "Monthly wilaya race — approved plantings are summed per wilaya, reset on the 1st.",
+    needsWater: "No care logged for this site in the last 14 days.",
+    wilayaLevel:
+      "The reporter didn't pin an exact spot — this marker sits at the wilaya's centre.",
+  },
   aria: {
     showCard: "Show the action card",
     hideCard: "Hide the action card",
