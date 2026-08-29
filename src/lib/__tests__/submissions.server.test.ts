@@ -219,7 +219,15 @@ describe("storePhoto", () => {
   });
 
   it("accepts a payload exactly at the limit and uploads it", async () => {
-    const b64 = "A".repeat(1_200_000);
+    // A real JPEG magic prefix + zero padding, encoded as ONE base64 string
+    // (no embedded padding chars — strict atob rejects those). Decoded size is
+    // exactly 900,000 bytes = the pre-decode limit.
+    const full = Buffer.concat([
+      Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01]),
+      Buffer.alloc(900_000 - 12),
+    ]);
+    const b64 = full.toString("base64");
+    expect(b64.length).toBe(1_200_000);
     const path = await storePhoto(`data:image/jpeg;base64,${b64}`, "plantings");
     expect(path).toMatch(/^plantings\/.+\.jpg$/);
     expect(upload).toHaveBeenCalledTimes(1);

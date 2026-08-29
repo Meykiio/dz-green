@@ -38,36 +38,93 @@ export interface AdminUser {
   created_at: string;
 }
 
-export const adminListUsers = createServerFn({ method: "GET" }).handler(async (): Promise<AdminUser[]> => {
-  await requireAdmin();
-  const [{ data: profiles }, { data: users }, { data: roles }, { data: assignments }] =
-    await Promise.all([
-      supabaseAdmin.from("profiles").select("id, display_name, created_at").limit(500),
-      supabaseAdmin.auth.admin.listUsers({ perPage: 200 }),
-      supabaseAdmin.from("user_roles").select("user_id, role"),
-      supabaseAdmin.from("moderator_wilayas").select("user_id, wilaya_code"),
-    ]);
+const listUsersShape = z.object({ offset: z.number().int().min(0).default(0), limit: z.number().int().min(1).max(100).default(50) });
 
-  const emailById = new Map((users?.users ?? []).map((u) => [u.id, u.email]));
-  const roleByUser = new Map((roles ?? []).map((r) => [r.user_id, r.role]));
-  const wilayasByUser = new Map<string, string[]>();
-  for (const a of assignments ?? []) {
-    const list = wilayasByUser.get(a.user_id) ?? [];
-    list.push(a.wilaya_code);
-    wilayasByUser.set(a.user_id, list);
-  }
+export const adminListUsers = createServerFn({ method: "GET" })
+  .validator((data: unknown) => listUsersShape.parse(data))
+  .handler(async ({ data }): Promise<AdminUser[]> => {
+    await requireAdmin();
+    const [{ data: profiles }, { data: users }, { data: roles }, { data: assignments }] =
+      await Promise.all([
+        supabaseAdmin
+          .from("profiles")
+          .select("id, display_name, created_at")
+          .order("created_at", { ascending: false })
+          .range(data.offset, data.offset + data.limit - 1),
+        supabaseAdmin.auth.admin.listUsers({ perPage: 200 }),
+        supabaseAdmin.from("user_roles").select("user_id, role"),
+        supabaseAdmin.from("moderator_wilayas").select("user_id, wilaya_code"),
+      ]);
 
-  return (profiles ?? [])
-    .map((p) => ({
-      id: p.id,
-      email: emailById.get(p.id) ?? null,
-      display_name: p.display_name,
-      role: (roleByUser.get(p.id) as AdminUser["role"]) ?? null,
-      wilayas: (wilayasByUser.get(p.id) ?? []).sort(),
-      created_at: p.created_at,
-    }))
-    .sort((a, b) => (a.email ?? "").localeCompare(b.email ?? ""));
+    const emailById = new Map((users?.users ?? []).map((u) => [u.id, u.email]));
+    const roleByUser = new Map((roles ?? []).map((r) => [r.user_id, r.role]));
+    const wilayasByUser = new Map<string, string[]>();
+    for (const a of assignments ?? []) {
+      const list = wilayasByUser.get(a.user_id) ?? [];
+      list.push(a.wilaya_code);
+      wilayasByUser.set(a.user_id, list);
+    }
+
+    return (profiles ?? [])
+      .map((p) => ({
+        id: p.id,
+        email: emailById.get(p.id) ?? null,
+        display_name: p.display_name,
+        role: (roleByUser.get(p.id) as AdminUser["role"]) ?? null,
+        wilayas: (wilayasByUser.get(p.id) ?? []).sort(),
+        created_at: p.created_at,
+      }))
+      .sort((a, b) => (a.email ?? "").localeCompare(b.email ?? ""));
+  });
+
+const createUserShape = z.object({
+  email: z.string().trim().email().max(200).toLowerCase(),
+  password: z.string().min(8).max(72),
+  display_name: z.string().trim().max(80).optional(),
+  role: z.enum(["moderator", "admin"]).default("moderator"),
+  wilayas: z.array(z.string().regex(/^\d{2}$/)).max(58).default([]),
 });
+
+/**
+ * Create an auth account as an admin (2026-08-28): the account is usable
+ * immediately (email_confirm: true is a service-role capability, independent
+ * of the Pro-plan email settings), the profile gets the display name, and a
+ * moderator role + wilayas are assigned in the same step.
+ */
+export const adminCreateUser = createServerFn({ method: "POST" })
+  .validator((data: unknown) => createUserShape.parse(data))
+  .handler(async ({ data }) => {
+    await requireAdmin();
+    const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
+      email: data.email,
+      password: data.password,
+      email_confirm: true,
+      ...(data.display_name ? { user_metadata: { display_name: data.display_name } } : {}),
+    });
+    if (error) {
+      if (error.status === 422) throw new Error("An account with this email already exists.");
+      throw error;
+    }
+    const userId = created.user.id;
+    if (data.display_name) {
+      const { error: profileError } = await supabaseAdmin
+        .from("profiles")
+        .update({ display_name: data.display_name })
+        .eq("id", userId);
+      if (profileError) throw profileError;
+    }
+    const { error: roleError } = await supabaseAdmin
+      .from("user_roles")
+      .insert({ user_id: userId, role: data.role });
+    if (roleError) throw roleError;
+    if (data.role === "moderator" && data.wilayas.length > 0) {
+      const { error: wErr } = await supabaseAdmin
+        .from("moderator_wilayas")
+        .insert([...new Set(data.wilayas)].map((w) => ({ user_id: userId, wilaya_code: w })));
+      if (wErr) throw wErr;
+    }
+    return { ok: true };
+  });
 
 export const adminSetRole = createServerFn({ method: "POST" })
   .validator(
@@ -147,19 +204,21 @@ export interface AdminFeedback {
   created_at: string;
 }
 
-export const adminListFeedback = createServerFn({ method: "GET" }).handler(
-  async (): Promise<AdminFeedback[]> => {
+const listFeedbackShape = z.object({ offset: z.number().int().min(0).default(0), limit: z.number().int().min(1).max(100).default(25) });
+
+export const adminListFeedback = createServerFn({ method: "GET" })
+  .validator((data: unknown) => listFeedbackShape.parse(data))
+  .handler(async ({ data }): Promise<AdminFeedback[]> => {
     await requireAdmin();
-    const { data, error } = await supabaseAdmin
+    const { data: rows, error } = await supabaseAdmin
       .from("feedback")
       .select("id, kind, message, page, device, created_at")
       .order("created_at", { ascending: false })
-      .limit(100);
+      .range(data.offset, data.offset + data.limit - 1);
     if (error) throw error;
     // kind is a check-constrained column; the generated types only know string.
-    return (data ?? []) as AdminFeedback[];
-  },
-);
+    return (rows ?? []) as AdminFeedback[];
+  });
 
 export interface AdminVolunteer {
   id: string;
@@ -175,19 +234,19 @@ export interface AdminVolunteer {
   created_at: string;
 }
 
-export const adminListVolunteers = createServerFn({ method: "GET" }).handler(
-  async (): Promise<AdminVolunteer[]> => {
+export const adminListVolunteers = createServerFn({ method: "GET" })
+  .validator((data: unknown) => listFeedbackShape.parse(data))
+  .handler(async ({ data }): Promise<AdminVolunteer[]> => {
     await requireAdmin();
-    const { data, error } = await supabaseAdmin
+    const { data: rows, error } = await supabaseAdmin
       .from("volunteers")
       .select("id, name, email, phone, wilaya_code, extra_wilayas, intents, availability, message, status, created_at")
       .order("created_at", { ascending: false })
-      .limit(500);
+      .range(data.offset, data.offset + data.limit - 1);
     if (error) throw error;
     // status is check-constrained; the generated types only know string.
-    return (data ?? []) as AdminVolunteer[];
-  },
-);
+    return (rows ?? []) as AdminVolunteer[];
+  });
 
 export const adminSetVolunteerStatus = createServerFn({ method: "POST" })
   .validator((data: unknown) =>

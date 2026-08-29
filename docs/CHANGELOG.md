@@ -3,6 +3,15 @@
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
 <<<<<<< HEAD
+## 2026-08-28 (fifty-first pass) — Admin dashboard: accounts, tabs, pagination + audit leftovers
+
+- **Admin can now create moderator accounts directly** (`CreateAccountDialog` + `adminCreateUser`): email + generated/typed password (show/hide) + display name + wilaya checkboxes → service-role `createUser` (usable immediately, `email_confirm:true` — independent of the Pro-plan email settings), profile display name, role + wilayas assigned in the same step. Duplicate email surfaces a friendly error. Reuses the shared `WilayaChecklist` (also deduplicated into `AssignWilayasDialog`).
+- **Admin layout refactor (owner: "it's a mess, endless scrolling"):** the admin page is now **four tabs** — Overview / Users & roles / Volunteers / Feedback — each mounting only when selected (`admin.tsx` 100 lines).
+- **Pagination everywhere:** `adminListUsers` / `adminListFeedback` / `adminListVolunteers` take offset+limit (50/25/25 pages); the three admin panels use "Show more" (`moderation.adm.more`) with accumulated rows and index-based query keys.
+- **Audit leftovers fixed:** magic-byte image sniff (mismatch → "Unsupported image format"; 4 new tests + storePhoto test hardened with a real full-size JPEG fixture), Nitro `routeRules` edge caching for `/about /privacy /terms /volunteer` (swr 3600) + `og.png`/`logo.png` cache headers. Shared-read throttle stays PARKED (needs `submission_meta.kind` CHECK widening — schema change deferred).
+- **Settings note (owner decision):** leaked-password protection + email-confirm toggle require **Pro** — documented in `docs/AUDIT_2026_08.md` §D; revisit on upgrade. Until then, confirm stays ON (built-in SMTP 2 emails/hour cap known) or OFF is the owner's choice at upgrade time.
+- Verified: tsc clean, **135/135 tests**, build green. Admin flows need a hands-on check (login as admin → four tabs, create an account, show-more on users/feedback).
+
 ## 2026-08-28 (fiftieth pass) — Audit fixes: live, phased (docs/AUDIT_2026_08.md)
 
 Owner: "test everything, find all problems, make a plan, fix what's broken" — audit + fix, then viral-launch readiness. Implemented this pass:

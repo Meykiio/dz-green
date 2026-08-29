@@ -1,8 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
 import { toast } from "sonner";
 
+import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n";
-import { adminListVolunteers, adminSetVolunteerStatus } from "@/lib/admin.functions";
+import { adminListVolunteers, adminSetVolunteerStatus, type AdminVolunteer } from "@/lib/admin.functions";
 import { wilayaName } from "@/lib/wilayas";
 
 const STATUS_META = {
@@ -11,13 +14,23 @@ const STATUS_META = {
   onboarded: { classes: "bg-muted text-muted-foreground" },
 } as const;
 
+const PAGE = 25;
+
 /** Volunteer applications (admin page): PII is service-role only, read here. */
 export function VolunteerPanel() {
   const { t, formatDateShort } = useI18n();
   const queryClient = useQueryClient();
+  const [offset, setOffset] = useState(0);
+  const [rows, setRows] = useState<AdminVolunteer[] | null>(null);
+  const listVolunteers = useServerFn(adminListVolunteers);
+
   const volunteers = useQuery({
-    queryKey: ["admin", "volunteers"],
-    queryFn: () => adminListVolunteers(),
+    queryKey: ["admin", "volunteers", offset],
+    queryFn: async () => {
+      const page = await listVolunteers({ data: { offset, limit: PAGE } });
+      setRows((prev) => (offset === 0 ? page : [...(prev ?? []), ...page]));
+      return page;
+    },
   });
 
   const setStatus = useMutation({
@@ -27,23 +40,25 @@ export function VolunteerPanel() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  if (volunteers.isLoading) {
+  if (volunteers.isLoading && offset === 0) {
     return <p className="mt-6 text-muted-foreground">{t("moderation.volp.loading")}</p>;
   }
-  if (volunteers.isError) {
+  if (volunteers.isError && offset === 0) {
     return (
       <p className="mt-6 rounded-lg border border-fire/40 bg-fire/10 px-4 py-3 text-sm">
         {t("moderation.volp.error")}
       </p>
     );
   }
-  if (!volunteers.data?.length) {
+  const list = rows ?? [];
+  if (list.length === 0) {
     return <p className="mt-6 text-muted-foreground">{t("moderation.volp.empty")}</p>;
   }
+  const hasMore = (volunteers.data?.length ?? 0) >= PAGE;
 
   return (
     <div className="mt-6 space-y-3">
-      {volunteers.data.map((v) => (
+      {list.map((v) => (
         <div key={v.id} className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -106,6 +121,13 @@ export function VolunteerPanel() {
           <p className="mt-2 text-xs text-muted-foreground">{t("moderation.volp.onboardHint")}</p>
         </div>
       ))}
+      {hasMore && (
+        <div className="flex justify-center">
+          <Button variant="secondary" onClick={() => setOffset((o) => o + PAGE)} disabled={volunteers.isFetching}>
+            {t("moderation.adm.more")}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

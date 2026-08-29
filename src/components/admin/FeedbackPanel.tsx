@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n";
-import { adminListFeedback } from "@/lib/admin.functions";
-import { formatDate } from "@/lib/data";
+import { adminListFeedback, type AdminFeedback } from "@/lib/admin.functions";
 
 const KIND_META = {
   bug: { classes: "bg-fire/15 text-fire" },
@@ -10,31 +12,43 @@ const KIND_META = {
   other: { classes: "bg-muted text-muted-foreground" },
 } as const;
 
-/** Read-only visitor feedback list (admin page). Latest 100 messages. */
+const PAGE = 25;
+
+/** Read-only visitor feedback list, paged (show more). */
 export function FeedbackPanel() {
   const { t, formatDateShort } = useI18n();
+  const [offset, setOffset] = useState(0);
+  const [rows, setRows] = useState<AdminFeedback[] | null>(null);
+  const listFeedback = useServerFn(adminListFeedback);
+
   const feedback = useQuery({
-    queryKey: ["admin", "feedback"],
-    queryFn: () => adminListFeedback(),
+    queryKey: ["admin", "feedback", offset],
+    queryFn: async () => {
+      const page = await listFeedback({ data: { offset, limit: PAGE } });
+      setRows((prev) => (offset === 0 ? page : [...(prev ?? []), ...page]));
+      return page;
+    },
   });
 
-  if (feedback.isLoading) {
+  if (feedback.isLoading && offset === 0) {
     return <p className="mt-6 text-muted-foreground">{t("moderation.fb.loading")}</p>;
   }
-  if (feedback.isError) {
+  if (feedback.isError && offset === 0) {
     return (
       <p className="mt-6 rounded-lg border border-fire/40 bg-fire/10 px-4 py-3 text-sm">
         {t("moderation.fb.error")}
       </p>
     );
   }
-  if (!feedback.data?.length) {
+  const list = rows ?? [];
+  if (list.length === 0) {
     return <p className="mt-6 text-muted-foreground">{t("moderation.fb.empty")}</p>;
   }
+  const hasMore = (feedback.data?.length ?? 0) >= PAGE;
 
   return (
     <div className="mt-6 space-y-3">
-      {feedback.data.map((f) => (
+      {list.map((f) => (
         <div key={f.id} className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-start justify-between gap-3">
             <p className="whitespace-pre-wrap text-sm">{f.message}</p>
@@ -55,6 +69,13 @@ export function FeedbackPanel() {
           ) : null}
         </div>
       ))}
+      {hasMore && (
+        <div className="flex justify-center">
+          <Button variant="secondary" onClick={() => setOffset((o) => o + PAGE)} disabled={feedback.isFetching}>
+            {t("moderation.adm.more")}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

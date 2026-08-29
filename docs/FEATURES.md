@@ -54,11 +54,14 @@ Smoke check performed: `GET /`, `/about`, `/plant`, `/care`, `/fire`, `/auth`, `
 - **Decision data (2026-08-21):** both queues show exact timestamps (`formatDateTime` — date + time): the pending queue shows the submission's `created_at` (previously only the planted date) and a wilaya-level badge; fire triage shows exact reported/resolved times. A **"Show contact"** button on each card reveals the submitter's name/phone on demand via the new moderator-only server functions `getSiteContact` / `getFireContact` (service-role, live role check per call — PII is column-grant protected, so this is the only read path; nothing is fetched by default).
 - Fire report triage: list with status badge (active/resolved/false alarm), severity, photo, dates; actions Mark resolved / False alarm / Reopen, writing `status` + `resolved_at` under `fire_moderator_update`. **Verified live 2026-08-13: the one live fire report round-tripped Active → Resolved → Active with zero console errors.**
 
-## 5b. Admin dashboard (`/admin`) — verified end to end (2026-08-17, extended 2026-08-18)
+## 5b. Admin dashboard (`/admin`) — verified end to end (2026-08-17, extended 2026-08-18, refactored 2026-08-28)
 
-- Admin-only guard (`isAdmin` from `user_roles`, live read). Two sections: **Overview** (platform stats — users, pending/approved, active fires, care logs, submissions 24h — plus per-wilaya oversight: pending + active-fire counts per wilaya, sorted by load) and **Moderators & roles** (user list with email, display name, role, assigned wilayas; Make admin/moderator, Assign wilayas dialog, Remove role, Sign out; self-demote blocked).
+- Admin-only guard (`isAdmin` from `user_roles`, live read). **Four tabs** — Overview (platform stats + per-wilaya oversight), Users & roles, Volunteers, Feedback — each mounting only when selected. Lists are paginated with "Show more" (users 50, feedback/volunteers 25 per page via offset params on the server fns).
+- **Users & roles tab:** user list with email, display name, role, assigned wilayas; Make admin/moderator, Assign wilayas dialog, Remove role, Sign out; self-demote blocked. **"New account"** creates a moderator account directly (email + password + display name + wilayas) via `adminCreateUser` — service-role createUser works regardless of the email-confirmation plan setting; role + wilayas assigned in the same step.
+- **Volunteers tab:** applications list (name/email/phone, wilaya, intents, availability, message) with status select (new → contacted → onboarded) and the onboard hint.
+- **Feedback tab:** visitor messages, kind badges, device + page provenance.
 - All mutations go through `src/lib/admin.functions.ts` server functions, which re-check the caller's admin role from the request token on every call — a demoted admin loses access on the next request.
-- **Verified live by `e2e/admin.spec.ts` + `e2e/activity.spec.ts`:** assign Oran to a moderator → moderator sees only Oran pending rows and approves one → remove the wilaya and the role → demoted lockout; overview stats and wilaya oversight render with real counts.
+- **Verified live by `e2e/admin.spec.ts` + `e2e/activity.spec.ts`:** assign Oran to a moderator → moderator sees only Oran pending rows and approves one → remove the wilaya and the role → demoted lockout; overview stats and wilaya oversight render with real counts. The 2026-08-28 refactor (tabs/pagination/create-account) was verified with tsc + unit suite + build; hands-on click-through still queued.
 
 ## 5c. User dashboard (`/activity`) — verified end to end (2026-08-18)
 

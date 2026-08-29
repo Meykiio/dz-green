@@ -1,6 +1,7 @@
 import { getRequest } from "@tanstack/react-start/server";
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { sniffImageMime } from "@/lib/image";
 
 /**
  * Abuse gate for anonymous public writes.
@@ -149,6 +150,10 @@ export async function storePhoto(dataUrl: string, folder: string): Promise<strin
   }
   const binary = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
   if (binary.byteLength > MAX_PHOTO_BYTES) throw new GateError("Photo is too large.");
+  // Audit 2026-08-28: magic-byte check — the regex above alone lets text through
+  // masquerading as an image (storage pollution; the proxy pins content-type so
+  // no XSS, but the bytes should match the declared type).
+  if (sniffImageMime(dataUrl) !== contentType) throw new GateError("Unsupported image format.");
 
   const ext = contentType.split("/")[1]!.replace("jpeg", "jpg");
   const path = `${folder}/${crypto.randomUUID()}.${ext}`;
