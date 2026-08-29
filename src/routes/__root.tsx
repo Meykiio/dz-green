@@ -13,28 +13,32 @@ import { type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { I18nProvider, useI18n } from "@/i18n";
+import { I18nProvider, ssrT } from "@/i18n";
 import { localeInitScript } from "@/i18n";
 import { getLocale } from "@/i18n/locale";
 
+/**
+ * Error/404 boundaries render OUTSIDE the route tree (in place of the root
+ * component), so they cannot use the I18nProvider context — `useI18n` would
+ * throw and mask the real error. They use `ssrT` (module singleton) instead.
+ */
 function NotFoundComponent() {
-  const { t } = useI18n();
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">
-          {t("chrome.browser.notFoundHeading")}
+          {ssrT("chrome.browser.notFoundHeading")}
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          {t("chrome.browser.notFoundBody")}
+          {ssrT("chrome.browser.notFoundBody")}
         </p>
         <div className="mt-6">
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            {t("chrome.browser.goHome")}
+            {ssrT("chrome.browser.goHome")}
           </Link>
         </div>
       </div>
@@ -45,16 +49,15 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-  const { t } = useI18n();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          {t("chrome.browser.loadErrorHeading")}
+          {ssrT("chrome.browser.loadErrorHeading")}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          {t("chrome.browser.loadErrorBody")}
+          {ssrT("chrome.browser.loadErrorBody")}
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -64,13 +67,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             }}
             className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            {t("chrome.browser.retry")}
+            {ssrT("chrome.browser.retry")}
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-full border border-input bg-background px-5 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-accent"
           >
-            {t("chrome.browser.goHome")}
+            {ssrT("chrome.browser.goHome")}
           </a>
         </div>
       </div>

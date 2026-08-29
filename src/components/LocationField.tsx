@@ -231,7 +231,7 @@ export function LocationField({
               onClick={() => setShowMap((v) => !v)}
               className="tap-target"
             >
-              {showMap ? "Hide map" : "Adjust on map"}
+              {showMap ? t("forms.location.hideMap") : t("forms.location.adjust")}
             </Button>
           )}
         </div>
