@@ -49,15 +49,17 @@ export function parseGoogleMapsLink(input: string): ParsedPoint | null {
 
 /** True when the link is a short URL that needs server-side redirect resolution. */
 export function isShortMapsLink(input: string): boolean {
-  return /(goo\.gl\/maps|maps\.app\.goo\.gl)\//i.test(input.trim());
+  // goo.gl is dead (Google shut the shortener down on 2025-08-25 — issue #38);
+  // only maps.app.goo.gl links still resolve.
+  return /maps\.app\.goo\.gl\//i.test(input.trim());
 }
 
 /**
  * SSRF guard (audit 2026-08-28): only these hosts may ever be fetched
- * server-side. Google's shorteners (goo.gl / maps.app.goo.gl) may redirect;
- * every hop must land on one of these too.
+ * server-side. Google shortener redirects; every hop must land on one of
+ * these too. goo.gl removed (dead service, issue #38).
  */
-const ALLOWED_MAPS_HOSTS = new Set(["goo.gl", "maps.app.goo.gl", "maps.google.com", "www.maps.google.com"]);
+const ALLOWED_MAPS_HOSTS = new Set(["maps.app.goo.gl", "maps.google.com", "www.maps.google.com"]);
 
 export function isAllowedMapsHost(url: string): boolean {
   let parsed: URL;

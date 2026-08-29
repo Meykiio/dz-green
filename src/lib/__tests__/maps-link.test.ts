@@ -27,8 +27,8 @@ describe("parseGoogleMapsLink", () => {
 });
 
 describe("isShortMapsLink", () => {
-  it("detects short links", () => {
-    expect(isShortMapsLink("https://goo.gl/maps/AbCdEf")).toBe(true);
+  it("detects short links (issue #38: goo.gl is dead, only maps.app.goo.gl resolves)", () => {
+    expect(isShortMapsLink("https://goo.gl/maps/AbCdEf")).toBe(false);
     expect(isShortMapsLink("https://maps.app.goo.gl/AbCdEf")).toBe(true);
     expect(isShortMapsLink("https://www.google.com/maps/@36.75,3.05,15z")).toBe(false);
   });
@@ -44,14 +44,19 @@ describe("directionsUrl", () => {
 
 describe("isAllowedMapsHost (SSRF guard, audit 2026-08-28)", () => {
   it.each([
-    "https://goo.gl/maps/abc",
     "https://maps.app.goo.gl/abc",
     "https://maps.google.com/?q=36.7,3.0",
     "https://www.maps.google.com/?q=36.7,3.0",
     "https://www.google.com/maps/place/Algiers",
-    "http://goo.gl/maps/abc",
   ])("allows Google Maps hosts: %s", (url) => {
     expect(isAllowedMapsHost(url)).toBe(true);
+  });
+
+  it.each([
+    "https://goo.gl/maps/abc",
+    "http://goo.gl/maps/abc",
+  ])("rejects dead goo.gl links (issue #38): %s", (url) => {
+    expect(isAllowedMapsHost(url)).toBe(false);
   });
 
   it.each([

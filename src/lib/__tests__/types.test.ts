@@ -77,6 +77,22 @@ describe("needsWater (CARE_WINDOW_DAYS = 14)", () => {
     expect(needsWater(site(), [log(13)])).toBe(false);
   });
 
+  it("issue #39: a backdated logged_date cannot fake freshness (created_at wins)", () => {
+    const backdated = log(0, {
+      logged_date: new Date(Date.now() - 60 * DAY).toISOString().slice(0, 10),
+      created_at: new Date().toISOString(),
+    });
+    expect(needsWater(site(), [backdated])).toBe(false);
+  });
+
+  it("issue #39: an old created_at makes the site thirsty even with a recent logged_date", () => {
+    const oldInsert = log(0, {
+      logged_date: new Date().toISOString().slice(0, 10),
+      created_at: new Date(Date.now() - 20 * DAY).toISOString(),
+    });
+    expect(needsWater(site(), [oldInsert])).toBe(true);
+  });
+
   it("is true with a care log 15 days ago", () => {
     expect(needsWater(site(), [log(15)])).toBe(true);
   });

@@ -107,30 +107,39 @@ export async function submitPlantingImpl(data: PlantingInput) {
   try {
     if ((await verifyGate("planting", data)) === "dropped") return silentDrop("planting");
     const userId = await optionalUserId();
-    const photoPath = await storePhoto(data.photo, "sites");
+    // Issue #36: validate the location BEFORE uploading — a rejected location
+    // must not leave an orphaned photo in the bucket.
     const loc = resolveLocation(data);
-    const { data: row, error } = await supabaseAdmin
-      .from("sites")
-      .insert({
-        lat: loc.lat,
-        lng: loc.lng,
-        wilaya_code: loc.wilaya,
-        location_approximate: loc.approximate,
-        commune: data.commune ?? null,
-        photo_url: photoPath,
-        species: data.species ?? null,
-        tree_count: data.tree_count,
-        planted_date: data.planted_date,
-        notes: data.notes ?? null,
-        planter_display_name: data.planter_display_name ?? null,
-        contact_phone: data.contact_phone ?? null,
-        user_id: userId,
-      })
-      .select("id")
-      .single();
-    if (error) throw error;
-    const receipt = await mintReceipt("planting", row.id as string);
-    return { id: row.id as string, status: "pending" as const, receipt };
+    const photoPath = await storePhoto(data.photo, "sites");
+    let row: { id: string } | null = null;
+    try {
+      const { data: inserted, error } = await supabaseAdmin
+        .from("sites")
+        .insert({
+          lat: loc.lat,
+          lng: loc.lng,
+          wilaya_code: loc.wilaya,
+          location_approximate: loc.approximate,
+          commune: data.commune ?? null,
+          photo_url: photoPath,
+          species: data.species ?? null,
+          tree_count: data.tree_count,
+          planted_date: data.planted_date,
+          notes: data.notes ?? null,
+          planter_display_name: data.planter_display_name ?? null,
+          contact_phone: data.contact_phone ?? null,
+          user_id: userId,
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+      row = inserted;
+    } catch (insertError) {
+      await supabaseAdmin.storage.from("photos").remove([photoPath]);
+      throw insertError;
+    }
+    const receipt = await mintReceipt("planting", row!.id as string);
+    return { id: row!.id as string, status: "pending" as const, receipt };
   } catch (error) {
     fail(error);
   }
@@ -151,22 +160,29 @@ export async function submitCareImpl(data: CareInput) {
     }
 
     const photoPath = data.photo ? await storePhoto(data.photo, "care") : null;
-    const { data: row, error } = await supabaseAdmin
-      .from("care_logs")
-      .insert({
-        site_id: data.site_id,
-        action: data.action,
-        submitter_name: data.submitter_name ?? null,
-        photo_url: photoPath,
-        notes: data.notes ?? null,
-        logged_date: data.logged_date,
-        user_id: userId,
-      })
-      .select("id")
-      .single();
-    if (error) throw error;
-    const receipt = await mintReceipt("care", row.id as string);
-    return { id: row.id as string, status: "published" as const, receipt };
+    let row: { id: string } | null = null;
+    try {
+      const { data: inserted, error } = await supabaseAdmin
+        .from("care_logs")
+        .insert({
+          site_id: data.site_id,
+          action: data.action,
+          submitter_name: data.submitter_name ?? null,
+          photo_url: photoPath,
+          notes: data.notes ?? null,
+          logged_date: data.logged_date,
+          user_id: userId,
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+      row = inserted;
+    } catch (insertError) {
+      if (photoPath) await supabaseAdmin.storage.from("photos").remove([photoPath]);
+      throw insertError;
+    }
+    const receipt = await mintReceipt("care", row!.id as string);
+    return { id: row!.id as string, status: "published" as const, receipt };
   } catch (error) {
     fail(error);
   }
@@ -176,28 +192,36 @@ export async function submitFireImpl(data: FireInput) {
   try {
     if ((await verifyGate("fire", data)) === "dropped") return silentDrop("fire");
     const userId = await optionalUserId();
-    const photoPath = data.photo ? await storePhoto(data.photo, "fires") : null;
+    // Issue #36: validate first, upload second.
     const loc = resolveLocation(data);
-    const { data: row, error } = await supabaseAdmin
-      .from("fire_reports")
-      .insert({
-        lat: loc.lat,
-        lng: loc.lng,
-        wilaya_code: loc.wilaya,
-        location_approximate: loc.approximate,
-        commune: data.commune ?? null,
-        severity: data.severity ?? null,
-        description: data.description ?? null,
-        photo_url: photoPath,
-        reporter_name: data.reporter_name ?? null,
-        reporter_phone: data.reporter_phone ?? null,
-        user_id: userId,
-      })
-      .select("id")
-      .single();
-    if (error) throw error;
-    const receipt = await mintReceipt("fire", row.id as string);
-    return { id: row.id as string, status: "active" as const, receipt };
+    const photoPath = data.photo ? await storePhoto(data.photo, "fires") : null;
+    let row: { id: string } | null = null;
+    try {
+      const { data: inserted, error } = await supabaseAdmin
+        .from("fire_reports")
+        .insert({
+          lat: loc.lat,
+          lng: loc.lng,
+          wilaya_code: loc.wilaya,
+          location_approximate: loc.approximate,
+          commune: data.commune ?? null,
+          severity: data.severity ?? null,
+          description: data.description ?? null,
+          photo_url: photoPath,
+          reporter_name: data.reporter_name ?? null,
+          reporter_phone: data.reporter_phone ?? null,
+          user_id: userId,
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+      row = inserted;
+    } catch (insertError) {
+      if (photoPath) await supabaseAdmin.storage.from("photos").remove([photoPath]);
+      throw insertError;
+    }
+    const receipt = await mintReceipt("fire", row!.id as string);
+    return { id: row!.id as string, status: "active" as const, receipt };
   } catch (error) {
     fail(error);
   }

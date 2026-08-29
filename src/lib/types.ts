@@ -56,11 +56,15 @@ export type MapFeature =
 
 export const CARE_WINDOW_DAYS = 14;
 
-/** Client-side derived flag: no care log in the last 14 days. */
+/**
+ * Client-side derived flag: no care log in the last 14 days.
+ * Uses `created_at` (server time), not the user-entered `logged_date` —
+ * a backdated log must not fake freshness (issue #39).
+ */
 export function needsWater(site: Site, logs: CareLog[]): boolean {
   const last = logs
     .filter((l) => l.site_id === site.id)
-    .map((l) => new Date(l.logged_date).getTime())
+    .map((l) => new Date(l.created_at).getTime())
     .sort((a, b) => b - a)[0];
   const reference = last ?? new Date(site.planted_date).getTime();
   return Date.now() - reference > CARE_WINDOW_DAYS * 86400000;

@@ -85,6 +85,12 @@ export function RejectedQueue() {
               alt={t("moderation.queue.alt", { wilaya: wilayaName(site.wilaya_code) })}
               className="size-24 shrink-0 rounded-lg object-cover"
               loading="lazy"
+              // Reject deletes the photo object (immutable-cache rule), so the
+              // proxy 404s for older rejected rows — hide the broken thumbnail
+              // instead of showing a black box.
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
             />
           )}
           <div className="min-w-0 flex-1 space-y-1">

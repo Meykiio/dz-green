@@ -154,6 +154,15 @@ export const adminSetRole = createServerFn({ method: "POST" })
         .insert({ user_id: data.userId, role: data.role });
       if (error) throw error;
     }
+    // Issue #37: leaving 'moderator' must clear the wilaya assignments,
+    // otherwise a later re-promotion silently restores the old scope.
+    if (data.role !== "moderator") {
+      const { error: wErr } = await supabaseAdmin
+        .from("moderator_wilayas")
+        .delete()
+        .eq("user_id", data.userId);
+      if (wErr) throw wErr;
+    }
     return { ok: true };
   });
 
