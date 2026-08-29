@@ -23,13 +23,29 @@ export function useMapRealtime(
   tRef.current = t;
 
   useEffect(() => {
+    // Audit 2026-08-28: a burst of inserts (e.g. a day of fire reports)
+    // would invalidate queries dozens of times per second. Debounce each
+    // invalidate so the client re-fetches at most every 2s, per table.
+    const timers = new Map<string, ReturnType<typeof setTimeout>>();
+    const schedule = (key: string) => {
+      const existing = timers.get(key);
+      if (existing) clearTimeout(existing);
+      timers.set(
+        key,
+        setTimeout(() => {
+          timers.delete(key);
+          void queryClient.invalidateQueries({ queryKey: [key] });
+        }, 2000),
+      );
+    };
+
     const channel = supabase
       .channel("green-algeria-map")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "sites", filter: "status=eq.approved" },
         (payload) => {
-          void queryClient.invalidateQueries({ queryKey: ["sites"] });
+          schedule("sites");
           if (payload.eventType === "INSERT") {
             const row = payload.new as { wilaya_code?: string; tree_count?: number };
             if (row.wilaya_code) {
@@ -45,7 +61,7 @@ export function useMapRealtime(
         },
       )
       .on("postgres_changes", { event: "*", schema: "public", table: "fire_reports" }, (payload) => {
-        void queryClient.invalidateQueries({ queryKey: ["fire_reports"] });
+        schedule("fire_reports");
         if (payload.eventType === "INSERT") {
           const row = payload.new as { wilaya_code?: string };
           if (row.wilaya_code) {
@@ -59,7 +75,7 @@ export function useMapRealtime(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "care_logs" },
         (payload) => {
-          void queryClient.invalidateQueries({ queryKey: ["care_logs"] });
+          schedule("care_logs");
           const row = payload.new as { site_id?: string };
           const site = sitesRef.current.find((s) => s.id === row.site_id);
           if (site) {
@@ -71,6 +87,8 @@ export function useMapRealtime(
       )
       .subscribe();
     return () => {
+      for (const t of timers.values()) clearTimeout(t);
+      timers.clear();
       void supabase.removeChannel(channel);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

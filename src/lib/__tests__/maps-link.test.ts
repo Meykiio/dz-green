@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { directionsUrl, isShortMapsLink, parseGoogleMapsLink } from "@/lib/maps-link";
+import { directionsUrl, isAllowedMapsHost, isIpLiteralHost, isShortMapsLink, parseGoogleMapsLink } from "@/lib/maps-link";
 
 describe("parseGoogleMapsLink", () => {
   it.each([
@@ -39,5 +39,43 @@ describe("directionsUrl", () => {
     expect(directionsUrl(36.7538, 3.0588)).toBe(
       "https://www.google.com/maps/dir/?api=1&destination=36.7538,3.0588",
     );
+  });
+});
+
+describe("isAllowedMapsHost (SSRF guard, audit 2026-08-28)", () => {
+  it.each([
+    "https://goo.gl/maps/abc",
+    "https://maps.app.goo.gl/abc",
+    "https://maps.google.com/?q=36.7,3.0",
+    "https://www.maps.google.com/?q=36.7,3.0",
+    "https://www.google.com/maps/place/Algiers",
+    "http://goo.gl/maps/abc",
+  ])("allows Google Maps hosts: %s", (url) => {
+    expect(isAllowedMapsHost(url)).toBe(true);
+  });
+
+  it.each([
+    "http://169.254.169.254/latest/meta-data/",
+    "http://127.0.0.1/",
+    "https://[::1]/",
+    "https://evil.com/",
+    "https://maps.google.com.evil.com/",
+    "https://www.google.com/search?q=36.7,3",
+    "ftp://www.google.com/maps",
+    "https://localhost/dir",
+  ])("rejects non-allowlisted targets: %s", (url) => {
+    expect(isAllowedMapsHost(url)).toBe(false);
+  });
+});
+
+describe("isIpLiteralHost", () => {
+  it.each(["http://10.0.0.1/", "https://[2001:db8::1]/", "http://localhost/"])(
+    "detects IP-literal hosts: %s",
+    (url) => {
+      expect(isIpLiteralHost(url)).toBe(true);
+    },
+  );
+  it("ignores real hostnames", () => {
+    expect(isIpLiteralHost("https://maps.google.com/maps")).toBe(false);
   });
 });

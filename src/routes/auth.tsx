@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { FormShell } from "@/components/FormShell";
 import { Button } from "@/components/ui/button";
-import { localizeError, ssrT, useI18n } from "@/i18n";
+import { ssrT, useI18n } from "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
@@ -46,8 +46,11 @@ function AuthPage() {
         toast.success(t("info.auth.toastOk"));
         setMode("signin");
       }
-    } catch (error) {
-      toast.error(localizeError(error instanceof Error ? error.message : "") || t("info.auth.toastError"));
+    } catch {
+      // Neutral on purpose (audit 2026-08-28): raw Supabase messages differ
+      // between "already registered" and "wrong credentials" — revealing
+      // which emails have accounts is an enumeration side channel.
+      toast.error(t("info.auth.genericAuthError"));
     } finally {
       setBusy(false);
     }

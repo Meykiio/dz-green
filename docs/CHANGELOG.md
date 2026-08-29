@@ -3,6 +3,23 @@
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
 <<<<<<< HEAD
+## 2026-08-28 (fiftieth pass) — Audit fixes: live, phased (docs/AUDIT_2026_08.md)
+
+Owner: "test everything, find all problems, make a plan, fix what's broken" — audit + fix, then viral-launch readiness. Implemented this pass:
+
+- **P1 fixed — SSRF (`resolveMapsLink`):** server-side Google-host allowlist (`goo.gl`, `maps.app.goo.gl`, `maps.google.com`, `www.maps.google.com`, `www.google.com/maps…`), IP-literal rejection, manual redirect loop with per-hop re-validation. 8 new allowlist unit tests (incl. metadata endpoints + lookalike hosts).
+- **P1 fixed — wilaya-scoped PII:** `getSiteContact`/`getFireContact` now assert the submission's wilaya (incl. post-2019 parent) against the moderator's assignment; admins global. New `moderateSite` service fn replaces the direct-RLS update in PendingQueue — role + scope + "already reviewed" checks, and on **reject the storage photo is deleted** (proxy 404s; no immortal rejected photos).
+- **P2 fixed — rate-limit IP trust:** `clientIp()` now uses Vercel-sanitized `x-forwarded-for` first, `x-real-ip` second; `cf-connecting-ip` no longer trusted (spoofable without Cloudflare). Tests updated to the new order.
+- **P3 fixed:** neutral auth error (email-enumeration side channel removed), fail-loud salt/env checks (no more `?? "green-algeria"`), unhandled-promise fixes (clipboard, getSession, role fetch, signOut).
+- **P2 fixed — rejected-photo lifecycle:** above (delete on reject).
+- **P2 fixed — bucket backstop:** `photos` bucket now 10 MB + jpeg/png/webp (live-verified).
+- **P3 fixed — `rls_auto_enable()` executable by anon/authenticated:** revoked (PUBLIC) — live-verified `has_function_privilege` false.
+- **Migration `20260829000000_audit_hardening` (live):** 4 FK indexes (`sites.user_id`, `sites.reviewed_by`, `care_logs.user_id`, `fire_reports.user_id`) + RLS initplan rewrites (8 policies → `(select auth.uid())`, same semantics).
+- **P2 fixed — realtime burst storm:** invalidations debounced 2s per table in `useMapRealtime`.
+- Verified: tsc clean, **131/131 tests** (8 new), build green, migration applied + post-verified.
+- **Owner actions pending (dashboard only):** leak-password protection toggle ON (1 click); **confirm-email = OFF deliberately** (instant signups; trade-off documented: email not verified, roles stay admin-granted); plan/PITR/support-ticket checklist in the AUDIT doc §D.
+- Parked (documented, not urgent): shared throttle for receipt/maps/photo-public paths, receipt-token expiry, magic-byte sniffing, `user_id`/`reviewed_by` column visibility (accepted by design).
+
 ## 2026-08-28 (forty-ninth pass) — Arabic-first interface
 
 Owner request: the whole platform in Arabic (default), with English one click away. Phased on `feat/ar-i18n`, each phase verified + committed separately: i18n core → chrome/home → forms → info pages → moderation/admin → feedback/offline/tooltips.

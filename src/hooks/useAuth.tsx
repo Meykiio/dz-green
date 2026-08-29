@@ -30,12 +30,18 @@ export function useAuth(): AuthState {
       setSessionLoading(false);
     });
 
-    void supabase.auth.getSession().then(({ data }) => {
-      if (!active) return;
-      setSession(data.session);
-      setRoleLoading(true);
-      setSessionLoading(false);
-    });
+    void supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (!active) return;
+        setSession(data.session);
+        setRoleLoading(true);
+        setSessionLoading(false);
+      })
+      .catch(() => {
+        if (!active) return;
+        setSessionLoading(false);
+      });
 
     return () => {
       active = false;
@@ -52,17 +58,23 @@ export function useAuth(): AuthState {
     }
     let active = true;
     setRoleLoading(true);
-    void supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .then(({ data }) => {
+    void (async () => {
+      try {
+        const { data } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", userId);
         if (!active) return;
         // A user can hold multiple role rows; admin wins when both exist.
         const roles = (data ?? []).map((r) => r.role);
         setRole(roles.includes("admin") ? "admin" : roles.includes("moderator") ? "moderator" : null);
-        setRoleLoading(false);
-      });
+      } catch {
+        if (!active) return;
+        setRole(null);
+      } finally {
+        if (active) setRoleLoading(false);
+      }
+    })();
     return () => {
       active = false;
     };

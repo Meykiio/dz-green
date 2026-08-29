@@ -33,10 +33,15 @@ export function ReceiptLink({ token }: { token: string }) {
             <button
               type="button"
               onClick={() => {
-                void navigator.clipboard?.writeText(url).then(() => {
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                });
+                void navigator.clipboard
+                  ?.writeText(url)
+                  .then(() => {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  })
+                  .catch(() => {
+                    /* clipboard denied — nothing to show, button remains */
+                  });
               }}
               className="tap-target grid size-10 shrink-0 place-items-center rounded-md border border-border text-muted-foreground hover:text-foreground"
               aria-label={t("forms.receiptLink.copy")}

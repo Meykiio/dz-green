@@ -34,8 +34,12 @@ export interface GateInput {
 function clientIp(): string {
   const request = getRequest();
   const headers = request.headers;
-  const forwarded = headers.get("cf-connecting-ip") ?? headers.get("x-forwarded-for") ?? "";
-  return forwarded.split(",")[0]?.trim() || headers.get("x-real-ip") || "unknown";
+  // Vercel's edge sanitizes `x-forwarded-for` (first entry = the client).
+  // `x-real-ip` is the last-resort headered value; trusting
+  // `cf-connecting-ip` was removed (audit 2026-08-28): it is only
+  // authoritative behind Cloudflare, and a direct caller can spoof it.
+  const forwarded = headers.get("x-forwarded-for") ?? headers.get("x-real-ip") ?? "";
+  return forwarded.split(",")[0]?.trim() || "unknown";
 }
 
 async function sha256Hex(input: string): Promise<string> {
@@ -46,7 +50,8 @@ async function sha256Hex(input: string): Promise<string> {
 }
 
 async function hashIp(ip: string): Promise<string> {
-  const salt = process.env["SUPABASE_PROJECT_ID"] ?? "green-algeria";
+  const salt = process.env["SUPABASE_PROJECT_ID"];
+  if (!salt) throw new Error("SUPABASE_PROJECT_ID is required server-side.");
   return sha256Hex(`${salt}:${ip}`);
 }
 
@@ -55,7 +60,8 @@ async function hashIp(ip: string): Promise<string> {
  * The date in the preimage makes today's hash unlinkable to yesterday's.
  */
 async function hashDevice(secret: string, kind: Kind): Promise<string> {
-  const key = process.env["DEVICE_HASH_KEY"] ?? process.env["SUPABASE_PROJECT_ID"] ?? "green-algeria";
+  const key = process.env["DEVICE_HASH_KEY"] ?? process.env["SUPABASE_PROJECT_ID"];
+  if (!key) throw new Error("DEVICE_HASH_KEY (or SUPABASE_PROJECT_ID) is required server-side.");
   const day = new Date().toISOString().slice(0, 10); // UTC date — daily rotation
   const preimage = await sha256Hex(`${secret}:${kind}:${day}`);
   const hmacKey = await crypto.subtle.importKey(

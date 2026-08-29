@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => {
   const state = {
-    // Queue of counts — one per rate-limit query (IP check, then device check).
+    // Queue of counts â€” one per rate-limit query (IP check, then device check).
     counts: [0] as number[],
     error: null as { message: string } | null,
     inserted: [] as Record<string, unknown>[],
@@ -39,6 +39,10 @@ vi.mock("@tanstack/react-start/server", () => ({
   getRequest: () => ({ headers: mocks.headers }),
 }));
 
+// hashIp/hashDevice fail loud when the salt env is missing (audit 2026-08-28).
+process.env["SUPABASE_PROJECT_ID"] = "test-project";
+process.env["DEVICE_HASH_KEY"] = "test-device-key";
+
 import { GateError, storePhoto, verifyGate } from "@/lib/submissions.server";
 
 async function sha256Hex(text: string): Promise<string> {
@@ -65,7 +69,7 @@ async function hmacSha256Hex(key: string, message: string): Promise<string> {
 
 async function expectedDeviceHash(secret: string, kind: string): Promise<string> {
   const day = new Date().toISOString().slice(0, 10);
-  return hmacSha256Hex("green-algeria", await sha256Hex(`${secret}:${kind}:${day}`));
+  return hmacSha256Hex("test-device-key", await sha256Hex(`${secret}:${kind}:${day}`));
 }
 
 describe("verifyGate", () => {
@@ -155,26 +159,27 @@ describe("verifyGate", () => {
     await expect(verifyGate("fire", { elapsedMs: 5000 })).resolves.toBe("ok");
   });
 
-  it("hashes ip with the green-algeria salt and records the hash", async () => {
+  it("hashes ip with the server salt and records the hash", async () => {
     await verifyGate("planting", { elapsedMs: 5000 });
-    const expected = await sha256Hex("green-algeria:203.0.113.7");
+    const expected = await sha256Hex("test-project:203.0.113.7");
     expect(mocks.state.inserted[0]?.["ip_hash"]).toBe(expected);
   });
 
-  it("falls back to cf-connecting-ip, then x-real-ip, then unknown", async () => {
-    mocks.headers.delete("x-forwarded-for");
+  it("trusts x-forwarded-for first (Vercel-sanitized), then x-real-ip, then unknown", async () => {
+    // x-forwarded-for present — first entry wins, even when a header like
+    // cf-connecting-ip is present (audit 2026-08-28: no unverified trust).
     mocks.headers.set("cf-connecting-ip", "198.51.100.9");
     await verifyGate("planting", { elapsedMs: 5000 });
-    expect(mocks.state.inserted[0]?.["ip_hash"]).toBe(await sha256Hex("green-algeria:198.51.100.9"));
+    expect(mocks.state.inserted[0]?.["ip_hash"]).toBe(await sha256Hex("test-project:203.0.113.7"));
 
-    mocks.headers.delete("cf-connecting-ip");
+    mocks.headers.delete("x-forwarded-for");
     mocks.headers.set("x-real-ip", "192.0.2.7");
     await verifyGate("planting", { elapsedMs: 5000 });
-    expect(mocks.state.inserted[1]?.["ip_hash"]).toBe(await sha256Hex("green-algeria:192.0.2.7"));
+    expect(mocks.state.inserted[1]?.["ip_hash"]).toBe(await sha256Hex("test-project:192.0.2.7"));
 
     mocks.headers.delete("x-real-ip");
     await verifyGate("planting", { elapsedMs: 5000 });
-    expect(mocks.state.inserted[2]?.["ip_hash"]).toBe(await sha256Hex("green-algeria:unknown"));
+    expect(mocks.state.inserted[2]?.["ip_hash"]).toBe(await sha256Hex("test-project:unknown"));
   });
 
   it("does not record a device hash when no secret is sent", async () => {

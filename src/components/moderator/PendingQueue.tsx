@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -8,6 +9,7 @@ import { useI18n } from "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { photoUrl, SITE_COLUMNS } from "@/lib/data";
+import { moderateSite } from "@/lib/moderation.functions";
 import type { Site } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
 import { ContactReveal } from "./ContactReveal";
@@ -15,8 +17,8 @@ import { ContactReveal } from "./ContactReveal";
 export function PendingQueue() {
   const { t, count, formatDate, formatDateTime } = useI18n();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
   const [notes, setNotes] = useState<Record<string, string>>({});
+  const moderate = useServerFn(moderateSite);
 
   const pending = useQuery({
     queryKey: ["sites", "pending"],
@@ -36,17 +38,7 @@ export function PendingQueue() {
 
   const decide = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: "approved" | "rejected" }) => {
-      const note = notes[id]?.trim();
-      const { error } = await supabase
-        .from("sites")
-        .update({
-          status,
-          reviewed_by: user?.id ?? null,
-          reviewed_at: new Date().toISOString(),
-          moderator_notes: note ? note : null,
-        })
-        .eq("id", id);
-      if (error) throw error;
+      await moderate({ data: { id, status, note: notes[id] } });
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["sites"] });

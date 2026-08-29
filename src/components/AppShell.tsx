@@ -74,8 +74,11 @@ function Shell({
   }, [pathname]);
 
   async function signOut() {
-    await supabase.auth.signOut();
-    void navigate({ to: "/" });
+    try {
+      await supabase.auth.signOut();
+    } finally {
+      void navigate({ to: "/" });
+    }
   }
 
   const rows = NAV_ITEMS.filter((r) => {

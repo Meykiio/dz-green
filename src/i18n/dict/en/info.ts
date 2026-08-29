@@ -176,6 +176,8 @@ export const info = {
     toggleSignin: "Already have an account? Sign in",
     toastOk: "Account created. You can sign in now.",
     toastError: "Something went wrong.",
+    genericAuthError:
+      "Couldn't sign in — check your details and try again. One account per email.",
   },
   receipt: {
     eyebrow: "Receipt",

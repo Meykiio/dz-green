@@ -52,6 +52,36 @@ export function isShortMapsLink(input: string): boolean {
   return /(goo\.gl\/maps|maps\.app\.goo\.gl)\//i.test(input.trim());
 }
 
+/**
+ * SSRF guard (audit 2026-08-28): only these hosts may ever be fetched
+ * server-side. Google's shorteners (goo.gl / maps.app.goo.gl) may redirect;
+ * every hop must land on one of these too.
+ */
+const ALLOWED_MAPS_HOSTS = new Set(["goo.gl", "maps.app.goo.gl", "maps.google.com", "www.maps.google.com"]);
+
+export function isAllowedMapsHost(url: string): boolean {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return false;
+  }
+  if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return false;
+  const host = parsed.hostname.toLowerCase();
+  if (ALLOWED_MAPS_HOSTS.has(host)) return true;
+  return host === "www.google.com" && parsed.pathname.startsWith("/maps");
+}
+
+/** True when the hostname is an IPv4/IPv6 literal (never allowed for fetch). */
+export function isIpLiteralHost(url: string): boolean {
+  try {
+    const host = new URL(url).hostname;
+    return /^\d{1,3}(\.\d{1,3}){3}$/.test(host) || host.includes(":") || host === "localhost";
+  } catch {
+    return false;
+  }
+}
+
 /** Official cross-platform directions URL (no API key needed). */
 export function directionsUrl(lat: number, lng: number): string {
   return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;

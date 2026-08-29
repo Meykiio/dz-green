@@ -175,6 +175,7 @@ export const info: typeof import("../en/info").info = {
     toggleSignin: "لديك حساب؟ ادخل",
     toastOk: "تم إنشاء الحساب. يمكنك التسجيل الآن.",
     toastError: "وقع خطأ ما.",
+    genericAuthError: "تعذّر تسجيل الدخول — تحقق من بياناتك وأعد المحاولة. حساب واحد لكل بريد.",
   },
   receipt: {
     eyebrow: "وصل البلاغ",
