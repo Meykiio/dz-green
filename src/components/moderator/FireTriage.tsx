@@ -1,9 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Flame, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { adminDeleteFire } from "@/lib/admin.functions";
 import { fireReportsQuery, photoUrl } from "@/lib/data";
 import type { FireReport, FireStatus } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
@@ -24,9 +28,22 @@ const STATUS_TONE: Record<FireStatus, "fire" | "plant" | "muted"> = {
 /** Fire report triage — mark active reports resolved or false alarms. */
 export function FireTriage() {
   const { t, formatDateTime } = useI18n();
+  const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
+  const [confirming, setConfirming] = useState<string | null>(null);
 
   const fires = useQuery(fireReportsQuery);
+
+  const del = useMutation({
+    mutationFn: adminDeleteFire,
+    onSuccess: () => {
+      toast.success(t("moderation.adm.deleteToast"));
+      setConfirming(null);
+      void queryClient.invalidateQueries({ queryKey: ["fire_reports"] });
+      void queryClient.invalidateQueries({ queryKey: ["moderation", "stats"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: FireStatus }) => {
@@ -60,18 +77,22 @@ export function FireTriage() {
   }
 
   return (
-    <ul className="space-y-4">
+    <ul className="space-y-3">
       {list.map((fire) => (
-        <li key={fire.id} className="overflow-hidden rounded-lg border border-border bg-card">
-          {photoUrl(fire.photo_url) && (
+        <li key={fire.id} className="flex gap-3 rounded-lg border border-border bg-card p-3">
+          {photoUrl(fire.photo_url) ? (
             <img
               src={photoUrl(fire.photo_url)!}
               alt={t("moderation.triage.alt", { wilaya: wilayaName(fire.wilaya_code) })}
-              className="aspect-[16/9] w-full object-cover"
+              className="size-24 shrink-0 rounded-lg object-cover"
               loading="lazy"
             />
+          ) : (
+            <span className="grid size-24 shrink-0 place-items-center rounded-lg bg-fire/15 text-fire">
+              <Flame className="size-6" />
+            </span>
           )}
-          <div className="space-y-1 p-4">
+          <div className="min-w-0 flex-1 space-y-1">
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge tone={STATUS_TONE[fire.status]}>
                 {t(`moderation.triage.badge.${STATUS_KEY[fire.status]}`)}
@@ -91,7 +112,7 @@ export function FireTriage() {
               {fire.lng.toFixed(4)}
               {fire.location_approximate ? ` · ${t("home.list.wilayaLevel")}` : ""}
             </p>
-            {fire.description && <p className="text-sm">{fire.description}</p>}
+            {fire.description && <p className="line-clamp-2 text-sm">{fire.description}</p>}
             {fire.resolved_at && (
               <p className="text-xs text-muted-foreground">
                 {fire.status === "false_alarm"
@@ -102,7 +123,7 @@ export function FireTriage() {
             <div className="pt-1">
               <ContactReveal kind="fire" id={fire.id} />
             </div>
-            <div className="flex flex-wrap gap-2 pt-3">
+            <div className="flex flex-wrap gap-2 pt-2">
               {fire.status === "active" ? (
                 <>
                   <Button
@@ -126,6 +147,25 @@ export function FireTriage() {
                   disabled={setStatus.isPending}
                 >
                   {t("moderation.triage.reopen")}
+                </Button>
+              )}
+              {isAdmin && (
+                <Button
+                  variant="ghost"
+                  className={confirming === fire.id ? "text-fire" : ""}
+                  onClick={() => {
+                    if (confirming === fire.id) {
+                      del.mutate({ data: { id: fire.id } });
+                    } else {
+                      setConfirming(fire.id);
+                      setTimeout(() => setConfirming((c) => (c === fire.id ? null : c)), 4000);
+                    }
+                  }}
+                  disabled={del.isPending}
+                  aria-label={t("moderation.adm.deleteUser")}
+                >
+                  <Trash2 className="size-4" />
+                  {confirming === fire.id ? t("moderation.adm.confirmDelete") : ""}
                 </Button>
               )}
             </div>

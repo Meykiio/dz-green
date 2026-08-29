@@ -3,6 +3,14 @@
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
 <<<<<<< HEAD
+## 2026-08-28 (fifty-second pass) — Moderation CRUD, re-approve, compact queue + translation fixes
+
+- **Owner screenshot findings:** raw `mod.*` keys visible on `/moderate` (heading + stat labels) — the i18n paths were wrong (`mod.*` instead of `moderation.mod.*`); fixed.
+- **Compact queue/triage rows (owner: "posts take too much space"):** PendingQueue + FireTriage items now show a 96px photo thumbnail (or icon placeholder) beside a clamped content column instead of a full-width 16:9 image; descriptions clamp to 2 lines.
+- **Rejected plantings tab (owner: "rejected posts should be accessible so we can re-approve"):** third moderation tab "Rejected" (`RejectedQueue`, count in `useModerationStats`), with **Re-approve** — `moderateSite` now allows the `rejected → approved` transition (scope-checked; note: the photo was deleted on reject, so a re-approved record shows without its photo — documented trade-off, intentional per the immutable-cache rule).
+- **Admin CRUD deletes (owner: spam/malicious inputs):** `adminDeleteUser` (ordered child deletes + auth delete; self-delete blocked), `adminDeleteVolunteer`, `adminDeleteFeedback`, `adminDeleteFire` (+ photo), `adminDeleteSite` (+ care logs + photo). UI: two-step confirm buttons (Trash → "Confirm?" for 4s) on Users/Volunteers/Feedback panels; FireTriage + RejectedQueue show the delete action to **admins only** (malicious fires publish instantly, so hard-delete is the real mitigation — false-alarm alone keeps them public).
+- Verified: tsc clean, 135/135 tests, build green. Hands-on click-through queued for the owner (delete + re-approve paths).
+
 ## 2026-08-28 (fifty-first pass) — Admin dashboard: accounts, tabs, pagination + audit leftovers
 
 - **Admin can now create moderator accounts directly** (`CreateAccountDialog` + `adminCreateUser`): email + generated/typed password (show/hide) + display name + wilaya checkboxes → service-role `createUser` (usable immediately, `email_confirm:true` — independent of the Pro-plan email settings), profile display name, role + wilayas assigned in the same step. Duplicate email surfaces a friendly error. Reuses the shared `WilayaChecklist` (also deduplicated into `AssignWilayasDialog`).

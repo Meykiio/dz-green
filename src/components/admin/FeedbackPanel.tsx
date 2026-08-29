@@ -1,10 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n";
-import { adminListFeedback, type AdminFeedback } from "@/lib/admin.functions";
+import { adminDeleteFeedback, adminListFeedback, type AdminFeedback } from "@/lib/admin.functions";
 
 const KIND_META = {
   bug: { classes: "bg-fire/15 text-fire" },
@@ -20,6 +22,18 @@ export function FeedbackPanel() {
   const [offset, setOffset] = useState(0);
   const [rows, setRows] = useState<AdminFeedback[] | null>(null);
   const listFeedback = useServerFn(adminListFeedback);
+  const queryClient = useQueryClient();
+
+  const del = useMutation({
+    mutationFn: adminDeleteFeedback,
+    onSuccess: () => {
+      toast.success(t("moderation.adm.deleteToast"));
+      setConfirming(null);
+      void queryClient.invalidateQueries({ queryKey: ["admin", "feedback"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const [confirming, setConfirming] = useState<string | null>(null);
 
   const feedback = useQuery({
     queryKey: ["admin", "feedback", offset],
@@ -52,11 +66,31 @@ export function FeedbackPanel() {
         <div key={f.id} className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-start justify-between gap-3">
             <p className="whitespace-pre-wrap text-sm">{f.message}</p>
-            <span
-              className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${KIND_META[f.kind].classes}`}
-            >
-              {t(`moderation.fb.kind.${f.kind}`)}
-            </span>
+            <div className="flex shrink-0 items-center gap-2">
+              <span
+                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${KIND_META[f.kind].classes}`}
+              >
+                {t(`moderation.fb.kind.${f.kind}`)}
+              </span>
+              <Button
+                size="sm"
+                variant="ghost"
+                className={confirming === f.id ? "text-fire" : ""}
+                onClick={() => {
+                  if (confirming === f.id) {
+                    del.mutate({ data: { id: f.id } });
+                  } else {
+                    setConfirming(f.id);
+                    setTimeout(() => setConfirming((c) => (c === f.id ? null : c)), 4000);
+                  }
+                }}
+                disabled={del.isPending}
+                aria-label={t("moderation.adm.deleteUser")}
+              >
+                <Trash2 className="size-4" />
+                {confirming === f.id ? t("moderation.adm.confirmDelete") : ""}
+              </Button>
+            </div>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             {formatDateShort(f.created_at)}

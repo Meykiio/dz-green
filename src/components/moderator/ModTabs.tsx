@@ -1,12 +1,13 @@
-import { Flame, Sprout } from "lucide-react";
+import { Flame, Sprout, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n";
 
-export type Section = "queue" | "fires";
+export type Section = "queue" | "fires" | "rejected";
 
-const SECTIONS: { id: Section; key: "pending" | "fires"; icon: typeof Sprout }[] = [
+const SECTIONS: { id: Section; key: "pending" | "fires" | "rejected"; icon: typeof Sprout }[] = [
   { id: "queue", key: "pending", icon: Sprout },
   { id: "fires", key: "fires", icon: Flame },
+  { id: "rejected", key: "rejected", icon: XCircle },
 ];
 
 interface Props {

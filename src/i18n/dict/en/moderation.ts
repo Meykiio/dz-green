@@ -2,6 +2,9 @@ export const moderation = {
   mod: {
     headingQueue: "Pending plantings",
     headingFires: "Fire reports",
+    headingRejected: "Rejected plantings",
+    rejectedEmpty: "Nothing rejected. The list is clear.",
+    reApprove: "Re-approve",
     checking: "Checking your access…",
     statPending: "Pending",
     statApprovedToday: "Approved today",
@@ -11,6 +14,7 @@ export const moderation = {
   tabs: {
     pending: "Pending plantings",
     fires: "Fire reports",
+    rejected: "Rejected",
     aria: "Moderation sections",
   },
   queue: {
@@ -117,6 +121,9 @@ export const moderation = {
       feedback: "Feedback",
     },
     more: "Show more",
+    deleteUser: "Delete account",
+    confirmDelete: "Confirm?",
+    deleteToast: "Deleted.",
     create: {
       trigger: "New account",
       title: "Create account",

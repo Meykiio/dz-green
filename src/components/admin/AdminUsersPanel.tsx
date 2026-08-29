@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { UserPlus, UserX } from "lucide-react";
+import { Trash2, UserPlus, UserX } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -9,6 +9,7 @@ import { CreateAccountDialog } from "@/components/admin/CreateAccountDialog";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n";
 import {
+  adminDeleteUser,
   adminListUsers,
   adminSetRole,
   adminSignOutUser,
@@ -62,6 +63,18 @@ export function AdminUsersPanel() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const deleteUser = useMutation({
+    mutationFn: adminDeleteUser,
+    onSuccess: () => {
+      toast.success(t("moderation.adm.deleteToast"));
+      setConfirming(null);
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const [confirming, setConfirming] = useState<string | null>(null);
 
   const hasMore = (users.data?.length ?? 0) >= PAGE;
 
@@ -148,6 +161,26 @@ export function AdminUsersPanel() {
                   disabled={signOut.isPending}
                 >
                   {t("chrome.auth.signout")}
+                </Button>
+              )}
+              {u.id !== me?.id && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className={confirming === u.id ? "text-fire" : ""}
+                  onClick={() => {
+                    if (confirming === u.id) {
+                      deleteUser.mutate({ data: { userId: u.id } });
+                    } else {
+                      setConfirming(u.id);
+                      setTimeout(() => setConfirming((c) => (c === u.id ? null : c)), 4000);
+                    }
+                  }}
+                  disabled={deleteUser.isPending}
+                  aria-label={t("moderation.adm.deleteUser")}
+                >
+                  <Trash2 className="size-4" />
+                  {confirming === u.id ? t("moderation.adm.confirmDelete") : t("moderation.adm.deleteUser")}
                 </Button>
               )}
             </div>

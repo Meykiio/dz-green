@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n";
-import { adminListVolunteers, adminSetVolunteerStatus, type AdminVolunteer } from "@/lib/admin.functions";
+import { adminDeleteVolunteer, adminListVolunteers, adminSetVolunteerStatus, type AdminVolunteer } from "@/lib/admin.functions";
 import { wilayaName } from "@/lib/wilayas";
 
 const STATUS_META = {
@@ -39,6 +40,17 @@ export function VolunteerPanel() {
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["admin", "volunteers"] }),
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const del = useMutation({
+    mutationFn: adminDeleteVolunteer,
+    onSuccess: () => {
+      toast.success(t("moderation.adm.deleteToast"));
+      setConfirming(null);
+      void queryClient.invalidateQueries({ queryKey: ["admin", "volunteers"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const [confirming, setConfirming] = useState<string | null>(null);
 
   if (volunteers.isLoading && offset === 0) {
     return <p className="mt-6 text-muted-foreground">{t("moderation.volp.loading")}</p>;
@@ -93,6 +105,24 @@ export function VolunteerPanel() {
                 <option value="contacted">{t("moderation.volp.status.contacted")}</option>
                 <option value="onboarded">{t("moderation.volp.status.onboarded")}</option>
               </select>
+              <Button
+                size="sm"
+                variant="ghost"
+                className={confirming === v.id ? "text-fire" : ""}
+                onClick={() => {
+                  if (confirming === v.id) {
+                    del.mutate({ data: { id: v.id } });
+                  } else {
+                    setConfirming(v.id);
+                    setTimeout(() => setConfirming((c) => (c === v.id ? null : c)), 4000);
+                  }
+                }}
+                disabled={del.isPending}
+                aria-label={t("moderation.adm.deleteUser")}
+              >
+                <Trash2 className="size-4" />
+                {confirming === v.id ? t("moderation.adm.confirmDelete") : ""}
+              </Button>
             </div>
           </div>
           {v.extra_wilayas && (

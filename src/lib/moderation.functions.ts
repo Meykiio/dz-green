@@ -92,9 +92,10 @@ const moderateShape = z.object({
 });
 
 /**
- * Approve/reject a pending planting, service-role. Same scope check as the
- * contact reveal; on reject the photo object is removed so a rejected
- * submission is never served again via the public photo proxy.
+ * Approve/reject a pending planting, or re-approve a rejected one, service-role.
+ * Same scope check as the contact reveal; on reject the photo object is removed
+ * so a rejected submission is never served again via the public photo proxy
+ * (re-approving restores the record without its photo — documented trade-off).
  */
 export const moderateSite = createServerFn({ method: "POST" })
   .validator((data: unknown) => moderateShape.parse(data))
@@ -106,7 +107,10 @@ export const moderateSite = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .single();
     if (!site) throw new Error("Submission not found.");
-    if (site.status !== "pending") throw new Error("This submission was already reviewed.");
+    const allowedTransition =
+      (site.status === "pending" && (data.status === "approved" || data.status === "rejected")) ||
+      (site.status === "rejected" && data.status === "approved");
+    if (!allowedTransition) throw new Error("This submission was already reviewed.");
     assertScope(staff, site.wilaya_code);
 
     const { error: updateError } = await supabaseAdmin

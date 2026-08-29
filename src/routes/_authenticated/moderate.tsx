@@ -6,13 +6,15 @@ import { AppShell } from "@/components/AppShell";
 import { FireTriage } from "@/components/moderator/FireTriage";
 import { ModTabs, type Section } from "@/components/moderator/ModTabs";
 import { PendingQueue } from "@/components/moderator/PendingQueue";
+import { RejectedQueue } from "@/components/moderator/RejectedQueue";
 import { ssrT, useI18n } from "@/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useModerationStats } from "@/lib/moderation";
 
 const SECTION_KEY: Record<Section, string> = {
-  queue: "mod.headingQueue",
-  fires: "mod.headingFires",
+  queue: "moderation.mod.headingQueue",
+  fires: "moderation.mod.headingFires",
+  rejected: "moderation.mod.headingRejected",
 };
 
 export const Route = createFileRoute("/_authenticated/moderate")({
@@ -52,6 +54,7 @@ function ModeratePage() {
   const counts = {
     queue: stats.data?.pending ?? 0,
     fires: stats.data?.activeFires ?? 0,
+    rejected: stats.data?.rejected ?? 0,
   };
 
   return (
@@ -63,15 +66,16 @@ function ModeratePage() {
         </div>
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat label={t("mod.mod.statPending")} value={stats.data?.pending} tone="text-plant" />
-          <Stat label={t("mod.mod.statApprovedToday")} value={stats.data?.approvedToday} />
-          <Stat label={t("mod.mod.statActiveFires")} value={stats.data?.activeFires} tone="text-fire" />
-          <Stat label={t("mod.mod.statTotal")} value={stats.data?.totalSubmissions} />
+          <Stat label={t("moderation.mod.statPending")} value={stats.data?.pending} tone="text-plant" />
+          <Stat label={t("moderation.mod.statApprovedToday")} value={stats.data?.approvedToday} />
+          <Stat label={t("moderation.mod.statActiveFires")} value={stats.data?.activeFires} tone="text-fire" />
+          <Stat label={t("moderation.mod.statTotal")} value={stats.data?.totalSubmissions} />
         </div>
 
         <main className="mt-6">
           {section === "queue" && <PendingQueue />}
           {section === "fires" && <FireTriage />}
+          {section === "rejected" && <RejectedQueue />}
         </main>
       </div>
     </AppShell>

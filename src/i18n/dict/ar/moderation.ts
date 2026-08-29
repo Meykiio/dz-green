@@ -2,6 +2,9 @@ export const moderation: typeof import("../en/moderation").moderation = {
   mod: {
     headingQueue: "الغرسات المنتظرة",
     headingFires: "بلاغات الحرائق",
+    headingRejected: "الغرسات المرفوضة",
+    rejectedEmpty: "لا شيء مرفوض. القائمة فارغة.",
+    reApprove: "إعادة القبول",
     checking: "جارٍ التحقق من صلاحياتك…",
     statPending: "منتظرة",
     statApprovedToday: "مقبول اليوم",
@@ -11,6 +14,7 @@ export const moderation: typeof import("../en/moderation").moderation = {
   tabs: {
     pending: "الغرسات المنتظرة",
     fires: "بلاغات الحرائق",
+    rejected: "المرفوضة",
     aria: "أقسام المراجعة",
   },
   queue: {
@@ -117,6 +121,9 @@ export const moderation: typeof import("../en/moderation").moderation = {
       feedback: "الملاحظات",
     },
     more: "عرض المزيد",
+    deleteUser: "حذف الحساب",
+    confirmDelete: "تأكيد؟",
+    deleteToast: "تم الحذف.",
     create: {
       trigger: "حساب جديد",
       title: "إنشاء حساب",

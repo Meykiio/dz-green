@@ -46,12 +46,16 @@ Smoke check performed: `GET /`, `/about`, `/plant`, `/care`, `/fire`, `/auth`, `
 
 ## 5. Moderation dashboard (`/moderate`) — verified end to end
 
+- Moderator guard (live role read). **Three tabs** — Pending plantings, Fire reports, Rejected — with live count badges and stat cards. Compact rows (photo thumbnail + clamped content).
+- **Pending:** photo, count/species, wilaya/commune, exact coords + submitted-at, ContactReveal (wilaya-scoped PII), moderator note, Approve/Reject (service-role, scope-checked; **reject deletes the photo** so it never serves again).
+- **Fire triage:** status/severity badges, reported-at, contact reveal, Mark resolved / False alarm / Reopen. **Admins additionally see a two-step Delete** (hard-delete + photo) — fires publish instantly, so this is the malicious-content escape hatch.
+- **Rejected:** rejected plantings with **Re-approve** (same scoped service fn; photo is not restored — by design).
+- **Verified live by `e2e/admin.spec.ts`:** assign Oran → Oran-only pending visible → approve; role revocation lockout.
+
 - Behind the platform-managed `_authenticated` gate; the page additionally checks `isModerator` before running any query.
 - **Wilaya scoping (2026-08-17):** every queue, triage and contact query is scoped by RLS — admins see everything, moderators only their assigned wilayas (`private.can_moderate`). A moderator with no assignments sees an empty queue. **Verified live:** the E2E admin round-trip seeds pending rows in Alger and Oran, assigns Oran to a moderator, and that moderator sees and approves only the Oran row.
-- **Section navigation is a segmented tab bar** (`ModTabs`, 2026-08-18) — the old second sidebar is gone (the app shell already provides one; the double sidebar was an owner-flagged bug). Tabs carry live count badges: Pending plantings, Fire reports.
 - Stats strip: pending, approved today, active fires, total submissions — head-count queries (`head: true`), no row fetches.
-- Pending plantings: oldest-first list with photo, approve/reject via direct RLS-scoped `sites` update (`sites_moderator_update`), writing `status`, `reviewed_by`, `reviewed_at` and an optional `moderator_notes`. **Verified live by the E2E suite (approve with note, fields asserted via REST).**
-- **Decision data (2026-08-21):** both queues show exact timestamps (`formatDateTime` — date + time): the pending queue shows the submission's `created_at` (previously only the planted date) and a wilaya-level badge; fire triage shows exact reported/resolved times. A **"Show contact"** button on each card reveals the submitter's name/phone on demand via the new moderator-only server functions `getSiteContact` / `getFireContact` (service-role, live role check per call — PII is column-grant protected, so this is the only read path; nothing is fetched by default).
+- **Decision data (2026-08-21):** both queues show exact timestamps (`formatDateTime` — date + time): the pending queue shows the submission's `created_at` (previously only the planted date) and a wilaya-level badge; fire triage shows exact reported/resolved times. A **"Show contact"** button on each card reveals the submitter's name/phone on demand via the moderator-only server functions `getSiteContact` / `getFireContact` (service-role, live role check per call — PII is column-grant protected, so this is the only read path; nothing is fetched by default).
 - Fire report triage: list with status badge (active/resolved/false alarm), severity, photo, dates; actions Mark resolved / False alarm / Reopen, writing `status` + `resolved_at` under `fire_moderator_update`. **Verified live 2026-08-13: the one live fire report round-tripped Active → Resolved → Active with zero console errors.**
 
 ## 5b. Admin dashboard (`/admin`) — verified end to end (2026-08-17, extended 2026-08-18, refactored 2026-08-28)

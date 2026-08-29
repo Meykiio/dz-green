@@ -195,6 +195,95 @@ export const adminSignOutUser = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/**
+ * Delete an auth account (2026-08-28, spam/abuse): the public schema keeps no
+ * FKs, so children are removed in order, then the auth user. Historical
+ * submissions keep their dangling `user_id`/`reviewed_by` (audit trail).
+ */
+export const adminDeleteUser = createServerFn({ method: "POST" })
+  .validator(z.object({ userId: z.string().uuid() }))
+  .handler(async ({ data }) => {
+    const adminId = await requireAdmin();
+    if (data.userId === adminId) throw new Error("You can't delete your own account here.");
+    const { error: rolesErr } = await supabaseAdmin
+      .from("user_roles")
+      .delete()
+      .eq("user_id", data.userId);
+    if (rolesErr) throw rolesErr;
+    const { error: wilErr } = await supabaseAdmin
+      .from("moderator_wilayas")
+      .delete()
+      .eq("user_id", data.userId);
+    if (wilErr) throw wilErr;
+    const { error: profileErr } = await supabaseAdmin
+      .from("profiles")
+      .delete()
+      .eq("id", data.userId);
+    if (profileErr) throw profileErr;
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const adminDeleteVolunteer = createServerFn({ method: "POST" })
+  .validator(z.object({ id: z.string().uuid() }))
+  .handler(async ({ data }) => {
+    await requireAdmin();
+    const { error } = await supabaseAdmin.from("volunteers").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const adminDeleteFeedback = createServerFn({ method: "POST" })
+  .validator(z.object({ id: z.string().uuid() }))
+  .handler(async ({ data }) => {
+    await requireAdmin();
+    const { error } = await supabaseAdmin.from("feedback").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+/**
+ * Hard-delete a fire report (2026-08-28): fires publish instantly, so a
+ * malicious one stays public until removed — false-alarm only mutes it on
+ * the map. Admin-only; deletes the photo object too.
+ */
+export const adminDeleteFire = createServerFn({ method: "POST" })
+  .validator(z.object({ id: z.string().uuid() }))
+  .handler(async ({ data }) => {
+    await requireAdmin();
+    const { data: row } = await supabaseAdmin
+      .from("fire_reports")
+      .select("photo_url")
+      .eq("id", data.id)
+      .single();
+    const { error } = await supabaseAdmin.from("fire_reports").delete().eq("id", data.id);
+    if (error) throw error;
+    if (row?.photo_url) await supabaseAdmin.storage.from("photos").remove([row.photo_url]);
+    return { ok: true };
+  });
+
+/** Hard-delete a planting (spam that slipped through approval). Photo too. */
+export const adminDeleteSite = createServerFn({ method: "POST" })
+  .validator(z.object({ id: z.string().uuid() }))
+  .handler(async ({ data }) => {
+    await requireAdmin();
+    const { data: row } = await supabaseAdmin
+      .from("sites")
+      .select("photo_url")
+      .eq("id", data.id)
+      .single();
+    const { error: careErr } = await supabaseAdmin
+      .from("care_logs")
+      .delete()
+      .eq("site_id", data.id);
+    if (careErr) throw careErr;
+    const { error } = await supabaseAdmin.from("sites").delete().eq("id", data.id);
+    if (error) throw error;
+    if (row?.photo_url) await supabaseAdmin.storage.from("photos").remove([row.photo_url]);
+    return { ok: true };
+  });
+
 export interface AdminFeedback {
   id: string;
   kind: "bug" | "idea" | "other";
