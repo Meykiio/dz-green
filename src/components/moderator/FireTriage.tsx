@@ -31,6 +31,7 @@ export function FireTriage() {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | "active" | "resolved" | "false_alarm">("all");
 
   const fires = useQuery(fireReportsQuery);
 
@@ -75,10 +76,31 @@ export function FireTriage() {
   if (list.length === 0) {
     return <p className="text-muted-foreground">{t("moderation.triage.empty")}</p>;
   }
+  const filtered = filter === "all" ? list : list.filter((f) => f.status === filter);
 
   return (
-    <ul className="space-y-3">
-      {list.map((fire) => (
+    <div>
+      <div className="mb-3 flex flex-wrap gap-1.5">
+        {(["all", "active", "resolved", "false_alarm"] as const).map((f) => (
+          <button
+            key={f}
+            type="button"
+            onClick={() => setFilter(f)}
+            aria-pressed={filter === f}
+            className={`tap-target rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+              filter === f
+                ? "border-fire/50 bg-fire/10 text-fire"
+                : "border-border bg-card text-muted-foreground"
+            }`}
+          >
+            {f === "all"
+              ? t("moderation.triage.filterAll")
+              : t(`moderation.triage.badge.${STATUS_KEY[f]}`)}
+          </button>
+        ))}
+      </div>
+      <ul className="space-y-3">
+      {filtered.map((fire) => (
         <li key={fire.id} className="flex gap-3 rounded-lg border border-border bg-card p-3">
           {photoUrl(fire.photo_url) ? (
             <img
@@ -172,6 +194,7 @@ export function FireTriage() {
           </div>
         </li>
       ))}
-    </ul>
+      </ul>
+    </div>
   );
 }

@@ -41,6 +41,7 @@ export const moderation: typeof import("../en/moderation").moderation = {
     resolve: "وسم معالج",
     falseAlarm: "إنذار كاذب",
     reopen: "إعادة فتح",
+    filterAll: "الكل",
     badge: {
       active: "نشط",
       resolved: "معالج",
@@ -94,7 +95,7 @@ export const moderation: typeof import("../en/moderation").moderation = {
     overview: "نظرة عامة",
     volunteers: "المتطوعون",
     volunteersLead:
-      "أشخاص عرضوا مساعدة ولاياتهم. عند الحاجة أنشئ حسابهم وطابقه مع طلبهم وأسند دورًا في «المشرفون والأدوار».",
+      "أشخاص عرضوا مساعدة ولاياتهم. عند الحاجة أنشئ حسابهم وطابقه مع طلبهم وأسند دورًا في «المستخدمون والأدوار».",
     feedback: "الملاحظات",
     feedbackLead: "رسائل زر «الملاحظات»، أحدثها أولًا.",
     roles: "المشرفون والأدوار",
@@ -121,6 +122,7 @@ export const moderation: typeof import("../en/moderation").moderation = {
       feedback: "الملاحظات",
     },
     more: "عرض المزيد",
+    searchUsers: "ابحث بالبريد أو الاسم…",
     deleteUser: "حذف الحساب",
     confirmDelete: "تأكيد؟",
     deleteToast: "تم الحذف.",
@@ -185,7 +187,7 @@ export const moderation: typeof import("../en/moderation").moderation = {
     also: "أيضًا: {extra}",
     time: "الوقت: {availability}",
     onboardHint:
-      "للاستيعاب: تأكد أن الشخص لديه حساب، ثم أسند دور المشرف + الولاية في «المشرفون والأدوار».",
+      "للاستيعاب: تأكد أن الشخص لديه حساب، ثم أسند دور المشرف + الولاية في «المستخدمون والأدوار».",
   },
   assign: {
     title: "إسناد ولايات — {name}",

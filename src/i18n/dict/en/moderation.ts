@@ -41,6 +41,7 @@ export const moderation = {
     resolve: "Mark resolved",
     falseAlarm: "False alarm",
     reopen: "Reopen",
+    filterAll: "All",
     badge: {
       active: "Active",
       resolved: "Resolved",
@@ -94,7 +95,7 @@ export const moderation = {
     overview: "Overview",
     volunteers: "Volunteers",
     volunteersLead:
-      'People who offered to help their wilaya. When the time comes, create their account match and assign a role under "Moderators & roles".',
+      'People who offered to help their wilaya. When the time comes, create their account match and assign a role under "Users & roles".',
     feedback: "Feedback",
     feedbackLead: "Messages from the Feedback button, newest first.",
     roles: "Moderators & roles",
@@ -121,6 +122,7 @@ export const moderation = {
       feedback: "Feedback",
     },
     more: "Show more",
+    searchUsers: "Search email or name…",
     deleteUser: "Delete account",
     confirmDelete: "Confirm?",
     deleteToast: "Deleted.",
@@ -185,7 +187,7 @@ export const moderation = {
     also: "Also: {extra}",
     time: "Time: {availability}",
     onboardHint:
-      'To onboard: make sure the person has an account, then assign the moderator role + wilaya in "Moderators & roles".',
+      'To onboard: make sure the person has an account, then assign the moderator role + wilaya in "Users & roles".',
   },
   assign: {
     title: "Assign wilayas — {name}",

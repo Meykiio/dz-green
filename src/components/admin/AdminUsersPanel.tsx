@@ -75,15 +75,28 @@ export function AdminUsersPanel() {
   });
 
   const [confirming, setConfirming] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
   const hasMore = (users.data?.length ?? 0) >= PAGE;
 
+  const filtered = search.trim()
+    ? rows.filter((u) =>
+        `${u.email ?? ""} ${u.display_name ?? ""}`.toLowerCase().includes(search.trim().toLowerCase()),
+      )
+    : rows;
+
   return (
     <div className="mt-6">
-      <div className="flex gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Button size="sm" onClick={() => setCreating(true)}>
           <UserPlus className="size-4" /> {t("moderation.adm.create.trigger")}
         </Button>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={t("moderation.adm.searchUsers")}
+          className="tap-target w-48 rounded-md border border-input bg-card px-3 py-1.5 text-sm"
+        />
       </div>
 
       {users.isError && (
@@ -96,7 +109,7 @@ export function AdminUsersPanel() {
       )}
 
       <div className="mt-4 space-y-3">
-        {rows.map((u) => (
+        {filtered.map((u) => (
           <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4">
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">
@@ -186,7 +199,7 @@ export function AdminUsersPanel() {
             </div>
           </div>
         ))}
-        {!users.isLoading && rows.length === 0 && (
+        {!users.isLoading && filtered.length === 0 && (
           <p className="text-muted-foreground">{t("moderation.adm.emptyUsers")}</p>
         )}
         {hasMore && (

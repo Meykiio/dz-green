@@ -3,6 +3,15 @@
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
 <<<<<<< HEAD
+## 2026-08-29 (fifty-third pass) — Staff UX redesign + GitHub issues #36–#39
+
+- **Issues fixed (replies posted on the threads):** #39 `needsWater` now uses `created_at` (backdated care can't fake freshness, 2 new tests); #38 goo.gl dropped (dead service since 2025-08-25) from short-link detection + SSRF allowlist; #37 demotion clears `moderator_wilayas`; #36 validate-first + photo-orphan cleanup on insert failure. #38's reply kept failing on the flaky network — retry on next session.
+- **Staff redesign (owner: "not satisfied with admin/moderate — main working places"):** shared `SectionTabs` (icon + count always, labels from sm, **no more overflow at 390px** — the old scroll-arrows are gone); admin page header = current tab title + compact tabs; stale "Moderators & roles" copy → "Users & roles" everywhere (lead + onboard hint, EN + AR).
+- **Filters:** fire triage gets status filter chips (All / Active / Resolved / False alarm); admin users gets a client-side search (email/name) — cheap, no schema.
+- **RejectedQueue:** broken thumbnails (photo deleted on reject) hide on 404 instead of a black box.
+- **Verified:** tsc clean, 137/137 tests, build green; real screenshots of the redesigned /moderate + /admin on 390px mobile + desktop (Arabic RTL) — all correct (temporary admin account created for the check, deleted after).
+- **Honest note:** external web research was blocked by the flaky network (fetches failed); the redesign stands on the screenshot evidence + the established moderation-queue patterns from this session.
+
 ## 2026-08-28 (fifty-second pass) — Moderation CRUD, re-approve, compact queue + translation fixes
 
 - **Owner screenshot findings:** raw `mod.*` keys visible on `/moderate` (heading + stat labels) — the i18n paths were wrong (`mod.*` instead of `moderation.mod.*`); fixed.
