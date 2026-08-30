@@ -15,7 +15,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider, ssrT } from "@/i18n";
 import { localeInitScript } from "@/i18n";
-import { getLocale } from "@/i18n/locale";
+import { getLocale, initLocale } from "@/i18n/locale";
 import { PrivacyModeProvider } from "@/lib/privacy-mode";
 
 /**
@@ -110,6 +110,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  // initLocale reads the request-global on the server (set by src/server.ts
+  // from the visitor's cookie) and window.__GA_LOCALE__ on the client — so
+  // SSR text and the first client render always match (React #418 fix).
+  initLocale();
   const locale = getLocale();
   return (
     <html lang={locale === "ar" ? "ar" : "en"} dir={locale === "ar" ? "rtl" : "ltr"}>

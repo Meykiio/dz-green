@@ -11,8 +11,11 @@ declare global {
 let current: Locale = "ar";
 
 function detect(): Locale {
-  if (typeof window !== "undefined" && window.__GA_LOCALE__) return window.__GA_LOCALE__;
-  return "ar";
+  if (typeof window !== "undefined") {
+    return window.__GA_LOCALE__ ?? "ar";
+  }
+  // Server: src/server.ts sets this per request from the visitor's cookie.
+  return ((globalThis as { __GA_LOCALE_SSR__?: string }).__GA_LOCALE_SSR__ as Locale | undefined) ?? "ar";
 }
 
 export function getLocale(): Locale {
@@ -39,13 +42,6 @@ export function setLocale(locale: Locale): void {
 
 export function initLocale(): void {
   current = detect();
-}
-
-/** Server-side: pick the locale from the request cookie (SSR must match client). */
-export function initLocaleFromCookie(cookieHeader: string | null): void {
-  if (!cookieHeader) return;
-  const match = cookieHeader.match(/(?:^|;\s*)ga-locale=(en|ar)(?:;|$)/);
-  if (match) current = match[1] as Locale;
 }
 
 export function cookieSafe(locale: Locale): Locale {

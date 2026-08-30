@@ -94,7 +94,7 @@ function SignInToVolunteerCard() {
       <p className="font-semibold">{t("info.volunteer.signinTitle")}</p>
       <p className="mt-1.5 text-sm text-muted-foreground">{t("info.volunteer.signinBody")}</p>
       <Button asChild size="lg" className="mt-4 w-full">
-        <Link to="/auth" search={{ redirect: "/volunteer" }}>
+        <Link to="/auth" search={{ redirect: "/volunteer", mode: "signup" }}>
           {t("info.volunteer.signinCta")}
         </Link>
       </Button>

@@ -47,6 +47,13 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      // SSR locale (2026-08-30): expose the visitor's saved locale to the
+      // render pipeline so SSR text matches the client (React #418 fix).
+      // Set per request, immediately before rendering.
+      const cookie = request.headers.get("cookie");
+      const match = cookie?.match(/(?:^|;\s*)ga-locale=(en|ar)(?:;|$)/);
+      (globalThis as { __GA_LOCALE_SSR__?: string }).__GA_LOCALE_SSR__ = match?.[1] ?? "ar";
+
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import { ar, en } from "./dict";
 import { getLocale, initLocale, setLocale as persistLocale, type Locale } from "./locale";
 import { count, formatDate, type CountKind } from "./format";
@@ -33,22 +33,14 @@ export interface I18n {
 const I18nContext = createContext<I18n | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  // Hydration-mismatch fix (2026-08-30): the FIRST client render must match
-  // the SSR text (default Arabic). Reading the saved locale here would flip
-  // the first render to English and break hydration (React #418) — which is
-  // what kept /volunteer stuck on its loading spinner. So we always start
-  // with the SSR locale and flip to the saved one right after mount.
-  const [locale, setLocaleState] = useState<Locale>(() => getLocale());
-
-  useEffect(() => {
+  // SSR renders in the visitor's saved locale (cookie, read in the root
+  // beforeLoad); the no-flash script exposes the same value on
+  // window.__GA_LOCALE__ before the bundle runs — so the first client render
+  // always matches the SSR text (React #418 fix, 2026-08-30).
+  const [locale, setLocaleState] = useState<Locale>(() => {
     initLocale();
-    const saved = getLocale();
-    if (saved !== "ar") {
-      persistLocale(saved);
-      setLocaleState(saved);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return getLocale();
+  });
 
   const setLocale = useCallback((next: Locale) => {
     persistLocale(next);
@@ -110,7 +102,7 @@ export function localizeError(raw: string, locale: Locale = getLocale()): string
 
 /** No-flash script: apply saved locale before first paint (mirrors theme). */
 export function localeInitScript(): string {
-  return `try{var l=localStorage.getItem("ga-locale");if(l==="en"){document.documentElement.lang="en";document.documentElement.dir="ltr"}if(l)window.__GA_LOCALE__=l}catch(e){}`;
+  return `try{var l=localStorage.getItem("ga-locale");if(!l){var m=document.cookie.match(/(?:^|;\\s*)ga-locale=(en|ar)(?:;|$)/);if(m)l=m[1]}if(l==="en"){document.documentElement.lang="en";document.documentElement.dir="ltr"}if(l)window.__GA_LOCALE__=l}catch(e){}`;
 }
 
 /** Server-side-safe translate for route `head()` (uses the singleton locale). */
