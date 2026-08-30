@@ -15,6 +15,21 @@ export default defineConfig({
     // it Vercel serves only static files and every route 404s.
     nitro({
       routeRules: {
+        // Security headers everywhere (security pass 2026-08-30): clickjacking
+        // protection, nosniff, referrer + permissions policy, and a pragmatic
+        // CSP (inline scripts/styles required by the no-flash boot scripts
+        // and Tailwind; connections limited to self + Supabase + tiles +
+        // Vercel analytics).
+        "/**": {
+          headers: {
+            "x-frame-options": "SAMEORIGIN",
+            "x-content-type-options": "nosniff",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "permissions-policy": "camera=(), microphone=(), geolocation=(self)",
+            "content-security-policy":
+              "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; worker-src 'self' blob:; connect-src 'self' https://*.supabase.co https://*.openfreemap.org https://vitals.vercel-insights.com; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'",
+          },
+        },
         // Static informational pages: SSR once, cache at the edge (audit 2026-08-28).
         // /volunteer is deliberately NOT cached — it is auth-dependent (2026-08-30).
         "/about": { swr: 3600 },

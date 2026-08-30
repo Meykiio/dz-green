@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { AssignWilayasDialog } from "@/components/admin/AssignWilayasDialog";
 import { CreateAccountDialog } from "@/components/admin/CreateAccountDialog";
 import { Button } from "@/components/ui/button";
-import { useI18n } from "@/i18n";
+import { localizeError, useI18n } from "@/i18n";
 import {
   adminDeleteUser,
   adminListUsers,
@@ -21,7 +21,7 @@ import { wilayaName } from "@/lib/wilayas";
 
 const PAGE = 50;
 
-/** Users, roles and wilayas — one panel with "show more" pagination. */
+/** Users, roles and wilayas â€” one panel with "show more" pagination. */
 export function AdminUsersPanel() {
   const { t } = useI18n();
   const { masked } = usePrivacyMode();
@@ -54,7 +54,7 @@ export function AdminUsersPanel() {
       toast.success(t("moderation.adm.toastRole"));
       invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(localizeError(e.message ?? "")),
   });
 
   const signOut = useMutation({
@@ -63,7 +63,7 @@ export function AdminUsersPanel() {
       toast.success(t("moderation.adm.toastSignout"));
       invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(localizeError(e.message ?? "")),
   });
 
   const deleteUser = useMutation({
@@ -73,7 +73,7 @@ export function AdminUsersPanel() {
       setConfirming(null);
       invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(localizeError(e.message ?? "")),
   });
 
   const [confirming, setConfirming] = useState<string | null>(null);
@@ -130,8 +130,8 @@ export function AdminUsersPanel() {
                       (u.wilayas.length > 0
                         ? t("moderation.adm.rolesWilayas", {
                             n: u.wilayas.length,
-                            names: u.wilayas.slice(0, 4).map(wilayaName).join("، "),
-                          }) + (u.wilayas.length > 4 ? "…" : "")
+                            names: u.wilayas.slice(0, 4).map(wilayaName).join("ØŒ "),
+                          }) + (u.wilayas.length > 4 ? "â€¦" : "")
                         : t("moderation.adm.noWilayas"))}
                   </>
                 ) : (

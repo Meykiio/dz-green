@@ -3,6 +3,20 @@
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
 <<<<<<< HEAD
+## 2026-08-30 (fifty-seventh pass) — Security pattern review + OWASP API Top 10 sweep
+
+A dev DM'd 4 issues on Instagram; the owner asked for a full pattern review + deep research (OWASP API Top 10 2023 mapping). Everything verified against code + live DB, all fixed except one owner-dashboard item:
+
+- **NEW P1 (worse than the DM's finds): `spatial_ref_sys` is anonymously writable** — DELETE via REST returned HTTP 200/204 in a live probe. An attacker could wipe all 8,500 projection rows → PostGIS (wilaya derivation) breaks platform-wide. Root cause: extension-installed default grants; revoking requires the **table owner (postgres)** — the MCP SQL role can't. **Owner action: run the script in `docs/SYSTEM_INSTRUCTIONS.md` (Dashboard → SQL Editor, 30 seconds).** Belt-and-suspenders: RLS enable + read-only policy + revoke writes.
+- **DM #3 mapped to OWASP API3 (property-level authz) — fixed:** table-level UPDATE on `sites`/`fire_reports` revoked; column-level grants now allow only the moderation columns (`status, resolved_at` on fires; `status, reviewed_by, reviewed_at, moderator_notes` on sites). Moderators can no longer write tree_count/photo_url/PII via direct client updates. Live-verified in `column_privileges`.
+- **DM #2 — fixed:** `adminSetRole` self-guard ("You can't change your own role") + last-admin guard (can't demote the final admin).
+- **DM #1 — fixed:** `receipts.server.ts` fallback salt removed (fail loud like the others).
+- **DM #4 — fixed:** shared throttle wired into feedback (10/hour) + volunteers (5/hour) via the existing hashed-IP `submission_meta` mechanism (CHECK widened to the two new kinds, migration live).
+- **Geometry/geography columns:** probed — they're views, not writable (non-issue).
+- **Security headers (OWASP API8):** global `/**` routeRules — X-Frame-Options SAMEORIGIN, nosniff, Referrer-Policy, Permissions-Policy (camera/mic off, geolocation self), pragmatic CSP (self + Supabase + OpenFreeMap + Vercel analytics; inline script/style allowed for the boot scripts + Tailwind).
+- **Staff error toasts:** 12 spots now pass through `localizeError` (known messages localized; no raw schema/SQL hints).
+- Verified: tsc clean, 137/137 tests, build green; live grant verifications above.
+
 ## 2026-08-30 (fifty-sixth pass) — React #418 eliminated + volunteer CTA flow finalized
 
 - **React #418 (hydration text mismatch) — the recurring /volunteer spinner:** SSR always rendered Arabic while an EN-saved client flipped on first render → full-tree text mismatch → hydration aborted mid-tree → effects never ran → spinner forever. Final design (no flip, no flash, no mismatch possible): `setLocale` mirrors to a `ga-locale` cookie; `src/server.ts` reads it per request onto a request-global; `initLocale()` reads it on the server; RootShell + I18nProvider init via `initLocale()` — **SSR text == first client render, always.** The no-flash script reads localStorage OR the cookie. (The PowerShell `Invoke-WebRequest` Cookie-header drop nearly masked the verification — curl proved the chain works.)

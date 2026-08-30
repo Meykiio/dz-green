@@ -1,7 +1,7 @@
 export const forms: typeof import("../en/forms").forms = {
   backToMap: "الخريطة",
   plant: {
-    title: "أنا غرست شجرة",
+    title: "غرست شجرة",
     intro: "الصورة والموقع إلزاميان حتى تكون الخريطة موثوقة.",
     doneTitle: "شكرًا — بلاغك قيد المراجعة",
     doneIntro:

@@ -134,7 +134,23 @@ export const adminSetRole = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }) => {
-    await requireAdmin();
+    const adminId = await requireAdmin();
+    // Self-lockout guard (security report 2026-08-30): an admin must not
+    // demote or remove their own role — the UI hides the button, but the
+    // RPC is open. Being the LAST admin makes it a hard block either way.
+    if (data.userId === adminId) {
+      throw new Error("You can't change your own role — ask another admin.");
+    }
+    if (data.role !== "admin") {
+      const { data: admins } = await supabaseAdmin
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "admin");
+      const others = (admins ?? []).filter((a) => a.user_id !== data.userId);
+      if (others.length === 0) {
+        throw new Error("This is the last admin — assign another admin first.");
+      }
+    }
     if (data.role === "none") {
       const { error } = await supabaseAdmin
         .from("user_roles")

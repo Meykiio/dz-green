@@ -197,9 +197,9 @@ export const info: typeof import("../en/info").info = {
       "أصبح ظاهرًا. شكرًا — كل شجرة في الخريطة تحفز الشخص التالي على الغرس.",
     back: "العودة إلى الخريطة",
     kind: {
-      planting: "غرسة شجرة",
+      planting: "غرست شجرة",
       care: "متابعة شجرة",
-      fire: "بلاغ حريق",
+      fire: "بلاغ عن حريقا",
       fallback: "بلاغ",
     },
     status: {
@@ -208,8 +208,8 @@ export const info: typeof import("../en/info").info = {
       rejected: "غير مقبول",
       published: "منشور في الخريطة",
       active: "نشط",
-      resolved: "معالج",
-      falseAlarm: "مُيّز كإنذار كاذب",
+      resolved: "تمت معالجته",
+      falseAlarm: "كإنذار كاذب",
     },
   },
 };

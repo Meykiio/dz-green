@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useI18n } from "@/i18n";
+import { localizeError, useI18n } from "@/i18n";
 import { adminCreateUser } from "@/lib/admin.functions";
 import { WilayaChecklist } from "./WilayaChecklist";
 
@@ -50,7 +50,7 @@ export function CreateAccountDialog({ onClose }: { onClose: () => void }) {
       void queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
       onClose();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(localizeError(e.message ?? "")),
   });
 
   const toggle = (code: string, add: boolean) =>

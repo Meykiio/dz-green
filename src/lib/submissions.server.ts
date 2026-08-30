@@ -80,6 +80,29 @@ async function hashDevice(secret: string, kind: Kind): Promise<string> {
 
 export class GateError extends Error {}
 
+/**
+ * Lightweight shared throttle (security report 2026-08-30): the same
+ * hashed-IP counting the submission gate uses, for endpoints that have no
+ * full gate (feedback, volunteers). Records the attempt on pass.
+ */
+export async function throttle(
+  kind: "feedback" | "volunteer",
+  limitPerHour: number,
+): Promise<void> {
+  const ipHash = await hashIp(clientIp());
+  const since = new Date(Date.now() - 3600_000).toISOString();
+  const { count, error } = await supabaseAdmin
+    .from("submission_meta")
+    .select("id", { count: "exact", head: true })
+    .eq("ip_hash", ipHash)
+    .eq("kind", kind)
+    .gte("created_at", since);
+  if (!error && (count ?? 0) >= limitPerHour) {
+    throw new GateError("You've sent a lot of messages in the last hour. Please try again later.");
+  }
+  await supabaseAdmin.from("submission_meta").insert({ kind, ip_hash: ipHash });
+}
+
 /** Runs every abuse check and records the attempt. Throws GateError on reject. */
 export async function verifyGate(kind: Kind, input: GateInput): Promise<"ok" | "dropped"> {
   if (input.hp && input.hp.trim().length > 0) {

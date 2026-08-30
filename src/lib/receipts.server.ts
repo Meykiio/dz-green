@@ -19,7 +19,10 @@ export interface ReceiptStatus {
 }
 
 async function hashToken(token: string): Promise<string> {
-  const salt = process.env["SUPABASE_PROJECT_ID"] ?? "green-algeria";
+  // Fail loud (security report 2026-08-30): a missing salt must not fall back
+  // to a predictable constant — token hashes would become computable.
+  const salt = process.env["SUPABASE_PROJECT_ID"];
+  if (!salt) throw new Error("SUPABASE_PROJECT_ID is required server-side.");
   const bytes = new TextEncoder().encode(`${salt}:${token}`);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
   return Array.from(new Uint8Array(digest))

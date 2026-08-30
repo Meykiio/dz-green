@@ -5,7 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { useI18n } from "@/i18n";
+import { localizeError, useI18n } from "@/i18n";
 import { adminDeleteFeedback, adminListFeedback, type AdminFeedback } from "@/lib/admin.functions";
 
 const KIND_META = {
@@ -31,7 +31,7 @@ export function FeedbackPanel() {
       setConfirming(null);
       void queryClient.invalidateQueries({ queryKey: ["admin", "feedback"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(localizeError(e.message ?? "")),
   });
   const [confirming, setConfirming] = useState<string | null>(null);
 

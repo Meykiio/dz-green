@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { optionalUserId } from "@/lib/submissions.server";
+import { optionalUserId, throttle } from "@/lib/submissions.server";
 import type { z } from "zod";
 import type { volunteerSchema } from "./volunteers.functions";
 
@@ -9,6 +9,10 @@ export async function submitVolunteerImpl(
   if (data.hp) {
     return { ok: true };
   }
+
+  // Shared throttle (security report 2026-08-30): 5 applications per hour
+  // per hashed IP.
+  await throttle("volunteer", 5);
 
   // Account-first flow (2026-08-29): link the application to the applicant's
   // auth account when they're signed in, so onboarding is one click and

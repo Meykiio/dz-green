@@ -2,9 +2,9 @@ export const chrome: typeof import("../en/chrome").chrome = {
   brandTagline: "خريطة مجتمعية لغرس الأشجار في الجزائر",
   nav: {
     map: "الخريطة",
-    plant: "أنا غرست شجرة",
+    plant: "غرست شجرة",
     care: "سجّل متابعة",
-    fire: "أبلغ عن حريق",
+    fire: "بلغ عن حريق",
     about: "عن المشروع",
     volunteer: "تطوّع",
     privacy: "الخصوصية",

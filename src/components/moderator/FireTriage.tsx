@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { useI18n } from "@/i18n";
+import { localizeError, useI18n } from "@/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { adminDeleteFire } from "@/lib/admin.functions";
@@ -25,7 +25,7 @@ const STATUS_TONE: Record<FireStatus, "fire" | "plant" | "muted"> = {
   false_alarm: "muted",
 };
 
-/** Fire report triage — mark active reports resolved or false alarms. */
+/** Fire report triage â€” mark active reports resolved or false alarms. */
 export function FireTriage() {
   const { t, formatDateTime } = useI18n();
   const { isAdmin } = useAuth();
@@ -43,7 +43,7 @@ export function FireTriage() {
       void queryClient.invalidateQueries({ queryKey: ["fire_reports"] });
       void queryClient.invalidateQueries({ queryKey: ["moderation", "stats"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(localizeError(e.message ?? "")),
   });
 
   const setStatus = useMutation({
@@ -59,7 +59,7 @@ export function FireTriage() {
       void queryClient.invalidateQueries({ queryKey: ["fire_reports"] });
       void queryClient.invalidateQueries({ queryKey: ["moderation", "stats"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(localizeError(error.message ?? "")),
   });
 
   if (fires.isLoading) {
@@ -130,9 +130,9 @@ export function FireTriage() {
             </div>
             <p className="font-medium">
               {wilayaName(fire.wilaya_code)}
-              {fire.commune ? ` · ${fire.commune}` : ""} · {fire.lat.toFixed(4)},{" "}
+              {fire.commune ? ` Â· ${fire.commune}` : ""} Â· {fire.lat.toFixed(4)},{" "}
               {fire.lng.toFixed(4)}
-              {fire.location_approximate ? ` · ${t("home.list.wilayaLevel")}` : ""}
+              {fire.location_approximate ? ` Â· ${t("home.list.wilayaLevel")}` : ""}
             </p>
             {fire.description && <p className="line-clamp-2 text-sm">{fire.description}</p>}
             {fire.resolved_at && (

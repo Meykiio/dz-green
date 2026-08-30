@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { throttle } from "@/lib/submissions.server";
 import type { z } from "zod";
 import type { feedbackSchema } from "./feedback.functions";
 
@@ -8,6 +9,10 @@ export async function submitFeedbackImpl(
   if (data.hp) {
     return { ok: true };
   }
+
+  // Shared throttle (security report 2026-08-30): 10 feedback messages per
+  // hour per hashed IP — honest users never notice, spam dies here.
+  await throttle("feedback", 10);
 
   const { error } = await supabaseAdmin
     .from("feedback")

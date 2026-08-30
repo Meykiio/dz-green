@@ -80,3 +80,17 @@ How to re-run `rls-audit2`:
 ## Portability rule
 
 This project must stay exportable. It is intentionally runnable against a plain Supabase project, with no platform-specific tooling. Keep `docs/FULL_SCHEMA_EXPORT.sql` accurate, and avoid platform-only constructs where a standard alternative exists.
+
+## Pending owner dashboard action (2026-08-30): spatial_ref_sys write lock
+
+`public.spatial_ref_sys` (PostGIS projection table) is **anonymously writable** (verified: anonymous DELETE via REST returned HTTP 200/204). The table is extension-owned, so only the **postgres owner** can revoke — the migration role cannot. Run this once in **Dashboard → SQL Editor**:
+
+```sql
+-- spatial_ref_sys: anonymous writes were possible (verified 2026-08-30).
+-- PostGIS needs it READABLE; clients must never write it.
+alter table public.spatial_ref_sys enable row level security;
+create policy spatial_ref_sys_read on public.spatial_ref_sys for select using (true);
+revoke insert, update, delete on public.spatial_ref_sys from anon, authenticated, public;
+```
+
+Verify after: `select has_table_privilege('anon','public.spatial_ref_sys','delete')` → must be `f`. Reads keep working (the select policy allows them; PostGIS transforms unaffected).

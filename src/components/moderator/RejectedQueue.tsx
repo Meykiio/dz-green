@@ -5,7 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { useI18n } from "@/i18n";
+import { localizeError, useI18n } from "@/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { adminDeleteSite } from "@/lib/admin.functions";
@@ -17,7 +17,7 @@ import { wilayaName } from "@/lib/wilayas";
 /**
  * Rejected plantings (2026-08-28): visible so a moderator can re-approve
  * later. Photos are deleted on reject (immutable-cache rule), so most rows
- * have no photo — the record itself is the reviewable unit.
+ * have no photo â€” the record itself is the reviewable unit.
  */
 export function RejectedQueue() {
   const { t, count, formatDate, formatDateTime } = useI18n();
@@ -46,7 +46,7 @@ export function RejectedQueue() {
       void queryClient.invalidateQueries({ queryKey: ["sites"] });
       void queryClient.invalidateQueries({ queryKey: ["moderation", "stats"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(localizeError(error.message ?? "")),
   });
 
   const del = useMutation({
@@ -57,7 +57,7 @@ export function RejectedQueue() {
       void queryClient.invalidateQueries({ queryKey: ["sites"] });
       void queryClient.invalidateQueries({ queryKey: ["moderation", "stats"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(localizeError(e.message ?? "")),
   });
 
   if (rejected.isLoading) {
@@ -86,7 +86,7 @@ export function RejectedQueue() {
               className="size-24 shrink-0 rounded-lg object-cover"
               loading="lazy"
               // Reject deletes the photo object (immutable-cache rule), so the
-              // proxy 404s for older rejected rows — hide the broken thumbnail
+              // proxy 404s for older rejected rows â€” hide the broken thumbnail
               // instead of showing a black box.
               onError={(e) => {
                 e.currentTarget.style.display = "none";
@@ -96,11 +96,11 @@ export function RejectedQueue() {
           <div className="min-w-0 flex-1 space-y-1">
             <p className="font-medium">
               {count(site.tree_count, "tree")}
-              {site.species ? ` · ${site.species}` : ""}
+              {site.species ? ` Â· ${site.species}` : ""}
             </p>
             <p className="text-sm text-muted-foreground">
               {wilayaName(site.wilaya_code)}
-              {site.commune ? ` · ${site.commune}` : ""} ·{" "}
+              {site.commune ? ` Â· ${site.commune}` : ""} Â·{" "}
               {t("home.list.planted", { date: formatDate(site.planted_date, { day: "numeric", month: "short", year: "numeric" }) })}
             </p>
             <p className="text-sm text-muted-foreground">

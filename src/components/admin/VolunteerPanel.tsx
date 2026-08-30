@@ -5,7 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { useI18n } from "@/i18n";
+import { localizeError, useI18n } from "@/i18n";
 import {
   adminDeleteVolunteer,
   adminListVolunteers,
@@ -46,7 +46,7 @@ export function VolunteerPanel() {
     mutationFn: ({ id, status }: { id: string; status: "new" | "contacted" | "onboarded" }) =>
       adminSetVolunteerStatus({ data: { id, status } }),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["admin", "volunteers"] }),
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(localizeError(e.message ?? "")),
   });
 
   const del = useMutation({
@@ -56,7 +56,7 @@ export function VolunteerPanel() {
       setConfirming(null);
       void queryClient.invalidateQueries({ queryKey: ["admin", "volunteers"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(localizeError(e.message ?? "")),
   });
   const [confirming, setConfirming] = useState<string | null>(null);
 
@@ -67,7 +67,7 @@ export function VolunteerPanel() {
       void queryClient.invalidateQueries({ queryKey: ["admin", "volunteers"] });
       void queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(localizeError(e.message ?? "")),
   });
 
   if (volunteers.isLoading && offset === 0) {
@@ -100,7 +100,7 @@ export function VolunteerPanel() {
               </p>
               <p className="truncate text-sm text-muted-foreground">
                 {masked ? maskEmail(v.email) : v.email}
-                {v.phone ? ` · ${masked ? maskPhone(v.phone) : v.phone}` : ""}
+                {v.phone ? ` Â· ${masked ? maskPhone(v.phone) : v.phone}` : ""}
                 {t("moderation.volp.applied", { date: formatDateShort(v.created_at) })}
               </p>
             </div>

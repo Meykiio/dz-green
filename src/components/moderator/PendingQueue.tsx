@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useI18n } from "@/i18n";
+import { localizeError, useI18n } from "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { photoUrl, SITE_COLUMNS } from "@/lib/data";
@@ -26,7 +26,7 @@ export function PendingQueue() {
     queryFn: async (): Promise<Site[]> => {
       const { data, error } = await supabase
         .from("sites")
-        // Explicit list: contact_phone is column-grant protected — select("*")
+        // Explicit list: contact_phone is column-grant protected â€” select("*")
         // fails on purpose, same posture as fire reporter PII.
         .select(SITE_COLUMNS)
         .eq("status", "pending")
@@ -45,7 +45,7 @@ export function PendingQueue() {
       void queryClient.invalidateQueries({ queryKey: ["sites"] });
       void queryClient.invalidateQueries({ queryKey: ["moderation", "stats"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(localizeError(error.message ?? "")),
   });
 
   if (pending.isLoading) {
@@ -82,16 +82,16 @@ export function PendingQueue() {
           <div className="min-w-0 flex-1 space-y-1">
             <p className="font-medium">
               {count(site.tree_count, "tree")}
-              {site.species ? ` · ${site.species}` : ""}
+              {site.species ? ` Â· ${site.species}` : ""}
             </p>
             <p className="text-sm text-muted-foreground">
               {wilayaName(site.wilaya_code)}
-              {site.commune ? ` · ${site.commune}` : ""} ·{" "}
+              {site.commune ? ` Â· ${site.commune}` : ""} Â·{" "}
               {t("home.list.planted", { date: formatDate(site.planted_date, { day: "numeric", month: "short", year: "numeric" }) })}
-              {site.location_approximate ? ` · ${t("home.list.wilayaLevel")}` : ""}
+              {site.location_approximate ? ` Â· ${t("home.list.wilayaLevel")}` : ""}
             </p>
             <p className="text-sm text-muted-foreground">
-              {site.lat.toFixed(5)}, {site.lng.toFixed(5)} ·{" "}
+              {site.lat.toFixed(5)}, {site.lng.toFixed(5)} Â·{" "}
               {t("moderation.queue.submitted", { datetime: formatDateTime(site.created_at) })}
             </p>
             {site.notes && <p className="line-clamp-2 text-sm">{site.notes}</p>}
