@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { ar, en } from "./dict";
 import { getLocale, initLocale, setLocale as persistLocale, type Locale } from "./locale";
 import { count, formatDate, type CountKind } from "./format";
@@ -33,10 +33,22 @@ export interface I18n {
 const I18nContext = createContext<I18n | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(() => {
+  // Hydration-mismatch fix (2026-08-30): the FIRST client render must match
+  // the SSR text (default Arabic). Reading the saved locale here would flip
+  // the first render to English and break hydration (React #418) — which is
+  // what kept /volunteer stuck on its loading spinner. So we always start
+  // with the SSR locale and flip to the saved one right after mount.
+  const [locale, setLocaleState] = useState<Locale>(() => getLocale());
+
+  useEffect(() => {
     initLocale();
-    return getLocale();
-  });
+    const saved = getLocale();
+    if (saved !== "ar") {
+      persistLocale(saved);
+      setLocaleState(saved);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const setLocale = useCallback((next: Locale) => {
     persistLocale(next);

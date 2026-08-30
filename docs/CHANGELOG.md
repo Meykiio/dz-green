@@ -3,6 +3,14 @@
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
 <<<<<<< HEAD
+## 2026-08-30 (fifty-fifth pass) — Hydration mismatch fixed (React #418): the /volunteer stuck-spinner bug
+
+- **Owner report:** `/volunteer` shows a loading spinner forever for anonymous visitors; console shows React error #418 (hydration text mismatch). Signing up first made the content appear.
+- **Root cause:** SSR always rendered Arabic (server default), but a visitor with English saved flipped to English on the first client render — a full-tree text mismatch (#418). React discarded hydration mid-tree, the auth effect never fired, and the page stayed on the SSR spinner forever. Same latent crash existed on every page; /volunteer was the first with a loading-dependent branch, so it was the first visible victim.
+- **Fix:** the client's first render now always matches the SSR locale (Arabic default), and the saved locale flips in a post-mount effect (one clean re-render). No request-context needed, no SSR/client divergence possible, works for every page. `setLocale` also mirrors to a `ga-locale` cookie for any future SSR-locale work.
+- **Verified:** EN-saved visitor loads `/volunteer` — no #418, SSR Arabic flips to English cleanly (`lang=en dir=ltr`, full English content). 137/137 tests, tsc clean, build green.
+- **Known honest limitation:** EN-saved visitors see one frame of Arabic before the flip (visible for ~100ms on slow devices). Accepted; the alternative (cookie-aware SSR per request) has a serverless concurrency race and was rejected.
+
 ## 2026-08-29 (fifty-fourth pass) — Volunteer account-first flow, filming privacy mode, staff card fixes
 
 - **Volunteer flow redesigned (owner: "volunteers must create an account first — for female cases I don't want to contact them by phone"):** `/volunteer` now requires an account first — signed-out visitors get an inline "Create your account first" card (email + password, 20 seconds, or sign-in link); the application form appears with the email locked to the account. New copy: **"We review every application within 24 hours max"** — if accepted, the same account becomes the moderator login. Schema: `volunteers.user_id` (nullable, indexed) links applications to accounts; `submitVolunteer` links via `optionalUserId`. Older applications without a link stay workable via "New account".
