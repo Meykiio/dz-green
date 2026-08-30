@@ -3,6 +3,13 @@
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
 <<<<<<< HEAD
+## 2026-08-30 (fifty-sixth pass) — React #418 eliminated + volunteer CTA flow finalized
+
+- **React #418 (hydration text mismatch) — the recurring /volunteer spinner:** SSR always rendered Arabic while an EN-saved client flipped on first render → full-tree text mismatch → hydration aborted mid-tree → effects never ran → spinner forever. Final design (no flip, no flash, no mismatch possible): `setLocale` mirrors to a `ga-locale` cookie; `src/server.ts` reads it per request onto a request-global; `initLocale()` reads it on the server; RootShell + I18nProvider init via `initLocale()` — **SSR text == first client render, always.** The no-flash script reads localStorage OR the cookie. (The PowerShell `Invoke-WebRequest` Cookie-header drop nearly masked the verification — curl proved the chain works.)
+- **/auth `?mode=signup`:** the volunteer CTA now lands on sign-up mode — new users were hitting sign-in mode and getting 400 Bad Request on `signInWithPassword` (no account yet).
+- **Verified:** EN cookie → full EN SSR; no cookie → AR default; browser test with EN saved: no #418, instant CTA, zero spinners. 137/137 tests, tsc clean, build green.
+- **Owner-visible note:** `ERR_NAME_NOT_RESOLVED` for `*.supabase.co` in the console = the local DNS/ISP failing to resolve Supabase intermittently (same flakiness this machine shows). The app code is fine; retry when DNS recovers. If it persists for Algerian users, a Supabase custom domain (Pro) is the path.
+
 ## 2026-08-30 (fifty-fifth pass) — Hydration mismatch fixed (React #418): the /volunteer stuck-spinner bug
 
 - **Owner report:** `/volunteer` shows a loading spinner forever for anonymous visitors; console shows React error #418 (hydration text mismatch). Signing up first made the content appear.
