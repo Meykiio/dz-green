@@ -185,13 +185,16 @@ function Shell({
               onClick={togglePrivacy}
               aria-label={masked ? t("chrome.aria.privacyShow") : t("chrome.aria.privacyHide")}
               className={cn(
-                "tap-target grid size-10 place-items-center rounded-full transition-colors active:scale-[0.96]",
+                "tap-target inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold transition-transform active:scale-[0.97]",
                 masked
-                  ? "text-plant"
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                  ? "border-plant/40 bg-plant/10 text-plant"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground",
               )}
             >
-              {masked ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              {masked ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+              <span className="hidden sm:inline">
+                {masked ? t("chrome.privacy.showInfos") : t("chrome.privacy.hideInfos")}
+              </span>
             </button>
           )}
           <EmergencyContacts />

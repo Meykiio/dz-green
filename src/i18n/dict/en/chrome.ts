@@ -29,6 +29,10 @@ export const chrome = {
     signout: "Sign out",
     signin: "Sign in",
   },
+  privacy: {
+    showInfos: "Show infos",
+    hideInfos: "Hide infos",
+  },
   emergency: {
     label: "Emergency contacts",
     sosFull: "SOS · 14",

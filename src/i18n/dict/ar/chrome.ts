@@ -29,6 +29,10 @@ export const chrome: typeof import("../en/chrome").chrome = {
     signout: "تسجيل الخروج",
     signin: "تسجيل الدخول",
   },
+  privacy: {
+    showInfos: "إظهار البيانات",
+    hideInfos: "إخفاء البيانات",
+  },
   emergency: {
     label: "أرقام الطوارئ",
     sosFull: "SOS · 14",
