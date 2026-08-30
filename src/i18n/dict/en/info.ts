@@ -131,15 +131,11 @@ export const info = {
     formLead:
       "A short form. We read every one, and we'll answer by email or WhatsApp — that's the only way we contact you.",
     review24: "We review every application within 24 hours max.",
-    accountTitle: "Create your account first",
-    accountBody:
-      "Moderators work from an account. Create yours here — it takes 20 seconds — then tell us about yourself below. If accepted, you'll log in with this account as a moderator for your wilaya.",
-    accountCta: "Create my account",
-    accountHave: "I already have an account — sign in",
-    accountCreated: "Account created — now tell us about yourself",
-    accountCreatedBody:
-      "Your application below is linked to this account. We review within 24 hours max; if accepted, this account becomes your moderator login.",
     accountSignedIn: "Signed in as {email} — your application is linked to this account.",
+    signinTitle: "Create an account to volunteer",
+    signinBody:
+      "Moderators work from an account. Create one (20 seconds) or sign in — then come back here to apply. We review every application within 24 hours max.",
+    signinCta: "Create account / Sign in",
   },
   volunteerForm: {
     name: "Your name *",

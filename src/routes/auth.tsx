@@ -1,6 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import { AppShell } from "@/components/AppShell";
 import { FormShell } from "@/components/FormShell";
@@ -8,7 +9,15 @@ import { Button } from "@/components/ui/button";
 import { ssrT, useI18n } from "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
 
+const searchSchema = z.object({
+  redirect: z
+    .string()
+    .regex(/^\/[a-zA-Z0-9/_-]*$/)
+    .optional(),
+});
+
 export const Route = createFileRoute("/auth")({
+  validateSearch: searchSchema,
   head: () => ({
     meta: [
       { title: ssrT("meta.authTitle") },
@@ -23,6 +32,8 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const { t } = useI18n();
   const router = useRouter();
+  const { redirect } = Route.useSearch();
+  const target = redirect ?? "/";
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,7 +46,7 @@ function AuthPage() {
       if (mode === "signin") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        void router.navigate({ to: "/" });
+        void router.navigate({ to: target });
       } else {
         const { error } = await supabase.auth.signUp({
           email,

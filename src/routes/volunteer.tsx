@@ -1,14 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { HandHeart, Loader2 } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+import { HandHeart } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { VolunteerForm } from "@/components/volunteer/VolunteerForm";
 import { useAuth } from "@/hooks/useAuth";
 import { ssrT, useI18n } from "@/i18n";
-import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/volunteer")({
   head: () => ({
@@ -24,7 +21,7 @@ export const Route = createFileRoute("/volunteer")({
 
 function VolunteerPage() {
   const { t } = useI18n();
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   return (
     <AppShell>
       <article className="mx-auto w-full max-w-2xl px-4 py-10">
@@ -68,11 +65,7 @@ function VolunteerPage() {
           <p className="mt-1 text-sm text-muted-foreground">{t("info.volunteer.formLead")}</p>
           <p className="mt-1 text-sm font-medium text-plant">{t("info.volunteer.review24")}</p>
           <div className="mt-4">
-            {loading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="size-6 animate-spin text-muted-foreground" />
-              </div>
-            ) : user ? (
+            {user ? (
               <>
                 <p className="mb-3 rounded-lg border border-plant/40 bg-plant/10 px-3 py-2 text-sm text-plant">
                   {t("info.volunteer.accountSignedIn", { email: user.email ?? "" })}
@@ -80,7 +73,7 @@ function VolunteerPage() {
                 <VolunteerForm defaultEmail={user.email ?? ""} />
               </>
             ) : (
-              <AccountFirstCard />
+              <SignInToVolunteerCard />
             )}
           </div>
         </div>
@@ -90,82 +83,21 @@ function VolunteerPage() {
 }
 
 /**
- * Account-first card (2026-08-29): volunteers sign up here, then the
- * application form appears with their email locked. Reviewed within 24h max;
- * if accepted they log in with THIS account as a moderator.
+ * Simple account-first flow (2026-08-30): no auth-dependent spinner — the
+ * button shows instantly for everyone. After sign-in/up, /auth sends the
+ * visitor back here (?redirect=/volunteer) and the form appears.
  */
-function AccountFirstCard() {
+function SignInToVolunteerCard() {
   const { t } = useI18n();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [created, setCreated] = useState(false);
-
-  async function handleSignup(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: window.location.origin },
-      });
-      if (error) throw error;
-      setCreated(true);
-    } catch {
-      toast.error(t("info.auth.genericAuthError"));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  if (created) {
-    return (
-      <div className="rounded-2xl border border-plant/40 bg-plant/10 p-5">
-        <p className="font-semibold text-plant">{t("info.volunteer.accountCreated")}</p>
-        <p className="mt-1 text-sm text-muted-foreground">{t("info.volunteer.accountCreatedBody")}</p>
-        <div className="mt-4">
-          <VolunteerForm defaultEmail={email} />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
-      <p className="font-semibold">{t("info.volunteer.accountTitle")}</p>
-      <p className="mt-1.5 text-sm text-muted-foreground">{t("info.volunteer.accountBody")}</p>
-      <form className="mt-4 space-y-3" onSubmit={handleSignup}>
-        <label className="block">
-          <span className="eyebrow">{t("info.auth.email")}</span>
-          <input
-            required
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"
-          />
-        </label>
-        <label className="block">
-          <span className="eyebrow">{t("info.auth.password")}</span>
-          <input
-            required
-            minLength={8}
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"
-          />
-        </label>
-        <Button type="submit" size="lg" className="w-full" disabled={busy}>
-          {busy ? t("info.auth.wait") : t("info.volunteer.accountCta")}
-        </Button>
-        <p className="text-center text-sm text-muted-foreground">
-          <Link to="/auth" className="underline">
-            {t("info.volunteer.accountHave")}
-          </Link>
-        </p>
-      </form>
+    <div className="rounded-2xl border border-border bg-card p-5 text-center">
+      <p className="font-semibold">{t("info.volunteer.signinTitle")}</p>
+      <p className="mt-1.5 text-sm text-muted-foreground">{t("info.volunteer.signinBody")}</p>
+      <Button asChild size="lg" className="mt-4 w-full">
+        <Link to="/auth" search={{ redirect: "/volunteer" }}>
+          {t("info.volunteer.signinCta")}
+        </Link>
+      </Button>
     </div>
   );
 }

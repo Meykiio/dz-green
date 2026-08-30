@@ -16,10 +16,10 @@ export default defineConfig({
     nitro({
       routeRules: {
         // Static informational pages: SSR once, cache at the edge (audit 2026-08-28).
+        // /volunteer is deliberately NOT cached — it is auth-dependent (2026-08-30).
         "/about": { swr: 3600 },
         "/privacy": { swr: 3600 },
         "/terms": { swr: 3600 },
-        "/volunteer": { swr: 3600 },
         "/logo.png": { headers: { "cache-control": "public, max-age=86400, immutable" } },
         "/og.png": { headers: { "cache-control": "public, max-age=86400" } },
       },
