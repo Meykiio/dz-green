@@ -188,6 +188,9 @@ export const moderation = {
     time: "Time: {availability}",
     onboardHint:
       'To onboard: make sure the person has an account, then assign the moderator role + wilaya in "Users & roles".',
+    onboard: "Approve & make moderator",
+    onboardToast: "Moderator created.",
+    onboardNoAccount: "No account linked — ask them to create one first.",
   },
   assign: {
     title: "Assign wilayas — {name}",

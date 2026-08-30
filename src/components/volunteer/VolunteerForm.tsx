@@ -17,11 +17,11 @@ const INTENTS = [
   { value: "share", key: "share" },
 ] as const;
 
-export function VolunteerForm() {
+export function VolunteerForm({ defaultEmail }: { defaultEmail?: string }) {
   const { t, locale } = useI18n();
   const [hp, setHp] = useState("");
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(defaultEmail ?? "");
   const [phone, setPhone] = useState("");
   const [wilaya, setWilaya] = useState("");
   const [extra, setExtra] = useState("");
@@ -95,7 +95,10 @@ export function VolunteerForm() {
             maxLength={200}
             placeholder={t("info.volunteerForm.emailPlaceholder")}
             onChange={(e) => setEmail(e.target.value)}
-            className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"
+            readOnly={!!defaultEmail}
+            className={`tap-target mt-1 w-full rounded-md border border-input px-3 py-2 text-base ${
+              defaultEmail ? "bg-muted text-muted-foreground" : "bg-card"
+            }`}
           />
         </label>
       </div>

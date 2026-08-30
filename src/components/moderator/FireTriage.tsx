@@ -174,7 +174,7 @@ export function FireTriage() {
               {isAdmin && (
                 <Button
                   variant="ghost"
-                  className={confirming === fire.id ? "text-fire" : ""}
+                  className={`shrink-0 ${confirming === fire.id ? "text-fire" : ""}`}
                   onClick={() => {
                     if (confirming === fire.id) {
                       del.mutate({ data: { id: fire.id } });

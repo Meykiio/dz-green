@@ -22,6 +22,8 @@ export const chrome: typeof import("../en/chrome").chrome = {
     github: "مستودع GitHub",
     themeDark: "تفعيل الوضع الداكن",
     themeLight: "تفعيل الوضع الفاتح",
+    privacyShow: "إظهار البيانات الحساسة (وضع التصوير مفعّل)",
+    privacyHide: "إخفاء البيانات الحساسة (وضع التصوير)",
   },
   auth: {
     signout: "تسجيل الخروج",

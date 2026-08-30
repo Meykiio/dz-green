@@ -213,9 +213,9 @@ Visitor feedback box (home page "Feedback" button). Writes come from the `submit
 
 RLS **enabled with zero client policies** — `anon`/`authenticated` have no grants at all (revoked); only `service_role` can write or read. **Note:** RLS bypass does not imply table privileges — `service_role` needed an explicit `GRANT SELECT, INSERT, UPDATE, DELETE` (added 2026-08-19 after a live insert failed with 42501). Bot spam is handled client-side by the shared honeypot; no rate limit (deliberately — this is a low-value write path).
 
-### `public.volunteers` (2026-08-28 — live, applied via MCP)
+### `public.volunteers` (2026-08-28 — live, applied via MCP; extended 2026-08-29)
 
-Moderator-candidate applications from `/volunteer`. Same privacy posture as `feedback`: writes come from the `submitVolunteer` service-role server function (zod `volunteerSchema`, honeypot); reads service-role only (`adminListVolunteers` / `adminSetVolunteerStatus`, `requireAdmin`). **PII-heavy** (name/email/phone), so zero grants for `anon`/`authenticated`; DDL stored in `supabase/migrations/20260828120000_0a7233e6-fe94-45bb-97f0-0f4441fc23cc.sql`.
+Moderator-candidate applications from `/volunteer`. Same privacy posture as `feedback`: writes come from the `submitVolunteer` service-role server function (zod `volunteerSchema`, honeypot); reads service-role only (`adminListVolunteers` / `adminSetVolunteerStatus` / `adminOnboardVolunteer`, `requireAdmin`). **PII-heavy** (name/email/phone), so zero grants for `anon`/`authenticated`; DDL stored in `supabase/migrations/20260828120000_*.sql` (+ `20260829100000_volunteers_user_id.sql`).
 
 | Column | Type | Null | Default | Purpose |
 |---|---|---|---|---|
@@ -228,10 +228,11 @@ Moderator-candidate applications from `/volunteer`. Same privacy posture as `fee
 | `intents` | text | no | — | Comma-joined list of `review, triage, organize, share, other` (zod enum; migration CHECK mirrors it with a regex). Zod requires ≥1. |
 | `availability` | text | yes | — | Free text (≤120 client-side, no DB check). |
 | `message` | text | yes | — | CHECK `char_length(message) <= 600`. |
-| `status` | text | no | `'new'` | CHECK `status IN ('new','contacted','onboarded')` — admin pipeline. `onboarded` = account linked + moderator role assigned in "Moderators & roles". |
+| `status` | text | no | `'new'` | CHECK `status IN ('new','contacted','onboarded')` — admin pipeline. `onboarded` = account linked + moderator role assigned in "Users & roles" (or one-click onboard). |
+| `user_id` | uuid | yes | — | **2026-08-29:** the applicant's `auth.users` id when applied signed in (account-first flow). Indexed. Onboarding assigns role + wilaya to this account. |
 | `created_at` | timestamptz | no | `now()` | |
 
-Indexes: `(status, created_at desc)` and `(wilaya_code)`. The app's honeypot field is `hp` — validated client-side, **never stored**. RLS enabled, **zero policies**, anon/authenticated grants revoked; only `service_role` has table grants. **Live as of 2026-08-28** (applied via MCP; verified columns/grants/zero policies post-apply — see `FEATURES.md` §10).
+Indexes: `(status, created_at desc)`, `(wilaya_code)`, `(user_id)`. The app's honeypot field is `hp` — validated client-side, **never stored**. RLS enabled, **zero policies**, anon/authenticated grants revoked; only `service_role` has table grants. **Live as of 2026-08-28** (applied via MCP; verified columns/grants/zero policies post-apply — see `FEATURES.md` §10).
 
 ### `public.spatial_ref_sys`
 

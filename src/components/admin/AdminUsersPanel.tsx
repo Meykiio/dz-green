@@ -16,6 +16,7 @@ import {
   type AdminUser,
 } from "@/lib/admin.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { maskEmail, usePrivacyMode } from "@/lib/privacy-mode";
 import { wilayaName } from "@/lib/wilayas";
 
 const PAGE = 50;
@@ -23,6 +24,7 @@ const PAGE = 50;
 /** Users, roles and wilayas — one panel with "show more" pagination. */
 export function AdminUsersPanel() {
   const { t } = useI18n();
+  const { masked } = usePrivacyMode();
   const { user: me } = useAuth();
   const queryClient = useQueryClient();
   const [offset, setOffset] = useState(0);
@@ -114,7 +116,9 @@ export function AdminUsersPanel() {
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">
                 {u.display_name || t("moderation.adm.noName")}
-                <span className="ms-2 text-xs font-normal text-muted-foreground">{u.email}</span>
+                <span className="ms-2 text-xs font-normal text-muted-foreground">
+                  {u.email ? (masked ? maskEmail(u.email) : u.email) : ""}
+                </span>
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">
                 {u.role ? (

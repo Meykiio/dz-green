@@ -16,6 +16,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider, ssrT } from "@/i18n";
 import { localeInitScript } from "@/i18n";
 import { getLocale } from "@/i18n/locale";
+import { PrivacyModeProvider } from "@/lib/privacy-mode";
 
 /**
  * Error/404 boundaries render OUTSIDE the route tree (in place of the root
@@ -139,13 +140,15 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
-        <TooltipProvider delayDuration={300}>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-          <Toaster position="top-center" richColors />
-          {/* Vercel Web Analytics — self-contained loader script; no-ops off-Vercel. */}
-          <Analytics />
-        </TooltipProvider>
+        <PrivacyModeProvider>
+          <TooltipProvider delayDuration={300}>
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+            <Toaster position="top-center" richColors />
+            {/* Vercel Web Analytics — self-contained loader script; no-ops off-Vercel. */}
+            <Analytics />
+          </TooltipProvider>
+        </PrivacyModeProvider>
       </I18nProvider>
     </QueryClientProvider>
   );

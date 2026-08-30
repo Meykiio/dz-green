@@ -111,7 +111,7 @@ export function RejectedQueue() {
                 {t("moderation.act.note", { note: site.moderator_notes })}
               </p>
             )}
-            <div className="flex gap-2 pt-2">
+            <div className="flex flex-wrap items-center gap-2 pt-2">
               <Button
                 variant="secondary"
                 onClick={() => reapprove.mutate(site.id)}
@@ -122,7 +122,7 @@ export function RejectedQueue() {
               {isAdmin && (
                 <Button
                   variant="ghost"
-                  className={confirming === site.id ? "text-fire" : ""}
+                  className={`shrink-0 ${confirming === site.id ? "text-fire" : ""}`}
                   onClick={() => {
                     if (confirming === site.id) {
                       del.mutate({ data: { id: site.id } });

@@ -1,6 +1,8 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Droplets,
+  Eye,
+  EyeOff,
   FileText,
   Flame,
   Github,
@@ -24,6 +26,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { usePrivacyMode } from "@/lib/privacy-mode";
 import { EmergencyContacts } from "@/components/EmergencyContacts";
 import { FeedbackDialog } from "@/components/FeedbackDialog";
 import { useI18n } from "@/i18n";
@@ -66,8 +69,10 @@ function Shell({
   const { user, isModerator, isAdmin } = useAuth();
   const { theme, toggle } = useTheme();
   const { t, locale, setLocale, isRtl } = useI18n();
+  const { masked, toggle: togglePrivacy } = usePrivacyMode();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const isStaffPage = isAppPage || pathname.startsWith("/moderate");
 
   useEffect(() => {
     setDrawerOpen(false);
@@ -174,6 +179,21 @@ function Shell({
           </Link>
         </div>
         <div className="flex items-center gap-1">
+          {isStaffPage && (
+            <button
+              type="button"
+              onClick={togglePrivacy}
+              aria-label={masked ? t("chrome.aria.privacyShow") : t("chrome.aria.privacyHide")}
+              className={cn(
+                "tap-target grid size-10 place-items-center rounded-full transition-colors active:scale-[0.96]",
+                masked
+                  ? "text-plant"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground",
+              )}
+            >
+              {masked ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          )}
           <EmergencyContacts />
           <FeedbackDialog />
           <a

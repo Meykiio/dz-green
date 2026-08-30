@@ -354,6 +354,7 @@ export type Database = {
           name: string
           phone: string | null
           status: string
+          user_id: string | null
           wilaya_code: string
           availability: string | null
         }
@@ -368,6 +369,7 @@ export type Database = {
           name: string
           phone?: string | null
           status?: string
+          user_id?: string | null
           wilaya_code: string
         }
         Update: {
@@ -381,6 +383,7 @@ export type Database = {
           name?: string
           phone?: string | null
           status?: string
+          user_id?: string | null
           wilaya_code?: string
         }
         Relationships: []

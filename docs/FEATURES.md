@@ -103,9 +103,9 @@ The gate is four layers, all server-side, no third-party dependency:
 
 `submitResilient()` retries a submission once connectivity returns. Not tested under real network loss.
 
-## 10. Volunteer recruitment (`/volunteer`) — built 2026-08-28, live
+## 10. Volunteer recruitment (`/volunteer`) — built 2026-08-28, account-first flow 2026-08-29
 
-A warm, civic ask for wilaya-moderator candidates: hero ("Every green dot starts with a person"), what volunteers do / what we ask / what we never ask (money, equipment, **firefighting** — "we are a community map, not an emergency service; call Protection Civile 14/1021"). Form: name/email/phone-whatsapp/wilaya (58)/extra-wilayas/intent chips/availability/message (honeypot) → `public.volunteers` via service role. Admin sees applications on `/admin` (status new → contacted → onboarded); onboarding = link the vol's account + assign moderator role + wilaya in "Moderators & roles". **Live:** migration applied 2026-08-28 via MCP; shape verified against the live table (constraint proof insert accepted). Note: the first form attempt failed until the table existed — fixed.
+A warm, civic ask for wilaya-moderator candidates: hero ("Every green dot starts with a person"), what volunteers do / what we ask / what we never ask (money, equipment, **firefighting** — "we are a community map, not an emergency service; call Protection Civile 14/1021"). **Account-first flow (2026-08-29):** signed-out visitors create an account inline (email + password) before the application form appears (email locked to the account); "We review every application within 24 hours max" — if accepted, the same account becomes the moderator login. Form: name/email/phone-whatsapp/wilaya (58)/extra-wilayas/intent chips/availability/message (honeypot) → `public.volunteers` via service role, linked to `user_id` when signed in. Admin sees applications on `/admin` (status new → contacted → onboarded); **one-click onboard** ("Approve & make moderator") assigns role + wilaya to the linked account. **Live:** migration applied 2026-08-28 via MCP (+ `user_id` 2026-08-29); shape verified against the live table.
 
 ## 11. Not built at all
 
@@ -122,6 +122,10 @@ A warm, civic ask for wilaya-moderator candidates: hero ("Every green dot starts
 Arabic is the default UI language; English is one toggle away (top bar «عربي / English», persisted in `ga-locale`). Everything is translated from the reviewed master table in `docs/I18N_AR_MASTER.md` — warm-plain MSA, official terms verified against Algerian authorities («الحماية المدنية» 14/1021, Law 18-07 official title), wilaya names in Arabic, full RTL layout with self-hosted Noto Sans/Kufi Arabic, locale-aware dates and numeral agreement. Tooltips added for the less obvious bits (legend, leaderboard, needs-water, receipt link). See `CHANGELOG.md` forty-ninth pass for the phased list.
 - `bunx playwright test`: 16 live E2E tests — `e2e/flows.spec.ts` (5 core flows), `e2e/admin.spec.ts` (3 role-management flows), `e2e/receipts.spec.ts` (receipt round-trip, unknown-token, silent drop, wilaya-only), `e2e/activity.spec.ts` (4 dashboard flows: auth redirect, own activity, empty states, admin overview). Fixtures are SQL-seeded per the recipe in `SYSTEM_INSTRUCTIONS.md` and cleaned up after.
 - RLS battery: `rls-audit3.mjs` role-matrix (anon / regular / wilaya-moderator / admin) — 40/40 checks green on 2026-08-17, including cross-wilaya write no-ops, contact scoping, self-promotion denial and trigger sync.
+
+## 11c. Filming privacy mode (2026-08-29) — implemented
+
+Sensitive data on staff pages (`/moderate`, `/admin`, `/activity`) is **masked by default** so the owner can film without leaking: volunteer names → first letter + •••, emails → `ab***@domain`, phones → `05••••••`. An Eye/EyeOff toggle sits in the top bar (staff pages only), persisted in `ga-privacy` (default ON). ContactReveal stays on-demand by design (deliberate click = the "decide to show" action).
 
 ## 12. Design system (2026-08-18, post-viral Sprint 4 + owner-directed revision)
 

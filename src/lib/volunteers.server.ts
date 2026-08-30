@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { optionalUserId } from "@/lib/submissions.server";
 import type { z } from "zod";
 import type { volunteerSchema } from "./volunteers.functions";
 
@@ -9,6 +10,11 @@ export async function submitVolunteerImpl(
     return { ok: true };
   }
 
+  // Account-first flow (2026-08-29): link the application to the applicant's
+  // auth account when they're signed in, so onboarding is one click and
+  // nobody needs to be called.
+  const userId = await optionalUserId();
+
   const { error } = await supabaseAdmin.from("volunteers").insert({
     name: data.name,
     email: data.email,
@@ -18,6 +24,7 @@ export async function submitVolunteerImpl(
     intents: data.intents.join(","),
     availability: data.availability ?? null,
     message: data.message ?? null,
+    user_id: userId,
   });
 
   if (error) {

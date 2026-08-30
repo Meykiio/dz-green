@@ -188,6 +188,9 @@ export const moderation: typeof import("../en/moderation").moderation = {
     time: "الوقت: {availability}",
     onboardHint:
       "للاستيعاب: تأكد أن الشخص لديه حساب، ثم أسند دور المشرف + الولاية في «المستخدمون والأدوار».",
+    onboard: "قبول وجعله مشرفًا",
+    onboardToast: "تم إنشاء المشرف.",
+    onboardNoAccount: "لا حساب مرتبط — اطلب منه إنشاء حساب أولًا.",
   },
   assign: {
     title: "إسناد ولايات — {name}",

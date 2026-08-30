@@ -329,6 +329,7 @@ export interface AdminVolunteer {
   availability: string | null;
   message: string | null;
   status: "new" | "contacted" | "onboarded";
+  user_id: string | null;
   created_at: string;
 }
 
@@ -338,7 +339,7 @@ export const adminListVolunteers = createServerFn({ method: "GET" })
     await requireAdmin();
     const { data: rows, error } = await supabaseAdmin
       .from("volunteers")
-      .select("id, name, email, phone, wilaya_code, extra_wilayas, intents, availability, message, status, created_at")
+      .select("id, name, email, phone, wilaya_code, extra_wilayas, intents, availability, message, status, user_id, created_at")
       .order("created_at", { ascending: false })
       .range(data.offset, data.offset + data.limit - 1);
     if (error) throw error;
@@ -357,6 +358,51 @@ export const adminSetVolunteerStatus = createServerFn({ method: "POST" })
       .update({ status: data.status })
       .eq("id", data.id);
     if (error) throw error;
+  });
+
+/**
+ * One-click onboarding (2026-08-29): the applicant's linked account becomes a
+ * moderator with the application's wilaya. Requires a linked account — older
+ * applications without one must be handled by "New account" instead.
+ */
+export const adminOnboardVolunteer = createServerFn({ method: "POST" })
+  .validator(z.object({ id: z.string().uuid() }))
+  .handler(async ({ data }) => {
+    await requireAdmin();
+    const { data: v } = await supabaseAdmin
+      .from("volunteers")
+      .select("user_id, wilaya_code, status")
+      .eq("id", data.id)
+      .single();
+    if (!v) throw new Error("Application not found.");
+    if (!v.user_id) {
+      throw new Error("No account linked — ask them to create one first (or use New account).");
+    }
+    // Replace any existing role (single-role invariant), then assign.
+    const { error: delErr } = await supabaseAdmin
+      .from("user_roles")
+      .delete()
+      .eq("user_id", v.user_id);
+    if (delErr) throw delErr;
+    const { error: roleErr } = await supabaseAdmin
+      .from("user_roles")
+      .insert({ user_id: v.user_id, role: "moderator" });
+    if (roleErr) throw roleErr;
+    const { error: wErr } = await supabaseAdmin
+      .from("moderator_wilayas")
+      .delete()
+      .eq("user_id", v.user_id);
+    if (wErr) throw wErr;
+    const { error: insErr } = await supabaseAdmin
+      .from("moderator_wilayas")
+      .insert({ user_id: v.user_id, wilaya_code: v.wilaya_code });
+    if (insErr) throw insErr;
+    const { error: stErr } = await supabaseAdmin
+      .from("volunteers")
+      .update({ status: "onboarded" })
+      .eq("id", data.id);
+    if (stErr) throw stErr;
+    return { ok: true };
   });
 
 export interface AdminStats {

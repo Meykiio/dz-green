@@ -22,6 +22,8 @@ export const chrome = {
     github: "GitHub repository",
     themeDark: "Switch to dark theme",
     themeLight: "Switch to light theme",
+    privacyShow: "Show sensitive data (filming mode is on)",
+    privacyHide: "Hide sensitive data (filming mode)",
   },
   auth: {
     signout: "Sign out",
