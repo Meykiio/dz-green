@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { ar, en } from "./dict";
 import { getLocale, initLocale, setLocale as persistLocale, type Locale } from "./locale";
 import { count, formatDate, type CountKind } from "./format";
@@ -33,10 +33,9 @@ export interface I18n {
 const I18nContext = createContext<I18n | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  // SSR renders in the visitor's saved locale (cookie, read in the root
-  // beforeLoad); the no-flash script exposes the same value on
-  // window.__GA_LOCALE__ before the bundle runs — so the first client render
-  // always matches the SSR text (React #418 fix, 2026-08-30).
+  // SSR renders in the visitor's cookie locale; the no-flash script exposes
+  // the same value on window.__GA_LOCALE__ before the bundle runs — so the
+  // first client render always matches the SSR text (React #418 fix).
   const [locale, setLocaleState] = useState<Locale>(() => {
     initLocale();
     return getLocale();
@@ -46,6 +45,16 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     persistLocale(next);
     setLocaleState(next);
   }, []);
+
+  // Saved locale that disagreed with the cookie (ITP expiry / legacy save):
+  // SSR + first render were Arabic, so flip now — one clean post-mount
+  // re-render, never a hydration mismatch. setLocale re-mints the cookie.
+  useEffect(() => {
+    const pending = window.__GA_LOCALE_PENDING__;
+    if (!pending) return;
+    delete window.__GA_LOCALE_PENDING__;
+    if (pending !== getLocale()) setLocale(pending);
+  }, [setLocale]);
 
   const value = useMemo<I18n>(() => {
     const dict = locale === "ar" ? ar : en;
@@ -100,9 +109,15 @@ export function localizeError(raw: string, locale: Locale = getLocale()): string
   return raw;
 }
 
-/** No-flash script: apply saved locale before first paint (mirrors theme). */
+/**
+ * No-flash script: apply the SSR locale before first paint. The COOKIE wins —
+ * it is what the server rendered from, so the first client render must match
+ * it exactly (React #418). localStorage alone (legacy saves, or Safari ITP
+ * expiring the cookie after 7 days) must NOT override the first render; it is
+ * stashed as pending and flipped post-mount, which also re-mints the cookie.
+ */
 export function localeInitScript(): string {
-  return `try{var l=localStorage.getItem("ga-locale");if(!l){var m=document.cookie.match(/(?:^|;\\s*)ga-locale=(en|ar)(?:;|$)/);if(m)l=m[1]}if(l==="en"){document.documentElement.lang="en";document.documentElement.dir="ltr"}if(l)window.__GA_LOCALE__=l}catch(e){}`;
+  return `try{var m=document.cookie.match(/(?:^|;\\s*)ga-locale=(en|ar)(?:;|$)/);var c=m?m[1]:null;var s=localStorage.getItem("ga-locale");var l=c||"ar";if(l==="en"){document.documentElement.lang="en";document.documentElement.dir="ltr"}window.__GA_LOCALE__=l;if(!c&&(s==="en"||s==="ar")&&s!==l)window.__GA_LOCALE_PENDING__=s}catch(e){}`;
 }
 
 /** Server-side-safe translate for route `head()` (uses the singleton locale). */

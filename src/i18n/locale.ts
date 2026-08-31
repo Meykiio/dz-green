@@ -5,6 +5,9 @@ const KEY = "ga-locale";
 declare global {
   interface Window {
     __GA_LOCALE__?: Locale;
+    /** Saved locale that could NOT be first-rendered (no cookie => SSR was
+     *  Arabic). Flipped in a post-mount effect, never during hydration. */
+    __GA_LOCALE_PENDING__?: Locale;
   }
 }
 
