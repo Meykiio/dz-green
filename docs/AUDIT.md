@@ -1,52 +1,96 @@
-# AUDIT.md — Full platform audit (2026-08-18)
+# Platform audit — security, performance, scalability, robustness
 
-Method: six tracks, evidence-based. Standards: OWASP ASVS 5.0.0 (security), Core Web Vitals (performance), WCAG 2.2 AA (accessibility), plus SEO, code quality, and data/backend integrity. Every finding carries its evidence. Run again before each launch.
+> The single audit reference for the platform (formerly `AUDIT_2026_08.md`,
+> merged 2026-08-30; the older 2026-08-18 audit was stale and removed).
+> History: first sweep 2026-08-28 (2 P1 security bugs + P2 set, all fixed);
+> second sweep 2026-08-30 (OWASP API Top 10 mapping + Instagram DM report,
+> all fixed except the spatial_ref_sys item below).
 
-## Verdict
+Scope: full codebase scan (routes/components/libs/server fns/API routes), live Supabase
+posture (advisors, indexes, publication, row stats, storage config), and research against
+2026 Supabase/Vercel production guidance. **No production behavior was changed; this is the
+finding + fix plan.** Evidence per finding, honest gaps marked.
 
-**No P0 findings.** Nothing broken, nothing exploitable, no data integrity issues. P1 #1–2 and P2 #4–6 are **fixed** (commits `777a1bc`/`be33a38`, see statuses below); P1 #3 is owner-side. Remaining backlog: P2 #7–10.
+Headline: no critical hole found; the defense-in-depth is strong (server-derived wilaya,
+column grants, RLS everywhere except by-design service-role tables, live role re-checks,
+honeypot + timing floor + hashed limits, CSRF middleware, no client writes beyond RLS).
+But under viral traffic there are **two P1 security bugs**, several P2 scaling traps, a small
+set of dashboard policies to confirm, and a plan that fixes them without breaking anything.
 
-## P0 — fix now
+**STATUS 2026-08-30 — second sweep (OWASP API Top 10 mapping) DONE.** All DM-reported + sweep findings fixed and live, EXCEPT one owner-bound item: `public.spatial_ref_sys` is anonymously writable (live-probed: PATCH on srid 4326 returns the modified row). Extension-owned — only `supabase_admin` can fix it. **Supabase support ticket filed 2026-08-30; tracked as GitHub issue #40; cross-post to Discussion #46438 queued.** Everything else in this document is [DONE] or [PARKED-with-reason].
 
-_None._
+---
 
-## P1 — fix before launch
+## A. Findings
 
-| # | Finding | Evidence | Fix |
+### A1. Security
+
+| # | Severity | Finding | Evidence / why it matters |
 |---|---|---|---|
-| 1 | `src/components/map/HeroMap.tsx` is **393 lines**, over the project's 250-line rule | line count | **Fixed** (`777a1bc`): split into `map-style.ts` / `map-data.ts` / `map-layers.ts` + slim `HeroMap.tsx`, all < 250 |
-| 2 | `public/sitemap.xml` uses **relative `loc`s** — invalid per the sitemap spec (absolute URLs required) | file content; sitemaps.org spec | **Fixed** (`777a1bc`): removed; regenerate with the real domain at deploy |
-| 3 | **Auth dashboard settings unverified** — email-confirmation requirement and password minimum length live in the Supabase dashboard, not in SQL | not queryable via MCP/SQL | Owner: 2-minute check in Auth → Settings (require email confirmation ON for signups; password min ≥ 8) |
+| S1 | **P1** | **SSRF in `resolveMapsLink`** — public, unauthenticated serverFn fetches an attacker URL | `src/lib/maps.functions.ts:15-19` — `fetch(url, {redirect:"follow"})`; client-side `isShortMapsLink` guard is bypassable by calling the RPC directly. Internal port probing via redirect+coordinate oracle; 8s serverless time cost each call. | **[DONE: Google-host allowlist + per-hop redirect validation]** |
+| S2 | **P1** | **Moderator can read PII outside their wilayas** — `getSiteContact`/`getFireContact` check role only | `src/lib/moderation.functions.ts:14-28,37-61` — no wilaya-scope assertion, while the app's own model is wilaya-scoped moderation (RLS enforces scope for queue actions; the PII path doesn't). | **[DONE: wilaya-scope assertion + `moderateSite` service fn]** |
+| S3 | **P2** | **`rls_auto_enable()` is SECURITY DEFINER and executable by anon/authenticated** (live advisor WARN) | Residual DDL helper. Revoke EXECUTE (no internal user). Same advisor class flags PostGIS `st_estimatedextent` — leave (managed by extension). | **[DONE: revoked (PUBLIC), live-verified]** |
+| S4 | **P2** | **Rate-limit IP layer spoofable** — `clientIp()` trusts `cf-connecting-ip` then first `x-forwarded-for` without source trust | `src/lib/submissions.server.ts:34-39` — an attacker with no Cloudflare in front can rotate that header and walk past the per-kind hourly caps; fallback bucket key can be the literal `"unknown"` when headers are absent. | **[DONE: sanitized header order, no unverified trust]** |
+| S5 | **P2** | **Rejected-photo lifecycle** — photo proxy serves any uploaded photo immutably (1-year cache), even after the site is rejected | `src/routes/api/public/photo/$.ts` + `storePhoto` cacheControl. Link-dependent (UUIDs), but irreversible once shared. | **[DONE: reject removes the storage object; proxy 404s thereafter]** |
+| S6 | **P2** | **Leaked-password protection DISABLED** (live advisor WARN `auth_leaked_password_protection`) | Dashboard toggle: Authentication → Password Security. One click. | [OWNER-DASHBOARD one click] |
+| S7 | **P2** | **Signup emails: built-in SMTP provider caps at 2 emails/hour** — third registration fails for the hour | Supabase Auth rate limits (docs): email-sending endpoints 2/hour without custom SMTP. Viral traffic + email confirmation = dead signups. Dashboard: Authentication → Emails → SMTP (own provider) or keep built-in and confirm volume assumptions. | [OWNER DECISION: confirm-email DISABLED deliberately — signups become instant; trade-off: emails are not verified, roles stay admin-granted] |
+| S8 | **P2 (latent)** | **Static service-role import in client-shared files** — `admin/moderation/activity.functions.ts` statically import `client.server` | Not bundled today (verified in client assets — key absent). One build-graph change from leaking the service role key. Keep as static-analysis rule; the lazy Proxy guard stays. | [PARKED: static-analysis rule; verified not bundled] |
+| S9 | **P3** | Auth error messages surface raw Supabase text → **email enumeration** (`auth.tsx:52`) | Map known messages to neutral copy on the client. | **[DONE: uniform neutral message]** |
+| S10 | **P3** | Public unthrottled paths: `getReceipt`, `resolveMapsLink`, photo proxy — DB hit / 8s fetch / download per request | Shared lightweight throttle (reuses `submission_meta` counting, no schema change). | [PARKED: use the same gate util when a shared throttle is built] |
+| S11 | **P3** | Receipt tokens: no expiry, live in the URL a third-party analytics (Vercel) sees | Acceptable for anonymous receipts; consider `noindex` already set. Optional: expire tokens > 90 days. | [PARKED] |
+| S12 | **P3** | Fallback salts in `submissions.server.ts:49,58` (`?? "green-algeria"`) | If env unset in prod, IP hash reversible. Fail loud instead. | **[DONE: fail loud when salt env missing]** |
+| S13 | **P3** | Bucket `photos`: no `file_size_limit` / `allowed_mime_types` at bucket level (app-side only, confirmed live) | Backstop hardening (allowed_mime_types=image/*, 10MB cap) so a leaked service key can't abuse storage. | **[DONE: bucket 10MB + jpeg/png/webp, live-verified]** |
+| S14 | **P3** | Unhandled promise rejections: `ReceiptLink.tsx` clipboard `.then()` no `.catch`; `useAuth.tsx` `getSession().then()` no catch; `AppShell.tsx` `signOut()` no try/catch | One-liner each. | **[DONE]** |
+| S15 | **P3** | `sites` grants expose `user_id`/`reviewed_by` to anon (column grants) — account-UUID linkability of owners/reviewers | Acceptable by design (open map); documented. |
+| S16 | **P3** | No magic-byte image verification in `storePhoto` (data-URL regex only) — storage pollution, no XSS (content-type enforced) | Optional: decode + sniff first bytes. | **[DONE: magic-byte sniff, mismatch rejected]** |
 
-## P2 — backlog
+### A2. Performance / scalability (live + code)
 
-| # | Finding | Evidence | Suggested fix |
+| # | Severity | Finding | Evidence / why it matters |
 |---|---|---|---|
-| 4 | Moderator panels (`PendingQueue`, `FireTriage`, `ContactsPanel`) **silently render empty on query error** — a moderator can't tell "clear queue" from "query failed" | grep: `isLoading` handled, `isError` absent in all three | **Fixed** (`777a1bc`): error state added to each panel |
-| 5 | Dark-theme `--fire` text contrast **4.18:1** (AA needs 4.5 for small text) | computed-contrast probe | **Fixed** (`777a1bc`): `--fire` lightened to 0.67 L in `.dark` (4.5+:1) |
-| 6 | `inputValidator` (deprecated) used in 8 server fns | rg; dev-server warnings | **Fixed** (`be33a38`): renamed to `.validator()` |
-| 7 | Vendored `ui/chart.tsx` (296 lines) and `ui/sidebar.tsx` (691 lines) have **zero consumers** | rg: no imports outside the vendored dir | Prune or keep as vendored — owner decision |
-| 8 | First load transfers **~21 MB / 209 requests** (tile-heavy basemap) | performance probe | Accepted cost of the real map; evaluate a lighter basemap style later |
-| 9 | `submission_meta` has **no retention policy** — grows unboundedly at scale | row count 0 today; insert path reviewed | Opportunistic cleanup (delete > 24 h rows inside the gate insert) or a cron |
-| 10 | LCP/INP need **field data** — lab-only numbers captured (CLS 0, zero long tasks) | probe | PageSpeed Insights / RUM on the deployed URL post-launch |
+| P1 | **P1 at viral** | **Homepage loads ALL approved rows client-side, no limit** (`src/lib/data.ts`) and re-fetches everything on each realtime event | At 10k rows the GeoJSON rebuild + re-render on every invalidation spikes; at 100k it breaks phones. Today the DB is empty (verified: tables at 0 rows, 6 auth users) so nothing is slow — this is the launch wall. |
+| P2 | **P2** | **Realtime: one invalidation per INSERT bursts the client** — a fire wave (Aug 26–27: 154 fires/day) causes query storms | Debounce invalidation (2s) client-side; keep single channel + cleanup (already correct). Benchmark truth: Supabase Postgres-changes with RLS caps ~30 DB changes/s at 500 conns; Pro/500 current ceiling, plan upgrade above. | **[DONE: 2s debounced invalidation per table]** |
+| P3 | **P1 at scale** | **Missing FK indexes: `sites(user_id)`, `sites(reviewed_by)`, `care_logs(user_id)`, `fire_reports(user_id)`** (live advisor INFO ×4) | Activity queries + stats scan these; trivial non-destructive migration. Existing: sites `(status,created_at)`, `wilaya`, fire `(status,created_at)`, `care_logs(site_id,created_at)`, meta `(ip_hash,created_at)` ✓. | **[DONE: 4 indexes live]** |
+| P4 | **P2** | **RLS `initplan` re-evaluates `auth.*()` per row in 10 hot policies** (live advisor WARN ×10: profiles/sites/user_roles) | Rewrite to `(select auth.uid())` subquery — the documented fix, no behavior change, measurable win at row counts. | **[DONE: 8 policies rewritten live (advisor set)]** |
+| P5 | **P3** | Multiple permissive SELECT policies on sites (authenticated ×3) — advisor WARN | Acceptable; note only (could be merged later). |
+| P6 | **P2** | **First-load weight for phone visitors** — MapLibre (~270 KB gz) + app chunk ≈ 700-900 KB gz on `/`; 6 variable fonts imported (unicode-range subsets mitigate); Precomputed: `og.png`, `logo.png` un-cache-controlled | Route-level splitting exists (map code only on `/`; PrecisionPicker lazy ✓). Gains: cache headers via Nitro routeRules for static assets/pages, `cache-control` on og/logo, keep AR font subset loading as-is. |
+| P7 | **P3** | `adminStats` runs cross-table counts on every `/admin` open | Admin-only; already indexed; fine. |
+| P8 | **P3** | Unused indexes advisory: `sites_location_gix`, `fire_location_gix` (PostGIS unused in queries), `submission_meta_*_created` (small now) | Keep giss for future geo queries (cheap); revisit at 100k rows. |
+| P9 | **P3** | `submission_meta` grows forever (no retention) — 16 rows now | Daily cleanup job (Edge cron) keeping 45 days. |
+| P10 | **info** | Static pages (about/privacy/terms/volunteer) SSR each request | Nitro routeRules `s-maxage=3600` (purgeable) — trivial. | **[DONE: swr routeRules added; og/logo cache headers]** |
 
-## Verified clean (no action)
+### A3. Robustness / ops
 
-- **Dependencies:** `bun audit` — zero vulnerabilities.
-- **XSS/injection:** 3 `dangerouslySetInnerHTML`/`innerHTML` usages, all static literals (`__root` theme script, RecenterControl SVG, vendored chart.tsx); no `eval`, no `document.write`, no raw SQL — every query is parameterized via supabase-js; all server-fn inputs zod-validated.
-- **PII:** `fire_reports` column grants intact — `anon` SELECTs only the 13 safe columns; `reporter_name`/`reporter_phone`/`user_id` unreachable by clients.
-- **RLS:** role-matrix battery **40/40** (anon/regular/wilaya-moderator/admin; cross-wilaya write no-ops verified row-level; self-promotion denied; trigger sync both ways).
-- **Service key:** server-only (`*.server.ts` + server routes + tests; never a component or client module).
-- **Uploads:** photo type (jpeg/png/webp) + 900 KB cap enforced server-side.
-- **Schema vs export file:** exact match — 9 app tables, 12 policies, 7 private functions, 2 triggers, 25 indexes, 4 enums, private `photos` bucket, 3 realtime tables.
-- **Indexes:** pending-queue query uses `sites_status_created_idx` when it matters (EXPLAIN with seqscan off).
-- **Receipts:** zero orphans across all three kinds.
-- **A11y:** body text 13.27:1 (light) / 15.13:1 (dark); CTA 12.28:1 both themes (AAA); one `h1` per route with logical `h2` progression; unique titles; forms labeled; alt texts present; reduced-motion honored; **drawer made `inert` + `aria-hidden` when closed during this audit** (was a keyboard-focus-into-invisible-nav bug).
-- **Performance:** CLS 0; zero long tasks; bundle code-split correctly (maplibre separate chunk, 250 KB gzip; app 121 KB gzip); fonts subset-loaded on demand.
-- **Code hygiene:** no TODOs, no `any` leaks outside tests, console calls are all intentional error plumbing.
-- **Dashboard UI consistency (Phase 5, `6a37cc8` + this pass):** `/moderate`, `/admin`, `/activity` verified page-by-page against the home chrome — same `rounded-lg` card family (24px via `--radius`), same `border-border bg-card` rows, eyebrow pattern (admin/activity), icon-tinted section headers, tone colors (plant/care/fire); one divergence found and fixed — `PendingQueue` printed `planted_date` raw while activity used `formatDate`.
+- Dashboard to-dos (not code): **Pro-plan items documented, revisit on upgrade** — leaked-password protection toggle (S6) and email-confirm setting (S7) both require Pro; until then S7 stays with the built-in SMTP cap (2 emails/hour) and moderator accounts are created via the new admin "New account" flow (no signup-email needed — sidesteps S7 entirely for staff). Verify PITR/day backups + a test restore into a branch, plan limits (Pro: 500 concurrent realtime; DB compute tier — review current plan), Supabase support notice for viral launch (2-week rule).
+- Monitoring: Supabase logs (query + realtime + auth) reviewed weekly; Vercel Alerts (5xx rate, function duration, image); uptime ping on `/api/public/photo/og-check`? use external checker; a monthly `get_advisors` run (recorded).
+- Testing assets in place today (keep!): 113 unit tests (zod/gate/geometry/link parsing), 16 E2E Playwright flows (fixture recipe in SYSTEM_INSTRUCTIONS), 40-check RLS role-matrix battery (session script), RLS verified against live, map perf evidence in MAP_ARCHITECTURE_REPORT §8.
+- Honest gaps: Supabase email/SMTP + plan specifics are dashboard settings I cannot read (flagged to verify); no load test exists yet (planned); Photo-pickup and map perf at scale are estimates from code + research, not measured.
 
-## Dashboard checks for the owner (not SQL-verifiable)
+---
 
-1. Auth → Settings: email confirmation required for signups; password minimum length ≥ 8.
-2. Auth → URL configuration: production redirect URLs when the domain exists.
+## B. Fix plan (phased — each phase = one commit, verified, no behavior change outside its scope)
+
+**Phase A — Security fixes (no schema change, highest value)**
+1. `resolveMapsLink`: server-side allowlist (maps.google.com / goo.gl / maps.app.goo.gl / www.google.com with /maps prefix), reject IP-literal and private-range hosts, redirects manual ≤3 hops re-validated, 8s timeout kept. Tests: allowlist table + blocked host cases.
+2. Wilaya-scope PII: `getSiteContact`/`getFireContact` assert the target row's wilaya (incl. post-2019 parent mapping) is in the caller's `moderator_wilayas` (admins global). Test: cross-wilaya moderator gets null/error; owner-path E2E unchanged.
+3. `clientIp()`: trust order `x-real-ip` → first `x-forwarded-for` → Nitro `getRequestIP()`; never a shared `"unknown"` fallback. Test: header-present/absent cases.
+4. Client error mapping for auth (neutral copy), unhandled-promise one-liners (clipboard, getSession, signOut), fail-loud salt check.
+5. Photo lifecycle: on moderator **reject**, service-role deletes the storage object + nulls `photo_url` (semantics: rejected photo removed; approved data untouched). E2E: reject flow.
+6. (Requires your approval — small DDL, flagged separately in the PR): `REVOKE EXECUTE ... ON rls_auto_enable`, leaked-password toggle is dashboard-side (your click), and bucket-level `allowed_mime_types`+limit if you want the backstop.
+
+**Phase B — Data-scale readiness (one migration + client work)**
+1. Migration: 4 missing FK indexes + RLS initplan rewrites (10 policies, behavior-neutral, verified with the role-matrix battery afterward).
+2. `data.ts` caps: `.limit(5000)` guard + explicit truncation signal; realtime invalidation debounce (2s).
+3. Nitro routeRules: cache static pages + asset headers; keep SSR fresh for map data.
+4. Optional Phase B+: `/api/map-data` server endpoint (bounds+changed-since) for the home map once row counts demand it — designed now, built when needed (do not pre-build).
+
+**Phase C — Scale verification (staging, not production)**
+1. Run the existing E2E suite against the deployed preview branch (regression gate).
+2. k6 smoke: 50-200 VUs hitting home + the three submits (+ photo) against the preview — assert p95 and error rate; record in CHANGELOG.
+3. Realtime design check at 500-conn: hide ticker/subscription behind a feature flag to degrade gracefully if limits near (flag lives client-side).
+
+**Phase D — Ops**
+1. Dashboard checklist doc (one page, in /docs) with exact click-paths (SMTP, leaked-password, email confirm, PITR, plan size, support ticket for launch, alerts).
+2. Weekly audit recurring: advisors + logs + slow query check; retention cleanup cron for submission_meta (45d).
+
+Verdict: platform is safe to serve a big launch **only after Phase A + the dashboard to-dos**. Everything else is "very good today, grows with the map".
