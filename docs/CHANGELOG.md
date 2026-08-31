@@ -2,7 +2,14 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
-<<<<<<< HEAD
+## 2026-08-31 (fifty-ninth pass) — Docs hygiene: conflict markers removed, structure/roadmap corrections
+
+- **Committed merge-conflict markers removed from `main`:** an orphan `<<<<<<< HEAD` line above the 58th-pass entry in this file, and a full `<<<<<<< HEAD / ======= / >>>>>>> origin/feat/volunteers` block in `PROJECT_STRUCTURE.md` (around the test-count row). Both shipped in an earlier docs sweep and were visible in the published docs.
+- **`PROJECT_STRUCTURE.md` corrected against the tree:** 137 unit tests in 8 files (was 105/113 in the conflict block), admin described as the 4 tabs it actually is, `docs/` listing gains MOBILE.md / I18N_AR_MASTER.md / archive, missing lib rows added (`feedback.*`, `volunteers.*`, `privacy-mode.tsx` — which lives in `src/lib/`, not `src/components/lib/`), missing component rows added (`FeedbackDialog`, `admin/FeedbackPanel`).
+- **250-line rule claim made honest:** five hand-written files are currently over the cap — `admin.functions.ts` (484), `LocationField.tsx` (308), `AppShell.tsx` (273), `activity.tsx` (269), `index.tsx` (255). Splitting is queued as its own task; the doc no longer claims compliance.
+- **`ROADMAP.md` dead items refreshed:** #6 (wilayas 69) closed 2026-08-30 without shipping (still 58 wilayas); PR #9 closed as superseded by the merged Arabic-first PR #35; #2/#3 marked shipped (they said "commit pending"); #8 updated to its real state (app exists, contract shipped, blocked on a dev build); the demo-data block noted as cleaned back to zero.
+- Verified: tsc clean, 137/137 unit tests. Docs-only change — no code touched.
+
 ## 2026-08-30 (fifty-eighth pass) — Privacy toggle polish, issue-tracker housekeeping, mobile handoff, support ticket
 
 - **Privacy toggle made discoverable:** the masked-by-default filming mode now has a labeled pill on staff pages ("Show infos" green when masked / "Hide infos" when revealed) instead of an icon-only button.

@@ -1,6 +1,6 @@
 # PROJECT_STRUCTURE.md
 
-Last verified against the working tree on 2026-08-18. Stack as actually installed (see `package.json`): React 19 + TypeScript, TanStack Start v1 + TanStack Router + TanStack Query, Vite 8, Tailwind CSS v4 (config-less, via `src/styles.css`), shadcn/ui + Radix (vendored), lucide-react, MapLibre GL 6, Supabase JS 2, Zod 3, sonner, date-fns. No Framer Motion, no react-router â€” animations are CSS/SVG transitions.
+Last verified against the working tree on 2026-08-31. Stack as actually installed (see `package.json`): React 19 + TypeScript, TanStack Start v1 + TanStack Router + TanStack Query, Vite 8, Tailwind CSS v4 (config-less, via `src/styles.css`), shadcn/ui + Radix (vendored), lucide-react, MapLibre GL 6, Supabase JS 2, Zod 3, sonner, date-fns. No Framer Motion, no react-router â€” animations are CSS/SVG transitions.
 
 ## Root
 
@@ -25,7 +25,7 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `supabase/config.toml` | Platform-managed Supabase project config. Do not hand-edit. |
 | `supabase/migrations/*.sql` + `README.md` | Chronological **change record** (9 files, 2026-08-12 â†’ 2026-08-18). NOT a bootstrap path â€” the canonical schema source is `docs/FULL_SCHEMA_EXPORT.sql`. |
 | `public/` | `favicon.ico`, `logo.png` (128px brand mark used in the chrome), `og.png`, `robots.txt` (allows all). |
-| `docs/` | `AUDIT.md`, `CHANGELOG.md`, `DATABASE.md`, `DESIGN.md` (active design system), `FEATURES.md`, `FULL_SCHEMA_EXPORT.sql`, `PROJECT_STRUCTURE.md`, `ROADMAP.md`, `SYSTEM_INSTRUCTIONS.md`. |
+| `docs/` | `AUDIT.md`, `CHANGELOG.md`, `DATABASE.md`, `DESIGN.md` (active design system), `FEATURES.md`, `FULL_SCHEMA_EXPORT.sql`, `I18N_AR_MASTER.md`, `MOBILE.md`, `PROJECT_STRUCTURE.md`, `ROADMAP.md`, `SYSTEM_INSTRUCTIONS.md`, plus `archive/` (superseded planning docs). |
 | `e2e/` | 4 Playwright specs, 16 tests total (see below). |
 | `src/` | Application source (below). |
 
@@ -56,7 +56,7 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `volunteer.tsx` | `/volunteer` | Big warm ask: `VolunteerForm` (name/email/phone/wilaya/intents/availability/message, honeypot) â†’ `submitVolunteer`; "not an emergency service; call Protection Civile 14/1021" stays visible. Admin-only: `VolunteerPanel` lists applications (status newâ†’contactedâ†’onboarded). |
 | `_authenticated/route.tsx` | â€” | Auth gate (`ssr: false`), redirects signed-out users to `/auth`. |
 | `_authenticated/moderate.tsx` | `/moderate` | Moderation dashboard: stats strip, segmented tab bar (`ModTabs`), pending queue, fire triage, alert contacts. Wilaya-scoped by RLS. `noindex`. |
-| `_authenticated/admin.tsx` | `/admin` | Admin dashboard: Overview (platform stats + wilaya oversight) and Moderators & roles (user list, role actions, assign-wilayas dialog). Admin-only guard. `noindex`. |
+| `_authenticated/admin.tsx` | `/admin` | Admin dashboard: four tabs — Overview (platform stats + wilaya oversight), Users & roles (user list, role actions, create account, assign-wilayas dialog), Volunteers, Feedback — each mounting only when selected. Admin-only guard. `noindex`. |
 | `_authenticated/activity.tsx` | `/activity` | User dashboard: own plantings (with review status), care logs, fire reports; loading/empty/error states. `noindex`. |
 | `api/public/photo/$.ts` | `/api/public/photo/*` | Server route streaming objects out of the private `photos` bucket with long cache headers. The only public read path for images. |
 | `api/mobile/submissions.ts` | `/api/mobile/submissions` | POST â€” mobile submissions endpoint (issue #8): Bearer session verified, existing zod schemas, same abuse gate + impls as the web forms. |
@@ -71,10 +71,11 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `admin/AdminUsersPanel.tsx` | Users, roles and wilayas panel: paginated list ("Show more"), role buttons, sign-out, "New account" — all one tab. |
 | `admin/CreateAccountDialog.tsx` | Admin-created moderator accounts (email, password show/hide + generate, display name, wilayas) via `adminCreateUser`. |
 | `admin/WilayaChecklist.tsx` | Shared wilaya checkbox list (historic parents + post-2019 children) for Assign/Create dialogs. |
-| `admin/VolunteerPanel.tsx` | Admin-only list of volunteer applications: info + intent chips + status select (new/contacted/onboarded) + onboard hint. Paged. |
+| `admin/VolunteerPanel.tsx` | Admin-only list of volunteer applications: info + intent chips + status select (new/contacted/onboarded) + one-click "Approve & make moderator" (`adminOnboardVolunteer`). Paged. |
+| `admin/FeedbackPanel.tsx` | Admin-only feedback inbox: kind badges (bug/idea/other), message, page, device UA, two-step delete. Paged. |
 | `SectionTabs.tsx` | Shared segmented tab bar for staff pages (moderate, admin): icon + count always, labels from sm up — never overflows 390px. |
 | `moderator/RejectedQueue.tsx` | Rejected plantings tab: rows with Re-approve (scoped service fn) + admin-only delete; broken thumbnails hide on 404. |
-| `lib/privacy-mode.tsx` | Filming privacy mode: masked-by-default emails/phones/volunteer names on staff pages + the top-bar Show/Hide infos toggle (persisted `ga-privacy`). |
+| `FeedbackDialog.tsx` | The site-wide feedback box (home "Feedback" pill): Bug / Feature idea / Other kind selector + message, honeypot, sends `navigator.userAgent` (capped) with bug reports → `submitFeedback`. |
 | `admin/AssignWilayasDialog.tsx` | Wilaya assignment dialog for a moderator (uses the shared checklist). |
 | `FormShell.tsx` | Card-wrapped form container (rounded-2xl family) + the `Honeypot` hidden-field component. |
 | `PhotoInput.tsx` | Camera-capable file input; compresses on-device (max 1024px, WebP/JPEG) before base64 handoff. |
@@ -122,15 +123,14 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 | `submissions-impl.server.ts` | Server-only implementations: gate â†’ optional user id â†’ photo upload â†’ service-role insert. `wilaya_code` derived server-side; client value ignored. |
 | `submissions.server.ts` | Abuse gate: silent-drop honeypot, 1.2s submit-timing floor, hashed-IP + rotating device-hash hourly rate limits (planting 6 / care 20 / fire 8) via `submission_meta`, photo storage helper. |
 | `receipts.server.ts` | Receipt links: `mintReceipt` (stores only the token hash) and `getReceiptStatus` (token â†’ public-safe status snapshot). |
-| `admin.functions.ts` | Admin-only server functions: `adminListUsers`, `adminSetRole`, `adminSetWilayas`, `adminSignOutUser`, `adminStats`. Every call re-checks the caller's admin role live from the request token. |
+| `admin.functions.ts` | Admin-only server functions: `adminListUsers`, `adminSetRole` (self-guard + last-admin guard), `adminSetWilayas`, `adminSignOutUser`, `adminStats`, `adminCreateUser`, `adminListFeedback`/`adminListVolunteers` (paged), `adminSetVolunteerStatus`, `adminOnboardVolunteer`, and the `adminDelete*` CRUD set. Every call re-checks the caller's admin role live from the request token. Over the 250-line cap — split queued. |
 | `activity.functions.ts` | `myFireReports`: a signed-in user's own fire reports â€” `fire_reports.user_id` is not column-granted to clients, so the server filters by the caller's token. |
+| `feedback.functions.ts` / `feedback.server.ts` | `feedbackSchema` + `submitFeedback` server fn and its impl — service-role insert into the zero-grant `feedback` table, throttled 10/hour via the shared hashed-IP gate. |
+| `volunteers.functions.ts` / `volunteers.server.ts` | `volunteerSchema` + `submitVolunteer` server fn and its impl — service-role insert into the zero-grant `volunteers` table, links `user_id` when signed in, throttled 5/hour via the shared gate. |
+| `privacy-mode.tsx` | Filming privacy mode: `PrivacyModeProvider`/`usePrivacyMode` + `maskEmail`/`maskPhone`/`maskName` — masked-by-default PII on staff pages, top-bar Show/Hide infos toggle (persisted `ga-privacy`). |
 | `error-capture.ts`, `error-page.ts` | Platform error plumbing. |
 | `utils.ts` | `cn()` class merge helper. |
-<<<<<<< HEAD
-| `__tests__/` | 6 files, **105 unit tests** (2026-08-28 run): abuse gate, Zod schemas, wilaya derivation/geometry, Google Maps link parsing, `needsWater` boundaries, feedback schemas. |
-=======
-| `__tests__/` | 7 files, **113 unit tests** (2026-08-28 run): abuse gate, Zod schemas, wilaya derivation/geometry, Google Maps link parsing, `needsWater` boundaries, feedback + volunteer schemas. |
->>>>>>> origin/feat/volunteers
+| `__tests__/` | 8 files, **137 unit tests** (2026-08-31 run): abuse gate, Zod schemas, wilaya derivation/geometry, Google Maps link parsing, `needsWater` boundaries, image magic-byte sniff, feedback + volunteer schemas. |
 
 ## `src/hooks/`, `src/data/`, `src/integrations/`
 
@@ -158,9 +158,9 @@ Fixtures are SQL-seeded per the recipe in `docs/SYSTEM_INSTRUCTIONS.md` Â§E2E 
 
 ## Known structural notes
 
-- All hand-written source files are under the 250-line rule. Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`) are exempt.
+- The 250-line rule currently has **five exceptions** (flagged 2026-08-31, split queued): `src/lib/admin.functions.ts` (484), `src/components/LocationField.tsx` (308), `src/components/AppShell.tsx` (273), `src/routes/_authenticated/activity.tsx` (269), `src/routes/index.tsx` (255). Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`) are exempt.
 - `src/components/ui/` is template surface area, not project code; treat it as vendored. `chart.tsx` and `sidebar.tsx` currently have zero consumers (flagged in `docs/AUDIT.md` P2 #7).
-- Test suite: 105 unit tests + 16 live E2E tests, plus a 40-check RLS role-matrix battery run from a session script kept out of the repo. See `docs/CHANGELOG.md` for the full verification round-up.
+- Test suite: 137 unit tests + 16 live E2E tests, plus a 40-check RLS role-matrix battery run from a session script kept out of the repo. See `docs/CHANGELOG.md` for the full verification round-up.
 
 ## `src/i18n/` (Arabic-first localization, 2026-08-28)
 
