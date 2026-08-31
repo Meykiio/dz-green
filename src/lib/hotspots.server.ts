@@ -1,5 +1,6 @@
 import type { Feature, FeatureCollection } from "geojson";
 
+import { wilayaCodeForPoint } from "@/lib/geo";
 import type { Hotspot } from "@/lib/types";
 
 /**
@@ -144,14 +145,16 @@ function persistentPixelKeys(rows: FirmsRow[]): Set<string> {
 
 /**
  * Rows → display hotspots. Filters: drop low confidence (NASA: mostly
- * sun-glint false alarms), anything inside a static flare zone, and
- * southern same-pixel repeats (static infrastructure).
+ * sun-glint false alarms), anything outside Algeria (the API bbox is a
+ * rectangle — it necessarily catches Morocco/Tunisia/the sea), anything
+ * inside a static flare zone, and southern same-pixel repeats.
  */
 export function rowsToHotspots(rows: FirmsRow[]): Hotspot[] {
   const persistent = persistentPixelKeys(rows);
   const out: Hotspot[] = [];
   for (const r of rows) {
     if (r.confidence === "l") continue;
+    if (!wilayaCodeForPoint(r.lat, r.lng)) continue;
     if (inFlareZone(r.lat, r.lng)) continue;
     if (
       r.lat <= PERSISTENCE_LAT_LIMIT &&

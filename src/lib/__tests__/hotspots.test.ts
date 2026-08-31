@@ -12,7 +12,7 @@ const HEADER =
 
 function row(overrides: Partial<Record<string, string>> = {}): string {
   const cols = [
-    "36.10", "9.70", "323.15", "0.43", "0.38", "2026-08-31", "124",
+    "36.75", "3.06", "323.15", "0.43", "0.38", "2026-08-31", "124",
     "N21", "VIIRS", "n", "2.0NRT", "299.55", "12.3", "D",
   ];
   const idx: Record<string, number> = {
@@ -31,7 +31,7 @@ describe("parseFirmsCsv", () => {
     const csv = [HEADER, row(), "bad,row", "1,2,3", row({ latitude: "35.0" })].join("\n");
     const rows = parseFirmsCsv(csv);
     expect(rows).toHaveLength(2);
-    expect(rows[0]!).toMatchObject({ lat: 36.1, lng: 9.7, confidence: "n", daynight: "D" });
+    expect(rows[0]!).toMatchObject({ lat: 36.75, lng: 3.06, confidence: "n", daynight: "D" });
   });
 
   it("defaults daynight to N for unknown values", () => {
@@ -84,8 +84,8 @@ describe("rowsToHotspots", () => {
   it("keeps a northern pixel repeating on 2 days (real fire front)", () => {
     const csv = [
       HEADER,
-      row({ latitude: "36.10", longitude: "9.70", acq_date: "2026-08-30" }),
-      row({ latitude: "36.10", longitude: "9.70", acq_date: "2026-08-31" }),
+      row({ latitude: "36.77", longitude: "8.31", acq_date: "2026-08-30" }),
+      row({ latitude: "36.77", longitude: "8.31", acq_date: "2026-08-31" }),
     ].join("\n");
     expect(rowsToHotspots(parseFirmsCsv(csv))).toHaveLength(2);
   });
@@ -93,6 +93,19 @@ describe("rowsToHotspots", () => {
   it("keeps a southern pixel seen on one day only", () => {
     const csv = [HEADER, row({ latitude: "28.50", longitude: "7.50" })].join("\n");
     expect(rowsToHotspots(parseFirmsCsv(csv))).toHaveLength(1);
+  });
+
+  it("drops points outside Algeria (bbox catches Morocco/Tunisia/sea)", () => {
+    const csv = [
+      HEADER,
+      row({ latitude: "34.00", longitude: "-5.00" }), // Morocco
+      row({ latitude: "36.80", longitude: "10.30" }), // Tunisia
+      row({ latitude: "37.57", longitude: "-0.92" }), // Mediterranean sea
+      row({ latitude: "36.75", longitude: "3.06" }), // Algiers — stays
+    ].join("\n");
+    const out = rowsToHotspots(parseFirmsCsv(csv));
+    expect(out).toHaveLength(1);
+    expect(out[0]!.lat).toBeCloseTo(36.75);
   });
 });
 
@@ -109,7 +122,7 @@ describe("hotspotsGeoJSON", () => {
     const h = rowsToHotspots(parseFirmsCsv(csv))[0]!;
     const fc = hotspotsGeoJSON([h]);
     expect(fc.features).toHaveLength(1);
-    expect(fc.features[0]!.geometry).toEqual({ type: "Point", coordinates: [9.7, 36.1] });
+    expect(fc.features[0]!.geometry).toEqual({ type: "Point", coordinates: [3.06, 36.75] });
     expect(fc.features[0]!.properties).toMatchObject({ id: h.id, confidence: "nominal" });
   });
 });
