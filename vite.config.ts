@@ -19,7 +19,11 @@ export default defineConfig({
         // protection, nosniff, referrer + permissions policy, and a pragmatic
         // CSP (inline scripts/styles required by the no-flash boot scripts
         // and Tailwind; connections limited to self + Supabase + tiles +
-        // Vercel analytics).
+        // Vercel analytics). 2026-08-31 fix: connect-src must name wss://
+        // explicitly — https:// does NOT cover the realtime websocket, and
+        // Safari throws synchronously on a CSP-blocked `new WebSocket()`,
+        // which crashed the whole app into the root error boundary for every
+        // Safari/iPhone visitor. font-src gains data: for build-inlined woff2.
         "/**": {
           headers: {
             "x-frame-options": "SAMEORIGIN",
@@ -27,7 +31,7 @@ export default defineConfig({
             "referrer-policy": "strict-origin-when-cross-origin",
             "permissions-policy": "camera=(), microphone=(), geolocation=(self)",
             "content-security-policy":
-              "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; worker-src 'self' blob:; connect-src 'self' https://*.supabase.co https://*.openfreemap.org https://vitals.vercel-insights.com; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'",
+              "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; worker-src 'self' blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.openfreemap.org https://vitals.vercel-insights.com; font-src 'self' data:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'",
           },
         },
         // Static informational pages: SSR once, cache at the edge (audit 2026-08-28).
