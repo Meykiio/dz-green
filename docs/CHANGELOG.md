@@ -3,6 +3,14 @@
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
 <<<<<<< HEAD
+## 2026-08-30 (fifty-eighth pass) — Privacy toggle polish, issue-tracker housekeeping, mobile handoff, support ticket
+
+- **Privacy toggle made discoverable:** the masked-by-default filming mode now has a labeled pill on staff pages ("Show infos" green when masked / "Hide infos" when revealed) instead of an icon-only button.
+- **GitHub issue housekeeping:** closed 8 fixed/shipped issues with notes (#13, #36, #37, #38, #39, #5, #9, #6), replied and closed #4 + #14 (parked with reasons), opened **#40** to track the `spatial_ref_sys` anonymous-write exposure until Supabase support applies the fix. Open now: only #8 (mobile collab) and #40.
+- **Mobile handoff (#8):** repo cloned (`dz-green-mobile`, Expo SDK 57 + MapLibre native module), `.env` set (same Supabase project + live API URL). Deep-link scheme `dzgreenmobile://**` registered in Supabase Auth redirect URLs by the owner. **Research verdict:** Expo Go is retired from the App Store (frozen at SDK 54) and can never run native modules anyway — the app needs a development build (Android emulator free today / iOS needs Apple Developer). Walkthrough for the Android emulator path provided.
+- **Supabase support ticket filed** for the `spatial_ref_sys` anonymous-write exposure (verified: PATCH on srid 4326 returns the modified row). Tracked as #40.
+- Docs sweep: DATABASE.md (column-level UPDATE grants, throttle kinds), PROJECT_STRUCTURE (SectionTabs, RejectedQueue, privacy-mode), AUDIT status header, mojibake fix.
+
 ## 2026-08-30 (fifty-seventh pass) — Security pattern review + OWASP API Top 10 sweep
 
 A dev DM'd 4 issues on Instagram; the owner asked for a full pattern review + deep research (OWASP API Top 10 2023 mapping). Everything verified against code + live DB, all fixed except one owner-dashboard item:

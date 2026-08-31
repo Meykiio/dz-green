@@ -80,7 +80,7 @@ Tree planting submissions; the anchor record for care logs.
 
 Indexes: `sites_pkey` (btree id), `sites_location_gix` (GiST location), `sites_status_idx`, `sites_wilaya_idx`, `sites_created_at_idx` (created_at DESC), `sites_status_created_idx` (status, created_at DESC — 2026-08-18, queue read path).
 
-Grants (updated 2026-08-21): `SELECT` on `sites` for `anon`/`authenticated` is **column-level** (19 columns, excluding `contact_phone`) — previously table-level. `UPDATE` stays table-level for `authenticated` (narrowed by the moderator policy). All writes otherwise go through the service role.
+Grants (updated 2026-08-30): `SELECT` on `sites` for `anon`/`authenticated` is **column-level** (19 columns, excluding `contact_phone`). `UPDATE` for `authenticated` is also **column-level** (security sweep): only `status, reviewed_by, reviewed_at, moderator_notes` — moderators can no longer write tree_count/photo_url/PII via direct client updates. All other writes go through the service role.
 
 RLS **enabled**. Policies:
 
@@ -144,7 +144,7 @@ RLS **enabled**. Policies:
 
 No INSERT/DELETE policies; inserts go through the service-role server function.
 
-**Column-level grants (this is what actually hides the PII):** table-level SELECT was revoked from `anon` and `authenticated`; SELECT is granted per column on `id, lat, lng, location, wilaya_code, commune, severity, description, photo_url, status, created_at, resolved_at` only. A client that does `select *` gets a permission error — client queries must list columns explicitly, which `src/lib/data.ts` does.
+**Column-level grants (this is what actually hides the PII):** table-level SELECT was revoked from `anon` and `authenticated`; SELECT is granted per column on `id, lat, lng, location, wilaya_code, commune, severity, description, photo_url, status, created_at, resolved_at` only. A client that does `select *` gets a permission error — client queries must list columns explicitly, which `src/lib/data.ts` does. **UPDATE is also column-level (2026-08-30 security sweep):** only `status, resolved_at` — moderators can no longer write severity/description/photo_url/reporter PII via direct client updates.
 
 ### `public.submission_meta`
 
@@ -153,7 +153,7 @@ Abuse ledger for the rate limiter. Never exposed to clients.
 | Column | Type | Null | Default | Purpose |
 |---|---|---|---|---|
 | `id` | uuid PK | no | `gen_random_uuid()` | |
-| `kind` | text | no | — | CHECK `IN ('planting','care','fire')`. |
+| `kind` | text | no | — | CHECK `IN ('planting','care','fire','feedback','volunteer')` — the last two added 2026-08-30 for the shared throttle. |
 | `ip_hash` | text | no | — | SHA-256 of `"<project-id>:<ip>"`. Raw IPs are never stored. |
 | `device_fingerprint` | text | yes | — | Daily-rotating **device hash** (2026-08-17): `HMAC-SHA256(server key, SHA-256(client secret + kind + UTC date))`. Never a raw secret, never a real fingerprint. |
 | `created_at` | timestamptz | no | `now()` | |

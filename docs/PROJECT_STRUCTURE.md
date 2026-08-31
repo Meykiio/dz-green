@@ -68,10 +68,13 @@ Last verified against the working tree on 2026-08-18. Stack as actually installe
 |---|---|
 | `AppShell.tsx` | Global chrome, split by route: public pages get a top nav-bar (hamburger drawer, `inert` when closed); app pages (`/moderate`, `/admin`, `/activity`) get the sidebar shell. The mobile bottom action bar was removed 2026-08-21. Drawer contains the Volunteer row (HandHeart). |
 | `volunteer/VolunteerForm.tsx` | The `/volunteer` form: name/email/phone-whatsapp/wilaya dropdown (58)/extra-wilayas/intent chips (preselected "Review plantings")/availability/message, honeypot, success state. |
-| `admin/AdminUsersPanel.tsx` | Users, roles and wilayas panel: paginated list ("Show more"), role buttons, sign-out, "New account" â€” all one tab. |
+| `admin/AdminUsersPanel.tsx` | Users, roles and wilayas panel: paginated list ("Show more"), role buttons, sign-out, "New account" — all one tab. |
 | `admin/CreateAccountDialog.tsx` | Admin-created moderator accounts (email, password show/hide + generate, display name, wilayas) via `adminCreateUser`. |
 | `admin/WilayaChecklist.tsx` | Shared wilaya checkbox list (historic parents + post-2019 children) for Assign/Create dialogs. |
 | `admin/VolunteerPanel.tsx` | Admin-only list of volunteer applications: info + intent chips + status select (new/contacted/onboarded) + onboard hint. Paged. |
+| `SectionTabs.tsx` | Shared segmented tab bar for staff pages (moderate, admin): icon + count always, labels from sm up — never overflows 390px. |
+| `moderator/RejectedQueue.tsx` | Rejected plantings tab: rows with Re-approve (scoped service fn) + admin-only delete; broken thumbnails hide on 404. |
+| `lib/privacy-mode.tsx` | Filming privacy mode: masked-by-default emails/phones/volunteer names on staff pages + the top-bar Show/Hide infos toggle (persisted `ga-privacy`). |
 | `admin/AssignWilayasDialog.tsx` | Wilaya assignment dialog for a moderator (uses the shared checklist). |
 | `FormShell.tsx` | Card-wrapped form container (rounded-2xl family) + the `Honeypot` hidden-field component. |
 | `PhotoInput.tsx` | Camera-capable file input; compresses on-device (max 1024px, WebP/JPEG) before base64 handoff. |

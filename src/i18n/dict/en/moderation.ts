@@ -98,8 +98,6 @@ export const moderation = {
       'People who offered to help their wilaya. When the time comes, create their account match and assign a role under "Users & roles".',
     feedback: "Feedback",
     feedbackLead: "Messages from the Feedback button, newest first.",
-    roles: "Moderators & roles",
-    rolesLead: "Admins control everything. Moderators act only inside their assigned wilayas.",
     errUsers: "Couldn't load the user list — refresh to try again.",
     loadingUsers: "Loading users…",
     noName: "No display name",
@@ -190,7 +188,6 @@ export const moderation = {
       'To onboard: make sure the person has an account, then assign the moderator role + wilaya in "Users & roles".',
     onboard: "Approve & make moderator",
     onboardToast: "Moderator created.",
-    onboardNoAccount: "No account linked — ask them to create one first.",
   },
   assign: {
     title: "Assign wilayas — {name}",
