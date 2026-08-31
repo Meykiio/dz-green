@@ -1,4 +1,4 @@
-import { Droplets, Flame, Navigation, Sprout, X } from "lucide-react";
+import { Droplets, Flame, Navigation, Satellite, Sprout, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { photoUrl } from "@/lib/data";
 import { directionsUrl } from "@/lib/maps-link";
 import { needsWater, type CareLog } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
+import { HotspotBody } from "./detail-bodies";
 
 import type { MapFeature } from "@/lib/types";
 
@@ -27,7 +28,7 @@ export function DetailPanel({
   onClose: () => void;
 }) {
   const { t, formatDate } = useI18n();
-  const site = feature.kind === "fire" ? null : feature.site ?? null;
+  const site = feature.kind === "site" || feature.kind === "care" ? feature.site : null;
   const logs = site ? careLogs.filter((l) => l.site_id === site.id) : [];
 
   return (
@@ -49,6 +50,8 @@ export function DetailPanel({
 
       {feature.kind === "fire" ? (
         <FireBody feature={feature} />
+      ) : feature.kind === "hotspot" ? (
+        <HotspotBody hotspot={feature.hotspot} />
       ) : (
         site && (
           <div className="mt-4 space-y-4">
@@ -140,6 +143,17 @@ export function DetailPanel({
 
 function Header({ feature }: { feature: MapFeature }) {
   const { t } = useI18n();
+  if (feature.kind === "hotspot") {
+    return (
+      <div className="flex items-center gap-2">
+        <Satellite className="size-5 text-amber-500" />
+        <div>
+          <p className="eyebrow">{t("home.detail.eyebrow.hotspot")}</p>
+          <h2 className="text-lg font-semibold">{t("home.detail.hotspot.title")}</h2>
+        </div>
+      </div>
+    );
+  }
   if (feature.kind === "fire") {
     return (
       <div className="flex items-center gap-2">

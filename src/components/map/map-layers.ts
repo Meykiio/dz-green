@@ -12,7 +12,7 @@ import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
 import { colorsFor } from "./map-style";
 import { featureFor, onlyKind, withoutKind } from "./map-data";
 
-export type Layer = "trees" | "care" | "fires";
+export type Layer = "trees" | "care" | "fires" | "hotspots";
 
 interface LayerRefs {
   dataRef: MutableRefObject<FeatureCollection>;
@@ -147,6 +147,14 @@ export function applyLayerVisibility(
       if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", visible);
     }
   }
+  // Hotspots have no pulse layer by design (community-fire signature).
+  if (map.getLayer("ga-hotspots-points")) {
+    map.setLayoutProperty(
+      "ga-hotspots-points",
+      "visibility",
+      layersRef.current.hotspots ? "visible" : "none",
+    );
+  }
 }
 
 /** Expanding-ring pulse on points, so they read at a glance. */
@@ -186,7 +194,7 @@ export function wireInteractions(map: MapLibreMap, refs: LayerRefs) {
       const props = e.features?.[0]?.properties;
       if (!props) return;
       refs.selectRef.current(
-        featureFor(props["kind"] as Layer, props["id"] as string, refs.sites, refs.careLogs, refs.fires),
+        featureFor(props["kind"] as "trees" | "care", props["id"] as string, refs.sites, refs.careLogs, refs.fires),
       );
     });
     map.on("mouseenter", `ga-${kind}-points`, () => {

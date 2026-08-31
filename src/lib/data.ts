@@ -1,4 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
+import type { FeatureCollection } from "geojson";
 
 import { supabase } from "@/integrations/supabase/client";
 
@@ -58,6 +59,22 @@ export const fireReportsQuery = queryOptions({
     return (data ?? []) as FireReport[];
   },
   staleTime: 15_000,
+});
+
+/**
+ * NASA FIRMS satellite hotspots via our server route (display-only layer).
+ * Refetches every 10 min; on failure the previous data stays (query error
+ * keeps cache) — the layer just goes quiet, never breaks the map.
+ */
+export const hotspotsQuery = queryOptions({
+  queryKey: ["hotspots"],
+  queryFn: async (): Promise<FeatureCollection> => {
+    const res = await fetch("/api/public/hotspots");
+    if (!res.ok) throw new Error(`hotspots ${res.status}`);
+    return (await res.json()) as FeatureCollection;
+  },
+  staleTime: 600_000,
+  refetchInterval: 600_000,
 });
 
 export function formatDate(value: string | null | undefined): string {

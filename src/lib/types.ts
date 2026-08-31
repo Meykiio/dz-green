@@ -48,11 +48,28 @@ export interface FireReport {
   resolved_at: string | null;
 }
 
+/** A NASA FIRMS satellite detection (display-only, never stored). */
+export interface Hotspot {
+  id: string;
+  lat: number;
+  lng: number;
+  confidence: "nominal" | "high";
+  /** Fire radiative power, MW. */
+  frp: number;
+  /** Pixel brightness temperature, °C (from bright_ti4 K). */
+  brightnessC: number;
+  /** ISO UTC acquisition time. */
+  acquiredAt: string;
+  daynight: "day" | "night";
+  satellite: string;
+}
+
 /** A selectable thing on the hero map. */
 export type MapFeature =
   | { kind: "site"; site: Site }
   | { kind: "care"; log: CareLog; site: Site }
-  | { kind: "fire"; fire: FireReport };
+  | { kind: "fire"; fire: FireReport }
+  | { kind: "hotspot"; hotspot: Hotspot };
 
 export const CARE_WINDOW_DAYS = 14;
 

@@ -11,7 +11,8 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useTheme } from "@/hooks/useTheme";
 import { useI18n } from "@/i18n";
 import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
-import { DARK_STYLE, LIGHT_STYLE, NORTH_BOUNDS, RecenterControl } from "./map-style";
+import type { FeatureCollection } from "geojson";
+import { DARK_STYLE, LIGHT_STYLE, NORTH_BOUNDS, RecenterControl, colorsFor } from "./map-style";
 import { featureCollection, onlyKind, withoutKind } from "./map-data";
 import {
   addDataLayers,
@@ -21,6 +22,8 @@ import {
   wireInteractions,
   type Layer,
 } from "./map-layers";
+import { addHotspotLayers, setHotspotsData } from "./hotspots-layer";
+import { MapFailureOverlay, webgl2Available, type MapFailure } from "./map-failure";
 
 export type { Layer };
 
@@ -28,49 +31,9 @@ interface Props {
   sites: Site[];
   careLogs: CareLog[];
   fires: FireReport[];
+  hotspots: FeatureCollection;
   layers: Record<Layer, boolean>;
   onSelectFeature: (feature: MapFeature) => void;
-}
-
-type MapFailure = "webgl2" | "lost";
-
-/** Same probe the browser uses for any WebGL canvas — cheap and side-effect free. */
-function webgl2Available(): boolean {
-  try {
-    const canvas = document.createElement("canvas");
-    const gl = canvas.getContext("webgl2");
-    const ok = gl !== null;
-    if (gl && "getExtension" in gl) gl.getExtension("WEBGL_lose_context")?.loseContext();
-    return ok;
-  } catch {
-    return false;
-  }
-}
-
-function MapFailureOverlay({ kind }: { kind: MapFailure }) {
-  const { t } = useI18n();
-  return (
-    <div
-      role="alert"
-      className="absolute inset-0 z-10 flex items-center justify-center bg-card/95 p-4 text-center"
-    >
-      <div className="max-w-sm">
-        <p className="text-base font-semibold">
-          {kind === "webgl2" ? t("home.mapFail.webglTitle") : t("home.mapFail.lostTitle")}
-        </p>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          {kind === "webgl2" ? t("home.mapFail.webglBody") : t("home.mapFail.lostBody")}
-        </p>
-        <button
-          type="button"
-          onClick={() => window.location.reload()}
-          className="mt-3 rounded-full border border-border bg-card px-4 py-1.5 text-sm font-semibold text-foreground transition-transform active:scale-[0.97]"
-        >
-          {t("home.mapFail.reload")}
-        </button>
-      </div>
-    </div>
-  );
 }
 
 /**
@@ -79,7 +42,7 @@ function MapFailureOverlay({ kind }: { kind: MapFailure }) {
  * tree/care/fire, and real geography underneath. Light/dark via OpenFreeMap
  * styles.
  */
-export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Props) {
+export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeature }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const pulseRef = useRef(0);
@@ -102,6 +65,8 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
   ctrlPosRef.current = isRtl ? "bottom-left" : "bottom-right";
 
   const refs = { dataRef, layersRef, themeRef, selectRef, sites, careLogs, fires };
+  const hotspotsRef = useRef(hotspots);
+  hotspotsRef.current = hotspots;
 
   // Mount once.
   useEffect(() => {
@@ -154,6 +119,10 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
       applyAlgeriaLabelFilter(map);
       addDataLayers(map, refs);
       wireInteractions(map, refs);
+      addHotspotLayers(map, colorsFor(themeRef.current).hotspots, (f) =>
+        selectRef.current(f),
+      );
+      setHotspotsData(map, hotspotsRef.current);
       startPulse(map, pulseRef, cancelledRef);
     };
     // "load" can stall forever when a sub-resource (sprite/glyphs) is
@@ -207,6 +176,10 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
       applyAlgeriaLabelFilter(map);
       addDataLayers(map, refs);
       wireInteractions(map, refs);
+      addHotspotLayers(map, colorsFor(themeRef.current).hotspots, (f) =>
+        selectRef.current(f),
+      );
+      setHotspotsData(map, hotspotsRef.current);
     };
     map.once("style.load", once);
     map.setStyle(style);
@@ -220,6 +193,12 @@ export function HeroMap({ sites, careLogs, fires, layers, onSelectFeature }: Pro
     const fires = map?.getSource("ga-fires") as GeoJSONSource | undefined;
     fires?.setData(onlyKind(data, "fires"));
   }, [data]);
+
+  // Hotspot updates (own source — never mixed into the community collection).
+  useEffect(() => {
+    const map = mapRef.current;
+    if (map) setHotspotsData(map, hotspots);
+  }, [hotspots]);
 
   // Layer toggles.
   useEffect(() => {

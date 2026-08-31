@@ -1,20 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Droplets, Flame, Sprout, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Droplets, Flame, Satellite, Sprout, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { ActivityTicker } from "@/components/home/ActivityTicker";
 import { Chip } from "@/components/home/HomeBits";
 import { Leaderboard } from "@/components/home/Leaderboard";
+import { LegendDots } from "@/components/home/LegendDots";
 import { useMapRealtime } from "@/components/home/useMapRealtime";
 import { ViewToggle, type HomeView } from "@/components/home/ViewToggle";
 import { DetailPanel } from "@/components/map/DetailPanel";
 import { HeroMap, type Layer } from "@/components/map/HeroMap";
 import { SiteList } from "@/components/map/SiteList";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ssrT, useI18n } from "@/i18n";
-import { careLogsQuery, fireReportsQuery, sitesQuery } from "@/lib/data";
+import { careLogsQuery, fireReportsQuery, hotspotsQuery, sitesQuery } from "@/lib/data";
 import { needsWater, type MapFeature, type Site } from "@/lib/types";
 
 export const Route = createFileRoute("/")({
@@ -39,11 +39,13 @@ function HomePage() {
   const sites = useQuery(sitesQuery);
   const careLogs = useQuery(careLogsQuery);
   const fires = useQuery(fireReportsQuery);
+  const hotspots = useQuery(hotspotsQuery);
 
   const [layers, setLayers] = useState<Record<Layer, boolean>>({
     trees: true,
     care: true,
     fires: true,
+    hotspots: true,
   });
   const [view, setView] = useState<HomeView>("map");
   const [feature, setFeature] = useState<MapFeature | null>(null);
@@ -110,6 +112,7 @@ function HomePage() {
             sites={siteList}
             careLogs={logList}
             fires={fireList}
+            hotspots={hotspots.data ?? { type: "FeatureCollection", features: [] }}
             layers={layers}
             onSelectFeature={setFeature}
           />
@@ -117,23 +120,7 @@ function HomePage() {
 
         {/* Legend + view toggle, floating top-right */}
         <div className="absolute end-3 top-3 flex items-center gap-2">
-          <div className="flex items-center gap-3 rounded-full border border-border bg-card/90 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur">
-            {(["trees", "care", "fires"] as const).map((key) => (
-              <Tooltip key={key}>
-                <TooltipTrigger asChild>
-                  <span className="inline-flex cursor-help items-center gap-1.5">
-                    <span
-                      className={`size-2 rounded-full ${
-                        key === "trees" ? "bg-plant" : key === "care" ? "bg-care" : "bg-fire"
-                      }`}
-                    />
-                    <span className="hidden sm:inline">{t(`home.layers.${key}`)}</span>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>{t(`home.tooltip.layers.${key}`)}</TooltipContent>
-              </Tooltip>
-            ))}
-          </div>
+          <LegendDots />
           <ViewToggle view={view} onChange={setView} />
         </div>
 
@@ -207,7 +194,7 @@ function HomePage() {
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-3">
-                <div className="flex gap-1.5">
+                <div className="flex flex-wrap gap-1.5">
                   <Chip
                     active={layers.trees}
                     tone="plant"
@@ -228,6 +215,13 @@ function HomePage() {
                     icon={<Flame className="size-4" />}
                     label={t("home.layers.fires")}
                     onClick={() => setLayers((l) => ({ ...l, fires: !l.fires }))}
+                  />
+                  <Chip
+                    active={layers.hotspots}
+                    tone="hotspot"
+                    icon={<Satellite className="size-4" />}
+                    label={t("home.layers.hotspots")}
+                    onClick={() => setLayers((l) => ({ ...l, hotspots: !l.hotspots }))}
                   />
                 </div>
                 <Link

@@ -59,6 +59,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `_authenticated/admin.tsx` | `/admin` | Admin dashboard: four tabs — Overview (platform stats + wilaya oversight), Users & roles (user list, role actions, create account, assign-wilayas dialog), Volunteers, Feedback — each mounting only when selected. Admin-only guard. `noindex`. |
 | `_authenticated/activity.tsx` | `/activity` | User dashboard: own plantings (with review status), care logs, fire reports; loading/empty/error states. `noindex`. |
 | `api/public/photo/$.ts` | `/api/public/photo/*` | Server route streaming objects out of the private `photos` bucket with long cache headers. The only public read path for images. |
+| `api/public/hotspots.ts` | `/api/public/hotspots` | NASA FIRMS satellite hotspots GeoJSON — server-side fetch (key stays secret), edge-cached 10 min, 502/no-store on failure. |
 | `api/mobile/submissions.ts` | `/api/mobile/submissions` | POST â€” mobile submissions endpoint (issue #8): Bearer session verified, existing zod schemas, same abuse gate + impls as the web forms. |
 | `README.md` | â€” | Notes on the file-based routing conventions. |
 
@@ -89,6 +90,10 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `home/ActivityTicker.tsx` | Anonymous live-activity pill on the map, auto-dismissed. |
 | `home/useMapRealtime.ts` | The realtime subscription (query invalidation + ticker messages), extracted from the home route. |
 | `map/HeroMap.tsx` | The hero map: MapLibre GL + OpenFreeMap, mount/theme/data/toggle effects. No clustering â€” every tree/care/fire is its own dot at every zoom. |
+| `map/hotspots-layer.ts` | The satellite hotspot layer: amber hollow rings (no pulse â€” that stays the community-fire signature), radius by FRP, click â†’ hotspot detail. |
+| `map/detail-bodies.tsx` | `HotspotBody` â€” the satellite hotspot detail sheet (confidence/FRP/pixel temp/acquisition/satellite, disclaimer, NASA attribution). |
+| `map/map-failure.tsx` | The WebGL2 probe + map failure overlay (extracted from HeroMap 2026-08-31). |
+| `home/LegendDots.tsx` | The floating 4-dot legend (trees/care/fires/satellite) with tooltips (extracted from the home route 2026-08-31). |
 | `map/map-style.ts` | Map style constants, theme-aware colors, the RTL text plugin call (browser-guarded), and the RecenterControl. |
 | `map/map-data.ts` | GeoJSON builders (feature collection, kind filters, feature lookup). |
 | `map/map-layers.ts` | Source/layer setup (wilaya borders, per-kind points, fire pulse), layer visibility, the pulse rAF loop, click/hover interactions. |
@@ -128,9 +133,10 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `feedback.functions.ts` / `feedback.server.ts` | `feedbackSchema` + `submitFeedback` server fn and its impl — service-role insert into the zero-grant `feedback` table, throttled 10/hour via the shared hashed-IP gate. |
 | `volunteers.functions.ts` / `volunteers.server.ts` | `volunteerSchema` + `submitVolunteer` server fn and its impl — service-role insert into the zero-grant `volunteers` table, links `user_id` when signed in, throttled 5/hour via the shared gate. |
 | `privacy-mode.tsx` | Filming privacy mode: `PrivacyModeProvider`/`usePrivacyMode` + `maskEmail`/`maskPhone`/`maskName` — masked-by-default PII on staff pages, top-bar Show/Hide infos toggle (persisted `ga-privacy`). |
+| `hotspots.server.ts` | NASA FIRMS server lib: area URL, CSV parser, confidence filter, 13 static flare zones, southern persistence mask, GeoJSON builder. Fail-loud `FIRMS_MAP_KEY`. |
 | `error-capture.ts`, `error-page.ts` | Platform error plumbing. |
 | `utils.ts` | `cn()` class merge helper. |
-| `__tests__/` | 8 files, **137 unit tests** (2026-08-31 run): abuse gate, Zod schemas, wilaya derivation/geometry, Google Maps link parsing, `needsWater` boundaries, image magic-byte sniff, feedback + volunteer schemas. |
+| `__tests__/` | 9 files, **149 unit tests** (2026-08-31 run): abuse gate, Zod schemas, wilaya derivation/geometry, Google Maps link parsing, `needsWater` boundaries, image magic-byte sniff, feedback + volunteer schemas, FIRMS hotspot parsing/filters. |
 
 ## `src/hooks/`, `src/data/`, `src/integrations/`
 
@@ -158,7 +164,7 @@ Fixtures are SQL-seeded per the recipe in `docs/SYSTEM_INSTRUCTIONS.md` Â§E2E 
 
 ## Known structural notes
 
-- The 250-line rule currently has **four exceptions** (flagged 2026-08-31): `src/components/LocationField.tsx` (308), `src/components/AppShell.tsx` (273), `src/routes/_authenticated/activity.tsx` (269), `src/routes/index.tsx` (255). `admin.functions.ts` (was 484) was split the same day into a barrel + `admin-users`/`admin-content`/`admin-stats` + `admin-shared.server.ts`. Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`) are exempt.
+- The 250-line rule currently has **three exceptions** (flagged 2026-08-31): `src/components/LocationField.tsx` (308), `src/components/AppShell.tsx` (273), `src/routes/_authenticated/activity.tsx` (269). `admin.functions.ts` (was 484) was split the same day into a barrel + `admin-users`/`admin-content`/`admin-stats` + `admin-shared.server.ts`; `index.tsx` came back to 250 with the LegendDots extraction. Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`) are exempt.
 - `src/components/ui/` is template surface area, not project code; treat it as vendored. `chart.tsx` and `sidebar.tsx` currently have zero consumers (flagged in `docs/AUDIT.md` P2 #7).
 - Test suite: 137 unit tests + 16 live E2E tests, plus a 40-check RLS role-matrix battery run from a session script kept out of the repo. See `docs/CHANGELOG.md` for the full verification round-up.
 

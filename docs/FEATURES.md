@@ -127,6 +127,10 @@ Arabic is the default UI language; English is one toggle away (top bar «عرب�
 
 Sensitive data on staff pages (`/moderate`, `/admin`, `/activity`) is **masked by default** so the owner can film without leaking: volunteer names → first letter + •••, emails → `ab***@domain`, phones → `05••••••`. An Eye/EyeOff toggle sits in the top bar (staff pages only), persisted in `ga-privacy` (default ON). ContactReveal stays on-demand by design (deliberate click = the "decide to show" action).
 
+## 11d. Satellite hotspots (NASA FIRMS) — built 2026-08-31, display-only
+
+A fourth map layer next to Trees/Care/Fires: **amber hollow-ring dots** for NASA FIRMS satellite fire detections (VIIRS NOAA-21 NRT, 2-day window — Suomi NPP retires 2026-11-01, so SNPP was never an option). Fetch is server-side (`/api/public/hotspots`, key stays secret, edge-cached 10 min, 502-with-no-store on failure so clients keep last good data). Filtering: drop `low` confidence (NASA: mostly sun-glint), mask **13 static flare zones** (Hassi R'Mel 30km, Hassi Messaoud ×3, In Salah, In Amenas ×2, Ohanet, Gassi Touil, Hassi Berkin, Ouargla 25km, El Borma, Ghadames border — calibrated against the live feed), and a **persistence mask**: south of 33.5°N, a pixel repeating on 2+ distinct days is static infrastructure (62 industrial vs 23 real-fire repeat clusters in the verification feed; northern multi-day fire fronts are never touched). Click opens a detail sheet (confidence, FRP MW, pixel temp °C, acquisition time, satellite + day/night, wilaya when derivable) with honest "not ground-verified" copy, the Protection Civile line, and NASA FIRMS attribution. No schema, no realtime, not in list/board views, no CSP change. Verified: 12 unit tests (parser/filters/masks), live-feed calibration (483 raw → 236 shown, El Tarf real fire kept with 40 points), WebKit + Chromium probes (dots render, panel opens, 4 chips no overflow at 320px).
+
 ## 12. Design system (2026-08-18, post-viral Sprint 4 + owner-directed revision)
 
 The app runs its own design system (`docs/DESIGN.md`), built for Green Algeria and revised against the `design-taste-frontend` and `impeccable` rubrics:

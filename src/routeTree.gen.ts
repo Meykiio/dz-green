@@ -24,6 +24,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedModerateRouteImport } from './routes/_authenticated/moderate'
 import { Route as MyTokenRouteImport } from './routes/my/$token'
 import { Route as ApiMobileSubmissionsRouteImport } from './routes/api/mobile/submissions'
+import { Route as ApiPublicHotspotsRouteImport } from './routes/api/public/hotspots'
 import { Route as ApiPublicPhotoSplatRouteImport } from './routes/api/public/photo/$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -100,6 +101,11 @@ const ApiMobileSubmissionsRoute = ApiMobileSubmissionsRouteImport.update({
   path: '/api/mobile/submissions',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHotspotsRoute = ApiPublicHotspotsRouteImport.update({
+  id: '/api/public/hotspots',
+  path: '/api/public/hotspots',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPhotoSplatRoute = ApiPublicPhotoSplatRouteImport.update({
   id: '/api/public/photo/$',
   path: '/api/public/photo/$',
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/moderate': typeof AuthenticatedModerateRoute
   '/my/$token': typeof MyTokenRoute
   '/api/mobile/submissions': typeof ApiMobileSubmissionsRoute
+  '/api/public/hotspots': typeof ApiPublicHotspotsRoute
   '/api/public/photo/$': typeof ApiPublicPhotoSplatRoute
 }
 export interface FileRoutesByTo {
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/moderate': typeof AuthenticatedModerateRoute
   '/my/$token': typeof MyTokenRoute
   '/api/mobile/submissions': typeof ApiMobileSubmissionsRoute
+  '/api/public/hotspots': typeof ApiPublicHotspotsRoute
   '/api/public/photo/$': typeof ApiPublicPhotoSplatRoute
 }
 export interface FileRoutesById {
@@ -157,6 +165,7 @@ export interface FileRoutesById {
   '/_authenticated/moderate': typeof AuthenticatedModerateRoute
   '/my/$token': typeof MyTokenRoute
   '/api/mobile/submissions': typeof ApiMobileSubmissionsRoute
+  '/api/public/hotspots': typeof ApiPublicHotspotsRoute
   '/api/public/photo/$': typeof ApiPublicPhotoSplatRoute
 }
 export interface FileRouteTypes {
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
     | '/moderate'
     | '/my/$token'
     | '/api/mobile/submissions'
+    | '/api/public/hotspots'
     | '/api/public/photo/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/moderate'
     | '/my/$token'
     | '/api/mobile/submissions'
+    | '/api/public/hotspots'
     | '/api/public/photo/$'
   id:
     | '__root__'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/_authenticated/moderate'
     | '/my/$token'
     | '/api/mobile/submissions'
+    | '/api/public/hotspots'
     | '/api/public/photo/$'
   fileRoutesById: FileRoutesById
 }
@@ -227,6 +239,7 @@ export interface RootRouteChildren {
   VolunteerRoute: typeof VolunteerRoute
   MyTokenRoute: typeof MyTokenRoute
   ApiMobileSubmissionsRoute: typeof ApiMobileSubmissionsRoute
+  ApiPublicHotspotsRoute: typeof ApiPublicHotspotsRoute
   ApiPublicPhotoSplatRoute: typeof ApiPublicPhotoSplatRoute
 }
 
@@ -337,6 +350,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiMobileSubmissionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hotspots': {
+      id: '/api/public/hotspots'
+      path: '/api/public/hotspots'
+      fullPath: '/api/public/hotspots'
+      preLoaderRoute: typeof ApiPublicHotspotsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/photo/$': {
       id: '/api/public/photo/$'
       path: '/api/public/photo/$'
@@ -375,6 +395,7 @@ const rootRouteChildren: RootRouteChildren = {
   VolunteerRoute: VolunteerRoute,
   MyTokenRoute: MyTokenRoute,
   ApiMobileSubmissionsRoute: ApiMobileSubmissionsRoute,
+  ApiPublicHotspotsRoute: ApiPublicHotspotsRoute,
   ApiPublicPhotoSplatRoute: ApiPublicPhotoSplatRoute,
 }
 export const routeTree = rootRouteImport

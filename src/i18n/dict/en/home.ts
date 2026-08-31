@@ -18,12 +18,14 @@ export const home = {
     trees: "Trees",
     care: "Care",
     fires: "Fires",
+    hotspots: "Satellite",
   },
   tooltip: {
     layers: {
       trees: "Show or hide tree plantings",
       care: "Show or hide care updates",
       fires: "Show or hide fire reports",
+      hotspots: "Show or hide NASA satellite hotspot detections",
     },
     board: "Monthly wilaya race — approved plantings are summed per wilaya, reset on the 1st.",
     needsWater: "No care logged for this site in the last 14 days.",
@@ -82,6 +84,26 @@ export const home = {
       fire: "Fire report",
       care: "Care update",
       site: "Planting site",
+      hotspot: "NASA FIRMS",
+    },
+    hotspot: {
+      title: "Satellite hotspot",
+      confidence: "Confidence",
+      confidenceValue: {
+        nominal: "Nominal",
+        high: "High",
+      },
+      frp: "Fire power",
+      brightness: "Pixel temp",
+      acquired: "Detected",
+      satellite: "Satellite",
+      daynight: {
+        day: "day",
+        night: "night",
+      },
+      disclaimer:
+        "Satellite detection — not verified on the ground. It may be a small fire, a fire front, or an industrial heat source. For immediate danger call Protection Civile (14) or 1021.",
+      attribution: "Data:",
     },
     field: {
       wilaya: "Wilaya",

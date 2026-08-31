@@ -6,7 +6,7 @@ export function Chip({
   onClick,
 }: {
   active: boolean;
-  tone: "plant" | "care" | "fire";
+  tone: "plant" | "care" | "fire" | "hotspot";
   icon: React.ReactNode;
   label: string;
   onClick: () => void;
@@ -16,7 +16,9 @@ export function Chip({
       ? "border-plant/50 bg-plant/15 text-plant"
       : tone === "care"
         ? "border-care/50 bg-care/15 text-care"
-        : "border-fire/50 bg-fire/15 text-fire";
+        : tone === "fire"
+          ? "border-fire/50 bg-fire/15 text-fire"
+          : "border-amber-500/50 bg-amber-500/15 text-amber-600 dark:text-amber-400";
   return (
     <button
       type="button"
