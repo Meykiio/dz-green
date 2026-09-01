@@ -163,6 +163,10 @@ The fire/hotspot "Weather now" block gains a smoke line: **PM2.5 µg/m³ with a 
 
 The free-text commune field is now a dropdown: **1,541 communes from the Journal Officiel dataset** (`islam-re/Algeria-wilayas`, MIT — vendored as generated `src/data/communes.ts`, all 69 wilayas so phase G lights up free). Per-wilaya list (Algiers: 57), Arabic labels in AR mode, **canonical Latin name stored** for uniform data. Disabled until a wilaya is chosen; "Other" keeps a free-text escape hatch for dataset gaps. Kills typos and mixed-language commune values, and makes moderator filtering by commune meaningful. Verified: probe — wilaya 16 (IP hint) → 59 options with Arabic labels/Latin values, "Kouba" stores as `Kouba`, «أخرى» reveals the free-text input.
 
+## 11m. Species suggestion from photos (PlantNet, 2026-09-01) — built, not pushed
+
+The plant form gains an **"Identify from the photo"** button once a photo is picked: the compressed image goes server-side to PlantNet (key secret, 15 s timeout), and the top 2 suggestions (score ≥ 0.15) appear as one-tap chips that fill the species field — *"Aleppo pine (Pinus halepensis)"*. Suggestion only, never auto-assert; fails soft to nothing when the service is down or unsure. Free tier 500/day (we're at single digits); unthrottled in v1 (worst case is quota burn → quiet feature, no data/cost risk). Localized labels (`lang=ar` in AR mode). Verified: 2 unit tests (171 total), tsc, build; **live key check** — a Wikimedia Aleppo pine photo returned Maritime pine 0.38 + Aleppo pine 0.30 as top-2.
+
 ## 12. Design system (2026-08-18, post-viral Sprint 4 + owner-directed revision)
 
 The app runs its own design system (`docs/DESIGN.md`), built for Green Algeria and revised against the `design-taste-frontend` and `impeccable` rubrics:

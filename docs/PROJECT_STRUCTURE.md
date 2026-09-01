@@ -86,6 +86,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `PrecisionPicker.tsx` | MapLibre GL + OpenFreeMap picker for exact pin drops inside forms. Draws an amber accuracy-radius circle from the GPS fix. |
 | `LocationField.tsx` | Wilaya-first location: wilaya/commune selects first (works without GPS), then an optional "Exact location" card â€” GPS button with privacy line, MapLibre picker behind a toggle, Google Maps link input, remove-pin action. |
 | `CommuneField.tsx` | Commune dropdown per wilaya (1,541 communes, AR labels, canonical Latin stored) with a free-text "Other" escape hatch. |
+| `SpeciesSuggest.tsx` | "Identify from the photo" button + one-tap species chips on the plant form (PlantNet). |
 | `EmergencyContacts.tsx` | SOS pill + popover in the top bar: Protection Civile 14/1021, Police 17, Gendarmerie Nationale 1055, SAMU 16, `tel:` links. |
 | `home/HomeBits.tsx` | Home helpers: `Stat`, `Chip`, `HomeCtas`. |
 | `home/ViewToggle.tsx` | Map / List / Board switch (floats top-right over the home view). |
@@ -143,6 +144,8 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `weather.ts` | Shared pure weather helpers: `compass()` (8-wind, i18n'd) + the `FireWeather` type. Client-safe. |
 | `weather.server.ts` | Open-Meteo fetch (no key): current conditions for a point, 8 s timeout, 0.1°/30 min in-memory cache, `mapCurrent` mapper. |
 | `weather.functions.ts` | `getFireWeather` server fn (zod-bounded lat/lng) — returns null on failure, never breaks the panel. |
+| `plantnet.server.ts` | PlantNet identify call (key from env, fail loud) + `mapPlantNet` (top 2, score ≥ 0.15, common-name label). |
+| `plantnet.functions.ts` | `suggestSpecies` server fn (zod data-url + locale) — fails soft to null. |
 | `push.server.ts` | Web Push server lib: VAPID setup (fail loud), subscribe/unsubscribe impls, `shouldNotify` scope match, `notifyFireSubscribers` fan-out (total, prunes stale endpoints). |
 | `push.functions.ts` | `subscribePush` / `unsubscribePush` public server fns (zod). |
 | `error-capture.ts`, `error-page.ts` | Platform error plumbing. |

@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (seventieth pass) — PlantNet species suggestion (release-program phase H) — NOT PUSHED
+
+- **What shipped:** "Identify from the photo" on the plant form — photo → server-side PlantNet (key in env) → top-2 chips that fill the species field. Suggestion-only UX, fail-soft everywhere, `lang=ar` in AR mode. Unthrottled v1 (documented reasoning: worst case is free-quota burn → quiet feature).
+- **Verified:** 171/171 tests (2 new mapper tests), tsc clean, build green; **live key check** — Wikimedia Aleppo pine → Maritime pine 0.38 + Aleppo pine 0.30 as top-2 (correct species present, user picks).
+- Docs: FEATURES 11m, PROJECT_STRUCTURE, .env.example.
+
 ## 2026-09-01 (sixty-ninth pass) — Commune dropdown (release-program phase F) — NOT PUSHED
 
 - **What shipped:** commune free-text → dropdown. Dataset: `islam-re/Algeria-wilayas` (MIT, Journal Officiel — 69 wilayas, 1,541 communes, AR+Latin) vendored as generated `src/data/communes.ts`. `CommuneField`: per-wilaya list, Arabic labels in AR mode, canonical Latin stored, disabled until wilaya chosen, "Other" free-text hatch. Probe caught + fixed a real bug: the hatch was unreachable from the empty state (select snapped back to placeholder) — now tracked with explicit `otherMode` state.

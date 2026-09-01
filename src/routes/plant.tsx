@@ -9,6 +9,7 @@ import { FormShell, Honeypot } from "@/components/FormShell";
 import { LocationField } from "@/components/LocationField";
 import { PhotoInput } from "@/components/PhotoInput";
 import { ReceiptLink } from "@/components/ReceiptLink";
+import { SpeciesSuggest } from "@/components/SpeciesSuggest";
 import { Button } from "@/components/ui/button";
 import { localizeError, ssrT, useI18n } from "@/i18n";
 import { getDeviceSecret } from "@/lib/device";
@@ -118,6 +119,7 @@ function PlantPage() {
         >
           <Honeypot value={hp} onChange={setHp} />
           <PhotoInput value={photo} onChange={setPhoto} label={t("forms.plant.photoLabel")} required />
+          {photo && <SpeciesSuggest photo={photo} onPick={setSpecies} />}
           <LocationField
             lat={lat}
             lng={lng}
