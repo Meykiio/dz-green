@@ -151,7 +151,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `push.functions.ts` | `subscribePush` / `unsubscribePush` public server fns (zod). |
 | `error-capture.ts`, `error-page.ts` | Platform error plumbing. |
 | `utils.ts` | `cn()` class merge helper. |
-| `__tests__/` | 16 files, **192 tests** (2026-09-01 run): pure-function units (abuse gate, Zod schemas, geometry, link parsing, `needsWater` + rain, image sniff, feedback/volunteer/push schemas, FIRMS filters, GPS median, weather/AQ mappers, PlantNet mapper, 69-wilaya geo) + **component behavior tests** (testing-library + happy-dom: CommuneField, SpeciesSuggest, FireAlertsCard). |
+| `__tests__/` | 18 files, **202 tests** (2026-09-01 run): pure-function units (abuse gate, Zod schemas, geometry incl. 69-wilaya, link parsing, `needsWater` + rain, image sniff, feedback/volunteer/push schemas, FIRMS filters, GPS median, weather/AQ mappers, PlantNet mapper, planting guide, announcements) + **component behavior tests** (testing-library + happy-dom: CommuneField, SpeciesSuggest, FireAlertsCard). |
 
 ## `src/hooks/`, `src/data/`, `src/integrations/`
 
@@ -182,7 +182,7 @@ Fixtures are SQL-seeded per the recipe in `docs/SYSTEM_INSTRUCTIONS.md` Â§E2E 
 
 ## Known structural notes
 
-- The 250-line rule currently has **three exceptions** (flagged 2026-08-31): `src/components/LocationField.tsx` (328 after the geo-hint wiring), `src/components/AppShell.tsx` (273), `src/routes/_authenticated/activity.tsx` (269). `admin.functions.ts` (was 484) was split the same day into a barrel + `admin-users`/`admin-content`/`admin-stats` + `admin-shared.server.ts`; `index.tsx` came back to 250 with the LegendDots extraction. Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`) are exempt.
+- The 250-line rule currently has **six exceptions** (2026-09-01, post-launch cleanup queued): `LocationField.tsx` (332), `admin/AdminAnnouncementsPanel.tsx` (317), `AppShell.tsx` (290), `routes/index.tsx` (271), `_authenticated/activity.tsx` (269), `map/HeroMap.tsx` (256). Generated files are exempt. `admin.functions.ts` (was 484) was split the same day into a barrel + `admin-users`/`admin-content`/`admin-stats` + `admin-shared.server.ts`; `index.tsx` came back to 250 with the LegendDots extraction. Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`) are exempt.
 - `src/components/ui/` is template surface area, not project code; treat it as vendored. `chart.tsx` and `sidebar.tsx` currently have zero consumers (flagged in `docs/AUDIT.md` P2 #7).
 - Test suite: 137 unit tests + 16 live E2E tests, plus a 40-check RLS role-matrix battery run from a session script kept out of the repo. See `docs/CHANGELOG.md` for the full verification round-up.
 

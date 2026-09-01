@@ -2,6 +2,18 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (eighty-first pass) — Launch-readiness audit — NOT PUSHED
+
+Full pre-launch sweep, 4 hours before the announcement:
+
+- **Gates:** tsc clean, **202/202 tests** (18 files), build green. Every phase of the release program was verified at build time with browser probes (evidence in passes 61–80).
+- **Security advisors:** nothing new — the six `rls_enabled_no_policy` INFOs are the by-design service-role tables (feedback/volunteers/receipts/submission_meta/moderator_wilayas/push_subscriptions); `spatial_ref_sys` is issue #40 (support ticket filed); `st_estimatedextent` + postgis-in-public are extension-managed (accepted, documented); leaked-password protection + OTP expiry are the documented Pro-plan owner decisions (AUDIT §D).
+- **DB state:** no test junk — sites 5, care_logs 2, fires 6 (real tester data), push_subscriptions 1 (the owner's proven subscription), announcements 4 (seeded bilingual drafts, all inactive for launch), receipts 13.
+- **Migrations:** all mirrored in `supabase/migrations/` (push_subscriptions, announcements ×3).
+- **Docs current:** FEATURES (11o multi-publish), DATABASE (announcements speed + multi-active), PROJECT_STRUCTURE (202 tests, six honest 250-line exceptions — cleanup queued post-launch).
+- **Env:** `.env.vercel` holds all 12 vars (Supabase ×7, FIRMS, VAPID ×3, PlantNet) — upload once to Vercel before the main push.
+- **Preview:** `preview/release-2026-09` branch is live on Vercel for the owner's live testing; main still gated on his word.
+
 ## 2026-09-01 (eightieth pass) — Multi-publish announcements + reversed travel — NOT PUSHED
 
 - **Multi-publish (owner: "why can't I publish more than one?"):** the one-at-a-time constraint is gone — `adminSetAnnouncementActive` just toggles, the public query returns all active rows (≤10), and the strip joins them into one continuous marquee («إعلان 1 • إعلان 2»). Strip color/icon/speed come from the newest live row. Chrome-yield logic updated for the array shape.
