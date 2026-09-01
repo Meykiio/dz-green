@@ -17,6 +17,8 @@ interface Props {
   careLogs: CareLog[];
   fires: FireReport[];
   layers: { trees: boolean; fires: boolean };
+  /** 14-day rainfall per site id (rain-aware needsWater); absent = time-only. */
+  rainBySiteId?: Record<string, number>;
   onSelectFeature: (feature: MapFeature) => void;
 }
 
@@ -29,7 +31,7 @@ type Item =
  * headers with per-wilaya totals, photo-thumb rows inside. The map stays the
  * hero; this is the scannable fallback for visitors the map frustrates.
  */
-export function SiteList({ sites, careLogs, fires, layers, onSelectFeature }: Props) {
+export function SiteList({ sites, careLogs, fires, layers, rainBySiteId, onSelectFeature }: Props) {
   const { t, count, formatDateShort } = useI18n();
   const items: Item[] = [
     ...(layers.trees
@@ -87,7 +89,12 @@ export function SiteList({ sites, careLogs, fires, layers, onSelectFeature }: Pr
               {list.map((item) => (
                 <li key={item.kind === "site" ? item.site.id : item.fire.id}>
                   {item.kind === "site" ? (
-                    <SiteRow site={item.site} careLogs={careLogs} onSelectFeature={onSelectFeature} />
+                    <SiteRow
+                      site={item.site}
+                      careLogs={careLogs}
+                      rainMm={rainBySiteId?.[item.site.id]}
+                      onSelectFeature={onSelectFeature}
+                    />
                   ) : (
                     <FireRow fire={item.fire} onSelectFeature={onSelectFeature} />
                   )}
@@ -104,14 +111,16 @@ export function SiteList({ sites, careLogs, fires, layers, onSelectFeature }: Pr
 function SiteRow({
   site,
   careLogs,
+  rainMm,
   onSelectFeature,
 }: {
   site: Site;
   careLogs: CareLog[];
+  rainMm?: number | null | undefined;
   onSelectFeature: (feature: MapFeature) => void;
 }) {
   const { t, count, formatDateShort } = useI18n();
-  const thirsty = needsWater(site, careLogs);
+  const thirsty = needsWater(site, careLogs, rainMm);
   const photo = photoUrl(site.photo_url);
   return (
     <button

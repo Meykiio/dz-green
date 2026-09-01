@@ -85,6 +85,26 @@ describe("needsWater (CARE_WINDOW_DAYS = 14)", () => {
     expect(needsWater(site(), [backdated])).toBe(false);
   });
 
+  it("rain-aware: >= 10mm in the window clears an overdue site", () => {
+    const old = site({ planted_date: new Date(Date.now() - 30 * DAY).toISOString().slice(0, 10) });
+    expect(needsWater(old, [], 12.4)).toBe(false);
+  });
+
+  it("rain-aware: < 10mm keeps an overdue site thirsty", () => {
+    const old = site({ planted_date: new Date(Date.now() - 30 * DAY).toISOString().slice(0, 10) });
+    expect(needsWater(old, [], 3.2)).toBe(true);
+  });
+
+  it("rain-aware: null/undefined rainfall falls back to the time-only rule", () => {
+    const old = site({ planted_date: new Date(Date.now() - 30 * DAY).toISOString().slice(0, 10) });
+    expect(needsWater(old, [], null)).toBe(true);
+    expect(needsWater(old, [])).toBe(true);
+  });
+
+  it("rain-aware: recent care wins regardless of rainfall", () => {
+    expect(needsWater(site(), [log(2)], 0)).toBe(false);
+  });
+
   it("issue #39: an old created_at makes the site thirsty even with a recent logged_date", () => {
     const oldInsert = log(0, {
       logged_date: new Date().toISOString().slice(0, 10),

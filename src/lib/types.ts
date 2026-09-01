@@ -73,16 +73,25 @@ export type MapFeature =
 
 export const CARE_WINDOW_DAYS = 14;
 
+/** Rain at/above this in the care window counts as nature watering the site. */
+export const RAIN_RESET_MM = 10;
+
 /**
  * Client-side derived flag: no care log in the last 14 days.
  * Uses `created_at` (server time), not the user-entered `logged_date` —
  * a backdated log must not fake freshness (issue #39).
+ * Rain-aware (2026-09-01): when the rainfall for the site's spot over the
+ * window is known (Open-Meteo), enough rain clears the flag — nature watered
+ * it. `rainMm` null/undefined = rainfall unknown = time-only behavior.
  */
-export function needsWater(site: Site, logs: CareLog[]): boolean {
+export function needsWater(site: Site, logs: CareLog[], rainMm?: number | null): boolean {
   const last = logs
     .filter((l) => l.site_id === site.id)
     .map((l) => new Date(l.created_at).getTime())
     .sort((a, b) => b - a)[0];
   const reference = last ?? new Date(site.planted_date).getTime();
-  return Date.now() - reference > CARE_WINDOW_DAYS * 86400000;
+  const overdue = Date.now() - reference > CARE_WINDOW_DAYS * 86400000;
+  if (!overdue) return false;
+  if (rainMm != null && rainMm >= RAIN_RESET_MM) return false;
+  return true;
 }

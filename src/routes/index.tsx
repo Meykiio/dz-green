@@ -14,7 +14,7 @@ import { DetailPanel } from "@/components/map/DetailPanel";
 import { HeroMap, type Layer } from "@/components/map/HeroMap";
 import { SiteList } from "@/components/map/SiteList";
 import { ssrT, useI18n } from "@/i18n";
-import { careLogsQuery, fireReportsQuery, hotspotsQuery, sitesQuery } from "@/lib/data";
+import { careLogsQuery, fireReportsQuery, hotspotsQuery, rainFallbackQuery, sitesQuery } from "@/lib/data";
 import { needsWater, type MapFeature, type Site } from "@/lib/types";
 
 export const Route = createFileRoute("/")({
@@ -62,6 +62,19 @@ function HomePage() {
   const logList = careLogs.data ?? [];
   const fireList = fires.data ?? [];
 
+  // Rain-aware watering: one batched 14-day-rainfall lookup for the sites
+  // that are thirsty by the time-only rule; enough rain clears the flag.
+  const rainCandidates = useMemo(
+    () =>
+      siteList
+        .filter((s) => needsWater(s, logList))
+        .slice(0, 100)
+        .map((s) => ({ id: s.id, lat: s.lat, lng: s.lng })),
+    [siteList, logList],
+  );
+  const rain = useQuery(rainFallbackQuery(rainCandidates));
+  const rainById = rain.data ?? {};
+
   // Live map subscription + anonymous activity ticker ("2 trees just planted
   // in Oran") fed by the same realtime events.
   const sitesRef = useRef<Site[]>([]);
@@ -78,10 +91,10 @@ function HomePage() {
     () => ({
       trees: siteList.reduce((sum, s) => sum + s.tree_count, 0),
       wilayas: new Set(siteList.map((s) => s.wilaya_code)).size,
-      thirsty: siteList.filter((s) => needsWater(s, logList)).length,
+      thirsty: siteList.filter((s) => needsWater(s, logList, rainById[s.id])).length,
       fires: fireList.filter((f) => f.status === "active").length,
     }),
-    [siteList, logList, fireList],
+    [siteList, logList, fireList, rainById],
   );
 
   return (
@@ -95,6 +108,7 @@ function HomePage() {
                 careLogs={logList}
                 fires={fireList}
                 layers={layers}
+                rainBySiteId={rainById}
                 onSelectFeature={setFeature}
               />
             </div>
@@ -242,7 +256,12 @@ function HomePage() {
       </div>
 
       {feature && (
-        <DetailPanel feature={feature} careLogs={logList} onClose={() => setFeature(null)} />
+        <DetailPanel
+          feature={feature}
+          careLogs={logList}
+          rainBySiteId={rainById}
+          onClose={() => setFeature(null)}
+        />
       )}
     </AppShell>
   );

@@ -21,10 +21,12 @@ const ACTION_KEY: Record<CareLog["action"], "watered" | "checked" | "needsAttent
 export function DetailPanel({
   feature,
   careLogs,
+  rainBySiteId,
   onClose,
 }: {
   feature: MapFeature;
   careLogs: CareLog[];
+  rainBySiteId?: Record<string, number>;
   onClose: () => void;
 }) {
   const { t, formatDate } = useI18n();
@@ -87,7 +89,7 @@ export function DetailPanel({
             )}
             {site.notes && <p className="text-sm text-muted-foreground">{site.notes}</p>}
 
-            {needsWater(site, careLogs) && (
+            {needsWater(site, careLogs, rainBySiteId?.[site.id]) && (
               <p className="rounded-lg border border-care/40 bg-care/10 px-3 py-2 text-sm text-care">
                 {t("home.detail.thirsty")}
               </p>

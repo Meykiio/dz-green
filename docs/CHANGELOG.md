@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (sixty-seventh pass) — Rain-aware watering (release-program phase E2) — NOT PUSHED
+
+- **What shipped:** "needs water" gains a water check. Time rule first (unchanged), then one batched Open-Meteo 14-day-rainfall call for thirsty candidates only (max 100, multi-coordinate); ≥10 mm (`RAIN_RESET_MM`) clears the flag. Fail-soft: API down → time-only behavior. `needsWater(site, logs, rainMm?)` — all 4 call sites keep working; `rainBySiteId` threads index → SiteList/DetailPanel/stats.
+- **Verified:** 167/167 tests (6 new: rain branches + rain-total mapper), tsc clean, build green; live API shape check — 2-coordinate response = array of locations with 15 daily values each (Algiers 0.8 mm, Hassi Messaoud 0 mm).
+- Docs: FEATURES 11j.
+
 ## 2026-09-01 (sixty-sixth pass) — Fire weather on details (release-program phase E1) — NOT PUSHED
 
 - **What shipped:** a "Weather now" block on fire-report + hotspot panels (temp, humidity, wind speed/compass/gusts) via Open-Meteo — free, no key, server-side, cached. `getFireWeather` fn fails soft (block hides). Arabic compass labels.

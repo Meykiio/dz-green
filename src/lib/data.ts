@@ -2,6 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import type { FeatureCollection } from "geojson";
 
 import { supabase } from "@/integrations/supabase/client";
+import { getRainFallback } from "@/lib/weather.functions";
 
 import type { CareLog, FireReport, Site } from "./types";
 
@@ -76,6 +77,26 @@ export const hotspotsQuery = queryOptions({
   staleTime: 600_000,
   refetchInterval: 600_000,
 });
+
+/**
+ * 14-day rainfall for thirsty-candidate sites (rain-aware needsWater).
+ * Keyed by the sorted candidate ids so the query is stable across renders.
+ */
+export function rainFallbackQuery(candidates: { id: string; lat: number; lng: number }[]) {
+  const key = candidates
+    .map((c) => c.id)
+    .sort()
+    .join(",");
+  return queryOptions({
+    queryKey: ["rain-fallback", key],
+    queryFn: async (): Promise<Record<string, number>> => {
+      const out = await getRainFallback({ data: { sites: candidates } });
+      return out ?? {};
+    },
+    staleTime: 3 * 60 * 60 * 1000,
+    enabled: candidates.length > 0,
+  });
+}
 
 export function formatDate(value: string | null | undefined): string {
   if (!value) return "";

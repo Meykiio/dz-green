@@ -151,6 +151,10 @@ Three small accuracy wins. **Median fix:** the 12 s GPS watch no longer trusts t
 
 Fire report and satellite hotspot panels now carry a **"Weather now"** block: temperature, humidity, wind (speed, compass direction, gusts) — the spread-danger context, on-demand per open panel. Open-Meteo: free, no key, server-side fetch (`weather.server.ts`, 8 s timeout, 0.1°/30 min cache), `getFireWeather` server fn returning `null` on failure (the block just hides — never breaks the page). Compass mapping is a shared pure helper (`lib/weather.ts` — the client can't import `.server.*` files; the build's import-protection caught this and the split is the fix). Arabic compass labels («رياح 11 كم/س شرق»). Verified: 4 unit tests (161 total), tsc, build; live probe — a Sahara hotspot panel shows real data (43.4°C · 9% · E 11 km/h).
 
+## 11j. Rain-aware watering (Open-Meteo, 2026-09-01) — built, not pushed
+
+"Needs water" is no longer a dumb 14-day timer. The time rule still runs (no care in 14 days), but the home page then makes **one batched Open-Meteo call** (multi-coordinate, 14-day `precipitation_sum`) for just the thirsty candidates: **≥ 10 mm of rain in the window clears the flag** — nature watered it. Rainfall unknown (API down) → time-only behavior, never a false "all good". Threads through the stats strip, the list badge, and the detail notice via an optional `rainBySiteId` map; `needsWater(site, logs, rainMm?)` stays backward-compatible (6 unit tests incl. the rain branches). Verified: 167/167 tests, tsc, build; the multi-coordinate response shape validated against the live API (Algiers 0.8 mm / Hassi Messaoud 0 mm, 15 daily values each).
+
 ## 12. Design system (2026-08-18, post-viral Sprint 4 + owner-directed revision)
 
 The app runs its own design system (`docs/DESIGN.md`), built for Green Algeria and revised against the `design-taste-frontend` and `impeccable` rubrics:

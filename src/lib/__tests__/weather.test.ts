@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { compass } from "@/lib/weather";
-import { mapCurrent } from "@/lib/weather.server";
+import { mapCurrent, mapRainTotals } from "@/lib/weather.server";
 
 describe("compass", () => {
   it("maps degrees to 8-wind keys", () => {
@@ -45,5 +45,20 @@ describe("mapCurrent", () => {
   it("throws on a malformed payload", () => {
     expect(() => mapCurrent({})).toThrow();
     expect(() => mapCurrent({ current: { temperature_2m: 20 } })).toThrow();
+  });
+});
+
+describe("mapRainTotals", () => {
+  it("sums daily precipitation per location, aligned with input order", () => {
+    const totals = mapRainTotals([
+      { daily: { precipitation_sum: [1.5, 0, 2.5, null as unknown as number] } },
+      { daily: { precipitation_sum: [0, 0, 0] } },
+      { daily: {} },
+    ]);
+    expect(totals).toEqual([4, 0, 0]);
+  });
+
+  it("accepts a single-location (non-array) payload", () => {
+    expect(mapRainTotals({ daily: { precipitation_sum: [3, 7] } })).toEqual([10]);
   });
 });

@@ -43,6 +43,37 @@ export function mapCurrent(json: OpenMeteoCurrent): FireWeather {
   };
 }
 
+interface OpenMeteoDailyLocation {
+  daily?: { precipitation_sum?: (number | null)[] };
+}
+
+/**
+ * Rainfall totals (mm) over the past 14 days for a batch of points, one
+ * multi-coordinate request (Open-Meteo accepts comma-separated coords).
+ * Returns one total per input point, same order. Capped by the caller.
+ */
+export function mapRainTotals(json: OpenMeteoDailyLocation | OpenMeteoDailyLocation[]): number[] {
+  const locations = Array.isArray(json) ? json : [json];
+  return locations.map((loc) =>
+    (loc.daily?.precipitation_sum ?? []).reduce<number>((sum, v) => sum + (v ?? 0), 0),
+  );
+}
+
+export async function fetchDailyRainMm(
+  points: { lat: number; lng: number }[],
+): Promise<number[]> {
+  if (points.length === 0) return [];
+  const lats = points.map((p) => p.lat.toFixed(4)).join(",");
+  const lngs = points.map((p) => p.lng.toFixed(4)).join(",");
+  const url =
+    `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}` +
+    `&daily=precipitation_sum&past_days=14&forecast_days=1&timezone=GMT`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+  if (!res.ok) throw new Error(`Open-Meteo responded ${res.status}`);
+  const totals = mapRainTotals((await res.json()) as OpenMeteoDailyLocation[]);
+  return totals.map((t) => Math.round(t * 10) / 10);
+}
+
 export async function fetchFireWeather(lat: number, lng: number): Promise<FireWeather> {
   const key = `${lat.toFixed(1)},${lng.toFixed(1)}`;
   const hit = cache.get(key);
