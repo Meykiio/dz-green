@@ -98,6 +98,45 @@ export function rainFallbackQuery(candidates: { id: string; lat: number; lng: nu
   });
 }
 
+export interface ActiveAnnouncement {
+  id: string;
+  title_ar: string;
+  body_ar: string;
+  title_en: string;
+  body_en: string;
+  kind: "info" | "success" | "warning";
+  color: "ink" | "plant" | "care" | "fire" | "amber";
+}
+
+/** The announcement's text in the visitor's locale (bilingual fields). */
+export function localizedAnnouncement(
+  a: ActiveAnnouncement,
+  locale: "en" | "ar",
+): { title: string; body: string } {
+  return locale === "ar" ? { title: a.title_ar, body: a.body_ar } : { title: a.title_en, body: a.body_en };
+}
+
+/**
+ * The active announcement (admin-controlled). Shared by the banner strip and
+ * the chrome (which shifts down when it's present) — one network call, cache
+ * shared via the query key. RLS limits anon reads to the active row.
+ */
+export const announcementQuery = queryOptions({
+  queryKey: ["announcement", "active"],
+  queryFn: async (): Promise<ActiveAnnouncement | null> => {
+    const { data, error } = await supabase
+      .from("announcements")
+      .select("id, title_ar, body_ar, title_en, body_en, kind, color")
+      .eq("active", true)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw error;
+    return (data ?? null) as ActiveAnnouncement | null;
+  },
+  staleTime: 300_000,
+});
+
 export function formatDate(value: string | null | undefined): string {
   if (!value) return "";
   return new Date(value).toLocaleDateString(undefined, {

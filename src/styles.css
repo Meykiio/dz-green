@@ -271,6 +271,29 @@
   }
 }
 
+/* Announcement marquee: two copies loop seamlessly, traveling in the reading
+   direction (LTR rightward, RTL leftward via reverse). Pauses on hover (the
+   .group wrapper), off entirely for reduced-motion. */
+@keyframes ga-marquee {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.ga-marquee {
+  animation: ga-marquee 32s linear infinite;
+}
+[dir="rtl"] .ga-marquee {
+  animation-direction: reverse;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ga-marquee {
+    animation: none;
+  }
+}
+
 @keyframes ga-pin-in {
   from {
     transform: scale(0);

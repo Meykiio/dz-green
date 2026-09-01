@@ -14,7 +14,7 @@ import { DetailPanel } from "@/components/map/DetailPanel";
 import { HeroMap, type Layer } from "@/components/map/HeroMap";
 import { SiteList } from "@/components/map/SiteList";
 import { ssrT, useI18n } from "@/i18n";
-import { careLogsQuery, fireReportsQuery, hotspotsQuery, rainFallbackQuery, sitesQuery } from "@/lib/data";
+import { announcementQuery, careLogsQuery, fireReportsQuery, hotspotsQuery, rainFallbackQuery, sitesQuery } from "@/lib/data";
 import { needsWater, type MapFeature, type Site } from "@/lib/types";
 
 export const Route = createFileRoute("/")({
@@ -40,6 +40,7 @@ function HomePage() {
   const careLogs = useQuery(careLogsQuery);
   const fires = useQuery(fireReportsQuery);
   const hotspots = useQuery(hotspotsQuery);
+  const hasAnnouncement = useQuery(announcementQuery).data != null;
 
   const [layers, setLayers] = useState<Record<Layer, boolean>>({
     trees: true,
@@ -99,7 +100,9 @@ function HomePage() {
 
   return (
     <AppShell>
-      <div className="relative h-[calc(100dvh-3.5rem)] overflow-hidden">
+      <div
+        className={`relative overflow-hidden ${hasAnnouncement ? "h-[calc(100dvh-5.75rem)]" : "h-[calc(100dvh-3.5rem)]"}`}
+      >
         {view === "list" ? (
           <div className="h-full overflow-y-auto bg-background p-3 md:p-6">
             <div className="mx-auto max-w-2xl">

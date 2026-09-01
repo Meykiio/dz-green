@@ -17,4 +17,6 @@ create policy announcements_public_read on public.announcements
   for select using (active = true);
 
 grant select on public.announcements to anon, authenticated;
-grant insert, update, delete on public.announcements to service_role;
+-- service_role needs the explicit SELECT too (RLS bypass ≠ table privilege —
+-- the feedback lesson, 2026-08-19; owner caught the empty admin list 2026-09-01).
+grant select, insert, update, delete on public.announcements to service_role;

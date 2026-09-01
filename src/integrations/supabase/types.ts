@@ -187,27 +187,36 @@ export type Database = {
       announcements: {
         Row: {
           active: boolean
-          body: string
+          body_ar: string
+          body_en: string
+          color: string
           created_at: string
           id: string
           kind: string
-          title: string
+          title_ar: string
+          title_en: string
         }
         Insert: {
           active?: boolean
-          body: string
+          body_ar: string
+          body_en: string
+          color?: string
           created_at?: string
           id?: string
           kind?: string
-          title: string
+          title_ar: string
+          title_en: string
         }
         Update: {
           active?: boolean
-          body?: string
+          body_ar?: string
+          body_en?: string
+          color?: string
           created_at?: string
           id?: string
           kind?: string
-          title?: string
+          title_ar?: string
+          title_en?: string
         }
         Relationships: []
       }

@@ -2,6 +2,16 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (seventy-third pass) — Banner done properly: marquee strip, bilingual, color control, edit — NOT PUSHED
+
+Owner tested the first banner version and rejected it (invisible tint, overlapped the navbar, no edit, no list). Full rework:
+- **Bug:** the migration granted SELECT to anon/authenticated but not `service_role` → the admin list was empty (the feedback-table lesson recurring). Fixed live + mirrored.
+- **Design:** solid strip ABOVE the top bar (admin-picked color from a curated contrast-safe palette: ink/plant/care/fire/amber), marquee traveling in the reading direction (EN left→right, AR right→left), seamless loop, hover-pause, reduced-motion off. The chrome formally yields: header/sidebar/main/map-height all shift via the shared `announcementQuery` (one fetch, TanStack cache).
+- **Bilingual:** `title_ar/body_ar/title_en/body_en` — the banner shows the visitor's locale automatically (`localizedAnnouncement`, 2 unit tests). Existing row backfilled (EN=old text, AR=copy placeholder).
+- **Admin panel:** bilingual create + **edit** (the missing capability), color swatches, kind, publish/unpublish, delete.
+- **Verified:** 194/194 tests, tsc clean, build green; live probe — plant strip with Arabic in AR / English in EN, `stripBottom == headerTop` (no overlap), screenshot reviewed; test row cleaned.
+- **Also:** `.env.vercel` generated (all 12 vars in one upload-ready file, gitignored) for the owner's one-shot Vercel env setup.
+
 ## 2026-09-01 (seventy-second pass) — Announcement banner + test-pyramid middle layer — NOT PUSHED
 
 - **Announcement banner (owner request):** `announcements` table (RLS: anon reads active rows only; writes service-role via `requireAdmin` fns; migration live + mirrored). Admin 5th tab «الإعلانات»: create/publish/unpublish (one live at a time)/delete. Visitor banner: once per announcement id, tone by kind, AR+EN. Verified: live probe — SQL-activated test banner rendered + dismissed; cleaned up after.

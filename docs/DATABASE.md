@@ -254,14 +254,15 @@ Admin-controlled site-wide banner (owner request). One active at a time (enforce
 
 | Column | Type | Null | Default | Purpose |
 |---|---|---|---|---|
-| `id` | uuid PK | no | `gen_random_uuid()` | Dismissals are tracked per id client-side. |
-| `title` | text | no | — | CHECK 1–120 chars. |
-| `body` | text | no | — | CHECK 1–600 chars. |
-| `kind` | text | no | `'info'` | CHECK `IN ('info','success','warning')` — banner tone. |
+| `id` | uuid PK | no | `gen_random_uuid()` | |
+| `title_ar` / `body_ar` | text | no | — | Arabic text (CHECK ≤120/≤600). The banner picks by visitor locale. |
+| `title_en` / `body_en` | text | no | — | English text (same checks). |
+| `kind` | text | no | `'info'` | CHECK `IN ('info','success','warning')` — icon tone. |
+| `color` | text | no | `'ink'` | CHECK `IN ('ink','plant','care','fire','amber')` — curated contrast-safe palette (2026-09-01). |
 | `active` | boolean | no | `false` | Only active rows are publicly readable. |
 | `created_at` | timestamptz | no | `now()` | |
 
-RLS **enabled**. One policy: `announcements_public_read` — `FOR SELECT USING (active = true)`; anon/authenticated hold `SELECT` (active rows only by design — announcements are meant to be public). `INSERT`/`UPDATE`/`DELETE` granted to `service_role` only.
+RLS **enabled**. One policy: `announcements_public_read` — `FOR SELECT USING (active = true)`; anon/authenticated hold `SELECT` (active rows only by design). `service_role` holds explicit `SELECT, INSERT, UPDATE, DELETE` (the SELECT grant matters — RLS bypass does not imply table privilege; owner caught the empty admin list 2026-09-01). Bilingual columns + color added by `20260901130000_announcements_bilingual.sql` (backfilled from the original title/body).
 
 ### `public.spatial_ref_sys`
 

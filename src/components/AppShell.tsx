@@ -21,10 +21,12 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
+import { announcementQuery } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { usePrivacyMode } from "@/lib/privacy-mode";
 import { EmergencyContacts } from "@/components/EmergencyContacts";
@@ -67,6 +69,9 @@ function Shell({
   pathname: string;
 }) {
   const { user, isModerator, isAdmin } = useAuth();
+  // The announcement strip (when live) sits above the top bar — the chrome
+  // yields to it here (same query key as the banner, one shared fetch).
+  const hasAnnouncement = useQuery(announcementQuery).data != null;
   const { theme, toggle } = useTheme();
   const { t, locale, setLocale, isRtl } = useI18n();
   const { masked, toggle: togglePrivacy } = usePrivacyMode();
@@ -162,7 +167,12 @@ function Shell({
   return (
     <div className="flex min-h-dvh flex-col bg-background">
       {/* Slim top bar everywhere: hamburger + brand left, SOS + feedback + theme right. */}
-      <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-border bg-card/80 px-3 backdrop-blur-md">
+      <header
+        className={cn(
+          "fixed inset-x-0 z-40 flex h-14 items-center justify-between border-b border-border bg-card/80 px-3 backdrop-blur-md",
+          hasAnnouncement ? "top-9" : "top-0",
+        )}
+      >
         <div className="flex items-center gap-1">
           <button
             type="button"
@@ -257,7 +267,12 @@ function Shell({
 
       {/* Desktop static sidebar on app pages only. */}
       {isAppPage && (
-        <aside className="fixed inset-y-0 start-0 z-30 hidden w-60 flex-col border-e border-sidebar-border bg-sidebar pt-14 md:flex">
+        <aside
+          className={cn(
+            "fixed inset-y-0 start-0 z-30 hidden w-60 flex-col border-e border-sidebar-border bg-sidebar md:flex",
+            hasAnnouncement ? "pt-[5.75rem]" : "pt-14",
+          )}
+        >
           <nav aria-label={t("chrome.aria.sections")} className="mt-2 flex-1 space-y-1 px-3 py-2">
             {rows.map(navRow)}
           </nav>
@@ -267,7 +282,9 @@ function Shell({
         </aside>
       )}
 
-      <main className={cn("flex-1 pt-14", isAppPage && "md:ms-60")}>{children}</main>
+      <main className={cn("flex-1", hasAnnouncement ? "pt-[5.75rem]" : "pt-14", isAppPage && "md:ms-60")}>
+        {children}
+      </main>
     </div>
   );
 }
