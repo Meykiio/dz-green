@@ -106,6 +106,8 @@ export interface ActiveAnnouncement {
   body_en: string;
   kind: "info" | "success" | "warning";
   color: "ink" | "plant" | "care" | "fire" | "amber";
+  /** Marquee loop duration in seconds (10 fast → 120 very slow). */
+  speed_seconds: number;
 }
 
 /** The announcement's text in the visitor's locale (bilingual fields). */
@@ -126,7 +128,7 @@ export const announcementQuery = queryOptions({
   queryFn: async (): Promise<ActiveAnnouncement | null> => {
     const { data, error } = await supabase
       .from("announcements")
-      .select("id, title_ar, body_ar, title_en, body_en, kind, color")
+      .select("id, title_ar, body_ar, title_en, body_en, kind, color, speed_seconds")
       .eq("active", true)
       .order("created_at", { ascending: false })
       .limit(1)

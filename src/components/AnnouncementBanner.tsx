@@ -43,7 +43,10 @@ export function AnnouncementBanner() {
         <Icon className="size-4" />
       </span>
       <div className="group relative flex-1 overflow-hidden" dir={isRtl ? "rtl" : "ltr"}>
-        <div className="ga-marquee flex w-max items-center whitespace-nowrap text-sm font-medium group-hover:[animation-play-state:paused]">
+        <div
+          className="ga-marquee flex w-max items-center whitespace-nowrap text-sm font-medium group-hover:[animation-play-state:paused]"
+          style={{ animationDuration: `${a.speed_seconds}s` }}
+        >
           {/* Two copies for a seamless loop */}
           <span className="pe-16">{text}</span>
           <span className="pe-16" aria-hidden>

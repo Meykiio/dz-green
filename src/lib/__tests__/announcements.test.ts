@@ -10,6 +10,7 @@ const a: ActiveAnnouncement = {
   body_en: "English body",
   kind: "info",
   color: "plant",
+  speed_seconds: 32,
 };
 
 describe("localizedAnnouncement", () => {

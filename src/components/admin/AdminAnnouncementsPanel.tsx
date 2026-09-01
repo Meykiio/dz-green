@@ -24,9 +24,10 @@ interface FormState {
   body_en: string;
   kind: Kind;
   color: Color;
+  speed_seconds: number;
 }
 
-const EMPTY: FormState = { title_ar: "", body_ar: "", title_en: "", body_en: "", kind: "info", color: "ink" };
+const EMPTY: FormState = { title_ar: "", body_ar: "", title_en: "", body_en: "", kind: "info", color: "ink", speed_seconds: 32 };
 
 const SWATCH: Record<Color, string> = {
   ink: "bg-foreground",
@@ -81,6 +82,26 @@ function ColorPicker({ value, onChange }: { value: Color; onChange: (c: Color) =
         />
       ))}
     </div>
+  );
+}
+
+function SpeedInput({ form, setForm }: { form: FormState; setForm: (f: FormState) => void }) {
+  const { t } = useI18n();
+  return (
+    <label className="flex items-center gap-2 text-xs text-muted-foreground">
+      {t("moderation.adm.announce.speed")}
+      <input
+        type="number"
+        min={10}
+        max={120}
+        value={form.speed_seconds}
+        onChange={(e) =>
+          setForm({ ...form, speed_seconds: Math.max(10, Math.min(120, Number(e.target.value) || 32)) })
+        }
+        className="tap-target w-16 rounded-md border border-input bg-card px-2 py-1.5 text-sm tabular-nums"
+      />
+      <span>{t("moderation.adm.announce.speedUnit")}</span>
+    </label>
   );
 }
 
@@ -188,6 +209,7 @@ export function AdminAnnouncementsPanel() {
       body_en: a.body_en,
       kind: a.kind,
       color: a.color,
+      speed_seconds: a.speed_seconds,
     });
   };
 
@@ -208,6 +230,7 @@ export function AdminAnnouncementsPanel() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <KindPicker value={form.kind} onChange={(kind) => setForm({ ...form, kind })} />
           <ColorPicker value={form.color} onChange={(color) => setForm({ ...form, color })} />
+          <SpeedInput form={form} setForm={setForm} />
           <Button type="submit" size="sm" disabled={create.isPending || !formValid(form)}>
             {create.isPending ? t("moderation.adm.announce.creating") : t("moderation.adm.announce.create")}
           </Button>
@@ -226,6 +249,7 @@ export function AdminAnnouncementsPanel() {
                 <div className="flex flex-wrap items-center gap-2">
                   <KindPicker value={editForm.kind} onChange={(kind) => setEditForm({ ...editForm, kind })} />
                   <ColorPicker value={editForm.color} onChange={(color) => setEditForm({ ...editForm, color })} />
+                  <SpeedInput form={editForm} setForm={setEditForm} />
                   <Button
                     size="sm"
                     disabled={update.isPending || !formValid(editForm)}

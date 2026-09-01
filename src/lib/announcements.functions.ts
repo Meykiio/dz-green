@@ -14,6 +14,7 @@ export interface AdminAnnouncement {
   body_en: string;
   kind: "info" | "success" | "warning";
   color: "ink" | "plant" | "care" | "fire" | "amber";
+  speed_seconds: number;
   active: boolean;
   created_at: string;
 }
@@ -25,6 +26,7 @@ const contentShape = z.object({
   body_en: z.string().trim().min(1).max(600),
   kind: z.enum(["info", "success", "warning"]).default("info"),
   color: z.enum(["ink", "plant", "care", "fire", "amber"]).default("ink"),
+  speed_seconds: z.number().int().min(10).max(120).default(32),
 });
 
 export const adminListAnnouncements = createServerFn({ method: "GET" }).handler(
@@ -32,7 +34,7 @@ export const adminListAnnouncements = createServerFn({ method: "GET" }).handler(
     await requireAdmin();
     const { data, error } = await supabaseAdmin
       .from("announcements")
-      .select("id, title_ar, body_ar, title_en, body_en, kind, color, active, created_at")
+      .select("id, title_ar, body_ar, title_en, body_en, kind, color, speed_seconds, active, created_at")
       .order("created_at", { ascending: false })
       .limit(50);
     if (error) throw error;
@@ -51,6 +53,7 @@ export const adminCreateAnnouncement = createServerFn({ method: "POST" })
       body_en: data.body_en,
       kind: data.kind,
       color: data.color,
+      speed_seconds: data.speed_seconds,
       active: false,
     });
     if (error) throw error;
@@ -72,6 +75,7 @@ export const adminUpdateAnnouncement = createServerFn({ method: "POST" })
         body_en: data.body_en,
         kind: data.kind,
         color: data.color,
+        speed_seconds: data.speed_seconds,
       })
       .eq("id", data.id);
     if (error) throw error;

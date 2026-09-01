@@ -150,6 +150,8 @@ export const moderation = {
         fire: "Red",
         amber: "Amber",
       },
+      speed: "Speed",
+      speedUnit: "sec/loop",
     },
     more: "Show more",
     searchUsers: "Search email or name…",

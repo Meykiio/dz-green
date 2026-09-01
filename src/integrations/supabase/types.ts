@@ -193,6 +193,7 @@ export type Database = {
           created_at: string
           id: string
           kind: string
+          speed_seconds: number
           title_ar: string
           title_en: string
         }
@@ -204,6 +205,7 @@ export type Database = {
           created_at?: string
           id?: string
           kind?: string
+          speed_seconds?: number
           title_ar: string
           title_en: string
         }
@@ -215,6 +217,7 @@ export type Database = {
           created_at?: string
           id?: string
           kind?: string
+          speed_seconds?: number
           title_ar?: string
           title_en?: string
         }

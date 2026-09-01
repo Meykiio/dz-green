@@ -150,6 +150,8 @@ export const moderation: typeof import("../en/moderation").moderation = {
         fire: "أحمر",
         amber: "كهرماني",
       },
+      speed: "السرعة",
+      speedUnit: "ثانية/دورة",
     },
     more: "عرض المزيد",
     searchUsers: "ابحث بالبريد أو الاسم…",

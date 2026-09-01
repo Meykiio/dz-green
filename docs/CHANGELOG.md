@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (seventy-eighth pass) — Announcement speed control + seeded feature drafts — NOT PUSHED
+
+- **Speed control (owner request):** `announcements.speed_seconds` (10 fast → 120 very slow, default 32; migration live + mirrored). Admin create/edit forms get a «السرعة» seconds input; the marquee applies it inline (`animationDuration`). Verified live: a draft at 24s renders with `animation-duration: 24s` (the first probe's null was the flaky Supabase DNS, not the feature).
+- **Seeded feature announcements (inactive drafts)** so the release announcement is one click away at ship time — publishing early would announce features that aren't live yet. Four bilingual drafts in the admin tab: fires-by-satellite (plant, 32s), fire-alerts-on-your-phone (care, 24s), plant-smarter (plant, 40s), the-map-upgraded-69-wilayas (ink, 32s). Publish from «الإعلانات» when the release ships.
+- tsc clean, 201/201 tests, build green.
+
 ## 2026-09-01 (seventy-seventh pass) — Leaderboard: This month ⇄ All time (owner request) — NOT PUSHED
 
 - **Owner question:** the board resets every month — shouldn't it be all-time? Verdict applied: **both, not a replacement** — the monthly race is the engagement engine (every wilaya gets a fresh shot on the 1st; all-time calcifies), but the all-time view is the real national record. The Board view gains a period toggle («هذا الشهر» / «كل الوقت»), month stays default; subtitle + leader label adapt. Same already-loaded data, no schema, no new query.
