@@ -51,8 +51,13 @@ export async function identifyPlant(
 
   const base64 = imageBase64.replace(/^data:image\/\w+;base64,/, "");
   const bytes = Buffer.from(base64, "base64");
+  // Label the upload with the actual type (PlantNet accepts jpeg/png only —
+  // the caller re-encodes WebP to JPEG before this; sniffing here is the
+  // defense-in-depth so a mislabeled upload can never happen again).
+  const isPng = bytes[0] === 0x89 && bytes[1] === 0x50;
+  const mime = isPng ? "image/png" : "image/jpeg";
   const form = new FormData();
-  form.append("images", new Blob([bytes], { type: "image/jpeg" }), "photo.jpg");
+  form.append("images", new Blob([bytes], { type: mime }), mime === "image/png" ? "photo.png" : "photo.jpg");
 
   const url = `https://my-api.plantnet.org/v2/identify/all?api-key=${key}&lang=${locale}`;
   const res = await fetch(url, {

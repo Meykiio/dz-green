@@ -6,15 +6,40 @@ import { suggestSpecies } from "@/lib/plantnet.functions";
 import type { SpeciesSuggestion } from "@/lib/plantnet.server";
 
 /**
+ * PlantNet accepts JPEG/PNG only (verified live: WebP → 400 "Unsupported
+ * file type"), while PhotoInput compresses to WebP by default — so the
+ * identify call re-encodes to JPEG on a canvas first (no deps, no quality
+ * concern at identification sizes).
+ */
+async function toJpegDataUrl(dataUrl: string): Promise<string> {
+  if (dataUrl.startsWith("data:image/jpeg")) return dataUrl;
+  const img = new Image();
+  img.src = dataUrl;
+  await img.decode();
+  const canvas = document.createElement("canvas");
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return dataUrl;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, 0, 0);
+  return canvas.toDataURL("image/jpeg", 0.85);
+}
+
+/**
  * "Identify from the photo" — PlantNet suggestions as one-tap chips that fill
  * the species field. Suggestion only, never auto-assert. Quiet when the
  * service is down or unsure (the form never depends on it).
  */
 export function SpeciesSuggest({
   photo,
+  currentSpecies,
   onPick,
 }: {
   photo: string;
+  /** The species field's current value — auto-fill only happens when empty. */
+  currentSpecies: string;
   onPick: (species: string) => void;
 }) {
   const { t, locale } = useI18n();
@@ -26,9 +51,16 @@ export function SpeciesSuggest({
     setBusy(true);
     setFailed(false);
     try {
-      const out = await suggestSpecies({ data: { image: photo, locale } });
-      if (out && out.length > 0) setSuggestions(out);
-      else setFailed(true);
+      const jpeg = await toJpegDataUrl(photo);
+      const out = await suggestSpecies({ data: { image: jpeg, locale } });
+      if (out && out.length > 0) {
+        setSuggestions(out);
+        // Auto-fill the top match (owner request) — only into an empty field,
+        // never over something the user typed. Chips stay as alternatives.
+        if (!currentSpecies.trim() && out[0]) onPick(out[0].label);
+      } else {
+        setFailed(true);
+      }
     } catch {
       setFailed(true);
     }

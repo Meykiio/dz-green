@@ -120,7 +120,7 @@ function PlantPage() {
         >
           <Honeypot value={hp} onChange={setHp} />
           <PhotoInput value={photo} onChange={setPhoto} label={t("forms.plant.photoLabel")} required />
-          {photo && <SpeciesSuggest photo={photo} onPick={setSpecies} />}
+          {photo && <SpeciesSuggest photo={photo} currentSpecies={species} onPick={setSpecies} />}
           <LocationField
             lat={lat}
             lng={lng}

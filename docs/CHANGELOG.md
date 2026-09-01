@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (seventy-ninth pass) — PlantNet WebP root cause + species auto-fill — NOT PUSHED
+
+- **Owner report: identify always fails ("Couldn't identify this one").** Root cause, proven with evidence: PhotoInput compresses to **WebP** by default, and PlantNet **only accepts JPEG/PNG** (live answer: `400 "Unsupported file type for image[0] (jpeg or png)"` — both for WebP-labeled-JPEG and correctly-labeled WebP). My earlier verification passed because it sent a raw JPEG, not the app's compressed output — wrong-input testing, owned. Fix: `SpeciesSuggest` re-encodes to JPEG on a canvas before the call (no deps); `identifyPlant` also labels the upload from the actual magic bytes (defense in depth). Verified with the app's exact path: WebP → re-encode → PlantNet returns Maritime pine 0.41.
+- **Species auto-fill (owner request):** a successful identification now fills the species field with the top match — **only into an empty field** (never over user-typed text); chips remain as alternatives. 1 new component test (202 total).
+- tsc clean, build green.
+
 ## 2026-09-01 (seventy-eighth pass) — Announcement speed control + seeded feature drafts — NOT PUSHED
 
 - **Speed control (owner request):** `announcements.speed_seconds` (10 fast → 120 very slow, default 32; migration live + mirrored). Admin create/edit forms get a «السرعة» seconds input; the marquee applies it inline (`animationDuration`). Verified live: a draft at 24s renders with `animation-duration: 24s` (the first probe's null was the flaky Supabase DNS, not the feature).

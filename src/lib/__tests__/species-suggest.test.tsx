@@ -20,26 +20,35 @@ afterEach(cleanup);
 
 const PHOTO = "data:image/jpeg;base64,AAAA";
 
-function renderSuggest(onPick: (s: string) => void) {
+function renderSuggest(onPick: (s: string) => void, currentSpecies = "") {
   return render(
     <I18nProvider>
-      <SpeciesSuggest photo={PHOTO} onPick={onPick} />
+      <SpeciesSuggest photo={PHOTO} currentSpecies={currentSpecies} onPick={onPick} />
     </I18nProvider>,
   );
 }
 
 describe("SpeciesSuggest", () => {
-  it("offers chips after identify and fills the species only when the user picks one", async () => {
+  it("auto-fills the top match into an EMPTY species field, chips stay as alternatives", async () => {
     let picked = "";
     renderSuggest((s) => (picked = s));
     expect(picked).toBe("");
 
     await userEvent.click(screen.getByRole("button", { name: /تعرّف على النوع/ }));
-    const chip = await screen.findByRole("button", { name: "Aleppo pine (Pinus halepensis)" });
-    expect(picked).toBe(""); // still nothing — suggestion, never auto-assert
+    await screen.findByRole("button", { name: "Pinus brutia" });
+    expect(picked).toBe("Aleppo pine (Pinus halepensis)"); // top match applied
 
-    await userEvent.click(chip);
-    expect(picked).toBe("Aleppo pine (Pinus halepensis)");
+    // Tapping an alternative still works.
+    await userEvent.click(screen.getByRole("button", { name: "Pinus brutia" }));
+    expect(picked).toBe("Pinus brutia");
+  });
+
+  it("never overwrites a species the user already typed", async () => {
+    let picked = "زيتون";
+    renderSuggest((s) => (picked = s), "زيتون");
+    await userEvent.click(screen.getByRole("button", { name: /تعرّف على النوع/ }));
+    await screen.findByRole("button", { name: "Pinus brutia" });
+    expect(picked).toBe("زيتون"); // untouched
   });
 
   it("lets the user go back and retry", async () => {
