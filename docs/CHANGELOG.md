@@ -2,6 +2,18 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (eighty-second pass) — THE RELEASE — LIVE
+
+**26 commits shipped to production** (`4649f26..c42cd3f`): the full release program — NASA FIRMS satellite hotspots, PWA install, Web Push fire alerts, IP geolocation pre-fill, GPS trio, Open-Meteo fire weather + smoke, rain-aware watering, commune dropdown (1,541), wilayas 69, PlantNet species ID (+ auto-fill), what-to-plant guide, the admin announcement marquee (bilingual, color, speed, multi-publish, edit), leaderboard All-time toggle, full-country zoom-out, and the control-layout fixes.
+
+**Production verification at deploy time:**
+- `/api/public/hotspots` → HTTP 200, 119 features, **zero out-of-country leaks** (FIRMS key set in Vercel env, country clip live).
+- Home SSR → HTTP 200 (Arabic RTL).
+- WebKit probe (Safari engine, fresh + returning visitor): no error boundary, map canvas mounts, **zero console errors, zero page errors** — the CSP WebSocket crash class stays dead.
+- Announcements: all 4 seeded drafts inactive by design — the owner publishes from «الإعلانات» when he chooses.
+
+**Owner's own device checks (the ones that count):** iPhone — install the PWA, enable fire alerts (real end-to-end notification on production), IP pre-fill on the form, PlantNet with a real photo, publish an announcement.
+
 ## 2026-09-01 (eighty-first pass) — Launch-readiness audit — NOT PUSHED
 
 Full pre-launch sweep, 4 hours before the announcement:
