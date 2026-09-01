@@ -159,7 +159,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `hooks/useAuth.tsx` | Supabase session state + `role`/`isModerator`/`isAdmin` read live from the caller's `user_roles` row. `loading` stays true until the role query settles. |
 | `hooks/useTheme.tsx` | Shared light/dark theme store: one module-level value + listeners so every consumer (shell AND map) flips together. localStorage-persisted, `.dark` on `<html>`. |
 | `hooks/use-mobile.tsx` | Viewport breakpoint hook (template). |
-| `data/algeria-wilayas.ts` | Auto-generated from Natural Earth 10m admin-1 boundaries (public domain): Mercator-projected SVG path data for the 48 historic wilaya polygons. Do not hand-edit. |
+| `data/algeria-wilayas.ts` | Auto-generated from namrouche993/algeria-wilayas-geojson v69 (MIT): Mercator-projected SVG path data for all **69** wilaya polygons (Law 26-06, the 2025 division). Do not hand-edit. |
 | `data/communes.ts` | Auto-generated from islam-re/Algeria-wilayas (MIT, Journal Officiel): `COMMUNES_BY_WILAYA` — 1,541 communes (ar + latin) across all 69 wilayas. Do not hand-edit. |
 | `integrations/supabase/client.ts` | Browser client (publishable key). Auto-generated â€” never edit. |
 | `integrations/supabase/client.server.ts` | Service-role admin client. Server-only. Auto-generated. |

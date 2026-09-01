@@ -2,6 +2,14 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (seventy-first pass) — Wilayas 69 (release-program phase G) + insecure-context alerts note — NOT PUSHED
+
+- **The 2025 division, shipped:** all 69 wilayas (Law 26-06, JO No. 25 — verified against the official hierarchy, NOT the ROADMAP's guessed codes: several differ, e.g. El Kantara is 61, Messaad 66, El Abiodh Sidi Cheikh 69). New v69 polygons (namrouche993, MIT) regenerated into the app's Mercator-SVG format — sharper borders, and every wilaya now has geometry, so `mapCode` is identity. 69-entry list (JO names AR+Latin); meta copy 58→69 (EN+AR).
+- **Data continuity:** moderator expansion SQL (2019+2025 children) ran — 0 rows needed it (all 3 moderators hold childless codes 36/18/23); exact-pin backfill — all 6 rows already correct; approximate rows keep the submitter's choice by design.
+- **Verified:** 184/184 tests (13 new geo cases — all 11 new wilayas + Timimoun/Touggourt; two of my guessed town coordinates were wrong, fixed against the dataset's own centers), tsc clean, build green, 69 borders render (89 features/59 codes in one viewport probe).
+- **Also in this pass (owner report):** the fire-alerts card vanished silently on `http://<lan-ip>` — not a bug: browsers gate ServiceWorker/PushManager to secure contexts (HTTPS/localhost). The card now shows an honest note («التنبيهات غير متوفرة هنا — تحتاج اتصالًا آمنًا») instead of hiding. iPhone push testing happens on the HTTPS production URL at release.
+- Docs: FEATURES 11n, DATABASE (moderator_wilayas semantics), PROJECT_STRUCTURE, ROADMAP (#6 wilayas-69 → shipped).
+
 ## 2026-09-01 (seventieth pass) — PlantNet species suggestion (release-program phase H) — NOT PUSHED
 
 - **What shipped:** "Identify from the photo" on the plant form — photo → server-side PlantNet (key in env) → top-2 chips that fill the species field. Suggestion-only UX, fail-soft everywhere, `lang=ar` in AR mode. Unthrottled v1 (documented reasoning: worst case is free-quota burn → quiet feature).

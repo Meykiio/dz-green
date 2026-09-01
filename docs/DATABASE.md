@@ -175,7 +175,7 @@ RLS **enabled**. Single policy `user_roles_read_own` — `FOR SELECT TO authenti
 
 ### `public.moderator_wilayas` (2026-08-17)
 
-Wilaya assignments for moderators. Assignments use the **historic 01–48 codes**; post-2019 wilayas share their historic parent's territory (the UI groups them under the parent).
+Wilaya assignments for moderators. **Since the 69-wilaya map (2026-09-01):** assignments use any of the 69 codes; a moderator of a split parent keeps territory via expansion rows (2019 + 2025 children added alongside their code — the idempotent expansion SQL ran 2026-09-01, 0 rows needed it that day). Before that: assignments used the historic 01–48 codes with post-2019 wilayas sharing the parent's territory.
 
 | Column | Type | Null | Default | Purpose |
 |---|---|---|---|---|
