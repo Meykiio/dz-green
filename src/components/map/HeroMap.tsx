@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   GPUInitializationError,
+  GeolocateControl,
   Map as MapLibreMap,
   NavigationControl,
+  ScaleControl,
   type ErrorEvent,
   type GeoJSONSource,
 } from "maplibre-gl";
@@ -113,6 +115,9 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
     const pos = ctrlPosRef.current;
     map.addControl(new NavigationControl({ showCompass: false }), pos);
     map.addControl(new RecenterControl(), pos);
+    // "Find me" for viewers (fire waves) + a km scale for judging distances.
+    map.addControl(new GeolocateControl({ trackUserLocation: false }), pos);
+    map.addControl(new ScaleControl({ maxWidth: 90, unit: "metric" }), pos);
 
     const init = () => {
       if (cancelled) return;

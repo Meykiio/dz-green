@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n";
 import { wilayaCodeForPoint } from "@/lib/geo";
 import { getGeoHint } from "@/lib/geo-hint";
+import { medianFix, type GpsFix } from "@/lib/gps";
 import { isShortMapsLink, parseGoogleMapsLink } from "@/lib/maps-link";
 import { resolveMapsLink } from "@/lib/maps.functions";
 import { WILAYAS } from "@/lib/wilayas";
@@ -63,6 +64,7 @@ export function LocationField({
   const watchIdRef = useRef<number | null>(null);
   const watchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bestFixRef = useRef<{ lat: number; lng: number; accuracy: number } | null>(null);
+  const fixesRef = useRef<GpsFix[]>([]);
 
   // GPS best-fix watch: the first answer is usually a coarse network fix
   // (±50–500 m); the phone refines toward true GPS over the next seconds.
@@ -95,9 +97,12 @@ export function LocationField({
 
   function finishWatch() {
     stopWatch();
-    const best = bestFixRef.current;
-    if (best) handleLocation(best.lat, best.lng, best.accuracy);
+    // Median of the last good fixes — a single "best" reading can be a
+    // lucky outlier tens of meters off (see lib/gps.ts).
+    const final = medianFix(fixesRef.current) ?? bestFixRef.current;
+    if (final) handleLocation(final.lat, final.lng, final.accuracy);
     bestFixRef.current = null;
+    fixesRef.current = [];
     setLocating(false);
     setBestAccuracy(null);
   }
@@ -112,20 +117,27 @@ export function LocationField({
     }
   }
 
+  const isAndroid =
+    typeof navigator !== "undefined" && /android/i.test(navigator.userAgent);
+
   function useMyLocation() {
     if (typeof navigator === "undefined" || !navigator.geolocation) return;
     setLocating(true);
     setBestAccuracy(null);
     bestFixRef.current = null;
+    fixesRef.current = [];
     watchIdRef.current = navigator.geolocation.watchPosition(
       (pos) => {
         const acc = pos.coords.accuracy ?? Infinity;
+        const fix = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          accuracy: acc,
+        };
+        if (fixesRef.current.length >= 10) fixesRef.current.shift();
+        fixesRef.current.push(fix);
         if (!bestFixRef.current || acc < bestFixRef.current.accuracy) {
-          bestFixRef.current = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-            accuracy: acc,
-          };
+          bestFixRef.current = fix;
           setBestAccuracy(acc);
         }
         if (acc <= GOOD_ENOUGH_M) finishWatch();
@@ -259,6 +271,9 @@ export function LocationField({
                   s: WATCH_BUDGET_MS / 1000,
                 })
               : t("forms.location.waitingFirstFix")}
+            {isAndroid && bestAccuracy != null && bestAccuracy > GOOD_ENOUGH_M && (
+              <span className="block mt-0.5">{t("forms.location.wifiHint")}</span>
+            )}
           </p>
         )}
 

@@ -138,6 +138,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `hotspots.server.ts` | NASA FIRMS server lib: area URL, CSV parser, confidence filter, 13 static flare zones, southern persistence mask, GeoJSON builder. Fail-loud `FIRMS_MAP_KEY`. |
 | `pwa.ts` | Production-only service-worker registration. |
 | `geo-hint.ts` | Coarse IP-geolocation hint (Vercel headers): `getGeoHint()` reads `window.__GA_GEO__` (client) / the request-global (server). Never stored. |
+| `gps.ts` | `medianFix()` — robust final GPS fix: median of the last 3 ±100 m readings (rejects lucky outliers), single-best fallback. Unit-tested. |
 | `push.server.ts` | Web Push server lib: VAPID setup (fail loud), subscribe/unsubscribe impls, `shouldNotify` scope match, `notifyFireSubscribers` fan-out (total, prunes stale endpoints). |
 | `push.functions.ts` | `subscribePush` / `unsubscribePush` public server fns (zod). |
 | `error-capture.ts`, `error-page.ts` | Platform error plumbing. |

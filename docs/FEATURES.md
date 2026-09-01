@@ -143,6 +143,10 @@ Browser fire alerts, free and account-free: a card on `/fire` (form + success sc
 
 Forms now start one step ahead: Vercel's free IP-geolocation headers (`x-vercel-ip-latitude/longitude`) are read per request in `src/server.ts` (never stored), injected by SSR as `window.__GA_GEO__`, and `LocationField` uses them to **pre-select the wilaya** (derived via the existing polygons) and **center the picker on the visitor's city** (zoom 9 vs country 4.4). It's a suggestion only — the user can change it, and the server derives the real wilaya from the pin anyway, so a wrong hint (mobile carrier NAT resolving to Algiers) can't corrupt data. The autofill note is honest about the source: "Detected from your pin" (GPS) vs "Guessed approximately from your connection" (IP), AR+EN. Absent off-Vercel — local behavior unchanged. Verified: SSR injects the hint with headers and `null` without; probe with mocked headers → wilaya 16 pre-selected + the IP note visible.
 
+## 11h. GPS trio (2026-09-01) — built, not pushed
+
+Three small accuracy wins. **Median fix:** the 12 s GPS watch no longer trusts the single "best accuracy" reading (a lucky outlier can sit tens of meters off) — `medianFix` (lib/gps.ts, unit-tested) takes the 3 most recent ±100 m fixes and medians them. **WiFi hint:** Android users see "turn WiFi on (even without connecting) usually sharpens the fix" while the watch runs (Google's location service uses WiFi scanning). **Viewer controls:** the home map gains MapLibre's `GeolocateControl` ("find me" during fire waves) and a metric `ScaleControl` (km bar for judging fire distances). Verified: 4 new unit tests (157 total), tsc, build; probe — both controls render, scale reads "50 km".
+
 ## 12. Design system (2026-08-18, post-viral Sprint 4 + owner-directed revision)
 
 The app runs its own design system (`docs/DESIGN.md`), built for Green Algeria and revised against the `design-taste-frontend` and `impeccable` rubrics:

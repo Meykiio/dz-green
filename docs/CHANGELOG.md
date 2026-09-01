@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (sixty-fifth pass) — GPS trio (release-program phase D) — NOT PUSHED
+
+- **What shipped:** (1) `medianFix` — the GPS watch finishes with the median of the last 3 ±100 m fixes instead of one lucky best reading (pure fn in `lib/gps.ts`, 4 unit tests); (2) Android WiFi hint while locating («تفعيل الواي فاي يحسّن دقة الموقع»); (3) home-map `GeolocateControl` ("find me") + metric `ScaleControl`.
+- **Verified:** 157/157 tests, tsc clean, build green; probe — both controls render on the home map, scale reads "50 km".
+- Docs: FEATURES 11h, PROJECT_STRUCTURE.
+
 ## 2026-09-01 (sixty-fourth pass) — IP geolocation pre-fill (release-program phase C) — NOT PUSHED
 
 - **What shipped:** forms start one step ahead. Vercel's free IP-geo headers read per request in `server.ts` (never stored) → SSR injects `window.__GA_GEO__` → `LocationField` pre-selects the wilaya (existing polygons) and centers the picker on the visitor's city (zoom 9). Suggestion-only by design: user-overridable, and the server derives the real wilaya from the pin regardless. Honest source copy: "Detected from your pin" vs "Guessed approximately from your connection" (AR+EN). Graceful null off-Vercel.

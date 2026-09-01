@@ -90,6 +90,7 @@ export const forms = {
     chooseWilaya: "Choose a wilaya",
     detected: "Detected from your pin — change it here if it's wrong.",
     detectedIp: "Guessed approximately from your connection — change it here if it's wrong.",
+    wifiHint: "Tip: turning WiFi on (even without connecting) usually sharpens the fix.",
     commune: "Commune (optional)",
     exact: "Exact location (optional)",
     helper: "Used once, never stored. Skip it and the report is wilaya-level.",
