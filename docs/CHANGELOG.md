@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (seventy-seventh pass) — Leaderboard: This month ⇄ All time (owner request) — NOT PUSHED
+
+- **Owner question:** the board resets every month — shouldn't it be all-time? Verdict applied: **both, not a replacement** — the monthly race is the engagement engine (every wilaya gets a fresh shot on the 1st; all-time calcifies), but the all-time view is the real national record. The Board view gains a period toggle («هذا الشهر» / «كل الوقت»), month stays default; subtitle + leader label adapt. Same already-loaded data, no schema, no new query.
+- **Real bug caught by the probe:** on 390px the floating Map/List/Board pill covered the new toggle (elementFromPoint proved it — a real user couldn't tap it). Fixed: the list/board scroll containers get `pt-14` so content starts below the pill.
+- **Verified:** toggle renders, all-time shows the ranked list with «منذ البداية», the overlap is gone (tappable). tsc clean, 201/201 tests, build green.
+
 ## 2026-09-01 (seventy-sixth pass) — Map controls: the always-free corner + locale-follow — NOT PUSHED
 
 - **Owner report (3 screenshots):** the card reveal button overlaps the zoom/recenter controls; card open covers them on desktop; the km scale is under the card on mobile. Deeper root cause found in the evidence: **controls were positioned by the mount-time locale and never followed language switches** — his desktop mounted in Arabic (controls stuck in the AR corner after switching to English), his mobile mounted in English (correct corner). Two devices, two different stale layouts.

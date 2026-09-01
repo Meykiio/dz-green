@@ -46,10 +46,15 @@ export const home: typeof import("../en/home").home = {
   board: {
     heading: "سباق هذا الشهر",
     subtitle: "في {wilayas} — الغرسات المقبولة فقط. تُصفَّر في كل أول شهر.",
+    subtitleAll: "في {wilayas} — الغرسات المقبولة، منذ البداية.",
     empty: "لا غرسات هذا الشهر بعد.",
     emptyCta: "الشجرة الأولى لهذا الشهر قد تكون شجرتك.",
     leading: "في الصدارة",
     thisMonth: "هذا الشهر",
+    allTime: "كل الوقت",
+    periodMonth: "هذا الشهر",
+    periodAll: "كل الوقت",
+    periodAria: "فترة لوحة الصدارة",
   },
   ticker: {
     planted: "غُرست {count} شجرة للتو في {wilaya}",

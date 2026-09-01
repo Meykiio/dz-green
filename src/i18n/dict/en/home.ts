@@ -47,10 +47,15 @@ export const home = {
   board: {
     heading: "This month's race",
     subtitle: "across {wilayas} — approved plantings only. Resets on the 1st.",
+    subtitleAll: "across {wilayas} — approved plantings, since the beginning.",
     empty: "No plantings this month yet.",
     emptyCta: "The first tree of the month could be yours.",
     leading: "Leading",
     thisMonth: "this month",
+    allTime: "all time",
+    periodMonth: "This month",
+    periodAll: "All time",
+    periodAria: "Leaderboard period",
   },
   ticker: {
     planted: "{count} trees just planted in {wilaya}",

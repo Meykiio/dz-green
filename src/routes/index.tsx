@@ -104,7 +104,7 @@ function HomePage() {
         className={`relative overflow-hidden ${hasAnnouncement ? "h-[calc(100dvh-5.75rem)]" : "h-[calc(100dvh-3.5rem)]"}`}
       >
         {view === "list" ? (
-          <div className="h-full overflow-y-auto bg-background p-3 md:p-6">
+          <div className="h-full overflow-y-auto bg-background px-3 pb-3 pt-14 md:p-6">
             <div className="mx-auto max-w-2xl">
               <SiteList
                 sites={siteList}
@@ -117,7 +117,7 @@ function HomePage() {
             </div>
           </div>
         ) : view === "board" ? (
-          <div className="h-full overflow-y-auto bg-background p-3 md:p-6">
+          <div className="h-full overflow-y-auto bg-background px-3 pb-3 pt-14 md:p-6">
             <div className="mx-auto max-w-2xl">
               <Leaderboard sites={siteList} />
             </div>
