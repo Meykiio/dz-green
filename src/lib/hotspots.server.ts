@@ -11,7 +11,10 @@ import type { Hotspot } from "@/lib/types";
 
 const SOURCE = "VIIRS_NOAA21_NRT";
 const ALGERIA_BBOX = "-8.7,18.9,12.1,38.0"; // west,south,east,north
-const DAY_RANGE = 2; // API max is 5; 2 keeps the payload small and fresh
+// 4-day window (API max 5): the persistence mask needs the depth — a flare
+// burns every night, so 2+ detections in 4 days exposes it; 2 days was too
+// shallow (user reports of gas flares showing in Ouargla, 2026-09-01).
+const DAY_RANGE = 4;
 const FETCH_TIMEOUT_MS = 10_000;
 const MAX_BODY_BYTES = 5_000_000;
 
@@ -36,7 +39,8 @@ const FLARE_ZONES: { name: string; lat: number; lng: number; radiusKm: number }[
   { name: "Ghadames border", lat: 31.3, lng: 11.8, radiusKm: 12 },
   { name: "Gassi Touil / Rhourde Nouss", lat: 30.4, lng: 6.6, radiusKm: 15 },
   { name: "Hassi Berkin", lat: 29.7, lng: 6.7, radiusKm: 15 },
-  { name: "Haoud Berkaoui / Ouargla", lat: 31.0, lng: 8.1, radiusKm: 25 },
+  { name: "Haoud Berkaoui / Ouargla", lat: 31.0, lng: 8.1, radiusKm: 35 },
+  { name: "Haoud Berkaoui North", lat: 31.36, lng: 8.01, radiusKm: 12 },
   { name: "El Borma", lat: 31.65, lng: 9.17, radiusKm: 15 },
 ];
 
@@ -120,11 +124,10 @@ function acqIso(date: string, time: string): string {
 
 /**
  * South of this latitude (industrial Sahara), a detection repeating at the
- * exact same pixel on 2+ distinct days is masked as static infrastructure:
- * flares burn every night at the same spot, while wildfires move, grow, or
- * die. Verified against the live 2-day feed (2026-08-30/31): 62 southern
- * repeat clusters (industrial) vs 23 northern ones (real multi-day fire
- * fronts, e.g. Kasserine/Tébessa) — northern repeats are never touched.
+ * exact same pixel on 2+ distinct days (of the 4-day window) is masked as
+ * static infrastructure: flares burn every night at the same spot, while
+ * wildfires move, grow, or die. Northern repeats are never touched — real
+ * fire fronts burn for days there.
  */
 const PERSISTENCE_LAT_LIMIT = 33.5;
 

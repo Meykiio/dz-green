@@ -271,21 +271,23 @@
   }
 }
 
-/* Announcement marquee: two copies loop seamlessly. Travel direction (owner
-   request 2026-09-01): LTR right→left (reverse), RTL left→right (normal).
-   Pauses on hover (the .group wrapper), off entirely for reduced-motion. */
+/* Announcement marquee: two copies loop seamlessly. The track is ALWAYS
+   dir=ltr (geometry identical in both locales — an RTL track blanks out at
+   -50%, the empty-strip bug the owner caught). Travel direction: LTR
+   right→left (normal 0→-50%), RTL left→right (reverse). Pauses on hover,
+   off entirely for reduced-motion. */
 @keyframes ga-marquee {
   from {
-    transform: translateX(-50%);
+    transform: translateX(0);
   }
   to {
-    transform: translateX(0);
+    transform: translateX(-50%);
   }
 }
 .ga-marquee {
   animation: ga-marquee 32s linear infinite;
 }
-[dir="ltr"] .ga-marquee {
+.ga-marquee-rtl {
   animation-direction: reverse;
 }
 @media (prefers-reduced-motion: reduce) {

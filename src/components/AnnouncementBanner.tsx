@@ -50,10 +50,16 @@ export function AnnouncementBanner() {
       <span className={`grid h-full w-9 shrink-0 place-items-center ${ICON_TONE[newest.kind]}`}>
         <Icon className="size-4" />
       </span>
-      <div className="group relative flex-1 overflow-hidden" dir={isRtl ? "rtl" : "ltr"}>
+      <div className="group relative flex-1 overflow-hidden">
+        {/* The track stays dir=ltr so the marquee geometry is identical in
+            both locales (an RTL track blanks out at -50% — the empty-strip
+            bug). Arabic text shapes correctly inside the spans regardless. */}
         <div
-          className="ga-marquee flex w-max items-center whitespace-nowrap text-sm font-medium group-hover:[animation-play-state:paused]"
+          className={`ga-marquee flex w-max items-center whitespace-nowrap text-sm font-medium group-hover:[animation-play-state:paused] ${
+            isRtl ? "ga-marquee-rtl" : ""
+          }`}
           style={{ animationDuration: `${newest.speed_seconds}s` }}
+          dir="ltr"
         >
           {/* Two copies for a seamless loop */}
           <span className="pe-16">{text}</span>

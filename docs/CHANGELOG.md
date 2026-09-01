@@ -2,6 +2,15 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (eighty-third pass) — Post-launch fixes: empty AR strip, drawer overlap, southern flares — LIVE
+
+Owner + public reports within hours of launch:
+
+- **Empty Arabic strip (owner, screenshot):** the marquee broke in RTL containers — an RTL track with `w-max` blanks out at translateX(-50%). Fix: the track is **always dir=ltr** (identical geometry in both locales; Arabic shapes correctly inside the spans regardless), travel direction set by a `ga-marquee-rtl` class. Verified: Arabic text traverses the strip, `direction: reverse`.
+- **Strip covers the drawer's brand (owner, screenshot):** the drawer now starts below the strip when announcements are live (`top-9` vs `inset-y-0`). Verified: drawerTop == stripBottom.
+- **"In the south these are oil-well service flares" (public comments ×2, Ouargla):** the 2-day persistence window was too shallow. `DAY_RANGE` 2→**4** (flares burn every night; 2+ detections in 4 days exposes them), Ouargla zone widened to 35km, **Haoud Berkaoui North zone added** (a 3-point flare cluster 40km north of the field, confirmed in the live feed). Southern points 45→32, remaining are scattered one-day singles under the honest "not ground-verified" label. The commenters were right, and the fix is real.
+- Verified: tsc clean, 202/202 tests, build green, live-feed checks above, screenshots reviewed.
+
 ## 2026-09-01 (eighty-second pass) — THE RELEASE — LIVE
 
 **26 commits shipped to production** (`4649f26..c42cd3f`): the full release program — NASA FIRMS satellite hotspots, PWA install, Web Push fire alerts, IP geolocation pre-fill, GPS trio, Open-Meteo fire weather + smoke, rain-aware watering, commune dropdown (1,541), wilayas 69, PlantNet species ID (+ auto-fill), what-to-plant guide, the admin announcement marquee (bilingual, color, speed, multi-publish, edit), leaderboard All-time toggle, full-country zoom-out, and the control-layout fixes.

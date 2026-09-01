@@ -233,7 +233,10 @@ function Shell({
       )}
       <aside
         className={cn(
-          "fixed inset-y-0 start-0 z-50 flex w-72 flex-col border-e border-border bg-card transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          "fixed start-0 z-50 flex w-72 flex-col border-e border-border bg-card transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          // The announcement strip (when live) owns the top 2.25rem — the
+          // drawer starts below it, so the brand is never covered.
+          hasAnnouncement ? "top-9 bottom-0" : "inset-y-0",
           drawerOpen
             ? "translate-x-0"
             : "-translate-x-full rtl:translate-x-full",
