@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (seventy-sixth pass) — Map controls: the always-free corner + locale-follow — NOT PUSHED
+
+- **Owner report (3 screenshots):** the card reveal button overlaps the zoom/recenter controls; card open covers them on desktop; the km scale is under the card on mobile. Deeper root cause found in the evidence: **controls were positioned by the mount-time locale and never followed language switches** — his desktop mounted in Arabic (controls stuck in the AR corner after switching to English), his mobile mounted in English (correct corner). Two devices, two different stale layouts.
+- **Fix:** all control buttons (zoom, recenter, geolocate) now live at **top-start** — the one corner that's always free in both locales (legend is top-end, action card is bottom-start); the scale sits alone at **bottom-end** (clear of the card's edge on mobile). A new `[isRtl]` effect removes + re-adds every control when the language flips, so positions always follow.
+- **Verified:** EN-after-AR-toggle desktop — controls top-left, scale bottom-right, card clean; AR mobile — controls top-right, legend top-left, reveal button clear, zero overlaps (screenshots reviewed). tsc clean, 201/201 tests, build green.
+
 ## 2026-09-01 (seventy-fifth pass) — Full-country zoom-out (owner report) — NOT PUSHED
 
 - **Owner report:** the map can't zoom out far enough to see the whole country — desktop AND mobile. Root cause (two layers): `minZoom: 4` was set for the north-first initial view, and **`maxBounds` width is the real clamp** — MapLibre limits zoom-out when the viewport would exceed the bounds, and wide desktop viewports hit that wall first (proven empirically: desktop clamped at ~4.8 while mobile fit at ~4.1).

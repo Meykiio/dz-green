@@ -61,10 +61,17 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
   layersRef.current = layers;
   const selectRef = useRef(onSelectFeature);
   selectRef.current = onSelectFeature;
-  // The action card anchors to `start` (bottom-right in RTL, bottom-left in
-  // LTR), so map controls must live in the opposite physical corner.
-  const ctrlPosRef = useRef<"bottom-right" | "bottom-left">(isRtl ? "bottom-left" : "bottom-right");
-  ctrlPosRef.current = isRtl ? "bottom-left" : "bottom-right";
+  // The action card anchors to `start` and the legend to `end` (top), so
+  // control buttons go to top-start and the scale to bottom-end — always
+  // free in both locales. Kept in a ref so locale switches can reposition.
+  const ctrlPosRef = useRef<"top-left" | "top-right">(isRtl ? "top-right" : "top-left");
+  ctrlPosRef.current = isRtl ? "top-right" : "top-left";
+  const controlsRef = useRef<{
+    nav: NavigationControl;
+    recenter: RecenterControl;
+    geolocate: GeolocateControl;
+    scale: ScaleControl;
+  } | null>(null);
 
   const refs = { dataRef, layersRef, themeRef, selectRef, sites, careLogs, fires };
   const hotspotsRef = useRef(hotspots);
@@ -114,12 +121,19 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
       setFailure("webgl2");
       return;
     }
+    // Controls live in the two corners that are always free: buttons at
+    // top-start (legend is top-end, action card is bottom-start), the scale
+    // at bottom-end. They follow locale switches (see the isRtl effect).
+    const nav = new NavigationControl({ showCompass: false });
+    const recenter = new RecenterControl();
+    const geolocate = new GeolocateControl({ trackUserLocation: false });
+    const scale = new ScaleControl({ maxWidth: 90, unit: "metric" });
+    controlsRef.current = { nav, recenter, geolocate, scale };
     const pos = ctrlPosRef.current;
-    map.addControl(new NavigationControl({ showCompass: false }), pos);
-    map.addControl(new RecenterControl(), pos);
-    // "Find me" for viewers (fire waves) + a km scale for judging distances.
-    map.addControl(new GeolocateControl({ trackUserLocation: false }), pos);
-    map.addControl(new ScaleControl({ maxWidth: 90, unit: "metric" }), pos);
+    map.addControl(nav, pos);
+    map.addControl(recenter, pos);
+    map.addControl(geolocate, pos);
+    map.addControl(scale, pos === "top-left" ? "bottom-right" : "bottom-left");
 
     const init = () => {
       if (cancelled) return;
@@ -191,6 +205,22 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
     map.once("style.load", once);
     map.setStyle(style);
   }, [theme]);
+
+  // Locale switch: controls were added at mount with the mount-time locale —
+  // reposition them when it flips (the stale-corner bug in the owner report).
+  useEffect(() => {
+    const map = mapRef.current;
+    const controls = controlsRef.current;
+    if (!map || !controls) return;
+    const pos = ctrlPosRef.current;
+    const scalePos = pos === "top-left" ? "bottom-right" : "bottom-left";
+    for (const c of [controls.nav, controls.recenter, controls.geolocate]) {
+      map.removeControl(c);
+      map.addControl(c, pos);
+    }
+    map.removeControl(controls.scale);
+    map.addControl(controls.scale, scalePos);
+  }, [isRtl]);
 
   // Data updates.
   useEffect(() => {
