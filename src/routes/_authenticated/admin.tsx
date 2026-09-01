@@ -1,8 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { HandHeart, LayoutDashboard, MessageSquareText, Users } from "lucide-react";
+import { HandHeart, LayoutDashboard, Megaphone, MessageSquareText, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { AdminAnnouncementsPanel } from "@/components/admin/AdminAnnouncementsPanel";
 import { AdminOverview } from "@/components/admin/AdminOverview";
 import { AdminUsersPanel } from "@/components/admin/AdminUsersPanel";
 import { FeedbackPanel } from "@/components/admin/FeedbackPanel";
@@ -22,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type AdminTab = "overview" | "users" | "volunteers" | "feedback";
+type AdminTab = "overview" | "users" | "volunteers" | "feedback" | "announcements";
 
 function AdminPage() {
   const { t } = useI18n();
@@ -63,6 +64,7 @@ function AdminPage() {
               { id: "users", label: t("moderation.adm.tabs.users"), icon: Users },
               { id: "volunteers", label: t("moderation.adm.tabs.volunteers"), icon: HandHeart },
               { id: "feedback", label: t("moderation.adm.tabs.feedback"), icon: MessageSquareText },
+              { id: "announcements", label: t("moderation.adm.tabs.announcements"), icon: Megaphone },
             ]}
           />
         </div>
@@ -80,6 +82,12 @@ function AdminPage() {
             <>
               <p className="mt-2 text-sm text-muted-foreground">{t("moderation.adm.feedbackLead")}</p>
               <FeedbackPanel />
+            </>
+          )}
+          {tab === "announcements" && (
+            <>
+              <p className="mt-2 text-sm text-muted-foreground">{t("moderation.adm.announceLead")}</p>
+              <AdminAnnouncementsPanel />
             </>
           )}
         </main>

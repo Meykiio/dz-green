@@ -150,7 +150,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `push.functions.ts` | `subscribePush` / `unsubscribePush` public server fns (zod). |
 | `error-capture.ts`, `error-page.ts` | Platform error plumbing. |
 | `utils.ts` | `cn()` class merge helper. |
-| `__tests__/` | 9 files, **149 unit tests** (2026-08-31 run): abuse gate, Zod schemas, wilaya derivation/geometry, Google Maps link parsing, `needsWater` boundaries, image magic-byte sniff, feedback + volunteer schemas, FIRMS hotspot parsing/filters. |
+| `__tests__/` | 16 files, **192 tests** (2026-09-01 run): pure-function units (abuse gate, Zod schemas, geometry, link parsing, `needsWater` + rain, image sniff, feedback/volunteer/push schemas, FIRMS filters, GPS median, weather/AQ mappers, PlantNet mapper, 69-wilaya geo) + **component behavior tests** (testing-library + happy-dom: CommuneField, SpeciesSuggest, FireAlertsCard). |
 
 ## `src/hooks/`, `src/data/`, `src/integrations/`
 

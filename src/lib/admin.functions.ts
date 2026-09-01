@@ -11,3 +11,4 @@
 export * from "./admin-users.functions";
 export * from "./admin-content.functions";
 export * from "./admin-stats.functions";
+export * from "./announcements.functions";

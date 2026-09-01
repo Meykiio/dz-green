@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { PwaInstallBanner } from "@/components/pwa-install";
 import { I18nProvider, ssrT } from "@/i18n";
 import { localeInitScript } from "@/i18n";
@@ -168,6 +169,7 @@ function RootComponent() {
           <TooltipProvider delayDuration={300}>
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
+            <AnnouncementBanner />
             <PwaInstallBanner />
             <Toaster position="top-center" richColors />
             {/* Vercel Web Analytics — self-contained loader script; no-ops off-Vercel. */}

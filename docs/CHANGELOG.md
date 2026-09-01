@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (seventy-second pass) — Announcement banner + test-pyramid middle layer — NOT PUSHED
+
+- **Announcement banner (owner request):** `announcements` table (RLS: anon reads active rows only; writes service-role via `requireAdmin` fns; migration live + mirrored). Admin 5th tab «الإعلانات»: create/publish/unpublish (one live at a time)/delete. Visitor banner: once per announcement id, tone by kind, AR+EN. Verified: live probe — SQL-activated test banner rendered + dismissed; cleaned up after.
+- **Test-quality upgrade (owner: "tests that really test the app"):** researched addyosmani/agent-skills (pyramid 80/15/5, DAMP, Beyonce Rule) + mattpocock/skills (test through the interface). Installed testing-library + happy-dom + jest-dom; 8 component behavior tests for the components that actually broke before (CommuneField Other-hatch as a regression test, SpeciesSuggest pick-flow, FireAlertsCard honesty state). 192/192 green, tsc clean, build green.
+- **Also researched (design only, not built):** "what to plant where" — GBIF per-wilaya species evidence (568k Algeria Pinopsida occurrences, faceted, free) + Open-Meteo climate classes + a curated species×climate matrix → later suggestion chips on /plant. Plan in the session report.
+- Docs: DATABASE (announcements), FEATURES 11o + 11p, PROJECT_STRUCTURE.
+
 ## 2026-09-01 (seventy-first pass) — Wilayas 69 (release-program phase G) + insecure-context alerts note — NOT PUSHED
 
 - **The 2025 division, shipped:** all 69 wilayas (Law 26-06, JO No. 25 — verified against the official hierarchy, NOT the ROADMAP's guessed codes: several differ, e.g. El Kantara is 61, Messaad 66, El Abiodh Sidi Cheikh 69). New v69 polygons (namrouche993, MIT) regenerated into the app's Mercator-SVG format — sharper borders, and every wilaya now has geometry, so `mapCode` is identity. 69-entry list (JO names AR+Latin); meta copy 58→69 (EN+AR).

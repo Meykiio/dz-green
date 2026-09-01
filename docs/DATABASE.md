@@ -248,6 +248,21 @@ Web Push fire-alert subscriptions (release phase B). One row per browser subscri
 
 Index: `(wilaya_code)`. RLS **enabled with zero client policies** — anon/authenticated grants revoked; only `service_role` has table grants. Stale subscriptions (push service answers 404/410) are deleted at send time.
 
+### `public.announcements` (2026-09-01 — live, applied via MCP)
+
+Admin-controlled site-wide banner (owner request). One active at a time (enforced in app code — activating one clears the others). Public reads are RLS-limited to the active row only; all writes are service-role (the `adminCreateAnnouncement`/`adminSetAnnouncementActive`/`adminDeleteAnnouncement` fns, `requireAdmin`). Migration mirrored in `supabase/migrations/20260901120000_*.sql`.
+
+| Column | Type | Null | Default | Purpose |
+|---|---|---|---|---|
+| `id` | uuid PK | no | `gen_random_uuid()` | Dismissals are tracked per id client-side. |
+| `title` | text | no | — | CHECK 1–120 chars. |
+| `body` | text | no | — | CHECK 1–600 chars. |
+| `kind` | text | no | `'info'` | CHECK `IN ('info','success','warning')` — banner tone. |
+| `active` | boolean | no | `false` | Only active rows are publicly readable. |
+| `created_at` | timestamptz | no | `now()` | |
+
+RLS **enabled**. One policy: `announcements_public_read` — `FOR SELECT USING (active = true)`; anon/authenticated hold `SELECT` (active rows only by design — announcements are meant to be public). `INSERT`/`UPDATE`/`DELETE` granted to `service_role` only.
+
 ### `public.spatial_ref_sys`
 
 PostGIS reference table, extension-owned. **RLS is off** and cannot be enabled from a migration on Supabase (the role does not own the table). It contains static public projection definitions with no user data. Accepted risk, recorded in security memory.
