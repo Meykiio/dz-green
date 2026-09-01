@@ -2,6 +2,14 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-08-31 (sixty-second pass) — PWA basics (release-program phase A) — NOT PUSHED (single release at the end)
+
+Owner picked 10 features (+FIRMS) for one release; nothing pushes until the end. Program tracked in the session todo list: A PWA → B Web Push → C IP geolocation → D GPS trio → E Open-Meteo (×3) → F communes → G wilayas-69 → H PlantNet.
+
+- **Phase A done:** the site is an installable PWA. `manifest.webmanifest` (Arabic name, standalone, sage/plant colors), icons 192/512 + apple-touch-icon (upscaled from the 128px logo — honest note: a crisp 512 master would be sharper), tiny `public/sw.js` (precache icons, cache-first `/assets/*` only, **no page caching** — SSR stays fresh; **push + notificationclick handlers pre-wired** so phase B needs no SW update), production-only registration, one-time install banner (Chromium native prompt / iOS Share instructions, dismissed state persisted, AR+EN).
+- **Verified:** tsc clean, 150/150 tests, build green; probe — manifest/sw/icons all 200, manifest fields correct, SW registers in Chromium AND WebKit, iOS banner renders correct Arabic. **Not verified:** Chromium's native `beforeinstallprompt` (headless limitation — owner's device check at release).
+- Docs: FEATURES 11e, PROJECT_STRUCTURE.
+
 ## 2026-08-31 (sixty-first pass) — Satellite hotspots layer (NASA FIRMS) — built, NOT YET PUSHED (owner device test first)
 
 Owner picked the FIRMS overlay from the FireSightDZ study report. Deep research before code caught two real mistakes avoided: **Suomi NPP retires 2026-11-01** (FireSightDZ's default source — we use `VIIRS_NOAA21_NRT`) and the API day-range max is 5, not 7.

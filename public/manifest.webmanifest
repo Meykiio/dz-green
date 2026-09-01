@@ -1,0 +1,15 @@
+{
+  "name": "الجزائر الخضراء — Green Algeria",
+  "short_name": "الجزائر الخضراء",
+  "description": "The community map of tree planting, tree care and wildfire reports in Algeria",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#e9ece5",
+  "theme_color": "#2ead4b",
+  "icons": [
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ]
+}

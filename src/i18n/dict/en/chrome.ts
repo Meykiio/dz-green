@@ -71,4 +71,11 @@ export const chrome = {
   shell: {
     backToMap: "Back to the map",
   },
+  install: {
+    title: "Install Green Algeria",
+    body: "Add it to your home screen — fires and plantings one tap away, even on a weak connection.",
+    iosBody: "Tap the Share button, then “Add to Home Screen” — fires and plantings one tap away.",
+    button: "Install",
+    dismiss: "Not now",
+  },
 };

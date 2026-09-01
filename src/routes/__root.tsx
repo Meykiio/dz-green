@@ -8,15 +8,17 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { Analytics } from "@vercel/analytics/react";
-import { type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { PwaInstallBanner } from "@/components/pwa-install";
 import { I18nProvider, ssrT } from "@/i18n";
 import { localeInitScript } from "@/i18n";
 import { getLocale, initLocale } from "@/i18n/locale";
 import { PrivacyModeProvider } from "@/lib/privacy-mode";
+import { registerServiceWorker } from "@/lib/pwa";
 
 /**
  * Error/404 boundaries render OUTSIDE the route tree (in place of the root
@@ -95,12 +97,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Green Algeria" },
       { name: "twitter:description", content: "a crowdsourced public platform for Algeria's tree-planting and environmental-protection movement" },
+      { name: "theme-color", content: "#2ead4b" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-title", content: "الجزائر الخضراء" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -141,6 +148,10 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
@@ -148,6 +159,7 @@ function RootComponent() {
           <TooltipProvider delayDuration={300}>
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
+            <PwaInstallBanner />
             <Toaster position="top-center" richColors />
             {/* Vercel Web Analytics — self-contained loader script; no-ops off-Vercel. */}
             <Analytics />

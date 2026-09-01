@@ -24,7 +24,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `LICENSE` | AGPL-3.0 (owner decision 2026-08-18), copyright Sifeddine Mebarki. |
 | `supabase/config.toml` | Platform-managed Supabase project config. Do not hand-edit. |
 | `supabase/migrations/*.sql` + `README.md` | Chronological **change record** (9 files, 2026-08-12 â†’ 2026-08-18). NOT a bootstrap path â€” the canonical schema source is `docs/FULL_SCHEMA_EXPORT.sql`. |
-| `public/` | `favicon.ico`, `logo.png` (128px brand mark used in the chrome), `og.png`, `robots.txt` (allows all). |
+| `public/` | `favicon.ico`, `logo.png` (128px brand mark used in the chrome), `og.png`, `robots.txt` (allows all), `manifest.webmanifest` + `icon-192/512.png` + `apple-touch-icon.png` (PWA), `sw.js` (tiny service worker: static-asset cache + pre-wired push handlers, no page caching). |
 | `docs/` | `AUDIT.md`, `CHANGELOG.md`, `DATABASE.md`, `DESIGN.md` (active design system), `FEATURES.md`, `FULL_SCHEMA_EXPORT.sql`, `I18N_AR_MASTER.md`, `MOBILE.md`, `PROJECT_STRUCTURE.md`, `ROADMAP.md`, `SYSTEM_INSTRUCTIONS.md`, plus `archive/` (superseded planning docs). |
 | `e2e/` | 4 Playwright specs, 16 tests total (see below). |
 | `src/` | Application source (below). |
@@ -75,6 +75,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `admin/VolunteerPanel.tsx` | Admin-only list of volunteer applications: info + intent chips + status select (new/contacted/onboarded) + one-click "Approve & make moderator" (`adminOnboardVolunteer`). Paged. |
 | `admin/FeedbackPanel.tsx` | Admin-only feedback inbox: kind badges (bug/idea/other), message, page, device UA, two-step delete. Paged. |
 | `SectionTabs.tsx` | Shared segmented tab bar for staff pages (moderate, admin): icon + count always, labels from sm up — never overflows 390px. |
+| `pwa-install.tsx` | One-time install banner: native prompt on Chromium, Share → Add to Home Screen instructions on iOS; dismissed state persisted. |
 | `moderator/RejectedQueue.tsx` | Rejected plantings tab: rows with Re-approve (scoped service fn) + admin-only delete; broken thumbnails hide on 404. |
 | `FeedbackDialog.tsx` | The site-wide feedback box (home "Feedback" pill): Bug / Feature idea / Other kind selector + message, honeypot, sends `navigator.userAgent` (capped) with bug reports → `submitFeedback`. |
 | `admin/AssignWilayasDialog.tsx` | Wilaya assignment dialog for a moderator (uses the shared checklist). |
@@ -134,6 +135,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `volunteers.functions.ts` / `volunteers.server.ts` | `volunteerSchema` + `submitVolunteer` server fn and its impl — service-role insert into the zero-grant `volunteers` table, links `user_id` when signed in, throttled 5/hour via the shared gate. |
 | `privacy-mode.tsx` | Filming privacy mode: `PrivacyModeProvider`/`usePrivacyMode` + `maskEmail`/`maskPhone`/`maskName` — masked-by-default PII on staff pages, top-bar Show/Hide infos toggle (persisted `ga-privacy`). |
 | `hotspots.server.ts` | NASA FIRMS server lib: area URL, CSV parser, confidence filter, 13 static flare zones, southern persistence mask, GeoJSON builder. Fail-loud `FIRMS_MAP_KEY`. |
+| `pwa.ts` | Production-only service-worker registration. |
 | `error-capture.ts`, `error-page.ts` | Platform error plumbing. |
 | `utils.ts` | `cn()` class merge helper. |
 | `__tests__/` | 9 files, **149 unit tests** (2026-08-31 run): abuse gate, Zod schemas, wilaya derivation/geometry, Google Maps link parsing, `needsWater` boundaries, image magic-byte sniff, feedback + volunteer schemas, FIRMS hotspot parsing/filters. |
