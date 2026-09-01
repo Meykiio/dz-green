@@ -21,6 +21,21 @@ const cases: Array<[number, number, string | null, string]> = [
   [31.62, -2.22, "08", "Bechar"],
   [37.25, 6.0, null, "Mediterranean sea (north of the coast)"],
   [34.0, -4.0, null, "Morocco (outside the border)"],
+  // The 2025 division (Law 26-06): new wilayas resolve to their own codes.
+  [34.11, 2.1, "59", "Aflou"],
+  [35.39, 5.37, "60", "Barika"],
+  [35.22, 5.7, "61", "El Kantara"],
+  [34.75, 8.06, "62", "Bir El Ater"],
+  [34.41, -1.31, "63", "El Aricha"],
+  [35.21, 2.32, "64", "Ksar Chellala"],
+  [35.45, 2.9, "65", "Aïn Oussera"],
+  [33.75, 4.1, "66", "Messaad"],
+  [35.89, 2.75, "67", "Ksar El Boukhari"],
+  [35.21, 4.18, "68", "Bou Saâda"],
+  [32.9, 0.55, "69", "El Abiodh Sidi Cheikh"],
+  // The 2019 wilayas now have their own polygons too.
+  [29.26, 0.24, "49", "Timimoun"],
+  [33.1, 6.06, "55", "Touggourt"],
 ];
 
 describe("wilayaCodeForPoint", () => {

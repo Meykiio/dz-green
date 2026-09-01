@@ -86,6 +86,8 @@ export const forms: typeof import("../en/forms").forms = {
     denied: "الإشعارات محظورة في إعدادات المتصفح — اسمح بها لتصلك تنبيهات الحرائق.",
     wilayaLabel: "ولاية التنبيهات",
     allWilayas: "كل الجزائر",
+    unsupported:
+      "التنبيهات غير متوفرة هنا — تحتاج اتصالًا آمنًا (HTTPS) ومتصفحًا حديثًا. تعمل على الموقع المباشر.",
   },
   location: {
     wilaya: "الولاية *",

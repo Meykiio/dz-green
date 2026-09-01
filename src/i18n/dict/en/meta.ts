@@ -1,7 +1,7 @@
 export const meta = {
   homeTitle: "Green Algeria — the live map of Algeria's tree planting",
   homeDesc:
-    "See every tree planted across Algeria's 58 wilayas, log care for sites near you, and report wildfires on one community-run map.",
+    "See every tree planted across Algeria's 69 wilayas, log care for sites near you, and report wildfires on one community-run map.",
   aboutTitle: "About Green Algeria — a community map, not an emergency service",
   aboutDesc:
     "How Green Algeria works: open planting records reviewed before publishing, immediate care logs and fire reports, run by the community for the whole country.",

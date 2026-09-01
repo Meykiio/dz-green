@@ -89,6 +89,8 @@ export const forms = {
       "Notifications are blocked in your browser settings — allow them to get fire alerts.",
     wilayaLabel: "Wilaya for alerts",
     allWilayas: "All of Algeria",
+    unsupported:
+      "Alerts aren't available here — they need a secure connection (HTTPS) and a modern browser. They work on the live site.",
   },
   location: {
     wilaya: "Wilaya *",

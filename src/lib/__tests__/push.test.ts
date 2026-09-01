@@ -14,10 +14,12 @@ describe("shouldNotify", () => {
     expect(shouldNotify("16", "31")).toBe(false);
   });
 
-  it("a post-2019 wilaya resolves to its historic parent", () => {
-    const child = WILAYAS.find((w) => w.mapCode !== w.code)!;
-    expect(shouldNotify(child.code, child.mapCode)).toBe(true);
-    const other = WILAYAS.find((w) => w.mapCode !== child.mapCode && w.code === w.mapCode)!;
+  it("post-2019/2025 wilayas match their own code (69-polygon map)", () => {
+    // mapCode is identity since the 69-polygon map; territory continuity for
+    // moderators is handled at the DB level (assignments expanded to children).
+    const child = WILAYAS.find((w) => Number(w.code) >= 49)!;
+    expect(shouldNotify(child.code, child.code)).toBe(true);
+    const other = WILAYAS.find((w) => w.code !== child.code)!;
     expect(shouldNotify(child.code, other.code)).toBe(false);
   });
 });

@@ -107,7 +107,7 @@ export function FireAlertsCard() {
     setState("idle");
   };
 
-  if (state === "loading" || state === "unsupported") return null;
+  if (state === "loading") return null;
 
   return (
     <div className="rounded-xl border border-fire/30 bg-fire/5 p-4">
@@ -118,9 +118,13 @@ export function FireAlertsCard() {
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold">{t("forms.fireAlerts.title")}</p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {state === "denied" ? t("forms.fireAlerts.denied") : t("forms.fireAlerts.body")}
+            {state === "unsupported"
+              ? t("forms.fireAlerts.unsupported")
+              : state === "denied"
+                ? t("forms.fireAlerts.denied")
+                : t("forms.fireAlerts.body")}
           </p>
-          {state !== "denied" && (
+          {state !== "denied" && state !== "unsupported" && (
             <div className="mt-3 flex flex-wrap items-center gap-2">
               {state !== "subscribed" && (
                 <select
