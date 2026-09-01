@@ -97,13 +97,15 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
       style: theme === "dark" ? DARK_STYLE : LIGHT_STYLE,
       bounds: NORTH_BOUNDS,
       fitBoundsOptions: { padding: 24 },
-      minZoom: 4,
+      // 3.5 lets the whole country fit on screen (owner report 2026-09-01:
+      // minZoom 4 cut the south off on desktop AND mobile). The dim mask
+      // keeps the wider neighborhood clean; maxBounds still bounds panning.
+      minZoom: 3.5,
       maxZoom: 16,
-      // Keep Algeria framed — no getting lost in the whole globe.
-      maxBounds: [
-        [-14, 14],
-        [17, 42],
-      ],
+      // No maxBounds: any bounds wide enough to matter also clamps zoom-out
+      // on wide screens (the full-country report, 2026-09-01). minZoom 3.5
+      // is the real guardrail — you can never zoom out far enough to get
+      // lost — and Recenter brings the camera home.
       attributionControl: { compact: true },
     });
     if (creationError) {

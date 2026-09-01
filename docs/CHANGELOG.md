@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (seventy-fifth pass) — Full-country zoom-out (owner report) — NOT PUSHED
+
+- **Owner report:** the map can't zoom out far enough to see the whole country — desktop AND mobile. Root cause (two layers): `minZoom: 4` was set for the north-first initial view, and **`maxBounds` width is the real clamp** — MapLibre limits zoom-out when the viewport would exceed the bounds, and wide desktop viewports hit that wall first (proven empirically: desktop clamped at ~4.8 while mobile fit at ~4.1).
+- **Fix:** `minZoom` 4 → 3.5 and **maxBounds removed entirely** — any bounds wide enough to matter also clamps zoom-out, and minZoom is the real guardrail (you can't get lost at 3.5; Recenter brings you home).
+- **Verified:** both viewports reach exactly zoom 3.50 with the full country in frame (desktop 46.3°N→6.1°N, mobile 47.2°N→4.7°N); mobile screenshot shows the whole country with borders + dim mask, scale reads 500 km. tsc clean, build green.
+
 ## 2026-09-01 (seventy-fourth pass) — What to plant where (phase I) — NOT PUSHED
 
 - **What shipped:** "ماذا تغرس في {wilaya}؟" on /plant — up to 4 suggestion chips per wilaya (tap fills species). Layers: GBIF evidence per wilaya (exact WKT polygons → generated `data/wilaya-species.ts`, 69/69 harvested), hand-curated climate class per wilaya, curated 19-species matrix (AR/EN, fits, notes, cautions). Evidence-in-your-wilaya first, climate-fit after.
