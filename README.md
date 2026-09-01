@@ -1,79 +1,83 @@
-# Green Algeria
+# 🌱 Green Algeria — الجزائر الخضراء
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 [![CI](https://github.com/Meykiio/dz-green/actions/workflows/ci.yml/badge.svg)](https://github.com/Meykiio/dz-green/actions/workflows/ci.yml)
 
-A community-run live map of Algeria's tree planting, tree care, and wildfire reports — every tree on one map, so the next person plants one too.
+> **الجزائر الخضراء** خريطة حيّة يصنعها المجتمع: غرست شجرة؟ ضعها على الخريطة. سقيتها؟ سجّلها. رأيت حريقًا؟ أبلغ عنه — ويصلك تنبيه إن اشتعل حريق في ولايتك. مجانًا، بلا حساب، بلا إعلانات — من المجتمع، للمجتمع. **[green-dz.vercel.app](https://green-dz.vercel.app)**
 
-**[green-dz.vercel.app](https://green-dz.vercel.app)** — use the app · **[github.com/Meykiio/dz-green](https://github.com/Meykiio/dz-green)** — the code
+**[▶ Use the app — green-dz.vercel.app](https://green-dz.vercel.app)** · Arabic-first interface, English one tap away · free, no account, no ads
 
 ![Green Algeria home](public/og.png)
 
-## What it does
+## What is this?
 
-Planting activity in Algeria happens all over social media and disappears there. Nobody can see the cumulative total, nobody knows which trees are still being watered a month later, and there is no fast, shared way to flag a fire. Green Algeria puts all three on one live map of the country's 58 wilayas.
+Algeria plants trees everywhere — and the proof disappears into social media feeds. Nobody sees the total grow, nobody knows which trees are still watered a month later, and when a fire starts, there's no shared place to see it.
 
-Anyone can contribute, no account needed:
+Green Algeria puts all of it on **one living map of the country**: every tree planted, every care visit, every fire — posted by ordinary people, visible to everyone.
 
-- **Plant** — post a planting with a photo and a location (GPS, a pin, a Google Maps link, or just the wilaya). A volunteer moderator in that wilaya reviews it before it appears.
-- **Care** — log that you watered or checked any approved site. Publishes immediately and builds a visible timeline per site.
-- **Fire** — report a wildfire. Publishes immediately — speed beats moderation there.
+**You don't need an account, and it takes under a minute.** If you only remember one thing: **it is not an emergency service** — in danger, call **Protection Civile on 14 or 1021**. We say that on the fire form, on its confirmation screen, and in the SOS panel in the top bar.
 
-**Green Algeria is not an emergency service.** In danger, call Protection Civile on 14 or 1021. The app says this on the fire form, on its confirmation screen, and in the SOS panel in the top bar — and that wording stays.
+## What you can do
 
-## Features
+**The basics**
 
-- **Map-first home** — MapLibre GL + OpenFreeMap: every tree, care log and fire as its own dot at every zoom, wilaya borders, fire pulse halos, click-to-zoom wilayas, a recenter control, correct Arabic labels, dark theme.
-- **Anonymous-first submissions** — no account, under a minute, with a private receipt link (`/my/<token>`) to check your submission's status later.
-- **Honest locations** — server-side wilaya derivation from coordinates; wilaya-only submissions are stored and labeled as "wilaya-level", never fake precision.
-- **Roles** — admin + wilaya-scoped moderators managed from `/admin`; moderation queues scoped by RLS, with an audit trail (`reviewed_by/at`, moderator notes).
-- **Dashboards** — admin (platform stats + wilaya oversight + role management), moderator (queues scoped to their wilayas), and `/activity` for every signed-in user.
-- **Abuse gate** — silent-drop honeypot, submit-timing floor, hashed-IP + daily-rotating device-hash rate limits. Raw IPs and device secrets are never stored.
-- **Emergency contacts** — Protection Civile 14/1021, Police 17, Gendarmerie Nationale 1055, SAMU 16, one tap in the top bar.
+- **🌱 Plant a tree** — photo + location (GPS, a pin on the map, a Google Maps link, or just your wilaya). A volunteer moderator in your wilaya reviews it before it appears.
+- **💧 Log care** — "I watered it" / "I checked it" on any approved site. Builds a visible timeline, and the map shows which trees are thirsty.
+- **🔥 Report a fire** — publishes instantly (speed beats moderation), with the Protection Civile reminder always visible.
 
-Known gaps, honestly: alerting is schema-only (a contacts UI exists but nothing sends — wire-or-drop is an open decision); the interface is English-only (Arabic/French is an open decision). See [`docs/FEATURES.md`](docs/FEATURES.md) for the per-flow truth and [`docs/ROADMAP.md`](docs/ROADMAP.md) for what's next.
+**The new stuff**
 
-## Stack
+- **🛰️ Fires by satellite** — NASA's fire detections appear on the map as amber rings, several times a day, even where nobody is there to report. Tap one for its strength, confidence, and the **live weather + smoke** at that spot.
+- **🔔 Fire alerts on your phone** — install the app to your home screen, enable alerts for your wilaya (or all of Algeria), and your phone buzzes when a fire is reported. No account, no phone number, and turning it off deletes the subscription from our server.
+- **🌿 What to plant in your wilaya** — the plant form suggests trees that actually belong to your area: what's recorded growing there (GBIF biodiversity evidence) matched with your climate, from a guide of 19 Algerian species — with honest warnings (eucalyptus drinks too much; date palms are for oases).
+- **📷 Photo → species** — take a photo of your planting, and the app suggests the species (PlantNet botanical engine). One tap fills it in.
+- **🗺️ The new administrative map** — all **69 wilayas** with their real borders and **1,541 communes** as proper dropdowns. Zoom all the way out: the whole country finally fits on screen.
+- **💧 Rain-aware watering** — the "needs water" badge checks real rainfall: if it rained well on that spot, the tree isn't flagged.
 
-React 19 + TypeScript, TanStack Start (SSR + server functions) + TanStack Router + TanStack Query, Vite, Tailwind CSS v4, MapLibre GL, Supabase (Postgres + PostGIS, Auth, Storage, Realtime, RLS).
+## How it works (why you can trust it)
 
-## Run it locally
+- **No account needed** for anything public. Plantings are reviewed by volunteer moderators from the same wilaya; fires publish instantly because minutes matter.
+- **Your privacy is structural, not promised.** We never store your real IP address (only one-way hashes), phone numbers and names never appear on the public map, and there are no ads and no cross-site tracking.
+- **Anonymous receipts** — every submission gives you a private link to check its status later. That's the only way back to it; we can't tell who you are either.
+- **Open source** — every line of code and every rule is public in this repo.
 
-Requires Bun (or npm) and a Supabase project.
+## For moderators and volunteers
+
+Volunteers review plantings and triage fires for their own wilaya — a few minutes when you can, from your phone. The app has an admin panel (roles, volunteers, feedback, announcements), wilaya-scoped moderation queues, and a filming privacy mode that masks personal data on staff screens. Apply from the app's **Volunteer** page.
+
+## For developers
+
+<details>
+<summary><strong>Stack & local setup</strong></summary>
+
+React 19 + TypeScript, TanStack Start (SSR + server functions), Vite, Tailwind CSS v4, MapLibre GL, Supabase (Postgres + PostGIS, Auth, Storage, Realtime, RLS).
 
 ```bash
 bun install
-cp .env.example .env   # then fill in your project values
+cp .env.example .env   # fill in your Supabase values (all vars listed inside)
+bun run dev            # http://localhost:5173
+bun run test           # 202 unit + component tests
+bun run build          # production build
 ```
 
-`.env.example` lists every variable. The `VITE_*` trio goes into the browser bundle (safe — the publishable key is public by design). The server-side variables must reach the server runtime; the service-role key is required locally for submissions and photo serving, and is injected by the host in production. Never commit a real `.env`.
+Set up the database with [`docs/FULL_SCHEMA_EXPORT.sql`](docs/FULL_SCHEMA_EXPORT.sql) — the canonical schema source (tables, RLS, functions, grants, storage). `supabase/migrations/` is the change record, not a bootstrap path.
 
-Set up the database by running [`docs/FULL_SCHEMA_EXPORT.sql`](docs/FULL_SCHEMA_EXPORT.sql) in your project's SQL editor — the **single canonical schema source**, verified against the live database. It recreates everything: extensions, enums, tables, indexes, functions, triggers, RLS policies, grants, the realtime publication, and the private `photos` storage bucket. (`supabase/migrations/` is the change record for reviewers, not a bootstrap path — see its README.)
-
-```bash
-bun run dev     # http://localhost:5173
-bun run test    # unit tests
-bun run build   # production build
-```
-
-To make yourself an admin, sign up in the app, then run:
+First admin is seeded in SQL, then everything (roles, wilayas, volunteers, announcements) is managed from `/admin`:
 
 ```sql
 INSERT INTO public.user_roles (user_id, role) VALUES ('<your auth user id>', 'admin');
 ```
 
-The first admin must be seeded in SQL; after that, roles and wilaya assignments are managed from `/admin` in the app.
+</details>
 
 ## Documentation
 
-- [`docs/FEATURES.md`](docs/FEATURES.md) — what works, what is unverified, what is missing
-- [`docs/DATABASE.md`](docs/DATABASE.md) — tables, columns, every RLS policy in plain English, functions, grants, storage
-- [`docs/AUDIT.md`](docs/AUDIT.md) — the last full audit (security, performance, accessibility, SEO, code, data)
-- [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md) — every file and folder, one line each
-- [`docs/SYSTEM_INSTRUCTIONS.md`](docs/SYSTEM_INSTRUCTIONS.md) — standing rules for contributors
-- [`docs/CHANGELOG.md`](docs/CHANGELOG.md) — what changed and when
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) — what's next: pre-launch owner actions, open decisions, parked ideas
-- [`docs/FULL_SCHEMA_EXPORT.sql`](docs/FULL_SCHEMA_EXPORT.sql) — one-file database recreation
+- [`docs/FEATURES.md`](docs/FEATURES.md) — every feature, honestly: what works, what's unverified
+- [`docs/DATABASE.md`](docs/DATABASE.md) — tables, columns, every RLS policy in plain English
+- [`docs/AUDIT.md`](docs/AUDIT.md) — the security & performance audit
+- [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md) — every file, one line each
+- [`docs/CHANGELOG.md`](docs/CHANGELOG.md) — what changed and when (81 passes and counting)
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — what's next, what's parked, and why
 
 ## Contributing
 
