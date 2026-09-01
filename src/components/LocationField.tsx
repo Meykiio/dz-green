@@ -3,6 +3,7 @@ import { Crosshair, Link2, Loader2 } from "lucide-react";
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { CommuneField } from "@/components/CommuneField";
 import { useI18n } from "@/i18n";
 import { wilayaCodeForPoint } from "@/lib/geo";
 import { getGeoHint } from "@/lib/geo-hint";
@@ -206,15 +207,7 @@ export function LocationField({
             </span>
           )}
         </label>
-        <label className="block">
-          <span className="eyebrow">{t("forms.location.commune")}</span>
-          <input
-            value={commune}
-            maxLength={120}
-            onChange={(e) => onCommune(e.target.value)}
-            className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"
-          />
-        </label>
+        <CommuneField wilaya={wilaya} value={commune} onChange={onCommune} />
       </div>
 
       <div className="rounded-lg border border-border bg-card/50 p-3">

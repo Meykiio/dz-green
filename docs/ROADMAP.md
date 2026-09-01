@@ -48,7 +48,7 @@ DELETE FROM public.fire_reports WHERE id::text LIKE 'd2%';
 - **`submission_meta` retention policy** (`AUDIT.md` P2 #9): opportunistic cleanup inside the gate insert, or a cron.
 - **Payload reduction** (`AUDIT.md` P2 #8): ~21 MB / 209 requests first load, tile-heavy basemap. Evaluate a lighter basemap style after launch numbers exist.
 - **Field performance data** (`AUDIT.md` P2 #10): PageSpeed Insights / RUM on the deployed URL post-launch.
-- **Commune auto-suggest**: no commune dataset exists; adding one is real scope.
+- ~~**Commune auto-suggest**~~ **SHIPPED 2026-09-01 (release phase F, not yet pushed)** — the dataset turned out to exist (geoBoundaries ADM3 polygons; islam-re/Algeria-wilayas for the AR+Latin names we actually used). Commune is now a per-wilaya dropdown. See FEATURES.md Â§11l.
 - **Photo CDN**: stay on Supabase storage + proxy + cache headers (current) or move to a dedicated CDN. Cost-vs-simplicity decision, only relevant at scale.
 - **Search, per-wilaya pages, user profiles, leaderboards, sharing cards**: ideas, not plans.
 - **Scale revisit**: the no-auth-hook RLS design (live reads of `user_roles`) is the right call today; revisit if RLS checks ever become a hot path. Same for the 50k-row / 200-concurrent-realtime threshold on the home query.

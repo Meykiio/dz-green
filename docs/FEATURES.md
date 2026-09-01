@@ -159,6 +159,10 @@ Fire report and satellite hotspot panels now carry a **"Weather now"** block: te
 
 The fire/hotspot "Weather now" block gains a smoke line: **PM2.5 µg/m³ with a plain-language band** (US AQI breakpoints: good / moderate / unhealthy for sensitive people / unhealthy) **plus Saharan dust µg/m³** — the pair that tells a fire's smoke from a dust storm. CAMS gridded data via the Open-Meteo Air Quality API (no key, server-side, same 30 min cache), `getAirQuality` fn, fail-soft like the rest. `pm25Band` is shared-pure in `lib/weather.ts` (not `.server.*` — the import-protection rule). Verified: 4 new unit tests (169 total), tsc, build; live AQ shape check (Collo area: PM2.5 19.3, dust 17.0).
 
+## 11l. Commune dropdown (2026-09-01) — built, not pushed
+
+The free-text commune field is now a dropdown: **1,541 communes from the Journal Officiel dataset** (`islam-re/Algeria-wilayas`, MIT — vendored as generated `src/data/communes.ts`, all 69 wilayas so phase G lights up free). Per-wilaya list (Algiers: 57), Arabic labels in AR mode, **canonical Latin name stored** for uniform data. Disabled until a wilaya is chosen; "Other" keeps a free-text escape hatch for dataset gaps. Kills typos and mixed-language commune values, and makes moderator filtering by commune meaningful. Verified: probe — wilaya 16 (IP hint) → 59 options with Arabic labels/Latin values, "Kouba" stores as `Kouba`, «أخرى» reveals the free-text input.
+
 ## 12. Design system (2026-08-18, post-viral Sprint 4 + owner-directed revision)
 
 The app runs its own design system (`docs/DESIGN.md`), built for Green Algeria and revised against the `design-taste-frontend` and `impeccable` rubrics:

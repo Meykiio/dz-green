@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (sixty-ninth pass) — Commune dropdown (release-program phase F) — NOT PUSHED
+
+- **What shipped:** commune free-text → dropdown. Dataset: `islam-re/Algeria-wilayas` (MIT, Journal Officiel — 69 wilayas, 1,541 communes, AR+Latin) vendored as generated `src/data/communes.ts`. `CommuneField`: per-wilaya list, Arabic labels in AR mode, canonical Latin stored, disabled until wilaya chosen, "Other" free-text hatch. Probe caught + fixed a real bug: the hatch was unreachable from the empty state (select snapped back to placeholder) — now tracked with explicit `otherMode` state.
+- **Verified:** tsc clean, 169/169 tests, build green; probe — wilaya 16 (IP hint) → 59 options («حسين داي=Hussein Dey»), "Kouba" stores Latin, «أخرى» shows the input with the Arabic placeholder.
+- Docs: FEATURES 11l, PROJECT_STRUCTURE, ROADMAP (commune auto-suggest resolved).
+
 ## 2026-09-01 (sixty-eighth pass) — Smoke/AQ on fire details (release-program phase E3) — NOT PUSHED
 
 - **What shipped:** the fire/hotspot weather block gains a smoke line — PM2.5 with a plain band (US AQI breakpoints, AR+EN) + Saharan dust µg/m³ (fire smoke vs dust storm). Open-Meteo Air Quality API (CAMS, no key, server-side, cached), `getAirQuality` fn, fail-soft. `pm25Band` shared-pure in `lib/weather.ts`.

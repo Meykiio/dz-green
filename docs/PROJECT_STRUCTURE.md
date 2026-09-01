@@ -85,6 +85,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `ReceiptLink.tsx` | Success-screen receipt link: copyable `/my/<token>` URL, the only status lookup for anonymous submitters. |
 | `PrecisionPicker.tsx` | MapLibre GL + OpenFreeMap picker for exact pin drops inside forms. Draws an amber accuracy-radius circle from the GPS fix. |
 | `LocationField.tsx` | Wilaya-first location: wilaya/commune selects first (works without GPS), then an optional "Exact location" card â€” GPS button with privacy line, MapLibre picker behind a toggle, Google Maps link input, remove-pin action. |
+| `CommuneField.tsx` | Commune dropdown per wilaya (1,541 communes, AR labels, canonical Latin stored) with a free-text "Other" escape hatch. |
 | `EmergencyContacts.tsx` | SOS pill + popover in the top bar: Protection Civile 14/1021, Police 17, Gendarmerie Nationale 1055, SAMU 16, `tel:` links. |
 | `home/HomeBits.tsx` | Home helpers: `Stat`, `Chip`, `HomeCtas`. |
 | `home/ViewToggle.tsx` | Map / List / Board switch (floats top-right over the home view). |
@@ -156,6 +157,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `hooks/useTheme.tsx` | Shared light/dark theme store: one module-level value + listeners so every consumer (shell AND map) flips together. localStorage-persisted, `.dark` on `<html>`. |
 | `hooks/use-mobile.tsx` | Viewport breakpoint hook (template). |
 | `data/algeria-wilayas.ts` | Auto-generated from Natural Earth 10m admin-1 boundaries (public domain): Mercator-projected SVG path data for the 48 historic wilaya polygons. Do not hand-edit. |
+| `data/communes.ts` | Auto-generated from islam-re/Algeria-wilayas (MIT, Journal Officiel): `COMMUNES_BY_WILAYA` — 1,541 communes (ar + latin) across all 69 wilayas. Do not hand-edit. |
 | `integrations/supabase/client.ts` | Browser client (publishable key). Auto-generated â€” never edit. |
 | `integrations/supabase/client.server.ts` | Service-role admin client. Server-only. Auto-generated. |
 | `integrations/supabase/auth-attacher.ts` | Client middleware attaching the bearer token to server-fn calls. Auto-generated. |
