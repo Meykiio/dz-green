@@ -119,22 +119,22 @@ export function localizedAnnouncement(
 }
 
 /**
- * The active announcement (admin-controlled). Shared by the banner strip and
- * the chrome (which shifts down when it's present) — one network call, cache
- * shared via the query key. RLS limits anon reads to the active row.
+ * The active announcements (admin-controlled, possibly several at once —
+ * they scroll together in the strip). Shared by the banner and the chrome
+ * (which shifts down when any are present) — one network call, cache shared
+ * via the query key. RLS limits anon reads to active rows.
  */
 export const announcementQuery = queryOptions({
   queryKey: ["announcement", "active"],
-  queryFn: async (): Promise<ActiveAnnouncement | null> => {
+  queryFn: async (): Promise<ActiveAnnouncement[]> => {
     const { data, error } = await supabase
       .from("announcements")
       .select("id, title_ar, body_ar, title_en, body_en, kind, color, speed_seconds")
       .eq("active", true)
       .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .limit(10);
     if (error) throw error;
-    return (data ?? null) as ActiveAnnouncement | null;
+    return (data ?? []) as ActiveAnnouncement[];
   },
   staleTime: 300_000,
 });

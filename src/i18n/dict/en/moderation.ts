@@ -120,7 +120,7 @@ export const moderation = {
       feedback: "Feedback",
       announcements: "Announcements",
     },
-    announceLead: "One banner, site-wide. Publish shows it to every visitor; only one can be live at a time.",
+    announceLead: "Banners, site-wide. Published ones all show to every visitor — several live announcements scroll together in the strip.",
     announce: {
       new: "New announcement",
       titlePh: "Title (e.g. New: satellite hotspots on the map)",

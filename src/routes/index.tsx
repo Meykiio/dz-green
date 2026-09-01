@@ -40,7 +40,7 @@ function HomePage() {
   const careLogs = useQuery(careLogsQuery);
   const fires = useQuery(fireReportsQuery);
   const hotspots = useQuery(hotspotsQuery);
-  const hasAnnouncement = useQuery(announcementQuery).data != null;
+  const hasAnnouncement = (useQuery(announcementQuery).data ?? []).length > 0;
 
   const [layers, setLayers] = useState<Record<Layer, boolean>>({
     trees: true,

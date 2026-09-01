@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (eightieth pass) — Multi-publish announcements + reversed travel — NOT PUSHED
+
+- **Multi-publish (owner: "why can't I publish more than one?"):** the one-at-a-time constraint is gone — `adminSetAnnouncementActive` just toggles, the public query returns all active rows (≤10), and the strip joins them into one continuous marquee («إعلان 1 • إعلان 2»). Strip color/icon/speed come from the newest live row. Chrome-yield logic updated for the array shape.
+- **Direction reversed (owner request):** EN now travels right→left, AR left→right (one CSS rule swapped: reverse moves to the LTR container).
+- **Verified:** two drafts live → EN strip shows both joined with `animation-direction: reverse`; AR shows both in Arabic with `normal`. Drafts back to inactive for release. tsc clean, 202/202 tests, build green.
+
 ## 2026-09-01 (seventy-ninth pass) — PlantNet WebP root cause + species auto-fill — NOT PUSHED
 
 - **Owner report: identify always fails ("Couldn't identify this one").** Root cause, proven with evidence: PhotoInput compresses to **WebP** by default, and PlantNet **only accepts JPEG/PNG** (live answer: `400 "Unsupported file type for image[0] (jpeg or png)"` — both for WebP-labeled-JPEG and correctly-labeled WebP). My earlier verification passed because it sent a raw JPEG, not the app's compressed output — wrong-input testing, owned. Fix: `SpeciesSuggest` re-encodes to JPEG on a canvas before the call (no deps); `identifyPlant` also labels the upload from the actual magic bytes (defense in depth). Verified with the app's exact path: WebP → re-encode → PlantNet returns Maritime pine 0.41.

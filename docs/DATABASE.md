@@ -259,7 +259,8 @@ Admin-controlled site-wide banner (owner request). One active at a time (enforce
 | `title_en` / `body_en` | text | no | — | English text (same checks). |
 | `kind` | text | no | `'info'` | CHECK `IN ('info','success','warning')` — icon tone. |
 | `color` | text | no | `'ink'` | CHECK `IN ('ink','plant','care','fire','amber')` — curated contrast-safe palette (2026-09-01). |
-| `active` | boolean | no | `false` | Only active rows are publicly readable. |
+| `active` | boolean | no | `false` | Only active rows are publicly readable. **Several rows can be active at once** (2026-09-01) — the strip joins them; color/speed from the newest. |
+| `speed_seconds` | smallint | no | `32` | Marquee loop duration, CHECK 10–120 (2026-09-01). |
 | `created_at` | timestamptz | no | `now()` | |
 
 RLS **enabled**. One policy: `announcements_public_read` — `FOR SELECT USING (active = true)`; anon/authenticated hold `SELECT` (active rows only by design). `service_role` holds explicit `SELECT, INSERT, UPDATE, DELETE` (the SELECT grant matters — RLS bypass does not imply table privilege; owner caught the empty admin list 2026-09-01). Bilingual columns + color added by `20260901130000_announcements_bilingual.sql` (backfilled from the original title/body).

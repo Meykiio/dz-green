@@ -82,20 +82,16 @@ export const adminUpdateAnnouncement = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/** One active at a time: activating one deactivates every other row. */
+/**
+ * Publish/unpublish one row. Multiple announcements can be live at once
+ * (owner request 2026-09-01): all active rows scroll together in the strip.
+ */
 export const adminSetAnnouncementActive = createServerFn({ method: "POST" })
   .validator((data: unknown) =>
     z.object({ id: z.string().uuid(), active: z.boolean() }).parse(data),
   )
   .handler(async ({ data }) => {
     await requireAdmin();
-    if (data.active) {
-      const { error: clearErr } = await supabaseAdmin
-        .from("announcements")
-        .update({ active: false })
-        .eq("active", true);
-      if (clearErr) throw clearErr;
-    }
     const { error } = await supabaseAdmin
       .from("announcements")
       .update({ active: data.active })

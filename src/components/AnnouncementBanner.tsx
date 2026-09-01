@@ -28,24 +28,32 @@ const ICON_TONE = {
 export function AnnouncementBanner() {
   const { isRtl, locale } = useI18n();
   const announcement = useQuery(announcementQuery);
-  const a = announcement.data;
-  if (!a) return null;
-  const Icon = a.kind === "success" ? PartyPopper : a.kind === "warning" ? TriangleAlert : Info;
-  const { title, body } = localizedAnnouncement(a, locale);
-  const text = `${title} — ${body}`;
+  const list = announcement.data ?? [];
+  if (list.length === 0) return null;
+  // Several can be live at once: they scroll as one continuous marquee.
+  // Strip color/icon/speed come from the newest live announcement.
+  const newest = list[0]!;
+  const Icon =
+    newest.kind === "success" ? PartyPopper : newest.kind === "warning" ? TriangleAlert : Info;
+  const text = list
+    .map((a) => {
+      const { title, body } = localizedAnnouncement(a, locale);
+      return `${title} — ${body}`;
+    })
+    .join("   •   ");
 
   return (
     <div
       role="status"
-      className={`fixed inset-x-0 top-0 z-50 flex h-9 items-center overflow-hidden ${COLOR_STYLE[a.color] ?? COLOR_STYLE.ink}`}
+      className={`fixed inset-x-0 top-0 z-50 flex h-9 items-center overflow-hidden ${COLOR_STYLE[newest.color] ?? COLOR_STYLE.ink}`}
     >
-      <span className={`grid h-full w-9 shrink-0 place-items-center ${ICON_TONE[a.kind]}`}>
+      <span className={`grid h-full w-9 shrink-0 place-items-center ${ICON_TONE[newest.kind]}`}>
         <Icon className="size-4" />
       </span>
       <div className="group relative flex-1 overflow-hidden" dir={isRtl ? "rtl" : "ltr"}>
         <div
           className="ga-marquee flex w-max items-center whitespace-nowrap text-sm font-medium group-hover:[animation-play-state:paused]"
-          style={{ animationDuration: `${a.speed_seconds}s` }}
+          style={{ animationDuration: `${newest.speed_seconds}s` }}
         >
           {/* Two copies for a seamless loop */}
           <span className="pe-16">{text}</span>

@@ -271,9 +271,9 @@
   }
 }
 
-/* Announcement marquee: two copies loop seamlessly, traveling in the reading
-   direction (LTR rightward, RTL leftward via reverse). Pauses on hover (the
-   .group wrapper), off entirely for reduced-motion. */
+/* Announcement marquee: two copies loop seamlessly. Travel direction (owner
+   request 2026-09-01): LTR right→left (reverse), RTL left→right (normal).
+   Pauses on hover (the .group wrapper), off entirely for reduced-motion. */
 @keyframes ga-marquee {
   from {
     transform: translateX(-50%);
@@ -285,7 +285,7 @@
 .ga-marquee {
   animation: ga-marquee 32s linear infinite;
 }
-[dir="rtl"] .ga-marquee {
+[dir="ltr"] .ga-marquee {
   animation-direction: reverse;
 }
 @media (prefers-reduced-motion: reduce) {

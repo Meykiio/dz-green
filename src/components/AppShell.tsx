@@ -71,7 +71,7 @@ function Shell({
   const { user, isModerator, isAdmin } = useAuth();
   // The announcement strip (when live) sits above the top bar — the chrome
   // yields to it here (same query key as the banner, one shared fetch).
-  const hasAnnouncement = useQuery(announcementQuery).data != null;
+  const hasAnnouncement = (useQuery(announcementQuery).data ?? []).length > 0;
   const { theme, toggle } = useTheme();
   const { t, locale, setLocale, isRtl } = useI18n();
   const { masked, toggle: togglePrivacy } = usePrivacyMode();
