@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (sixty-eighth pass) — Smoke/AQ on fire details (release-program phase E3) — NOT PUSHED
+
+- **What shipped:** the fire/hotspot weather block gains a smoke line — PM2.5 with a plain band (US AQI breakpoints, AR+EN) + Saharan dust µg/m³ (fire smoke vs dust storm). Open-Meteo Air Quality API (CAMS, no key, server-side, cached), `getAirQuality` fn, fail-soft. `pm25Band` shared-pure in `lib/weather.ts`.
+- **Verified:** 169/169 tests (4 new: band breakpoints + AQ mapper), tsc clean, build green; live AQ shape check (PM2.5 19.3, dust 17.0 near Collo).
+- Docs: FEATURES 11k.
+
 ## 2026-09-01 (sixty-seventh pass) — Rain-aware watering (release-program phase E2) — NOT PUSHED
 
 - **What shipped:** "needs water" gains a water check. Time rule first (unchanged), then one batched Open-Meteo 14-day-rainfall call for thirsty candidates only (max 100, multi-coordinate); ≥10 mm (`RAIN_RESET_MM`) clears the flag. Fail-soft: API down → time-only behavior. `needsWater(site, logs, rainMm?)` — all 4 call sites keep working; `rainBySiteId` threads index → SiteList/DetailPanel/stats.

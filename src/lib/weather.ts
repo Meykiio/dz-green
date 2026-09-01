@@ -17,3 +17,13 @@ export interface FireWeather {
   /** 0-359, meteorological (the direction the wind comes FROM). */
   windDirectionDeg: number;
 }
+
+export type Pm25Band = "good" | "moderate" | "unhealthySensitive" | "unhealthy";
+
+/** PM2.5 µg/m³ → a simple, explainable band (US AQI breakpoints). */
+export function pm25Band(pm25: number): Pm25Band {
+  if (pm25 <= 12) return "good";
+  if (pm25 <= 35.4) return "moderate";
+  if (pm25 <= 55.4) return "unhealthySensitive";
+  return "unhealthy";
+}

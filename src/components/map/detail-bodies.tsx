@@ -6,8 +6,8 @@ import { useI18n } from "@/i18n";
 import { directionsUrl } from "@/lib/maps-link";
 import type { Hotspot } from "@/lib/types";
 import { wilayaCodeForPoint } from "@/lib/geo";
-import { compass } from "@/lib/weather";
-import { getFireWeather } from "@/lib/weather.functions";
+import { compass, pm25Band } from "@/lib/weather";
+import { getAirQuality, getFireWeather } from "@/lib/weather.functions";
 import { wilayaName } from "@/lib/wilayas";
 
 /**
@@ -21,25 +21,42 @@ export function FireWeatherBlock({ lat, lng }: { lat: number; lng: number }) {
     queryFn: () => getFireWeather({ data: { lat, lng } }),
     staleTime: 600_000,
   });
+  const air = useQuery({
+    queryKey: ["air-quality", lat.toFixed(2), lng.toFixed(2)],
+    queryFn: () => getAirQuality({ data: { lat, lng } }),
+    staleTime: 600_000,
+  });
   const w = weather.data;
-  if (!w) return null;
+  const a = air.data;
+  if (!w && !a) return null;
   return (
     <div className="rounded-lg border border-border bg-card px-3 py-2.5">
       <p className="eyebrow flex items-center gap-1.5">
         <Wind className="size-3.5" />
         {t("home.detail.weather.title")}
       </p>
-      <p className="mt-1 text-sm">
-        <span className="font-medium tabular-nums">{w.temperatureC}°C</span>
-        {" · "}
-        {t("home.detail.weather.humidity", { pct: w.humidityPct })}
-        {" · "}
-        {t("home.detail.weather.wind", {
-          speed: w.windSpeedKmh,
-          dir: t(`home.detail.weather.dir.${compass(w.windDirectionDeg)}`),
-          gusts: w.windGustsKmh,
-        })}
-      </p>
+      {w && (
+        <p className="mt-1 text-sm">
+          <span className="font-medium tabular-nums">{w.temperatureC}°C</span>
+          {" · "}
+          {t("home.detail.weather.humidity", { pct: w.humidityPct })}
+          {" · "}
+          {t("home.detail.weather.wind", {
+            speed: w.windSpeedKmh,
+            dir: t(`home.detail.weather.dir.${compass(w.windDirectionDeg)}`),
+            gusts: w.windGustsKmh,
+          })}
+        </p>
+      )}
+      {a && (
+        <p className="mt-1 text-sm text-muted-foreground">
+          {t("home.detail.weather.air", {
+            pm: a.pm25,
+            band: t(`home.detail.weather.band.${pm25Band(a.pm25)}`),
+            dust: a.dust,
+          })}
+        </p>
+      )}
     </div>
   );
 }

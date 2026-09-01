@@ -89,6 +89,13 @@ export const home: typeof import("../en/home").home = {
       title: "الطقس الآن",
       humidity: "رطوبة {pct}%",
       wind: "رياح {speed} كم/س {dir} (هبات {gusts})",
+      air: "PM2.5 ‏{pm} ميكروغرام/م³ — {band} · غبار {dust} ميكروغرام/م³",
+      band: {
+        good: "جيد",
+        moderate: "متوسط",
+        unhealthySensitive: "غير صحي للفئات الحساسة",
+        unhealthy: "غير صحي",
+      },
       dir: {
         n: "شمال",
         ne: "شمال شرق",

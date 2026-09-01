@@ -155,6 +155,10 @@ Fire report and satellite hotspot panels now carry a **"Weather now"** block: te
 
 "Needs water" is no longer a dumb 14-day timer. The time rule still runs (no care in 14 days), but the home page then makes **one batched Open-Meteo call** (multi-coordinate, 14-day `precipitation_sum`) for just the thirsty candidates: **≥ 10 mm of rain in the window clears the flag** — nature watered it. Rainfall unknown (API down) → time-only behavior, never a false "all good". Threads through the stats strip, the list badge, and the detail notice via an optional `rainBySiteId` map; `needsWater(site, logs, rainMm?)` stays backward-compatible (6 unit tests incl. the rain branches). Verified: 167/167 tests, tsc, build; the multi-coordinate response shape validated against the live API (Algiers 0.8 mm / Hassi Messaoud 0 mm, 15 daily values each).
 
+## 11k. Smoke / air quality on fire details (Open-Meteo AQ, 2026-09-01) — built, not pushed
+
+The fire/hotspot "Weather now" block gains a smoke line: **PM2.5 µg/m³ with a plain-language band** (US AQI breakpoints: good / moderate / unhealthy for sensitive people / unhealthy) **plus Saharan dust µg/m³** — the pair that tells a fire's smoke from a dust storm. CAMS gridded data via the Open-Meteo Air Quality API (no key, server-side, same 30 min cache), `getAirQuality` fn, fail-soft like the rest. `pm25Band` is shared-pure in `lib/weather.ts` (not `.server.*` — the import-protection rule). Verified: 4 new unit tests (169 total), tsc, build; live AQ shape check (Collo area: PM2.5 19.3, dust 17.0).
+
 ## 12. Design system (2026-08-18, post-viral Sprint 4 + owner-directed revision)
 
 The app runs its own design system (`docs/DESIGN.md`), built for Green Algeria and revised against the `design-taste-frontend` and `impeccable` rubrics:

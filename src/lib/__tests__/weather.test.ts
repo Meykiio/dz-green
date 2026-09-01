@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { compass } from "@/lib/weather";
-import { mapCurrent, mapRainTotals } from "@/lib/weather.server";
+import { compass, pm25Band } from "@/lib/weather";
+import { mapAirQuality, mapCurrent, mapRainTotals } from "@/lib/weather.server";
 
 describe("compass", () => {
   it("maps degrees to 8-wind keys", () => {
@@ -60,5 +60,25 @@ describe("mapRainTotals", () => {
 
   it("accepts a single-location (non-array) payload", () => {
     expect(mapRainTotals({ daily: { precipitation_sum: [3, 7] } })).toEqual([10]);
+  });
+});
+
+describe("pm25Band", () => {
+  it("bands PM2.5 on the US AQI breakpoints", () => {
+    expect(pm25Band(5)).toBe("good");
+    expect(pm25Band(12)).toBe("good");
+    expect(pm25Band(20)).toBe("moderate");
+    expect(pm25Band(40)).toBe("unhealthySensitive");
+    expect(pm25Band(80)).toBe("unhealthy");
+  });
+});
+
+describe("mapAirQuality", () => {
+  it("maps a valid payload and rejects a malformed one", () => {
+    expect(mapAirQuality({ current: { pm2_5: 42.24, dust: 120.07 } })).toEqual({
+      pm25: 42.2,
+      dust: 120.1,
+    });
+    expect(() => mapAirQuality({})).toThrow();
   });
 });

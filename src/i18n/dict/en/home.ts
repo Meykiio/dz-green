@@ -90,6 +90,13 @@ export const home = {
       title: "Weather now",
       humidity: "humidity {pct}%",
       wind: "wind {speed} km/h {dir} (gusts {gusts})",
+      air: "PM2.5 {pm} µg/m³ — {band} · dust {dust} µg/m³",
+      band: {
+        good: "good",
+        moderate: "moderate",
+        unhealthySensitive: "unhealthy for sensitive people",
+        unhealthy: "unhealthy",
+      },
       dir: {
         n: "N",
         ne: "NE",

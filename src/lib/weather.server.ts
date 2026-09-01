@@ -74,6 +74,40 @@ export async function fetchDailyRainMm(
   return totals.map((t) => Math.round(t * 10) / 10);
 }
 
+export interface AirQuality {
+  pm25: number;
+  dust: number;
+}
+
+interface OpenMeteoAirCurrent {
+  current?: { pm2_5?: number; dust?: number };
+}
+
+export function mapAirQuality(json: OpenMeteoAirCurrent): AirQuality {
+  const c = json.current;
+  if (!c || typeof c.pm2_5 !== "number" || typeof c.dust !== "number") {
+    throw new Error("Open-Meteo: malformed air-quality payload");
+  }
+  return { pm25: Math.round(c.pm2_5 * 10) / 10, dust: Math.round(c.dust * 10) / 10 };
+}
+
+/** CAMS air quality for a point (PM2.5 + Saharan dust), same cache map. */
+export async function fetchAirQuality(lat: number, lng: number): Promise<AirQuality> {
+  const key = `aq:${lat.toFixed(1)},${lng.toFixed(1)}`;
+  const hit = cache.get(key);
+  if (hit && Date.now() - hit.at < CACHE_TTL_MS) {
+    return hit.data as unknown as AirQuality;
+  }
+  const url =
+    `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat.toFixed(4)}` +
+    `&longitude=${lng.toFixed(4)}&current=pm2_5,dust`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+  if (!res.ok) throw new Error(`Open-Meteo AQ responded ${res.status}`);
+  const data = mapAirQuality((await res.json()) as OpenMeteoAirCurrent);
+  cache.set(key, { at: Date.now(), data: data as unknown as FireWeather });
+  return data;
+}
+
 export async function fetchFireWeather(lat: number, lng: number): Promise<FireWeather> {
   const key = `${lat.toFixed(1)},${lng.toFixed(1)}`;
   const hit = cache.get(key);
