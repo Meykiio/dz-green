@@ -86,6 +86,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `PrecisionPicker.tsx` | MapLibre GL + OpenFreeMap picker for exact pin drops inside forms. Draws an amber accuracy-radius circle from the GPS fix. |
 | `LocationField.tsx` | Wilaya-first location: wilaya/commune selects first (works without GPS), then an optional "Exact location" card â€” GPS button with privacy line, MapLibre picker behind a toggle, Google Maps link input, remove-pin action. |
 | `CommuneField.tsx` | Commune dropdown per wilaya (1,541 communes, AR labels, canonical Latin stored) with a free-text "Other" escape hatch. |
+| `PlantingGuide.tsx` | "What to plant here" chips on /plant: evidence-first species suggestions per wilaya (climate fit + GBIF evidence), tap-to-fill. |
 | `SpeciesSuggest.tsx` | "Identify from the photo" button + one-tap species chips on the plant form (PlantNet). |
 | `EmergencyContacts.tsx` | SOS pill + popover in the top bar: Protection Civile 14/1021, Police 17, Gendarmerie Nationale 1055, SAMU 16, `tel:` links. |
 | `home/HomeBits.tsx` | Home helpers: `Stat`, `Chip`, `HomeCtas`. |
@@ -161,6 +162,8 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `hooks/use-mobile.tsx` | Viewport breakpoint hook (template). |
 | `data/algeria-wilayas.ts` | Auto-generated from namrouche993/algeria-wilayas-geojson v69 (MIT): Mercator-projected SVG path data for all **69** wilaya polygons (Law 26-06, the 2025 division). Do not hand-edit. |
 | `data/communes.ts` | Auto-generated from islam-re/Algeria-wilayas (MIT, Journal Officiel): `COMMUNES_BY_WILAYA` — 1,541 communes (ar + latin) across all 69 wilayas. Do not hand-edit. |
+| `data/wilaya-species.ts` | Auto-generated from GBIF occurrence evidence (exact WKT wilaya polygons, Plantae only): top-10 recorded plant species per wilaya with counts. Do not hand-edit. |
+| `data/species-guide.ts` | Curated planting guide: `WILAYA_CLIMATE` (climate class per wilaya) + `SPECIES_GUIDE` (19 species: AR/EN names, climate fits, notes, cautions). Hand-curated — edit with sources. |
 | `integrations/supabase/client.ts` | Browser client (publishable key). Auto-generated â€” never edit. |
 | `integrations/supabase/client.server.ts` | Service-role admin client. Server-only. Auto-generated. |
 | `integrations/supabase/auth-attacher.ts` | Client middleware attaching the bearer token to server-fn calls. Auto-generated. |

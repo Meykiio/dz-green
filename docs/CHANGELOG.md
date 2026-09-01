@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (seventy-fourth pass) — What to plant where (phase I) — NOT PUSHED
+
+- **What shipped:** "ماذا تغرس في {wilaya}؟" on /plant — up to 4 suggestion chips per wilaya (tap fills species). Layers: GBIF evidence per wilaya (exact WKT polygons → generated `data/wilaya-species.ts`, 69/69 harvested), hand-curated climate class per wilaya, curated 19-species matrix (AR/EN, fits, notes, cautions). Evidence-in-your-wilaya first, climate-fit after.
+- **Harvest war stories (why deep verification matters):** GBIF's `class` param doesn't exist and is silently ignored — the first harvest came back with gulls as top "trees" (fixed to `taxonKey=6` Plantae); long WKTs 400 (stride-decimation); invalid-shape WKTs 400 (ring closing + bbox fallback, only Béjaïa needed it); GBIF author citations broke the evidence match (binomial normalization).
+- **Verified:** 201/201 tests (7 new suggester tests incl. all-wilayas climate-fit invariant), tsc clean, build green; probe — Béjaïa shows مصطكى + زيتون as evidence before Aleppo/Maritime pine as fit.
+- Docs: FEATURES 11q, PROJECT_STRUCTURE.
+
 ## 2026-09-01 (seventy-third pass) — Banner done properly: marquee strip, bilingual, color control, edit — NOT PUSHED
 
 Owner tested the first banner version and rejected it (invisible tint, overlapped the navbar, no edit, no list). Full rework:

@@ -8,6 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { FormShell, Honeypot } from "@/components/FormShell";
 import { LocationField } from "@/components/LocationField";
 import { PhotoInput } from "@/components/PhotoInput";
+import { PlantingGuide } from "@/components/PlantingGuide";
 import { ReceiptLink } from "@/components/ReceiptLink";
 import { SpeciesSuggest } from "@/components/SpeciesSuggest";
 import { Button } from "@/components/ui/button";
@@ -139,6 +140,7 @@ function PlantPage() {
             onWilaya={setWilaya}
             onCommune={setCommune}
           />
+          <PlantingGuide wilaya={wilaya} onPick={setSpecies} />
 
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block">
