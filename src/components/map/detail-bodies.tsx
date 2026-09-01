@@ -1,11 +1,48 @@
-import { Navigation } from "lucide-react";
+import { Navigation, Wind } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n";
 import { directionsUrl } from "@/lib/maps-link";
 import type { Hotspot } from "@/lib/types";
 import { wilayaCodeForPoint } from "@/lib/geo";
+import { compass } from "@/lib/weather";
+import { getFireWeather } from "@/lib/weather.functions";
 import { wilayaName } from "@/lib/wilayas";
+
+/**
+ * "Weather now" block for fire/hotspot panels: temp, humidity, wind — the
+ * spread-danger context. On-demand per open panel; hidden when unavailable.
+ */
+export function FireWeatherBlock({ lat, lng }: { lat: number; lng: number }) {
+  const { t } = useI18n();
+  const weather = useQuery({
+    queryKey: ["fire-weather", lat.toFixed(2), lng.toFixed(2)],
+    queryFn: () => getFireWeather({ data: { lat, lng } }),
+    staleTime: 600_000,
+  });
+  const w = weather.data;
+  if (!w) return null;
+  return (
+    <div className="rounded-lg border border-border bg-card px-3 py-2.5">
+      <p className="eyebrow flex items-center gap-1.5">
+        <Wind className="size-3.5" />
+        {t("home.detail.weather.title")}
+      </p>
+      <p className="mt-1 text-sm">
+        <span className="font-medium tabular-nums">{w.temperatureC}°C</span>
+        {" · "}
+        {t("home.detail.weather.humidity", { pct: w.humidityPct })}
+        {" · "}
+        {t("home.detail.weather.wind", {
+          speed: w.windSpeedKmh,
+          dir: t(`home.detail.weather.dir.${compass(w.windDirectionDeg)}`),
+          gusts: w.windGustsKmh,
+        })}
+      </p>
+    </div>
+  );
+}
 
 /** Detail body for a satellite hotspot (NASA FIRMS) — display-only, honest copy. */
 export function HotspotBody({ hotspot }: { hotspot: Hotspot }) {
@@ -27,6 +64,7 @@ export function HotspotBody({ hotspot }: { hotspot: Hotspot }) {
           value={`${hotspot.satellite} · ${t(`home.detail.hotspot.daynight.${hotspot.daynight}`)}`}
         />
       </dl>
+      <FireWeatherBlock lat={hotspot.lat} lng={hotspot.lng} />
       <p className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
         {t("home.detail.hotspot.disclaimer")}
       </p>

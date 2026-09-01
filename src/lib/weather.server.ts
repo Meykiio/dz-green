@@ -1,0 +1,59 @@
+/**
+ * Open-Meteo fire weather — server-only, no API key (free non-commercial).
+ * Current conditions for a point: what a viewer/moderator needs to read a
+ * fire's danger — temperature, humidity, wind (speed, direction, gusts).
+ * Tiny in-memory cache (0.1° grid, 30 min) to stay polite on repeat clicks.
+ * Shared pure helpers (compass, FireWeather) live in ./weather.
+ */
+
+import type { FireWeather } from "./weather";
+
+const cache = new Map<string, { at: number; data: FireWeather }>();
+const CACHE_TTL_MS = 30 * 60 * 1000;
+const FETCH_TIMEOUT_MS = 8000;
+
+interface OpenMeteoCurrent {
+  current?: {
+    temperature_2m?: number;
+    relative_humidity_2m?: number;
+    wind_speed_10m?: number;
+    wind_direction_10m?: number;
+    wind_gusts_10m?: number;
+  };
+}
+
+/** Map the API response; throws on a malformed payload. */
+export function mapCurrent(json: OpenMeteoCurrent): FireWeather {
+  const c = json.current;
+  if (
+    !c ||
+    typeof c.temperature_2m !== "number" ||
+    typeof c.relative_humidity_2m !== "number" ||
+    typeof c.wind_speed_10m !== "number" ||
+    typeof c.wind_direction_10m !== "number"
+  ) {
+    throw new Error("Open-Meteo: malformed current payload");
+  }
+  return {
+    temperatureC: Math.round(c.temperature_2m * 10) / 10,
+    humidityPct: Math.round(c.relative_humidity_2m),
+    windSpeedKmh: Math.round(c.wind_speed_10m),
+    windGustsKmh: Math.round(c.wind_gusts_10m ?? 0),
+    windDirectionDeg: c.wind_direction_10m,
+  };
+}
+
+export async function fetchFireWeather(lat: number, lng: number): Promise<FireWeather> {
+  const key = `${lat.toFixed(1)},${lng.toFixed(1)}`;
+  const hit = cache.get(key);
+  if (hit && Date.now() - hit.at < CACHE_TTL_MS) return hit.data;
+
+  const url =
+    `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lng.toFixed(4)}` +
+    `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+  if (!res.ok) throw new Error(`Open-Meteo responded ${res.status}`);
+  const data = mapCurrent((await res.json()) as OpenMeteoCurrent);
+  cache.set(key, { at: Date.now(), data });
+  return data;
+}

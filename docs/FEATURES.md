@@ -147,6 +147,10 @@ Forms now start one step ahead: Vercel's free IP-geolocation headers (`x-vercel-
 
 Three small accuracy wins. **Median fix:** the 12 s GPS watch no longer trusts the single "best accuracy" reading (a lucky outlier can sit tens of meters off) — `medianFix` (lib/gps.ts, unit-tested) takes the 3 most recent ±100 m fixes and medians them. **WiFi hint:** Android users see "turn WiFi on (even without connecting) usually sharpens the fix" while the watch runs (Google's location service uses WiFi scanning). **Viewer controls:** the home map gains MapLibre's `GeolocateControl` ("find me" during fire waves) and a metric `ScaleControl` (km bar for judging fire distances). Verified: 4 new unit tests (157 total), tsc, build; probe — both controls render, scale reads "50 km".
 
+## 11i. Fire weather on details (Open-Meteo, 2026-09-01) — built, not pushed
+
+Fire report and satellite hotspot panels now carry a **"Weather now"** block: temperature, humidity, wind (speed, compass direction, gusts) — the spread-danger context, on-demand per open panel. Open-Meteo: free, no key, server-side fetch (`weather.server.ts`, 8 s timeout, 0.1°/30 min cache), `getFireWeather` server fn returning `null` on failure (the block just hides — never breaks the page). Compass mapping is a shared pure helper (`lib/weather.ts` — the client can't import `.server.*` files; the build's import-protection caught this and the split is the fix). Arabic compass labels («رياح 11 كم/س شرق»). Verified: 4 unit tests (161 total), tsc, build; live probe — a Sahara hotspot panel shows real data (43.4°C · 9% · E 11 km/h).
+
 ## 12. Design system (2026-08-18, post-viral Sprint 4 + owner-directed revision)
 
 The app runs its own design system (`docs/DESIGN.md`), built for Green Algeria and revised against the `design-taste-frontend` and `impeccable` rubrics:

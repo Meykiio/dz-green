@@ -85,6 +85,21 @@ export const home: typeof import("../en/home").home = {
       site: "موقع الغرس",
       hotspot: "ناسا FIRMS",
     },
+    weather: {
+      title: "الطقس الآن",
+      humidity: "رطوبة {pct}%",
+      wind: "رياح {speed} كم/س {dir} (هبات {gusts})",
+      dir: {
+        n: "شمال",
+        ne: "شمال شرق",
+        e: "شرق",
+        se: "جنوب شرق",
+        s: "جنوب",
+        sw: "جنوب غرب",
+        w: "غرب",
+        nw: "شمال غرب",
+      },
+    },
     hotspot: {
       title: "نقطة حرارية — قمر صناعي",
       confidence: "درجة الثقة",

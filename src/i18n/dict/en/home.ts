@@ -86,6 +86,21 @@ export const home = {
       site: "Planting site",
       hotspot: "NASA FIRMS",
     },
+    weather: {
+      title: "Weather now",
+      humidity: "humidity {pct}%",
+      wind: "wind {speed} km/h {dir} (gusts {gusts})",
+      dir: {
+        n: "N",
+        ne: "NE",
+        e: "E",
+        se: "SE",
+        s: "S",
+        sw: "SW",
+        w: "W",
+        nw: "NW",
+      },
+    },
     hotspot: {
       title: "Satellite hotspot",
       confidence: "Confidence",

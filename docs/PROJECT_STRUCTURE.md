@@ -139,6 +139,9 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `pwa.ts` | Production-only service-worker registration. |
 | `geo-hint.ts` | Coarse IP-geolocation hint (Vercel headers): `getGeoHint()` reads `window.__GA_GEO__` (client) / the request-global (server). Never stored. |
 | `gps.ts` | `medianFix()` — robust final GPS fix: median of the last 3 ±100 m readings (rejects lucky outliers), single-best fallback. Unit-tested. |
+| `weather.ts` | Shared pure weather helpers: `compass()` (8-wind, i18n'd) + the `FireWeather` type. Client-safe. |
+| `weather.server.ts` | Open-Meteo fetch (no key): current conditions for a point, 8 s timeout, 0.1°/30 min in-memory cache, `mapCurrent` mapper. |
+| `weather.functions.ts` | `getFireWeather` server fn (zod-bounded lat/lng) — returns null on failure, never breaks the panel. |
 | `push.server.ts` | Web Push server lib: VAPID setup (fail loud), subscribe/unsubscribe impls, `shouldNotify` scope match, `notifyFireSubscribers` fan-out (total, prunes stale endpoints). |
 | `push.functions.ts` | `subscribePush` / `unsubscribePush` public server fns (zod). |
 | `error-capture.ts`, `error-page.ts` | Platform error plumbing. |

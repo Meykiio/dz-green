@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (sixty-sixth pass) — Fire weather on details (release-program phase E1) — NOT PUSHED
+
+- **What shipped:** a "Weather now" block on fire-report + hotspot panels (temp, humidity, wind speed/compass/gusts) via Open-Meteo — free, no key, server-side, cached. `getFireWeather` fn fails soft (block hides). Arabic compass labels.
+- **Caught by the build:** the client imported `compass` from a `.server.*` file — TanStack's import-protection denied it (the audit's S8 guard working as designed). Fix: shared pure helpers in `lib/weather.ts`, fetch/cache in `weather.server.ts`.
+- **Verified:** 161/161 tests (4 new: compass + payload mapper), tsc clean, build green; live probe — a Sahara hotspot panel shows real Open-Meteo data (43.4°C · 9% · E 11 km/h, gusts 31).
+- Docs: FEATURES 11i, PROJECT_STRUCTURE.
+
 ## 2026-09-01 (sixty-fifth pass) — GPS trio (release-program phase D) — NOT PUSHED
 
 - **What shipped:** (1) `medianFix` — the GPS watch finishes with the median of the last 3 ±100 m fixes instead of one lucky best reading (pure fn in `lib/gps.ts`, 4 unit tests); (2) Android WiFi hint while locating («تفعيل الواي فاي يحسّن دقة الموقع»); (3) home-map `GeolocateControl` ("find me") + metric `ScaleControl`.
