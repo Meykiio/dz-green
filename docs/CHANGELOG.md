@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (sixty-fourth pass) — IP geolocation pre-fill (release-program phase C) — NOT PUSHED
+
+- **What shipped:** forms start one step ahead. Vercel's free IP-geo headers read per request in `server.ts` (never stored) → SSR injects `window.__GA_GEO__` → `LocationField` pre-selects the wilaya (existing polygons) and centers the picker on the visitor's city (zoom 9). Suggestion-only by design: user-overridable, and the server derives the real wilaya from the pin regardless. Honest source copy: "Detected from your pin" vs "Guessed approximately from your connection" (AR+EN). Graceful null off-Vercel.
+- **Verified:** tsc clean, 153/153 tests, build green; SSR injects the hint with headers and `null` without; browser probe with mocked headers → wilaya 16 pre-selected + the IP note renders.
+- Docs: FEATURES 11g, PROJECT_STRUCTURE (geo-hint + LocationField's honest line count).
+
 ## 2026-09-01 (sixty-third pass) — Web Push fire alerts (release-program phase B) — NOT PUSHED
 
 - **What shipped:** browser fire alerts, free and account-free. `FireAlertsCard` on `/fire` (form + success screen) → permission → push subscription → `push_subscriptions` row (new table, RLS on, zero client grants — migration applied live via MCP + mirrored). Fire insert → `notifyFireSubscribers` fan-out (awaited, total): Arabic «🔥 حريق جديد في {wilaya}», high urgency, 24h TTL, per-wilaya topic, stale-endpoint pruning. Wilaya scoping incl. post-2019 → historic-parent resolution (`shouldNotify`, 3 unit tests). VAPID pair generated + env'd (public key bundled by design; subject = repo URL — Safari rejects localhost). `web-push` dependency added (server-only). /privacy gained a push line (AR+EN); supabase types regenerated for the new table.

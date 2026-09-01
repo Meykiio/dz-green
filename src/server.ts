@@ -54,6 +54,16 @@ export default {
       const match = cookie?.match(/(?:^|;\s*)ga-locale=(en|ar)(?:;|$)/);
       (globalThis as { __GA_LOCALE_SSR__?: string }).__GA_LOCALE_SSR__ = match?.[1] ?? "ar";
 
+      // Coarse geo hint (2026-09-01): Vercel's free IP-geolocation headers,
+      // per request, never stored. SSR injects them as window.__GA_GEO__ so
+      // forms can pre-select the wilaya / center the picker. Absent locally.
+      const hintLat = request.headers.get("x-vercel-ip-latitude");
+      const hintLng = request.headers.get("x-vercel-ip-longitude");
+      const lat = hintLat == null ? NaN : Number(hintLat);
+      const lng = hintLng == null ? NaN : Number(hintLng);
+      (globalThis as { __GA_GEO_SSR__?: { lat: number; lng: number } | null }).__GA_GEO_SSR__ =
+        Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);

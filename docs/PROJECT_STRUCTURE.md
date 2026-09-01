@@ -137,6 +137,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `privacy-mode.tsx` | Filming privacy mode: `PrivacyModeProvider`/`usePrivacyMode` + `maskEmail`/`maskPhone`/`maskName` — masked-by-default PII on staff pages, top-bar Show/Hide infos toggle (persisted `ga-privacy`). |
 | `hotspots.server.ts` | NASA FIRMS server lib: area URL, CSV parser, confidence filter, 13 static flare zones, southern persistence mask, GeoJSON builder. Fail-loud `FIRMS_MAP_KEY`. |
 | `pwa.ts` | Production-only service-worker registration. |
+| `geo-hint.ts` | Coarse IP-geolocation hint (Vercel headers): `getGeoHint()` reads `window.__GA_GEO__` (client) / the request-global (server). Never stored. |
 | `push.server.ts` | Web Push server lib: VAPID setup (fail loud), subscribe/unsubscribe impls, `shouldNotify` scope match, `notifyFireSubscribers` fan-out (total, prunes stale endpoints). |
 | `push.functions.ts` | `subscribePush` / `unsubscribePush` public server fns (zod). |
 | `error-capture.ts`, `error-page.ts` | Platform error plumbing. |
@@ -169,7 +170,7 @@ Fixtures are SQL-seeded per the recipe in `docs/SYSTEM_INSTRUCTIONS.md` Â§E2E 
 
 ## Known structural notes
 
-- The 250-line rule currently has **three exceptions** (flagged 2026-08-31): `src/components/LocationField.tsx` (308), `src/components/AppShell.tsx` (273), `src/routes/_authenticated/activity.tsx` (269). `admin.functions.ts` (was 484) was split the same day into a barrel + `admin-users`/`admin-content`/`admin-stats` + `admin-shared.server.ts`; `index.tsx` came back to 250 with the LegendDots extraction. Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`) are exempt.
+- The 250-line rule currently has **three exceptions** (flagged 2026-08-31): `src/components/LocationField.tsx` (328 after the geo-hint wiring), `src/components/AppShell.tsx` (273), `src/routes/_authenticated/activity.tsx` (269). `admin.functions.ts` (was 484) was split the same day into a barrel + `admin-users`/`admin-content`/`admin-stats` + `admin-shared.server.ts`; `index.tsx` came back to 250 with the LegendDots extraction. Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`) are exempt.
 - `src/components/ui/` is template surface area, not project code; treat it as vendored. `chart.tsx` and `sidebar.tsx` currently have zero consumers (flagged in `docs/AUDIT.md` P2 #7).
 - Test suite: 137 unit tests + 16 live E2E tests, plus a 40-check RLS role-matrix battery run from a session script kept out of the repo. See `docs/CHANGELOG.md` for the full verification round-up.
 

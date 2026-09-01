@@ -89,6 +89,7 @@ export const forms = {
     wilaya: "Wilaya *",
     chooseWilaya: "Choose a wilaya",
     detected: "Detected from your pin — change it here if it's wrong.",
+    detectedIp: "Guessed approximately from your connection — change it here if it's wrong.",
     commune: "Commune (optional)",
     exact: "Exact location (optional)",
     helper: "Used once, never stored. Skip it and the report is wilaya-level.",

@@ -16,6 +16,8 @@ interface Props {
   lat: number | null;
   lng: number | null;
   accuracy?: number | null;
+  /** Coarse start center when there is no pin (IP geo hint); Algeria default otherwise. */
+  hint?: { lat: number; lng: number } | null;
   onChange: (lat: number, lng: number) => void;
 }
 
@@ -32,7 +34,7 @@ function accuracyRadiusPx(accuracy: number, lat: number, zoom: number): number {
  * The only real-world map in the app: MapLibre GL + OpenFreeMap vector tiles
  * (no API key, no rate-limit cliff). Used purely for dropping an accurate pin.
  */
-export default function PrecisionPicker({ lat, lng, accuracy, onChange }: Props) {
+export default function PrecisionPicker({ lat, lng, accuracy, hint, onChange }: Props) {
   const { t } = useI18n();
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -47,13 +49,16 @@ export default function PrecisionPicker({ lat, lng, accuracy, onChange }: Props)
 
   useEffect(() => {
     if (!container.current || mapRef.current) return;
-    const start: [number, number] = [lng ?? ALGERIA_CENTER.lng, lat ?? ALGERIA_CENTER.lat];
+    const start: [number, number] = [
+      lng ?? hint?.lng ?? ALGERIA_CENTER.lng,
+      lat ?? hint?.lat ?? ALGERIA_CENTER.lat,
+    ];
 
     const map = new MapLibreMap({
       container: container.current,
       style: "https://tiles.openfreemap.org/styles/liberty",
       center: start,
-      zoom: lat && lng ? 14 : 4.4,
+      zoom: lat && lng ? 14 : hint ? 9 : 4.4,
       attributionControl: { compact: true },
     });
     map.addControl(new NavigationControl({ showCompass: false }), "top-right");

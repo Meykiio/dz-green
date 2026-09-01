@@ -18,6 +18,7 @@ import { I18nProvider, ssrT } from "@/i18n";
 import { localeInitScript } from "@/i18n";
 import { getLocale, initLocale } from "@/i18n/locale";
 import { PrivacyModeProvider } from "@/lib/privacy-mode";
+import { getGeoHint } from "@/lib/geo-hint";
 import { registerServiceWorker } from "@/lib/pwa";
 
 /**
@@ -135,6 +136,14 @@ function RootShell({ children }: { children: ReactNode }) {
             __html: localeInitScript(),
           }}
         />
+        {/* Geo hint: SSR only — the client keeps the value from page load. */}
+        {typeof document === "undefined" ? (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.__GA_GEO__=${JSON.stringify(getGeoHint())}`,
+            }}
+          />
+        ) : null}
         <HeadContent />
       </head>
       <body>

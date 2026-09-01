@@ -5,6 +5,7 @@ import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n";
 import { wilayaCodeForPoint } from "@/lib/geo";
+import { getGeoHint } from "@/lib/geo-hint";
 import { isShortMapsLink, parseGoogleMapsLink } from "@/lib/maps-link";
 import { resolveMapsLink } from "@/lib/maps.functions";
 import { WILAYAS } from "@/lib/wilayas";
@@ -56,7 +57,7 @@ export function LocationField({
   const [mapsLink, setMapsLink] = useState("");
   const [linkState, setLinkState] = useState<"idle" | "busy" | "ok" | "bad">("idle");
   const [wilayaTouched, setWilayaTouched] = useState(false);
-  const [autoFilled, setAutoFilled] = useState(false);
+  const [autoFilled, setAutoFilled] = useState<"pin" | "ip" | null>(null);
   const wilayaRef = useRef(wilaya);
   wilayaRef.current = wilaya;
   const watchIdRef = useRef<number | null>(null);
@@ -78,6 +79,20 @@ export function LocationField({
 
   useEffect(() => () => stopWatch(), []);
 
+  // IP geo hint (Vercel headers, coarse, never stored): pre-select the
+  // wilaya and center the picker on the visitor's city. A suggestion only —
+  // the user can change it; the server derives the real wilaya from the pin.
+  const geoHint = useState(() => getGeoHint())[0];
+  useEffect(() => {
+    if (!geoHint || wilayaRef.current || wilayaTouched) return;
+    const code = wilayaCodeForPoint(geoHint.lat, geoHint.lng);
+    if (code) {
+      onWilaya(code);
+      setAutoFilled("ip");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function finishWatch() {
     stopWatch();
     const best = bestFixRef.current;
@@ -93,7 +108,7 @@ export function LocationField({
     const code = wilayaCodeForPoint(nextLat, nextLng);
     if (code && code !== wilayaRef.current) {
       onWilaya(code);
-      setAutoFilled(true);
+      setAutoFilled("pin");
     }
   }
 
@@ -161,7 +176,7 @@ export function LocationField({
             value={wilaya}
             onChange={(e) => {
               setWilayaTouched(true);
-              setAutoFilled(false);
+              setAutoFilled(null);
               onWilaya(e.target.value);
             }}
             className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"
@@ -175,7 +190,7 @@ export function LocationField({
           </select>
           {autoFilled && (
             <span className="mt-1 block text-xs text-muted-foreground">
-              {t("forms.location.detected")}
+              {autoFilled === "ip" ? t("forms.location.detectedIp") : t("forms.location.detected")}
             </span>
           )}
         </label>
@@ -296,6 +311,7 @@ export function LocationField({
                   lat={lat}
                   lng={lng}
                   accuracy={accuracy}
+                  hint={hasPin ? null : geoHint}
                   onChange={(nextLat, nextLng) => handleLocation(nextLat, nextLng, null)}
                 />
               </Suspense>
