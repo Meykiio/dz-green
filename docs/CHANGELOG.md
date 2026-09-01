@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (sixty-third pass) — Web Push fire alerts (release-program phase B) — NOT PUSHED
+
+- **What shipped:** browser fire alerts, free and account-free. `FireAlertsCard` on `/fire` (form + success screen) → permission → push subscription → `push_subscriptions` row (new table, RLS on, zero client grants — migration applied live via MCP + mirrored). Fire insert → `notifyFireSubscribers` fan-out (awaited, total): Arabic «🔥 حريق جديد في {wilaya}», high urgency, 24h TTL, per-wilaya topic, stale-endpoint pruning. Wilaya scoping incl. post-2019 → historic-parent resolution (`shouldNotify`, 3 unit tests). VAPID pair generated + env'd (public key bundled by design; subject = repo URL — Safari rejects localhost). `web-push` dependency added (server-only). /privacy gained a push line (AR+EN); supabase types regenerated for the new table.
+- **Verified:** 153/153 tests, tsc clean, build green; live pipeline probe — fire in wilaya 16 fanned out to exactly the wilaya-16 + all-Algeria subscriptions (the 31 row excluded), send failures left the submission unaffected; test rows + test fires cleaned from the live DB after (fires back to 5, subs 0).
+- **Not verified (honest gap):** real browser subscribe + push delivery — headless Chromium forces `Notification.permission: denied` even with grants. The card, the fn wiring, and the server pipeline are verified; the last leg is the owner's device test at release.
+- Docs: DATABASE (push_subscriptions), FEATURES 11f, PROJECT_STRUCTURE, ROADMAP (alerting item resolved).
+
 ## 2026-08-31 (sixty-second pass) — PWA basics (release-program phase A) — NOT PUSHED (single release at the end)
 
 Owner picked 10 features (+FIRMS) for one release; nothing pushes until the end. Program tracked in the session todo list: A PWA → B Web Push → C IP geolocation → D GPS trio → E Open-Meteo (×3) → F communes → G wilayas-69 → H PlantNet.

@@ -43,7 +43,7 @@ DELETE FROM public.fire_reports WHERE id::text LIKE 'd2%';
 
 ## Parked (would be real scope, no decision needed yet)
 
-- **Alerting (email/SMS) â€” dropped 2026-08-20, rebuild later.** What it was: an `alert_contacts` table (email/phone contacts with per-wilaya `region_filter`) plus a ContactsPanel in the moderator dashboard to add/pause/delete contacts. Why dropped: it was **storage only â€” nothing ever actually sent an alert**; the table and UI were preparation for a delivery system that was never built. Removal (migration `drop_alert_contacts`): table, its RLS policy, the `private.can_manage_contact` helper, the ContactsPanel UI, the moderator "Alert contacts" tab and its count in the stats. **Future item: rebuild once the mobile phase and the PR queue are settled** â€” a real alerting design must start from the delivery side (email/SMS provider, per-wilaya fire triggers, rate-limit spike alerts), not from a contacts table. Reopening it before that is premature.
+- **Alerting â€” RESOLVED 2026-09-01 as Web Push (release phase B, not yet pushed).** The old `alert_contacts` design (email/SMS, storage-only, dropped 2026-08-20) was replaced by the delivery-first answer: browser Web Push, free, no provider, no PII beyond the endpoint. `push_subscriptions` table, `FireAlertsCard` on `/fire`, server-side fan-out on fire insert with wilaya scoping. See FEATURES.md Â§11f.
 
 - **`submission_meta` retention policy** (`AUDIT.md` P2 #9): opportunistic cleanup inside the gate insert, or a cron.
 - **Payload reduction** (`AUDIT.md` P2 #8): ~21 MB / 209 requests first load, tile-heavy basemap. Evaluate a lighter basemap style after launch numbers exist.

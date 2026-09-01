@@ -2,6 +2,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 import { wilayaCodeForPoint, wilayaCenterLatLng } from "./geo";
 import { mintReceipt } from "./receipts.server";
+import { notifyFireSubscribers } from "./push.server";
 import { mapCodeFor } from "./wilayas";
 import { GateError, optionalUserId, storePhoto, verifyGate, type GateInput } from "./submissions.server";
 
@@ -221,6 +222,9 @@ export async function submitFireImpl(data: FireInput) {
       throw insertError;
     }
     const receipt = await mintReceipt("fire", row!.id as string);
+    // Fire alerts fan-out: awaited (serverless freezes after the response),
+    // total by design (a push failure never breaks the submission).
+    await notifyFireSubscribers({ id: row!.id as string, wilaya_code: loc.wilaya });
     return { id: row!.id as string, status: "active" as const, receipt };
   } catch (error) {
     fail(error);

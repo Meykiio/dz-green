@@ -73,6 +73,18 @@ export const forms = {
     submit: "Post fire report",
     sending: "Sending…",
   },
+  fireAlerts: {
+    title: "Fire alerts",
+    body: "Get a notification when a fire is reported — for all of Algeria or just your wilaya.",
+    enable: "Enable alerts",
+    enabling: "Enabling…",
+    disable: "Turn off",
+    on: "Alerts are on for this device.",
+    denied:
+      "Notifications are blocked in your browser settings — allow them to get fire alerts.",
+    wilayaLabel: "Wilaya for alerts",
+    allWilayas: "All of Algeria",
+  },
   location: {
     wilaya: "Wilaya *",
     chooseWilaya: "Choose a wilaya",

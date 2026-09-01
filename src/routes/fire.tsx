@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { FireAlertsCard } from "@/components/fire/FireAlertsCard";
 import { FormShell, Honeypot } from "@/components/FormShell";
 import { LocationField } from "@/components/LocationField";
 import { PhotoInput } from "@/components/PhotoInput";
@@ -81,6 +82,7 @@ function FirePage() {
             {mutation.data && mutation.data !== "queued" && mutation.data.receipt && (
               <ReceiptLink token={mutation.data.receipt} />
             )}
+            <FireAlertsCard />
             <p className="text-xs text-muted-foreground">{t("forms.fire.donePublic")}</p>
             <Button onClick={() => router.navigate({ to: "/" })}>
               {t("chrome.shell.backToMap")}
@@ -197,6 +199,10 @@ function FirePage() {
             {mutation.isPending ? t("forms.fire.sending") : t("forms.fire.submit")}
           </Button>
         </form>
+
+        <div className="mt-6">
+          <FireAlertsCard />
+        </div>
       </FormShell>
     </AppShell>
   );

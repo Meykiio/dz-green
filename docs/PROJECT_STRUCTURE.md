@@ -76,6 +76,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `admin/FeedbackPanel.tsx` | Admin-only feedback inbox: kind badges (bug/idea/other), message, page, device UA, two-step delete. Paged. |
 | `SectionTabs.tsx` | Shared segmented tab bar for staff pages (moderate, admin): icon + count always, labels from sm up — never overflows 390px. |
 | `pwa-install.tsx` | One-time install banner: native prompt on Chromium, Share → Add to Home Screen instructions on iOS; dismissed state persisted. |
+| `fire/FireAlertsCard.tsx` | Fire-alerts card on `/fire` (form + success screen): enable/disable Web Push, optional wilaya scope, denied/unsupported states. |
 | `moderator/RejectedQueue.tsx` | Rejected plantings tab: rows with Re-approve (scoped service fn) + admin-only delete; broken thumbnails hide on 404. |
 | `FeedbackDialog.tsx` | The site-wide feedback box (home "Feedback" pill): Bug / Feature idea / Other kind selector + message, honeypot, sends `navigator.userAgent` (capped) with bug reports → `submitFeedback`. |
 | `admin/AssignWilayasDialog.tsx` | Wilaya assignment dialog for a moderator (uses the shared checklist). |
@@ -136,6 +137,8 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `privacy-mode.tsx` | Filming privacy mode: `PrivacyModeProvider`/`usePrivacyMode` + `maskEmail`/`maskPhone`/`maskName` — masked-by-default PII on staff pages, top-bar Show/Hide infos toggle (persisted `ga-privacy`). |
 | `hotspots.server.ts` | NASA FIRMS server lib: area URL, CSV parser, confidence filter, 13 static flare zones, southern persistence mask, GeoJSON builder. Fail-loud `FIRMS_MAP_KEY`. |
 | `pwa.ts` | Production-only service-worker registration. |
+| `push.server.ts` | Web Push server lib: VAPID setup (fail loud), subscribe/unsubscribe impls, `shouldNotify` scope match, `notifyFireSubscribers` fan-out (total, prunes stale endpoints). |
+| `push.functions.ts` | `subscribePush` / `unsubscribePush` public server fns (zod). |
 | `error-capture.ts`, `error-page.ts` | Platform error plumbing. |
 | `utils.ts` | `cn()` class merge helper. |
 | `__tests__/` | 9 files, **149 unit tests** (2026-08-31 run): abuse gate, Zod schemas, wilaya derivation/geometry, Google Maps link parsing, `needsWater` boundaries, image magic-byte sniff, feedback + volunteer schemas, FIRMS hotspot parsing/filters. |

@@ -58,6 +58,8 @@ export const info = {
         "Your IP address and device identifier. They are stored only as one-way hashes, used to stop spam and flooding. The raw values are never written down.",
       email:
         "Your email (only if you create an account — most people never do). Used for sign-in only.",
+      push:
+        "Fire-alert subscriptions (only if you enable them). Your browser gives us a private notification address plus an optional wilaya — no account, no name. Turning alerts off deletes the subscription from the server.",
     },
     where: {
       title: "Where it lives",

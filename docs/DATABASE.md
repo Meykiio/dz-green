@@ -234,6 +234,20 @@ Moderator-candidate applications from `/volunteer`. Same privacy posture as `fee
 
 Indexes: `(status, created_at desc)`, `(wilaya_code)`, `(user_id)`. The app's honeypot field is `hp` — validated client-side, **never stored**. RLS enabled, **zero policies**, anon/authenticated grants revoked; only `service_role` has table grants. **Live as of 2026-08-28** (applied via MCP; verified columns/grants/zero policies post-apply — see `FEATURES.md` §10).
 
+### `public.push_subscriptions` (2026-08-31 — live, applied via MCP)
+
+Web Push fire-alert subscriptions (release phase B). One row per browser subscription. The `endpoint` is the browser's private push address (pseudonymous — no account, no PII); `wilaya_code` scopes alerts when set (null = all of Algeria). Same privacy posture as `feedback`/`volunteers`: writes from the `subscribePush`/`unsubscribePush` service-role server functions, reads service-role only (`notifyFireSubscribers` in `push.server.ts`). Migration mirrored in `supabase/migrations/20260831120000_*.sql`.
+
+| Column | Type | Null | Default | Purpose |
+|---|---|---|---|---|
+| `id` | uuid PK | no | `gen_random_uuid()` | |
+| `endpoint` | text | no | — | UNIQUE. The push service URL (up to ~1k chars). |
+| `keys` | jsonb | no | — | `{p256dh, auth}` encryption keys from the browser. |
+| `wilaya_code` | text | yes | — | Two-digit code, or null = all fires. Post-2019 codes resolve to the historic parent at send time. |
+| `created_at` | timestamptz | no | `now()` | |
+
+Index: `(wilaya_code)`. RLS **enabled with zero client policies** — anon/authenticated grants revoked; only `service_role` has table grants. Stale subscriptions (push service answers 404/410) are deleted at send time.
+
 ### `public.spatial_ref_sys`
 
 PostGIS reference table, extension-owned. **RLS is off** and cannot be enabled from a migration on Supabase (the role does not own the table). It contains static public projection definitions with no user data. Accepted risk, recorded in security memory.
