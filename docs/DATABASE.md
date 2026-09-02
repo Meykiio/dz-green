@@ -257,6 +257,7 @@ Admin-controlled site-wide banner (owner request). One active at a time (enforce
 | `id` | uuid PK | no | `gen_random_uuid()` | |
 | `title_ar` / `body_ar` | text | no | — | Arabic text (CHECK ≤120/≤600). The banner picks by visitor locale. |
 | `title_en` / `body_en` | text | no | — | English text (same checks). |
+| `title_fr` / `body_fr` | text | no | — | French text (same checks; added 2026-09-01, backfilled from EN as placeholder). |
 | `kind` | text | no | `'info'` | CHECK `IN ('info','success','warning')` — icon tone. |
 | `color` | text | no | `'ink'` | CHECK `IN ('ink','plant','care','fire','amber')` — curated contrast-safe palette (2026-09-01). |
 | `active` | boolean | no | `false` | Only active rows are publicly readable. **Several rows can be active at once** (2026-09-01) — the strip joins them; color/speed from the newest. |

@@ -115,14 +115,16 @@ function Shell({
     </button>
   );
 
+  // 3-way locale cycle: عربي → English → Français → عربي (label = next).
+  const nextLocale = locale === "ar" ? "en" : locale === "en" ? "fr" : "ar";
   const localeButton = (
     <button
       type="button"
-      onClick={() => setLocale(locale === "ar" ? "en" : "ar")}
+      onClick={() => setLocale(nextLocale)}
       aria-label={t("chrome.aria.switchLocale")}
       className="tap-target inline-flex items-center rounded-full border border-border bg-card px-2.5 py-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
     >
-      {locale === "ar" ? "English" : "عربي"}
+      {locale === "ar" ? "English" : locale === "en" ? "Français" : "عربي"}
     </button>
   );
 

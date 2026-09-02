@@ -142,6 +142,7 @@ export const moderation = {
       cancel: "Cancel",
       arSide: "العربية (Arabic)",
       enSide: "English",
+      frSide: "Français",
       color: "Banner color",
       colors: {
         ink: "Ink (dark)",

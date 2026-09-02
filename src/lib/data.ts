@@ -104,18 +104,22 @@ export interface ActiveAnnouncement {
   body_ar: string;
   title_en: string;
   body_en: string;
+  title_fr: string;
+  body_fr: string;
   kind: "info" | "success" | "warning";
   color: "ink" | "plant" | "care" | "fire" | "amber";
   /** Marquee loop duration in seconds (10 fast → 120 very slow). */
   speed_seconds: number;
 }
 
-/** The announcement's text in the visitor's locale (bilingual fields). */
+/** The announcement's text in the visitor's locale (trilingual fields). */
 export function localizedAnnouncement(
   a: ActiveAnnouncement,
-  locale: "en" | "ar",
+  locale: "en" | "ar" | "fr",
 ): { title: string; body: string } {
-  return locale === "ar" ? { title: a.title_ar, body: a.body_ar } : { title: a.title_en, body: a.body_en };
+  if (locale === "ar") return { title: a.title_ar, body: a.body_ar };
+  if (locale === "fr") return { title: a.title_fr, body: a.body_fr };
+  return { title: a.title_en, body: a.body_en };
 }
 
 /**
@@ -129,7 +133,7 @@ export const announcementQuery = queryOptions({
   queryFn: async (): Promise<ActiveAnnouncement[]> => {
     const { data, error } = await supabase
       .from("announcements")
-      .select("id, title_ar, body_ar, title_en, body_en, kind, color, speed_seconds")
+      .select("id, title_ar, body_ar, title_en, body_en, title_fr, body_fr, kind, color, speed_seconds")
       .eq("active", true)
       .order("created_at", { ascending: false })
       .limit(10);

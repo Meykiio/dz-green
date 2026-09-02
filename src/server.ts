@@ -51,7 +51,7 @@ export default {
       // render pipeline so SSR text matches the client (React #418 fix).
       // Set per request, immediately before rendering.
       const cookie = request.headers.get("cookie");
-      const match = cookie?.match(/(?:^|;\s*)ga-locale=(en|ar)(?:;|$)/);
+      const match = cookie?.match(/(?:^|;\s*)ga-locale=(en|ar|fr)(?:;|$)/);
       (globalThis as { __GA_LOCALE_SSR__?: string }).__GA_LOCALE_SSR__ = match?.[1] ?? "ar";
 
       // Coarse geo hint (2026-09-01): Vercel's free IP-geolocation headers,

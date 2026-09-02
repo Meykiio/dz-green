@@ -195,3 +195,4 @@ Fixtures are SQL-seeded per the recipe in `docs/SYSTEM_INSTRUCTIONS.md` Â§E2E 
 | `format.ts` | `count(n, kind)` with Arabic numeral agreement (1/2/3â€“10/11+), `ar-DZ` date formatting with Latin digits. |
 | `dict/en/*` | English dictionary â€” the key source of truth. |
 | `dict/ar/*` | Arabic dictionary, `typeof`-locked to the EN shape: a missing/mismatched key fails `tsc`. |
+| `dict/fr/*` | French dictionary (2026-09-01), same `typeof` lock. |

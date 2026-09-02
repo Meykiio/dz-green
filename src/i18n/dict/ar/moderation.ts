@@ -142,6 +142,7 @@ export const moderation: typeof import("../en/moderation").moderation = {
       cancel: "ألغِ",
       arSide: "العربية",
       enSide: "English (الإنجليزية)",
+      frSide: "Français (الفرنسية)",
       color: "لون اللافتة",
       colors: {
         ink: "داكن",

@@ -8,6 +8,8 @@ const a: ActiveAnnouncement = {
   body_ar: "نص عربي",
   title_en: "English title",
   body_en: "English body",
+  title_fr: "Titre français",
+  body_fr: "Texte français",
   kind: "info",
   color: "plant",
   speed_seconds: 32,
@@ -20,5 +22,9 @@ describe("localizedAnnouncement", () => {
 
   it("picks the English fields in EN locale", () => {
     expect(localizedAnnouncement(a, "en")).toEqual({ title: "English title", body: "English body" });
+  });
+
+  it("picks the French fields in FR locale", () => {
+    expect(localizedAnnouncement(a, "fr")).toEqual({ title: "Titre français", body: "Texte français" });
   });
 });

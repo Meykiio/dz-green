@@ -46,18 +46,37 @@ function arWord(kind: CountKind, n: number): string {
   return u.many;
 }
 
-/** Localized count phrase, e.g. "24 trees" / "3 أشجار". */
+/** French numeral agreement (CLDR, verified via Intl.PluralRules): 0-1 singular, 2+ plural. */
+const FR_UNIT: Record<CountKind, { one: string; other: string }> = {
+  tree: { one: "arbre", other: "arbres" },
+  fire: { one: "feu", other: "feux" },
+  wilaya: { one: "wilaya", other: "wilayas" },
+  site: { one: "site", other: "sites" },
+  submission: { one: "signalement", other: "signalements" },
+  activeFire: { one: "feu actif", other: "feux actifs" },
+  treeNeed: { one: "arbre a besoin d'eau", other: "arbres ont besoin d'eau" },
+};
+
+function frWord(kind: CountKind, n: number): string {
+  const u = FR_UNIT[kind];
+  return n <= 1 ? u.one : u.other;
+}
+
+/** Localized count phrase, e.g. "24 trees" / "3 أشجار" / "3 arbres". */
 export function count(n: number, kind: CountKind, locale: Locale = getLocale()): string {
   if (locale === "ar") return `${n} ${arWord(kind, n)}`;
+  if (locale === "fr") return `${n} ${frWord(kind, n)}`;
   return `${n} ${EN_UNIT[kind](n)}`;
 }
+
+const DATE_LOCALE: Record<Locale, string> = { ar: "ar-DZ", en: "en-DZ", fr: "fr-FR" };
 
 export function formatDate(
   date: Date | string,
   locale: Locale = getLocale(),
   opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "long", year: "numeric" },
 ): string {
-  return new Date(date).toLocaleDateString(locale === "ar" ? "ar-DZ" : "en-DZ", {
+  return new Date(date).toLocaleDateString(DATE_LOCALE[locale], {
     ...opts,
     numberingSystem: "latn",
   });

@@ -189,6 +189,7 @@ export type Database = {
           active: boolean
           body_ar: string
           body_en: string
+          body_fr: string
           color: string
           created_at: string
           id: string
@@ -196,11 +197,13 @@ export type Database = {
           speed_seconds: number
           title_ar: string
           title_en: string
+          title_fr: string
         }
         Insert: {
           active?: boolean
           body_ar: string
           body_en: string
+          body_fr: string
           color?: string
           created_at?: string
           id?: string
@@ -208,11 +211,13 @@ export type Database = {
           speed_seconds?: number
           title_ar: string
           title_en: string
+          title_fr: string
         }
         Update: {
           active?: boolean
           body_ar?: string
           body_en?: string
+          body_fr?: string
           color?: string
           created_at?: string
           id?: string
@@ -220,6 +225,7 @@ export type Database = {
           speed_seconds?: number
           title_ar?: string
           title_en?: string
+          title_fr?: string
         }
         Relationships: []
       }

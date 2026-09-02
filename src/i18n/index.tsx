@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { ar, en } from "./dict";
+import { ar, en, fr } from "./dict";
 import { getLocale, initLocale, setLocale as persistLocale, type Locale } from "./locale";
 import { count, formatDate, type CountKind } from "./format";
 import { errors as enErrors } from "./dict/en/errors";
@@ -57,7 +57,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [setLocale]);
 
   const value = useMemo<I18n>(() => {
-    const dict = locale === "ar" ? ar : en;
+    const dict = locale === "ar" ? ar : locale === "fr" ? fr : en;
     const t = (path: string, params?: Record<string, string | number>): string => {
       let raw = lookup(dict, path);
       if (typeof raw !== "string") raw = lookup(en, path);
@@ -117,13 +117,13 @@ export function localizeError(raw: string, locale: Locale = getLocale()): string
  * stashed as pending and flipped post-mount, which also re-mints the cookie.
  */
 export function localeInitScript(): string {
-  return `try{var m=document.cookie.match(/(?:^|;\\s*)ga-locale=(en|ar)(?:;|$)/);var c=m?m[1]:null;var s=localStorage.getItem("ga-locale");var l=c||"ar";if(l==="en"){document.documentElement.lang="en";document.documentElement.dir="ltr"}window.__GA_LOCALE__=l;if(!c&&(s==="en"||s==="ar")&&s!==l)window.__GA_LOCALE_PENDING__=s}catch(e){}`;
+  return `try{var m=document.cookie.match(/(?:^|;\\s*)ga-locale=(en|ar|fr)(?:;|$)/);var c=m?m[1]:null;var s=localStorage.getItem("ga-locale");var l=c||"ar";if(l!=="ar"){document.documentElement.lang=l;document.documentElement.dir="ltr"}window.__GA_LOCALE__=l;if(!c&&(s==="en"||s==="ar"||s==="fr")&&s!==l)window.__GA_LOCALE_PENDING__=s}catch(e){}`;
 }
 
 /** Server-side-safe translate for route `head()` (uses the singleton locale). */
 export function ssrT(path: string, params?: Record<string, string | number>): string {
   initLocale();
-  const dict = getLocale() === "ar" ? ar : en;
+  const dict = getLocale() === "ar" ? ar : getLocale() === "fr" ? fr : en;
   let raw = lookup(dict, path);
   if (typeof raw !== "string") raw = lookup(en, path);
   if (typeof raw !== "string") return path;

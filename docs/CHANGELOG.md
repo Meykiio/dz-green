@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (eighty-sixth pass) — French locale (trilingual platform) — LIVE
+
+- **The platform speaks French now (owner request):** `Locale = "en" | "ar" | "fr"` — full `dict/fr/*` (7 files, typed parity enforced by tsc), the chrome switcher cycles عربي → English → Français (label = next locale), cookie/boot/SSR regexes accept `fr`, `isRtl` stays AR-only. **Plurals verified from the platform, not memory:** `Intl.PluralRules("fr")` — 0-1 singular, 2+ plural (`count()` French rules, 3 unit tests). Dates via `fr-FR` («31 août 2026»).
+- **Announcements are trilingual too:** `title_fr`/`body_fr` columns (migration live + mirrored, existing rows backfilled from EN as placeholder), the admin form is now three fieldsets (AR/EN/FR), the banner picks the visitor's locale (`localizedAnnouncement` + 1 test).
+- **Verified:** 206/206 tests, tsc clean, build green; 3-locale probe — AR default (rtl), EN cookie (ltr), FR cookie (ltr), the switcher cycles all three with zero page errors.
+- Method note for the announcement: the planting guide = GBIF evidence per wilaya (what's recorded growing there) × climate class × a curated 19-species guide, evidence-first — always a suggestion, never an order.
+
 ## 2026-09-01 (eighty-fifth pass) — iOS GPU hardening + AR marquee entry — LIVE
 
 - **CRITICAL (user reports ×2, iPhone 11 + 12 Pro): "The map lost its connection" — but only inside Instagram's in-app browser.** Confirmed class: iOS reclaims WebGL2 contexts under memory pressure (MapLibre #3241: 6.7% on iOS 17 vs 1.3% elsewhere), and Instagram's constrained WKWebView makes it near-certain. Hardening: `maxTileCacheSize` 50→20MB, `fadeDuration: 0`, the decorative pulse skipped on iOS + in-app browsers (`isConstrainedGpu`). And the honest escape hatch: the failure overlay **detects in-app browsers** (Instagram/Facebook/TikTok/Twitter) and shows "Open in Safari" guidance with a copy-link button (AR+EN) instead of a dead-end reload.

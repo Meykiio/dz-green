@@ -22,12 +22,14 @@ interface FormState {
   body_ar: string;
   title_en: string;
   body_en: string;
+  title_fr: string;
+  body_fr: string;
   kind: Kind;
   color: Color;
   speed_seconds: number;
 }
 
-const EMPTY: FormState = { title_ar: "", body_ar: "", title_en: "", body_en: "", kind: "info", color: "ink", speed_seconds: 32 };
+const EMPTY: FormState = { title_ar: "", body_ar: "", title_en: "", body_en: "", title_fr: "", body_fr: "", kind: "info", color: "ink", speed_seconds: 32 };
 
 const SWATCH: Record<Color, string> = {
   ink: "bg-foreground",
@@ -108,7 +110,7 @@ function SpeedInput({ form, setForm }: { form: FormState; setForm: (f: FormState
 function BilingualFields({ form, setForm }: { form: FormState; setForm: (f: FormState) => void }) {
   const { t } = useI18n();
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className="grid gap-3 sm:grid-cols-3">
       <div className="space-y-2" dir="rtl">
         <p className="eyebrow">{t("moderation.adm.announce.arSide")}</p>
         <input
@@ -145,12 +147,37 @@ function BilingualFields({ form, setForm }: { form: FormState; setForm: (f: Form
           className="w-full rounded-lg border border-input bg-card px-3 py-2 text-base"
         />
       </div>
+      <div className="space-y-2" dir="ltr">
+        <p className="eyebrow">{t("moderation.adm.announce.frSide")}</p>
+        <input
+          value={form.title_fr}
+          maxLength={120}
+          onChange={(e) => setForm({ ...form, title_fr: e.target.value })}
+          placeholder={t("moderation.adm.announce.titlePh")}
+          className="tap-target w-full rounded-md border border-input bg-card px-3 py-2 text-base"
+        />
+        <textarea
+          value={form.body_fr}
+          maxLength={600}
+          rows={3}
+          onChange={(e) => setForm({ ...form, body_fr: e.target.value })}
+          placeholder={t("moderation.adm.announce.bodyPh")}
+          className="w-full rounded-lg border border-input bg-card px-3 py-2 text-base"
+        />
+      </div>
     </div>
   );
 }
 
 function formValid(f: FormState): boolean {
-  return !!(f.title_ar.trim() && f.body_ar.trim() && f.title_en.trim() && f.body_en.trim());
+  return !!(
+    f.title_ar.trim() &&
+    f.body_ar.trim() &&
+    f.title_en.trim() &&
+    f.body_en.trim() &&
+    f.title_fr.trim() &&
+    f.body_fr.trim()
+  );
 }
 
 /** Admin panel for the announcement banner: list, create, edit, publish, delete. */
@@ -207,6 +234,8 @@ export function AdminAnnouncementsPanel() {
       body_ar: a.body_ar,
       title_en: a.title_en,
       body_en: a.body_en,
+      title_fr: a.title_fr,
+      body_fr: a.body_fr,
       kind: a.kind,
       color: a.color,
       speed_seconds: a.speed_seconds,

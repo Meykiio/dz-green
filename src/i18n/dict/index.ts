@@ -7,9 +7,10 @@ import { meta } from "./ar/meta";
 import { errors } from "./ar/errors";
 
 import { en } from "./en/index";
+import { fr } from "./fr/index";
 
 export type Dict = typeof en;
 
 export const ar = { chrome, home, forms, info, moderation, meta, errors };
 
-export { en };
+export { en, fr };

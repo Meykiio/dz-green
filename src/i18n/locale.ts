@@ -1,4 +1,4 @@
-export type Locale = "en" | "ar";
+export type Locale = "en" | "ar" | "fr";
 
 const KEY = "ga-locale";
 
@@ -38,7 +38,7 @@ export function setLocale(locale: Locale): void {
     // fix, 2026-08-30): without it, SSR is always Arabic while an EN-saved
     // client renders English — React #418, and effects never fire.
     document.cookie = `${KEY}=${locale}; path=/; max-age=31536000; SameSite=Lax`;
-    document.documentElement.lang = locale === "ar" ? "ar" : "en";
+    document.documentElement.lang = locale;
     document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
   }
 }
@@ -48,5 +48,5 @@ export function initLocale(): void {
 }
 
 export function cookieSafe(locale: Locale): Locale {
-  return locale === "en" ? "en" : "ar";
+  return locale === "en" || locale === "fr" ? locale : "ar";
 }

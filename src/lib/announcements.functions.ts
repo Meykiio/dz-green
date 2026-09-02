@@ -12,6 +12,8 @@ export interface AdminAnnouncement {
   body_ar: string;
   title_en: string;
   body_en: string;
+  title_fr: string;
+  body_fr: string;
   kind: "info" | "success" | "warning";
   color: "ink" | "plant" | "care" | "fire" | "amber";
   speed_seconds: number;
@@ -24,6 +26,8 @@ const contentShape = z.object({
   body_ar: z.string().trim().min(1).max(600),
   title_en: z.string().trim().min(1).max(120),
   body_en: z.string().trim().min(1).max(600),
+  title_fr: z.string().trim().min(1).max(120),
+  body_fr: z.string().trim().min(1).max(600),
   kind: z.enum(["info", "success", "warning"]).default("info"),
   color: z.enum(["ink", "plant", "care", "fire", "amber"]).default("ink"),
   speed_seconds: z.number().int().min(10).max(120).default(32),
@@ -34,7 +38,7 @@ export const adminListAnnouncements = createServerFn({ method: "GET" }).handler(
     await requireAdmin();
     const { data, error } = await supabaseAdmin
       .from("announcements")
-      .select("id, title_ar, body_ar, title_en, body_en, kind, color, speed_seconds, active, created_at")
+      .select("id, title_ar, body_ar, title_en, body_en, title_fr, body_fr, kind, color, speed_seconds, active, created_at")
       .order("created_at", { ascending: false })
       .limit(50);
     if (error) throw error;
@@ -51,6 +55,8 @@ export const adminCreateAnnouncement = createServerFn({ method: "POST" })
       body_ar: data.body_ar,
       title_en: data.title_en,
       body_en: data.body_en,
+      title_fr: data.title_fr,
+      body_fr: data.body_fr,
       kind: data.kind,
       color: data.color,
       speed_seconds: data.speed_seconds,
@@ -73,6 +79,8 @@ export const adminUpdateAnnouncement = createServerFn({ method: "POST" })
         body_ar: data.body_ar,
         title_en: data.title_en,
         body_en: data.body_en,
+        title_fr: data.title_fr,
+        body_fr: data.body_fr,
         kind: data.kind,
         color: data.color,
         speed_seconds: data.speed_seconds,
