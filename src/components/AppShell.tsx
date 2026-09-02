@@ -18,7 +18,6 @@ import {
   ShieldCheck,
   Sprout,
   Sun,
-  X,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -29,7 +28,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { announcementQuery } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { usePrivacyMode } from "@/lib/privacy-mode";
+import { AppDrawer } from "@/components/AppDrawer";
 import { EmergencyContacts } from "@/components/EmergencyContacts";
+import { LocaleDropdown } from "@/components/LocaleDropdown";
 import { FeedbackDialog } from "@/components/FeedbackDialog";
 import { useI18n } from "@/i18n";
 
@@ -73,7 +74,7 @@ function Shell({
   // yields to it here (same query key as the banner, one shared fetch).
   const hasAnnouncement = (useQuery(announcementQuery).data ?? []).length > 0;
   const { theme, toggle } = useTheme();
-  const { t, locale, setLocale, isRtl } = useI18n();
+  const { t, isRtl } = useI18n();
   const { masked, toggle: togglePrivacy } = usePrivacyMode();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -110,23 +111,10 @@ function Shell({
       onClick={toggle}
       aria-label={theme === "dark" ? t("chrome.aria.themeLight") : t("chrome.aria.themeDark")}
       className="tap-target grid size-10 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.96]"
-    >
-      {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
-    </button>
+    >{theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}</button>
   );
 
-  // 3-way locale cycle: عربي → English → Français → عربي (label = next).
-  const nextLocale = locale === "ar" ? "en" : locale === "en" ? "fr" : "ar";
-  const localeButton = (
-    <button
-      type="button"
-      onClick={() => setLocale(nextLocale)}
-      aria-label={t("chrome.aria.switchLocale")}
-      className="tap-target inline-flex items-center rounded-full border border-border bg-card px-2.5 py-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-    >
-      {locale === "ar" ? "English" : locale === "en" ? "Français" : "عربي"}
-    </button>
-  );
+  // Locale picker: a real dropdown with all three languages (2026-09-01).
 
   const authAction = user ? (
     <button
@@ -220,55 +208,21 @@ function Shell({
           >
             <Github className="size-5" />
           </a>
-          {localeButton}
+          <LocaleDropdown />
           {themeButton}
         </div>
       </header>
 
-      {/* Drawer — the whole nav, on every viewport. */}
-      {drawerOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px]"
-          onClick={() => setDrawerOpen(false)}
-          aria-hidden
-        />
-      )}
-      <aside
-        className={cn(
-          "fixed start-0 z-50 flex w-72 flex-col border-e border-border bg-card transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
-          // The announcement strip (when live) owns the top 2.25rem — the
-          // drawer starts below it, so the brand is never covered.
-          hasAnnouncement ? "top-9 bottom-0" : "inset-y-0",
-          drawerOpen
-            ? "translate-x-0"
-            : "-translate-x-full rtl:translate-x-full",
-        )}
-        aria-label={t("chrome.aria.menu")}
-        aria-hidden={!drawerOpen}
-        inert={!drawerOpen}
-      >
-        <div className="flex items-center justify-between px-4 py-3.5">
-          <span className="flex items-center gap-2">
-            <img src="/logo.png" alt="" className="size-5" />
-            <span className="text-base font-semibold tracking-tight">{brandName}</span>
-          </span>
-          <button
-            type="button"
-            onClick={() => setDrawerOpen(false)}
-            aria-label={t("chrome.aria.closeMenu")}
-            className="tap-target grid size-10 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
-          >
-            <X className="size-5" />
-          </button>
-        </div>
-        <nav aria-label={t("chrome.aria.main")} className="flex-1 space-y-1 overflow-y-auto px-3 py-2">
-          {rows.map(navRow)}
-        </nav>
-        <div className="flex items-center gap-2 border-t border-border px-4 py-3">
-          {themeButton}
-          {authAction}
-        </div>
-      </aside>
+      {/* Drawer — the whole nav, on every viewport (extracted to AppDrawer). */}
+      <AppDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        hasAnnouncement={hasAnnouncement}
+        brandName={brandName}
+        rows={rows.map(navRow)}
+        themeButton={themeButton}
+        authAction={authAction}
+      />
 
       {/* Desktop static sidebar on app pages only. */}
       {isAppPage && (

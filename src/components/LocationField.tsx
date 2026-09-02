@@ -1,5 +1,5 @@
 import { ClientOnly } from "@tanstack/react-router";
-import { Crosshair, Link2, Loader2 } from "lucide-react";
+import { Crosshair, Loader2 } from "lucide-react";
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -7,9 +7,8 @@ import { CommuneField } from "@/components/CommuneField";
 import { useI18n } from "@/i18n";
 import { wilayaCodeForPoint } from "@/lib/geo";
 import { getGeoHint } from "@/lib/geo-hint";
-import { medianFix, type GpsFix } from "@/lib/gps";
-import { isShortMapsLink, parseGoogleMapsLink } from "@/lib/maps-link";
-import { resolveMapsLink } from "@/lib/maps.functions";
+import { GOOD_ENOUGH_M, useGpsWatch, WATCH_BUDGET_MS } from "@/components/location-gps";
+import { MapsLinkField } from "@/components/location-maps-link";
 import { WILAYAS } from "@/lib/wilayas";
 
 const PrecisionPicker = lazy(() => import("./PrecisionPicker"));
@@ -56,31 +55,23 @@ export function LocationField({
   const [showMap, setShowMap] = useState(showMapByDefault);
   const [locating, setLocating] = useState(false);
   const [bestAccuracy, setBestAccuracy] = useState<number | null>(null);
-  const [mapsLink, setMapsLink] = useState("");
-  const [linkState, setLinkState] = useState<"idle" | "busy" | "ok" | "bad">("idle");
   const [wilayaTouched, setWilayaTouched] = useState(false);
   const [autoFilled, setAutoFilled] = useState<"pin" | "ip" | null>(null);
   const wilayaRef = useRef(wilaya);
   wilayaRef.current = wilaya;
-  const watchIdRef = useRef<number | null>(null);
-  const watchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const bestFixRef = useRef<{ lat: number; lng: number; accuracy: number } | null>(null);
-  const fixesRef = useRef<GpsFix[]>([]);
 
-  // GPS best-fix watch: the first answer is usually a coarse network fix
-  // (±50–500 m); the phone refines toward true GPS over the next seconds.
-  // Watch for up to 12 s, keep the best reading, stop early at ±15 m.
-  const GOOD_ENOUGH_M = 15;
-  const WATCH_BUDGET_MS = 12000;
-
-  function stopWatch() {
-    if (watchIdRef.current != null) navigator.geolocation.clearWatch(watchIdRef.current);
-    watchIdRef.current = null;
-    if (watchTimeoutRef.current) clearTimeout(watchTimeoutRef.current);
-    watchTimeoutRef.current = null;
+  function handleLocation(nextLat: number, nextLng: number, nextAccuracy: number | null) {
+    onLocation(nextLat, nextLng, nextAccuracy);
+    if (wilayaTouched) return;
+    const code = wilayaCodeForPoint(nextLat, nextLng);
+    if (code && code !== wilayaRef.current) {
+      onWilaya(code);
+      setAutoFilled("pin");
+    }
   }
 
-  useEffect(() => () => stopWatch(), []);
+  // The GPS best-fix watch lives in location-gps.ts (extracted 2026-09-01).
+  const gps = useGpsWatch((la, ln, acc) => handleLocation(la, ln, acc));
 
   // IP geo hint (Vercel headers, coarse, never stored): pre-select the
   // wilaya and center the picker on the visitor's city. A suggestion only —
@@ -95,86 +86,6 @@ export function LocationField({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  function finishWatch() {
-    stopWatch();
-    // Median of the last good fixes — a single "best" reading can be a
-    // lucky outlier tens of meters off (see lib/gps.ts).
-    const final = medianFix(fixesRef.current) ?? bestFixRef.current;
-    if (final) handleLocation(final.lat, final.lng, final.accuracy);
-    bestFixRef.current = null;
-    fixesRef.current = [];
-    setLocating(false);
-    setBestAccuracy(null);
-  }
-
-  function handleLocation(nextLat: number, nextLng: number, nextAccuracy: number | null) {
-    onLocation(nextLat, nextLng, nextAccuracy);
-    if (wilayaTouched) return;
-    const code = wilayaCodeForPoint(nextLat, nextLng);
-    if (code && code !== wilayaRef.current) {
-      onWilaya(code);
-      setAutoFilled("pin");
-    }
-  }
-
-  const isAndroid =
-    typeof navigator !== "undefined" && /android/i.test(navigator.userAgent);
-
-  function useMyLocation() {
-    if (typeof navigator === "undefined" || !navigator.geolocation) return;
-    setLocating(true);
-    setBestAccuracy(null);
-    bestFixRef.current = null;
-    fixesRef.current = [];
-    watchIdRef.current = navigator.geolocation.watchPosition(
-      (pos) => {
-        const acc = pos.coords.accuracy ?? Infinity;
-        const fix = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          accuracy: acc,
-        };
-        if (fixesRef.current.length >= 10) fixesRef.current.shift();
-        fixesRef.current.push(fix);
-        if (!bestFixRef.current || acc < bestFixRef.current.accuracy) {
-          bestFixRef.current = fix;
-          setBestAccuracy(acc);
-        }
-        if (acc <= GOOD_ENOUGH_M) finishWatch();
-      },
-      () => finishWatch(),
-      { enableHighAccuracy: true, maximumAge: 0 },
-    );
-    watchTimeoutRef.current = setTimeout(finishWatch, WATCH_BUDGET_MS);
-  }
-
-  /** Paste-a-Maps-link fallback: GPS failed or the pin is wrong. */
-  async function applyMapsLink(value: string) {
-    setMapsLink(value);
-    const direct = parseGoogleMapsLink(value);
-    if (direct) {
-      handleLocation(direct.lat, direct.lng, null);
-      setLinkState("ok");
-      return;
-    }
-    if (isShortMapsLink(value)) {
-      setLinkState("busy");
-      try {
-        const resolved = await resolveMapsLink({ data: { url: value.trim() } });
-        if (resolved) {
-          handleLocation(resolved.lat, resolved.lng, null);
-          setLinkState("ok");
-        } else {
-          setLinkState("bad");
-        }
-      } catch {
-        setLinkState("bad");
-      }
-      return;
-    }
-    setLinkState(value.trim() ? "bad" : "idle");
-  }
 
   const tone = accuracy != null ? accuracyTone(accuracy) : null;
   const hasPin = lat != null && lng != null;
@@ -217,23 +128,23 @@ export function LocationField({
           <Button
             type="button"
             variant="secondary"
-            onClick={useMyLocation}
-            disabled={locating}
+            onClick={gps.start}
+            disabled={gps.locating}
             className="tap-target"
           >
-            {locating ? (
+            {gps.locating ? (
               <Loader2 className="size-4 animate-spin" />
             ) : (
               <Crosshair className="size-4" />
             )}
-            {locating ? t("forms.location.improving") : t("forms.location.useLocation")}
+            {gps.locating ? t("forms.location.improving") : t("forms.location.useLocation")}
           </Button>
-          {locating && (
+          {gps.locating && (
             <Button
               type="button"
               variant="ghost"
-              onClick={finishWatch}
-              disabled={bestAccuracy == null}
+              onClick={gps.finish}
+              disabled={gps.bestAccuracy == null}
               className="tap-target"
             >
               {t("forms.location.useNow")}
@@ -244,7 +155,7 @@ export function LocationField({
               {t("forms.location.removePin")}
             </Button>
           )}
-          {!locating && (
+          {!gps.locating && (
             <Button
               type="button"
               variant="ghost"
@@ -255,38 +166,22 @@ export function LocationField({
             </Button>
           )}
         </div>
-        {locating && (
+        {gps.locating && (
           <p className="mt-1 text-xs text-muted-foreground" aria-live="polite">
-            {bestAccuracy != null
+            {gps.bestAccuracy != null
               ? t("forms.location.bestFix", {
-                  m: Math.round(bestAccuracy),
+                  m: Math.round(gps.bestAccuracy),
                   good: GOOD_ENOUGH_M,
                   s: WATCH_BUDGET_MS / 1000,
                 })
               : t("forms.location.waitingFirstFix")}
-            {isAndroid && bestAccuracy != null && bestAccuracy > GOOD_ENOUGH_M && (
+            {gps.isAndroid && gps.bestAccuracy != null && gps.bestAccuracy > GOOD_ENOUGH_M && (
               <span className="block mt-0.5">{t("forms.location.wifiHint")}</span>
             )}
           </p>
         )}
 
-        <div className="mt-2.5">
-          <label className="flex items-center gap-2 rounded-md border border-input bg-card px-3 py-2 text-sm focus-within:ring-1 focus-within:ring-ring">
-            <Link2 className="size-4 shrink-0 text-muted-foreground" />
-            <input
-              value={mapsLink}
-              onChange={(e) => void applyMapsLink(e.target.value)}
-              placeholder={t("forms.location.pasteLink")}
-              inputMode="url"
-              className="w-full bg-transparent outline-none placeholder:text-muted-foreground"
-            />
-            {linkState === "busy" && <Loader2 className="size-4 animate-spin text-muted-foreground" />}
-          </label>
-          {linkState === "ok" && (
-            <p className="mt-1 text-xs text-plant">{t("forms.location.linkOk")}</p>
-          )}
-          {linkState === "bad" && <p className="mt-1 text-xs text-fire">{t("forms.location.linkError")}</p>}
-        </div>
+        <MapsLinkField onLocation={(la, ln) => handleLocation(la, ln, null)} />
 
         {hasPin && (
           <p className="mt-2.5 text-sm text-muted-foreground">

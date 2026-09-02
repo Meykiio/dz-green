@@ -24,6 +24,7 @@ export const chrome: typeof import("../en/chrome").chrome = {
     themeLight: "تفعيل الوضع الفاتح",
     privacyShow: "إظهار البيانات الحساسة (وضع التصوير مفعّل)",
     privacyHide: "إخفاء البيانات الحساسة (وضع التصوير)",
+    switchLocale: "تغيير اللغة",
   },
   auth: {
     signout: "تسجيل الخروج",

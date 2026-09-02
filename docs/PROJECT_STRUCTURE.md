@@ -44,7 +44,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | Route file | URL | Purpose |
 |---|---|---|
 | `__root.tsx` | â€” | HTML document shell, head defaults, QueryClientProvider, `<Toaster />`, 404 component, root error boundary, no-flash theme script. |
-| `index.tsx` | `/` | Map-first home: `HeroMap` fills the viewport under the top bar, action card (hero copy, stats, layer chips, hide button â€” hidden by default on phones, pulsing reveal button), Map/List toggle, detail panel, realtime subscriptions. |
+| `index.tsx` | `/` | Map-first home: `HeroMap` fills the viewport under the top bar, `ActionCard` (hideable), Map/List toggle, detail panel, realtime subscriptions. Public views show **active fires only** (2026-09-01). |
 | `about.tsx` | `/about` | What the project is, how moderation works, the "not an emergency service" disclaimer. |
 | `privacy.tsx` | `/privacy` | Plain-language data policy: public vs never-public, Law 18-07 rights, hosting. |
 | `terms.tsx` | `/terms` | Plain-language terms: honest submissions, moderation, not an emergency service, no warranty. |
@@ -57,7 +57,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `_authenticated/route.tsx` | â€” | Auth gate (`ssr: false`), redirects signed-out users to `/auth`. |
 | `_authenticated/moderate.tsx` | `/moderate` | Moderation dashboard: stats strip, segmented tab bar (`ModTabs`), pending queue, fire triage, alert contacts. Wilaya-scoped by RLS. `noindex`. |
 | `_authenticated/admin.tsx` | `/admin` | Admin dashboard: four tabs — Overview (platform stats + wilaya oversight), Users & roles (user list, role actions, create account, assign-wilayas dialog), Volunteers, Feedback — each mounting only when selected. Admin-only guard. `noindex`. |
-| `_authenticated/activity.tsx` | `/activity` | User dashboard: own plantings (with review status), care logs, fire reports; loading/empty/error states. `noindex`. |
+| `_authenticated/activity.tsx` | `/activity` | User dashboard: the three data queries + loading/error shell only; the sections live in `components/activity/ActivitySections.tsx` (2026-09-01 split). `noindex`. |
 | `api/public/photo/$.ts` | `/api/public/photo/*` | Server route streaming objects out of the private `photos` bucket with long cache headers. The only public read path for images. |
 | `api/public/hotspots.ts` | `/api/public/hotspots` | NASA FIRMS satellite hotspots GeoJSON — server-side fetch (key stays secret), edge-cached 10 min, 502/no-store on failure. |
 | `api/mobile/submissions.ts` | `/api/mobile/submissions` | POST â€” mobile submissions endpoint (issue #8): Bearer session verified, existing zod schemas, same abuse gate + impls as the web forms. |
@@ -67,7 +67,9 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 
 | Path | Purpose |
 |---|---|
-| `AppShell.tsx` | Global chrome, split by route: public pages get a top nav-bar (hamburger drawer, `inert` when closed); app pages (`/moderate`, `/admin`, `/activity`) get the sidebar shell. The mobile bottom action bar was removed 2026-08-21. Drawer contains the Volunteer row (HandHeart). |
+| `AppShell.tsx` | Global chrome, split by route: public pages get a top nav-bar (hamburger drawer, `inert` when closed); app pages (`/moderate`, `/admin`, `/activity`) get the sidebar shell. The drawer and the locale dropdown are extracted (2026-09-01): `AppDrawer.tsx`, `LocaleDropdown.tsx`. |
+| `AppDrawer.tsx` | The navigation drawer (brand header, role-scoped nav rows, theme/auth footer) — starts below the announcement strip when one is live, `inert` when closed. Extracted from AppShell 2026-09-01. |
+| `LocaleDropdown.tsx` | 3-way locale dropdown (عربي/English/Français, check on current, outside-click + Escape close). Replaced the cycle button 2026-09-01. |
 | `volunteer/VolunteerForm.tsx` | The `/volunteer` form: name/email/phone-whatsapp/wilaya dropdown (58)/extra-wilayas/intent chips (preselected "Review plantings")/availability/message, honeypot, success state. |
 | `admin/AdminUsersPanel.tsx` | Users, roles and wilayas panel: paginated list ("Show more"), role buttons, sign-out, "New account" — all one tab. |
 | `admin/CreateAccountDialog.tsx` | Admin-created moderator accounts (email, password show/hide + generate, display name, wilayas) via `adminCreateUser`. |
@@ -84,20 +86,25 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `PhotoInput.tsx` | Camera-capable file input; compresses on-device (max 1024px, WebP/JPEG) before base64 handoff. |
 | `ReceiptLink.tsx` | Success-screen receipt link: copyable `/my/<token>` URL, the only status lookup for anonymous submitters. |
 | `PrecisionPicker.tsx` | MapLibre GL + OpenFreeMap picker for exact pin drops inside forms. Draws an amber accuracy-radius circle from the GPS fix. |
-| `LocationField.tsx` | Wilaya-first location: wilaya/commune selects first (works without GPS), then an optional "Exact location" card â€” GPS button with privacy line, MapLibre picker behind a toggle, Google Maps link input, remove-pin action. |
+| `LocationField.tsx` | Wilaya-first location: wilaya/commune selects first (works without GPS), then an optional "Exact location" card â€” GPS button with privacy line, MapLibre picker behind a toggle, Google Maps link input, remove-pin action. GPS + MapsLink extracted 2026-09-01.
+| `location-gps.ts` | `useGpsWatch` — the GPS fix watcher (good-enough 15m, 12s budget, last-best fallback), extracted from LocationField.
+| `location-maps-link.tsx` | `MapsLinkField` — the Google Maps link input + parse/apply row, extracted from LocationField. |
 | `CommuneField.tsx` | Commune dropdown per wilaya (1,541 communes, AR labels, canonical Latin stored) with a free-text "Other" escape hatch. |
 | `PlantingGuide.tsx` | "What to plant here" chips on /plant: evidence-first species suggestions per wilaya (climate fit + GBIF evidence), tap-to-fill. |
 | `SpeciesSuggest.tsx` | "Identify from the photo" button + one-tap species chips on the plant form (PlantNet). |
 | `EmergencyContacts.tsx` | SOS pill + popover in the top bar: Protection Civile 14/1021, Police 17, Gendarmerie Nationale 1055, SAMU 16, `tel:` links. |
 | `home/HomeBits.tsx` | Home helpers: `Stat`, `Chip`, `HomeCtas`. |
+| `home/ActionCard.tsx` | The home action card (hero copy, live stats, three CTAs, layer chips, hide/reveal) — extracted from the home route 2026-09-01. |
 | `home/ViewToggle.tsx` | Map / List / Board switch (floats top-right over the home view). |
 | `home/Leaderboard.tsx` | Monthly wilaya race â€” approved plantings summed per wilaya, resets on the 1st, client-computed. |
 | `home/ActivityTicker.tsx` | Anonymous live-activity pill on the map, auto-dismissed. |
 | `home/useMapRealtime.ts` | The realtime subscription (query invalidation + ticker messages), extracted from the home route. |
-| `map/HeroMap.tsx` | The hero map: MapLibre GL + OpenFreeMap, mount/theme/data/toggle effects. No clustering â€” every tree/care/fire is its own dot at every zoom. |
+| `activity/ActivitySections.tsx` | The three "my activity" sections (plantings/care/fires + empty states) — pure presentation, data stays in the route. Extracted 2026-09-01. |
+| `map/HeroMap.tsx` | The hero map: MapLibre GL + OpenFreeMap, theme/data/locale/toggle effects. No clustering â€” every tree/care/fire is its own dot at every zoom. Mount logic lives in `useHeroMapMount.ts` (2026-09-01 split). |
 | `map/hotspots-layer.ts` | The satellite hotspot layer: amber hollow rings (no pulse â€” that stays the community-fire signature), radius by FRP, click â†’ hotspot detail. |
 | `map/detail-bodies.tsx` | `HotspotBody` â€” the satellite hotspot detail sheet (confidence/FRP/pixel temp/acquisition/satellite, disclaimer, NASA attribution). |
 | `map/map-failure.tsx` | The WebGL2 probe + map failure overlay (extracted from HeroMap 2026-08-31). |
+| `map/useHeroMapMount.ts` | The HeroMap mount effect (WebGL2 probe, map construction, control placement, style.load init, context-loss handling) as a hook. Extracted 2026-09-01. |
 | `home/LegendDots.tsx` | The floating 4-dot legend (trees/care/fires/satellite) with tooltips (extracted from the home route 2026-08-31). |
 | `map/map-style.ts` | Map style constants, theme-aware colors, the RTL text plugin call (browser-guarded), and the RecenterControl. |
 | `map/map-data.ts` | GeoJSON builders (feature collection, kind filters, feature lookup). |
@@ -113,6 +120,9 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `admin/AdminOverview.tsx` | Admin stats strip + per-wilaya moderation load. |
 | `admin/AssignWilayasDialog.tsx` | Wilaya assignment dialog for a moderator (uses the shared checklist). |
 | `ui/*` | Unmodified shadcn/ui primitives. Most are unused by this app; they ship with the template (vendored â€” see note below). |
+| `AnnouncementBanner.tsx` | The site-wide marquee strip (trilingual, color, speed; never-empty by construction). |
+| `admin/AdminAnnouncementsPanel.tsx` | Admin announcements panel: list, create, edit, multi-publish, color/speed. Form bits live in `admin/announce-form-bits.tsx` (2026-09-01 split). |
+| `admin/announce-form-bits.tsx` | Announcement form state + KindPicker/ColorPicker/SpeedInput/TrilingualFields extracted from the panel. |
 
 ## `src/lib/`
 
@@ -138,7 +148,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `feedback.functions.ts` / `feedback.server.ts` | `feedbackSchema` + `submitFeedback` server fn and its impl — service-role insert into the zero-grant `feedback` table, throttled 10/hour via the shared hashed-IP gate. |
 | `volunteers.functions.ts` / `volunteers.server.ts` | `volunteerSchema` + `submitVolunteer` server fn and its impl — service-role insert into the zero-grant `volunteers` table, links `user_id` when signed in, throttled 5/hour via the shared gate. |
 | `privacy-mode.tsx` | Filming privacy mode: `PrivacyModeProvider`/`usePrivacyMode` + `maskEmail`/`maskPhone`/`maskName` — masked-by-default PII on staff pages, top-bar Show/Hide infos toggle (persisted `ga-privacy`). |
-| `hotspots.server.ts` | NASA FIRMS server lib: area URL, CSV parser, confidence filter, 13 static flare zones, southern persistence mask, GeoJSON builder. Fail-loud `FIRMS_MAP_KEY`. |
+| `hotspots.server.ts` | NASA FIRMS server lib: area URL, CSV parser, confidence filter, EOG-generated static flare mask (`data/flare-zones.ts`), southern persistence mask, GeoJSON builder. Fail-loud `FIRMS_MAP_KEY`. |
 | `pwa.ts` | Production-only service-worker registration. |
 | `geo-hint.ts` | Coarse IP-geolocation hint (Vercel headers): `getGeoHint()` reads `window.__GA_GEO__` (client) / the request-global (server). Never stored. |
 | `gps.ts` | `medianFix()` — robust final GPS fix: median of the last 3 ±100 m readings (rejects lucky outliers), single-best fallback. Unit-tested. |
@@ -151,7 +161,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `push.functions.ts` | `subscribePush` / `unsubscribePush` public server fns (zod). |
 | `error-capture.ts`, `error-page.ts` | Platform error plumbing. |
 | `utils.ts` | `cn()` class merge helper. |
-| `__tests__/` | 18 files, **202 tests** (2026-09-01 run): pure-function units (abuse gate, Zod schemas, geometry incl. 69-wilaya, link parsing, `needsWater` + rain, image sniff, feedback/volunteer/push schemas, FIRMS filters, GPS median, weather/AQ mappers, PlantNet mapper, planting guide, announcements) + **component behavior tests** (testing-library + happy-dom: CommuneField, SpeciesSuggest, FireAlertsCard). |
+| `__tests__/` | 19 files, **206 tests** (2026-09-01 run): pure-function units (abuse gate, Zod schemas, geometry incl. 69-wilaya, link parsing, `needsWater` + rain, image sniff, feedback/volunteer/push schemas, FIRMS filters, GPS median, weather/AQ mappers, PlantNet mapper, planting guide, announcements) + **component behavior tests** (testing-library + happy-dom: CommuneField, SpeciesSuggest, FireAlertsCard). |
 
 ## `src/hooks/`, `src/data/`, `src/integrations/`
 
@@ -164,6 +174,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `data/communes.ts` | Auto-generated from islam-re/Algeria-wilayas (MIT, Journal Officiel): `COMMUNES_BY_WILAYA` — 1,541 communes (ar + latin) across all 69 wilayas. Do not hand-edit. |
 | `data/wilaya-species.ts` | Auto-generated from GBIF occurrence evidence (exact WKT wilaya polygons, Plantae only): top-10 recorded plant species per wilaya with counts. Do not hand-edit. |
 | `data/species-guide.ts` | Curated planting guide: `WILAYA_CLIMATE` (climate class per wilaya) + `SPECIES_GUIDE` (19 species: AR/EN names, climate fits, notes, cautions). Hand-curated — edit with sources. |
+| `data/flare-zones.ts` | Auto-generated from the EOG Global Gas Flare Analysis 2024 (eogdata.mines.edu): 185 clustered Algerian flare zones (radius = clamp(spread + 2, 6, 12) km) + 5 live-feed supplements. The FIRMS static-source mask. Regenerate from the KML — do not hand-edit. |
 | `integrations/supabase/client.ts` | Browser client (publishable key). Auto-generated â€” never edit. |
 | `integrations/supabase/client.server.ts` | Service-role admin client. Server-only. Auto-generated. |
 | `integrations/supabase/auth-attacher.ts` | Client middleware attaching the bearer token to server-fn calls. Auto-generated. |
@@ -182,7 +193,7 @@ Fixtures are SQL-seeded per the recipe in `docs/SYSTEM_INSTRUCTIONS.md` Â§E2E 
 
 ## Known structural notes
 
-- The 250-line rule currently has **six exceptions** (2026-09-01, post-launch cleanup queued): `LocationField.tsx` (332), `admin/AdminAnnouncementsPanel.tsx` (317), `AppShell.tsx` (290), `routes/index.tsx` (271), `_authenticated/activity.tsx` (269), `map/HeroMap.tsx` (256). Generated files are exempt. `admin.functions.ts` (was 484) was split the same day into a barrel + `admin-users`/`admin-content`/`admin-stats` + `admin-shared.server.ts`; `index.tsx` came back to 250 with the LegendDots extraction. Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`) are exempt.
+- **The 250-line rule has zero hand-written exceptions** (2026-09-01 cleanup): `LocationField.tsx` 332→227 (+ `location-gps.ts`, `location-maps-link.tsx`), `admin/AdminAnnouncementsPanel.tsx` 317→193 (+ `announce-form-bits.tsx`), `AppShell.tsx` 290→249 (+ `AppDrawer.tsx`, `LocaleDropdown.tsx`), `routes/index.tsx` 271→168 (+ `home/ActionCard.tsx`), `_authenticated/activity.tsx` 269→102 (+ `activity/ActivitySections.tsx`), `map/HeroMap.tsx` 262→154 (+ `map/useHeroMapMount.ts`). Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`, `src/data/*` auto-generated) are exempt.
 - `src/components/ui/` is template surface area, not project code; treat it as vendored. `chart.tsx` and `sidebar.tsx` currently have zero consumers (flagged in `docs/AUDIT.md` P2 #7).
 - Test suite: 137 unit tests + 16 live E2E tests, plus a 40-check RLS role-matrix battery run from a session script kept out of the repo. See `docs/CHANGELOG.md` for the full verification round-up.
 

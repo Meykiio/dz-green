@@ -1,11 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Droplets, Flame, Satellite, Sprout, X } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { ActionCard } from "@/components/home/ActionCard";
 import { ActivityTicker } from "@/components/home/ActivityTicker";
-import { Chip } from "@/components/home/HomeBits";
 import { Leaderboard } from "@/components/home/Leaderboard";
 import { LegendDots } from "@/components/home/LegendDots";
 import { useMapRealtime } from "@/components/home/useMapRealtime";
@@ -35,7 +34,7 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const { t, count, isRtl } = useI18n();
+  const { t } = useI18n();
   const sites = useQuery(sitesQuery);
   const careLogs = useQuery(careLogsQuery);
   const fires = useQuery(fireReportsQuery);
@@ -61,7 +60,10 @@ function HomePage() {
 
   const siteList = sites.data ?? [];
   const logList = careLogs.data ?? [];
-  const fireList = fires.data ?? [];
+  // Public views show ACTIVE fires only (owner 2026-09-01): resolved and
+  // false-alarm reports are hidden from the map and list; reopening one in
+  // triage makes it active again, so it reappears. Triage keeps its own view.
+  const fireList = (fires.data ?? []).filter((f) => f.status === "active");
 
   // Rain-aware watering: one batched 14-day-rainfall lookup for the sites
   // that are thirsty by the time-only rule; enough rain clears the flag.
@@ -144,118 +146,13 @@ function HomePage() {
         {view === "map" && <ActivityTicker message={ticker} />}
 
         {/* The action card — compact, hideable for a clean map view. */}
-        {cardHidden ? (
-          <button
-            type="button"
-            onClick={() => setCardHidden(false)}
-            aria-label={t("home.aria.showCard")}
-            className="tap-target absolute bottom-3 start-3 grid size-12 place-items-center rounded-full border border-border bg-card/95 text-plant shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] backdrop-blur transition-transform active:scale-[0.96] md:bottom-6 md:start-6"
-          >
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-0 animate-ping rounded-full border-2 border-plant/60 [animation-duration:2s] motion-reduce:animate-none"
-            />
-            <Sprout className="size-5" />
-          </button>
-        ) : (
-          <div className="absolute inset-x-3 bottom-3 md:inset-x-auto md:bottom-6 md:start-6 md:w-88">
-            <div className="relative rounded-2xl border border-border bg-card/95 p-4 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] backdrop-blur md:p-5">
-              <button
-                type="button"
-                onClick={() => setCardHidden(true)}
-                aria-label={t("home.aria.hideCard")}
-                className="tap-target absolute end-3 top-3 grid place-items-center rounded-full text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <X className="size-4" />
-              </button>
-              <h1 className={`display-hero text-xl md:text-2xl ${isRtl ? "max-w-none" : "max-w-[16ch]"}`}>
-                {t("home.hero.title")}
-              </h1>
-              <p className="mt-1.5 text-sm text-muted-foreground">
-                <span className="font-semibold tabular-nums text-foreground">
-                  {count(stats.trees, "tree")}
-                </span>
-                {" · "}
-                <span className="font-semibold tabular-nums text-foreground">
-                  {count(stats.wilayas, "wilaya")}
-                </span>
-                {" · "}
-                <span className="font-semibold tabular-nums text-care">
-                  {count(stats.thirsty, "treeNeed")}
-                </span>
-                {" · "}
-                <span className="font-semibold tabular-nums text-fire">
-                  {count(stats.fires, "activeFire")}
-                </span>
-              </p>
-              <div className="mt-3 flex flex-col gap-2">
-                <Link
-                  to="/plant"
-                  className="tap-target flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 font-semibold text-primary-foreground transition-transform active:scale-[0.98]"
-                >
-                  <Sprout className="size-5" /> {t("home.cta.plant")}
-                </Link>
-                <div className="flex gap-2">
-                  <Link
-                    to="/care"
-                    className="tap-target flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-input bg-card px-4 py-2.5 text-sm font-semibold text-care transition-transform active:scale-[0.98]"
-                  >
-                    <Droplets className="size-4" /> {t("home.cta.care")}
-                  </Link>
-                  <Link
-                    to="/fire"
-                    className="tap-target flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-input bg-card px-4 py-2.5 text-sm font-semibold text-fire transition-transform active:scale-[0.98]"
-                  >
-                    <Flame className="size-4" /> {t("home.cta.fire")}
-                  </Link>
-                </div>
-              </div>
-              <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-3">
-                <div className="flex flex-wrap gap-1.5">
-                  <Chip
-                    active={layers.trees}
-                    tone="plant"
-                    icon={<Sprout className="size-4" />}
-                    label={t("home.layers.trees")}
-                    onClick={() => setLayers((l) => ({ ...l, trees: !l.trees }))}
-                  />
-                  <Chip
-                    active={layers.care}
-                    tone="care"
-                    icon={<Droplets className="size-4" />}
-                    label={t("home.layers.care")}
-                    onClick={() => setLayers((l) => ({ ...l, care: !l.care }))}
-                  />
-                  <Chip
-                    active={layers.fires}
-                    tone="fire"
-                    icon={<Flame className="size-4" />}
-                    label={t("home.layers.fires")}
-                    onClick={() => setLayers((l) => ({ ...l, fires: !l.fires }))}
-                  />
-                  <Chip
-                    active={layers.hotspots}
-                    tone="hotspot"
-                    icon={<Satellite className="size-4" />}
-                    label={t("home.layers.hotspots")}
-                    onClick={() => setLayers((l) => ({ ...l, hotspots: !l.hotspots }))}
-                  />
-                </div>
-                <Link
-                  to="/about"
-                  className="tap-target inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {t("home.hero.howItWorks")}{" "}
-                  {isRtl ? (
-                    <ArrowLeft className="size-3.5" />
-                  ) : (
-                    <ArrowRight className="size-3.5" />
-                  )}
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
+        <ActionCard
+          hidden={cardHidden}
+          onToggle={setCardHidden}
+          stats={stats}
+          layers={layers}
+          onToggleLayer={(layer) => setLayers((l) => ({ ...l, [layer]: !l[layer] }))}
+        />
       </div>
 
       {feature && (

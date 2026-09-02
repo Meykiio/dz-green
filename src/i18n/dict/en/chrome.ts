@@ -24,6 +24,7 @@ export const chrome = {
     themeLight: "Switch to light theme",
     privacyShow: "Show sensitive data (filming mode is on)",
     privacyHide: "Hide sensitive data (filming mode)",
+    switchLocale: "Switch language",
   },
   auth: {
     signout: "Sign out",

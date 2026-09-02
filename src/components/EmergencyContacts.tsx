@@ -36,7 +36,9 @@ export function EmergencyContacts() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} aria-hidden />
-          <div className="absolute end-0 top-full z-50 mt-2 w-64 rounded-xl border border-fire/30 bg-card p-3 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)]">
+          {/* Mobile: fixed card inset from both screen edges (can't overflow).
+              sm+: anchored popover under the trigger. */}
+          <div className="fixed inset-x-3 top-16 z-50 rounded-xl border border-fire/30 bg-card p-3 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)] sm:absolute sm:inset-x-auto sm:end-0 sm:top-full sm:mt-2 sm:w-64">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-fire">{t("chrome.emergency.heading")}</p>
               <button
