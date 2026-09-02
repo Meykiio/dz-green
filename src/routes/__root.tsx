@@ -125,7 +125,7 @@ function RootShell({ children }: { children: ReactNode }) {
   initLocale();
   const locale = getLocale();
   return (
-    <html lang={locale === "ar" ? "ar" : "en"} dir={locale === "ar" ? "rtl" : "ltr"}>
+    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>
       <head>
         <script
           dangerouslySetInnerHTML={{
