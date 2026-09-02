@@ -104,7 +104,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `map/hotspots-layer.ts` | The satellite hotspot layer: amber hollow rings (no pulse â€” that stays the community-fire signature), radius by FRP, click â†’ hotspot detail. |
 | `map/detail-bodies.tsx` | `HotspotBody` â€” the satellite hotspot detail sheet (confidence/FRP/pixel temp/acquisition/satellite, disclaimer, NASA attribution). |
 | `map/map-failure.tsx` | The WebGL2 probe + map failure overlay (extracted from HeroMap 2026-08-31). |
-| `map/useHeroMapMount.ts` | The HeroMap mount effect (WebGL2 probe, map construction, control placement, style.load init, context-loss handling) as a hook. Extracted 2026-09-01. |
+| `map/useHeroMapMount.ts` | The HeroMap mount effect (WebGL2 probe, map construction, control placement, style.load init, context-loss + style-fetch failure guards — BUG-04 2026-09-02) as a hook. Extracted 2026-09-01. |
 | `home/LegendDots.tsx` | The floating 4-dot legend (trees/care/fires/satellite) with tooltips (extracted from the home route 2026-08-31). |
 | `map/map-style.ts` | Map style constants, theme-aware colors, the RTL text plugin call (browser-guarded), and the RecenterControl. |
 | `map/map-data.ts` | GeoJSON builders (feature collection, kind filters, feature lookup). |

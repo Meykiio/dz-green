@@ -51,22 +51,31 @@ export function withoutKind(data: FeatureCollection, kind: string): FeatureColle
   };
 }
 
+/**
+ * Resolve a clicked feature id back to its full row. Returns null when the
+ * id is not in the current arrays — the click handler then simply does
+ * nothing. Two real ways to get here: the dot was removed between render
+ * and click (refetch swap, fire resolved and filtered out), or the source
+ * briefly holds data newer than the arrays. A null beats the old
+ * `.find(...)!` crash on the core surface (BUG-01, audit 2026-09-02).
+ */
 export function featureFor(
   kind: "trees" | "care" | "fires",
   id: string,
   sites: Site[],
   careLogs: CareLog[],
   fires: FireReport[],
-): MapFeature {
+): MapFeature | null {
   if (kind === "fires") {
-    const fire = fires.find((f) => f.id === id)!;
-    return { kind: "fire", fire };
+    const fire = fires.find((f) => f.id === id);
+    return fire ? { kind: "fire", fire } : null;
   }
   if (kind === "care") {
-    const log = careLogs.find((l) => l.id === id)!;
-    const site = sites.find((s) => s.id === log.site_id)!;
-    return { kind: "care", log, site };
+    const log = careLogs.find((l) => l.id === id);
+    if (!log) return null;
+    const site = sites.find((s) => s.id === log.site_id);
+    return site ? { kind: "care", log, site } : null;
   }
-  const site = sites.find((s) => s.id === id)!;
-  return { kind: "site", site };
+  const site = sites.find((s) => s.id === id);
+  return site ? { kind: "site", site } : null;
 }

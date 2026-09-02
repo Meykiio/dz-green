@@ -19,9 +19,12 @@ interface LayerRefs {
   layersRef: MutableRefObject<Record<Layer, boolean>>;
   themeRef: MutableRefObject<"light" | "dark">;
   selectRef: MutableRefObject<(feature: MapFeature) => void>;
-  sites: Site[];
-  careLogs: CareLog[];
-  fires: FireReport[];
+  // BUG-01 (audit 2026-09-02): these were plain prop arrays, frozen at
+  // mount — a dot added later (realtime insert, refetch) rendered but
+  // crashed on click. Refs, like every other member: current at click time.
+  sitesRef: MutableRefObject<Site[]>;
+  careLogsRef: MutableRefObject<CareLog[]>;
+  firesRef: MutableRefObject<FireReport[]>;
 }
 
 /**
@@ -202,9 +205,17 @@ export function wireInteractions(map: MapLibreMap, refs: LayerRefs) {
     map.on("click", `ga-${kind}-points`, (e: MapLayerMouseEvent) => {
       const props = e.features?.[0]?.properties;
       if (!props) return;
-      refs.selectRef.current(
-        featureFor(props["kind"] as "trees" | "care", props["id"] as string, refs.sites, refs.careLogs, refs.fires),
+      const feature = featureFor(
+        kind,
+        props["id"] as string,
+        refs.sitesRef.current,
+        refs.careLogsRef.current,
+        refs.firesRef.current,
       );
+      // Gone between render and click (refetch swap, fire resolved) —
+      // a quiet no-op, never a crash.
+      if (!feature) return;
+      refs.selectRef.current(feature);
     });
     map.on("mouseenter", `ga-${kind}-points`, () => {
       map.getCanvas().style.cursor = "pointer";
@@ -217,9 +228,15 @@ export function wireInteractions(map: MapLibreMap, refs: LayerRefs) {
   map.on("click", "ga-fires-points", (e: MapLayerMouseEvent) => {
     const props = e.features?.[0]?.properties;
     if (!props) return;
-    refs.selectRef.current(
-      featureFor("fires", props["id"] as string, refs.sites, refs.careLogs, refs.fires),
+    const feature = featureFor(
+      "fires",
+      props["id"] as string,
+      refs.sitesRef.current,
+      refs.careLogsRef.current,
+      refs.firesRef.current,
     );
+    if (!feature) return;
+    refs.selectRef.current(feature);
   });
   map.on("mouseenter", "ga-fires-points", () => {
     map.getCanvas().style.cursor = "pointer";

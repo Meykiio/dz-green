@@ -53,6 +53,15 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
   layersRef.current = layers;
   const selectRef = useRef(onSelectFeature);
   selectRef.current = onSelectFeature;
+  // BUG-01 (audit 2026-09-02): the row arrays used to travel as plain props
+  // frozen at mount — dots added later (realtime/refetch) crashed on click.
+  // Same ref pattern as dataRef: current at click time, always.
+  const sitesRef = useRef(sites);
+  sitesRef.current = sites;
+  const careLogsRef = useRef(careLogs);
+  careLogsRef.current = careLogs;
+  const firesRef = useRef(fires);
+  firesRef.current = fires;
   // The action card anchors to `start` and the legend to `end` (top), so
   // control buttons go to top-start and the scale to bottom-end — always
   // free in both locales. Kept in a ref so locale switches can reposition.
@@ -65,7 +74,7 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
     scale: ScaleControl;
   } | null>(null);
 
-  const refs = { dataRef, layersRef, themeRef, selectRef, sites, careLogs, fires };
+  const refs = { dataRef, layersRef, themeRef, selectRef, sitesRef, careLogsRef, firesRef };
   const hotspotsRef = useRef(hotspots);
   hotspotsRef.current = hotspots;
 

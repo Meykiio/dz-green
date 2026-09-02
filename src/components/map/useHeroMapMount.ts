@@ -17,14 +17,20 @@ import { webgl2Available, type MapFailure } from "./map-failure";
 
 export type MapFeatureCollection = FeatureCollection<Geometry, GeoJsonProperties>;
 
+// BUG-04 (audit 2026-09-02): if the style-JSON fetch fails or hangs, the map
+// area stays silently blank behind working UI chrome. 15s budget for the
+// style JSON (43KB) — a fetch slower than that is a broken experience.
+const STYLE_TIMEOUT_MS = 15_000;
+
 interface MapRefs {
   dataRef: RefObject<MapFeatureCollection>;
   layersRef: RefObject<Record<Layer, boolean>>;
   themeRef: RefObject<"light" | "dark">;
   selectRef: RefObject<(feature: MapFeature) => void>;
-  sites: Site[];
-  careLogs: CareLog[];
-  fires: FireReport[];
+  // Refs, not frozen arrays — see BUG-01 (audit 2026-09-02).
+  sitesRef: RefObject<Site[]>;
+  careLogsRef: RefObject<CareLog[]>;
+  firesRef: RefObject<FireReport[]>;
 }
 
 /**
@@ -123,8 +129,26 @@ export function useHeroMapMount({
     map.addControl(geolocate, ctrlPos);
     map.addControl(scale, ctrlPos === "top-left" ? "bottom-right" : "bottom-left");
 
+    // BUG-04 belt: style.load must fire within STYLE_TIMEOUT_MS. The
+    // fail-fast path below covers fetches that *error*; this catches the
+    // ones that hang. A late style.load clears the overlay and continues.
+    let styleLoaded = false;
+    let styleTimer: ReturnType<typeof setTimeout> | null = null;
+    const clearStyleTimer = () => {
+      if (styleTimer !== null) {
+        clearTimeout(styleTimer);
+        styleTimer = null;
+      }
+    };
+
     const init = () => {
       if (cancelled) return;
+      styleLoaded = true;
+      clearStyleTimer();
+      // A super-slow style can land after the timeout already surfaced the
+      // failure — clear it and continue (same state the context-restore
+      // path uses).
+      onFailure(null);
       applyAlgeriaLabelFilter(map);
       addDataLayers(map, refs);
       wireInteractions(map, refs);
@@ -138,11 +162,29 @@ export function useHeroMapMount({
     // blocked; "style.load" fires as soon as the style JSON parses, which is
     // early enough to add our sources and layers.
     if (map.loaded()) init();
-    else map.once("style.load", init);
+    else {
+      map.once("style.load", init);
+      styleTimer = setTimeout(() => {
+        if (styleLoaded || cancelled) return;
+        onFailure("lost");
+      }, STYLE_TIMEOUT_MS);
+    }
 
     map.on("error", (e: ErrorEvent) => {
-      if (e.error instanceof GPUInitializationError) onFailure("webgl2");
-      else console.error("[map] non-fatal error:", e.error);
+      if (e.error instanceof GPUInitializationError) {
+        onFailure("webgl2");
+        return;
+      }
+      // BUG-04 fail-fast: an error before style.load is the style fetch
+      // itself (tiles/glyphs come after) and MapLibre never retries it —
+      // surface the overlay instead of a silent blank.
+      if (!styleLoaded) {
+        console.error("[map] style failed to load:", e.error);
+        clearStyleTimer();
+        if (!cancelled) onFailure("lost");
+        return;
+      }
+      console.error("[map] non-fatal error:", e.error);
     });
 
     // Mid-session context loss (GPU process crash, memory pressure, driver
@@ -163,6 +205,7 @@ export function useHeroMapMount({
     return () => {
       cancelled = true;
       cancelledRef.current = true;
+      clearStyleTimer();
       cancelAnimationFrame(pulseRef.current);
       observer.disconnect();
       containerRef.current?.removeEventListener("webglcontextcreationerror", onCreationError);
