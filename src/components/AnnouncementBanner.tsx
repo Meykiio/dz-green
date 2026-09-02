@@ -67,7 +67,10 @@ export function AnnouncementBanner() {
       <span className={`grid h-full w-9 shrink-0 place-items-center ${ICON_TONE[newest.kind]}`}>
         <Icon className="size-4" />
       </span>
-      <div className="group relative flex-1 overflow-hidden">
+      {/* The whole marquee area is LTR geometry — in an RTL parent the wide
+          track aligns its RIGHT edge and starts off-screen (the AR
+          enters-late bug, 2026-09-01). */}
+      <div className="group relative flex-1 overflow-hidden" dir="ltr">
         {/* Hidden probe: measures one unit's width. */}
         <span ref={probeRef} className="invisible absolute whitespace-nowrap text-sm font-medium" aria-hidden>
           {unit}

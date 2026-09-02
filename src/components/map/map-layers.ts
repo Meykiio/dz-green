@@ -157,6 +157,14 @@ export function applyLayerVisibility(
   }
 }
 
+/** True on iOS devices and inside in-app browsers (Instagram/Facebook/TikTok)
+ *  — environments where the GPU context is reclaimed aggressively, so the
+ *  decorative per-frame GPU work (the pulse) is skipped. */
+export function isConstrainedGpu(): boolean {
+  const ua = navigator.userAgent;
+  return /iPhone|iPad|iPod/.test(ua) || /Instagram|FBAN|FBAV|TikTok/.test(ua);
+}
+
 /** Expanding-ring pulse on points, so they read at a glance. */
 export function startPulse(
   map: MapLibreMap,
@@ -164,6 +172,7 @@ export function startPulse(
   cancelledRef: MutableRefObject<boolean>,
 ) {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (isConstrainedGpu()) return;
   const start = performance.now();
   const tick = (now: number) => {
     if (cancelledRef.current) return;

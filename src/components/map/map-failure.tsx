@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useI18n } from "@/i18n";
 
 export type MapFailure = "webgl2" | "lost";
@@ -15,8 +16,26 @@ export function webgl2Available(): boolean {
   }
 }
 
+/** Instagram/Facebook/TikTok/Twitter in-app browsers — constrained WKWebView
+ *  where the GPU context gets reclaimed (user reports 2026-09-01). */
+export function isInAppBrowser(): boolean {
+  return /Instagram|FBAN|FBAV|TikTok|Twitter/.test(navigator.userAgent);
+}
+
 export function MapFailureOverlay({ kind }: { kind: MapFailure }) {
   const { t } = useI18n();
+  const [copied, setCopied] = useState(false);
+  const inApp = isInAppBrowser();
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+    } catch {
+      /* clipboard blocked — the instructions still help */
+    }
+  };
+
   return (
     <div
       role="alert"
@@ -24,18 +43,37 @@ export function MapFailureOverlay({ kind }: { kind: MapFailure }) {
     >
       <div className="max-w-sm">
         <p className="text-base font-semibold">
-          {kind === "webgl2" ? t("home.mapFail.webglTitle") : t("home.mapFail.lostTitle")}
+          {inApp
+            ? t("home.mapFail.inAppTitle")
+            : kind === "webgl2"
+              ? t("home.mapFail.webglTitle")
+              : t("home.mapFail.lostTitle")}
         </p>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          {kind === "webgl2" ? t("home.mapFail.webglBody") : t("home.mapFail.lostBody")}
+          {inApp
+            ? t("home.mapFail.inAppBody")
+            : kind === "webgl2"
+              ? t("home.mapFail.webglBody")
+              : t("home.mapFail.lostBody")}
         </p>
-        <button
-          type="button"
-          onClick={() => window.location.reload()}
-          className="mt-3 rounded-full border border-border bg-card px-4 py-1.5 text-sm font-semibold text-foreground transition-transform active:scale-[0.97]"
-        >
-          {t("home.mapFail.reload")}
-        </button>
+        <div className="mt-3 flex flex-wrap justify-center gap-2">
+          {inApp && (
+            <button
+              type="button"
+              onClick={copyLink}
+              className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground transition-transform active:scale-[0.97]"
+            >
+              {copied ? t("home.mapFail.inAppCopied") : t("home.mapFail.inAppCopy")}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="rounded-full border border-border bg-card px-4 py-1.5 text-sm font-semibold text-foreground transition-transform active:scale-[0.97]"
+          >
+            {t("home.mapFail.reload")}
+          </button>
+        </div>
       </div>
     </div>
   );

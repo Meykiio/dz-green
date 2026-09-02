@@ -113,6 +113,12 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
       // on wide screens (the full-country report, 2026-09-01). minZoom 3.5
       // is the real guardrail — you can never zoom out far enough to get
       // lost — and Recenter brings the camera home.
+      // GPU pressure hardening (iOS kills WebGL2 contexts under memory
+      // pressure, worst inside Instagram's in-app browser — user reports
+      // 2026-09-01): cap tile memory at 20MB (default 50) and skip the
+      // tile-fade animation work.
+      maxTileCacheSize: 20,
+      fadeDuration: 0,
       attributionControl: { compact: true },
     });
     if (creationError) {

@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (eighty-fifth pass) — iOS GPU hardening + AR marquee entry — LIVE
+
+- **CRITICAL (user reports ×2, iPhone 11 + 12 Pro): "The map lost its connection" — but only inside Instagram's in-app browser.** Confirmed class: iOS reclaims WebGL2 contexts under memory pressure (MapLibre #3241: 6.7% on iOS 17 vs 1.3% elsewhere), and Instagram's constrained WKWebView makes it near-certain. Hardening: `maxTileCacheSize` 50→20MB, `fadeDuration: 0`, the decorative pulse skipped on iOS + in-app browsers (`isConstrainedGpu`). And the honest escape hatch: the failure overlay **detects in-app browsers** (Instagram/Facebook/TikTok/Twitter) and shows "Open in Safari" guidance with a copy-link button (AR+EN) instead of a dead-end reload.
+- **AR marquee "moves outside the screen, enters later" (owner):** the track is dir=ltr but its *overflow wrapper* wasn't — in an RTL parent the wide track aligns its RIGHT edge and starts fully off-screen. One `dir="ltr"` on the wrapper fixes the geometry (0 empty frames in AR probe, sane scroll range).
+- Also: removed a stray duplicate `copyLink` key (EN dict) that broke AR/EN parity and silently failed tsc while Vite built green anyway — a reminder that `bun run build` does not typecheck.
+
 ## 2026-09-01 (eighty-fourth pass) — Marquee never-empty + flare calibration round 2 — LIVE
 
 - **Owner on the live app: "the banner takes a long time to arrive."** Root cause: with a short announcement, one copy (~800px) is narrower than a desktop window (1280px), so the strip sat mostly empty ~20s per loop. Three attempts taught the lesson (CSS `var()` keyframes overshoot unpredictably; WAAPI probes went flaky), and the final pattern is the standard bulletproof one: **the text unit repeats until one copy ≥ window width, then two copies scroll 0 → -50% in pure CSS** — the strip is provably never empty (0/10 sampled frames, desktop, short text). Also fixed en route: a hooks-after-early-return React #310 crash my first attempt introduced.

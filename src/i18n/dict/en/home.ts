@@ -69,6 +69,11 @@ export const home = {
     lostTitle: "The map lost its connection",
     lostBody: "The graphics connection dropped. If it doesn't come back, reload the page.",
     reload: "Reload map",
+    inAppTitle: "The map can't run inside this app's browser",
+    inAppBody:
+      "Embedded browsers (like Instagram's) limit the graphics the map needs. Open Green Algeria in Safari instead: copy the link and paste it there, or use the app's ⋯ menu → “Open in Safari”.",
+    inAppCopy: "Copy the link",
+    inAppCopied: "Copied — paste it in Safari",
   },
   list: {
     empty: "Nothing on the map yet — be the first.",
