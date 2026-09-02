@@ -33,15 +33,29 @@ const FLARE_ZONES: { name: string; lat: number; lng: number; radiusKm: number }[
   { name: "Hassi Messaoud West", lat: 31.7, lng: 5.81, radiusKm: 12 },
   { name: "Hassi Messaoud South", lat: 31.4, lng: 5.97, radiusKm: 12 },
   { name: "In Salah", lat: 27.19, lng: 2.47, radiusKm: 15 },
-  { name: "In Amenas / Tiguentourine", lat: 28.05, lng: 9.55, radiusKm: 15 },
+  { name: "In Amenas / Tiguentourine", lat: 28.05, lng: 9.55, radiusKm: 25 },
   { name: "In Amenas South", lat: 27.7, lng: 9.2, radiusKm: 12 },
-  { name: "Ohanet", lat: 28.7, lng: 9.75, radiusKm: 25 },
+  { name: "Ohanet", lat: 28.7, lng: 9.75, radiusKm: 40 },
   { name: "Ghadames border", lat: 31.3, lng: 11.8, radiusKm: 12 },
+  // Added 2026-09-01 from the live 4-day feed (user reports of southern
+  // flares): the corridor east of In Amenas, Gassi Touil East, the
+  // 32.2N industrial corridor, the Hassi R'Mel satellites, Adrar gas,
+  // and Haoud Berkaoui South.
+  { name: "In Amenas East", lat: 27.75, lng: 9.85, radiusKm: 15 },
+  { name: "Ohanet West", lat: 28.74, lng: 9.05, radiusKm: 15 },
+  { name: "Gassi Touil East", lat: 30.73, lng: 6.75, radiusKm: 12 },
+  { name: "Northern fields corridor", lat: 32.25, lng: 6.9, radiusKm: 45 },
+  { name: "Alrar", lat: 28.6, lng: 7.5, radiusKm: 20 },
+  { name: "Tihouda", lat: 32.4, lng: 4.0, radiusKm: 10 },
+  { name: "Hassi R'Mel South", lat: 32.56, lng: 3.17, radiusKm: 10 },
+  { name: "Hassi R'Mel East", lat: 32.77, lng: 4.57, radiusKm: 10 },
+  { name: "Adrar gas", lat: 28.15, lng: 0.1, radiusKm: 30 },
+  { name: "Haoud Berkaoui South", lat: 30.25, lng: 8.09, radiusKm: 10 },
   { name: "Gassi Touil / Rhourde Nouss", lat: 30.4, lng: 6.6, radiusKm: 15 },
   { name: "Hassi Berkin", lat: 29.7, lng: 6.7, radiusKm: 15 },
   { name: "Haoud Berkaoui / Ouargla", lat: 31.0, lng: 8.1, radiusKm: 35 },
   { name: "Haoud Berkaoui North", lat: 31.36, lng: 8.01, radiusKm: 12 },
-  { name: "El Borma", lat: 31.65, lng: 9.17, radiusKm: 15 },
+  { name: "El Borma", lat: 31.65, lng: 9.17, radiusKm: 20 },
 ];
 
 export function firmsAreaUrl(mapKey: string): string {

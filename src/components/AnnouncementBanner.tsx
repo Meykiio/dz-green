@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Info, PartyPopper, TriangleAlert } from "lucide-react";
 
@@ -22,25 +23,41 @@ const ICON_TONE = {
 /**
  * Site-wide announcement strip (admin-controlled): a solid marquee ABOVE the
  * top bar, in the admin-picked color, showing the AR or EN text per the
- * visitor's locale. Text travels in the reading direction, loops seamlessly,
- * pauses on hover, off for reduced-motion. The chrome yields to it.
+ * visitor's locale. The pattern is the standard bulletproof one: the text
+ * unit repeats until ONE copy is at least as wide as the window, then two
+ * copies scroll 0 → -50% in a seamless loop — so the strip is never empty at
+ * any text length or window size (the short-text-on-desktop gap, 2026-09-01).
+ * The track is ALWAYS dir=ltr (an RTL track blanks out at -50%). Travel: EN
+ * right→left, AR left→right. Pauses on hover, off for reduced-motion.
  */
 export function AnnouncementBanner() {
   const { isRtl, locale } = useI18n();
   const announcement = useQuery(announcementQuery);
+  // Hooks BEFORE any early return (React #310 — the empty-strip crash).
+  const probeRef = useRef<HTMLSpanElement>(null);
+  const [repeat, setRepeat] = useState(1);
   const list = announcement.data ?? [];
-  if (list.length === 0) return null;
-  // Several can be live at once: they scroll as one continuous marquee.
-  // Strip color/icon/speed come from the newest live announcement.
-  const newest = list[0]!;
+  const newest = list[0];
+  const unit =
+    list
+      .map((a) => {
+        const { title, body } = localizedAnnouncement(a, locale);
+        return `${title} — ${body}`;
+      })
+      .join("   •   ") + "   •   ";
+
+  // One copy must be at least as wide as the window — repeat the unit.
+  useEffect(() => {
+    const probe = probeRef.current;
+    if (!probe || !newest) return;
+    const w = probe.getBoundingClientRect().width;
+    if (w > 0) setRepeat(Math.max(1, Math.ceil(window.innerWidth / w)));
+  }, [unit, newest]);
+
+  if (!newest) return null;
   const Icon =
     newest.kind === "success" ? PartyPopper : newest.kind === "warning" ? TriangleAlert : Info;
-  const text = list
-    .map((a) => {
-      const { title, body } = localizedAnnouncement(a, locale);
-      return `${title} — ${body}`;
-    })
-    .join("   •   ");
+  const copy = unit.repeat(repeat);
 
   return (
     <div
@@ -51,9 +68,10 @@ export function AnnouncementBanner() {
         <Icon className="size-4" />
       </span>
       <div className="group relative flex-1 overflow-hidden">
-        {/* The track stays dir=ltr so the marquee geometry is identical in
-            both locales (an RTL track blanks out at -50% — the empty-strip
-            bug). Arabic text shapes correctly inside the spans regardless. */}
+        {/* Hidden probe: measures one unit's width. */}
+        <span ref={probeRef} className="invisible absolute whitespace-nowrap text-sm font-medium" aria-hidden>
+          {unit}
+        </span>
         <div
           className={`ga-marquee flex w-max items-center whitespace-nowrap text-sm font-medium group-hover:[animation-play-state:paused] ${
             isRtl ? "ga-marquee-rtl" : ""
@@ -61,10 +79,9 @@ export function AnnouncementBanner() {
           style={{ animationDuration: `${newest.speed_seconds}s` }}
           dir="ltr"
         >
-          {/* Two copies for a seamless loop */}
-          <span className="pe-16">{text}</span>
-          <span className="pe-16" aria-hidden>
-            {text}
+          <span className="whitespace-nowrap">{copy}</span>
+          <span className="whitespace-nowrap" aria-hidden>
+            {copy}
           </span>
         </div>
       </div>

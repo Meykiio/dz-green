@@ -91,7 +91,8 @@ describe("rowsToHotspots", () => {
   });
 
   it("keeps a southern pixel seen on one day only", () => {
-    const csv = [HEADER, row({ latitude: "28.50", longitude: "7.50" })].join("\n");
+    // Deep Sahara, outside every flare zone.
+    const csv = [HEADER, row({ latitude: "27.00", longitude: "5.00" })].join("\n");
     expect(rowsToHotspots(parseFirmsCsv(csv))).toHaveLength(1);
   });
 

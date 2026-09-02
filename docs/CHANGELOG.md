@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-01 (eighty-fourth pass) — Marquee never-empty + flare calibration round 2 — LIVE
+
+- **Owner on the live app: "the banner takes a long time to arrive."** Root cause: with a short announcement, one copy (~800px) is narrower than a desktop window (1280px), so the strip sat mostly empty ~20s per loop. Three attempts taught the lesson (CSS `var()` keyframes overshoot unpredictably; WAAPI probes went flaky), and the final pattern is the standard bulletproof one: **the text unit repeats until one copy ≥ window width, then two copies scroll 0 → -50% in pure CSS** — the strip is provably never empty (0/10 sampled frames, desktop, short text). Also fixed en route: a hooks-after-early-return React #310 crash my first attempt introduced.
+- **Flare calibration round 2 (owner: "filtering doesn't seem accurate"):** the stubborn southern points were 3–5km outside their zones — Northern corridor 35→45km, In Amenas 15→25, El Borma 15→20, Adrar gas 15→30, **Alrar zone added** (identified in round 1, never zoned). Southern dots: 45 → 32 → **7**, all seven weak one-day singles under the honest "not ground-verified" label. The remaining calibration lever is documented: new permanent clusters are one-line zone additions.
+- Verified: tsc clean, 202/202 tests (one test's fixture coordinate fell inside the new Alrar zone — fixed the fixture, not the code), build green, live-feed checks above.
+
 ## 2026-09-01 (eighty-third pass) — Post-launch fixes: empty AR strip, drawer overlap, southern flares — LIVE
 
 Owner + public reports within hours of launch:

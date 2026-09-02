@@ -281,6 +281,8 @@
     transform: translateX(0);
   }
   to {
+    /* Exactly one copy of two — the copy is guaranteed ≥ window width by the
+       repeat logic in the component, so the strip is never empty. */
     transform: translateX(-50%);
   }
 }
