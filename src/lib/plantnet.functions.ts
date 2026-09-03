@@ -13,7 +13,11 @@ export const suggestSpecies = createServerFn({ method: "POST" })
     z
       .object({
         image: z.string().startsWith("data:image/").max(1_400_000),
-        locale: z.enum(["en", "ar"]).default("en"),
+        // Three locales today (2026-09-02): "fr" was added by the French
+        // pass but never here — every French identify fell through the gap
+        // into the "couldn't identify" UI. PlantNet accepts all three
+        // (live-verified: lang=fr returns the same results as en).
+        locale: z.enum(["en", "ar", "fr"]).default("en"),
       })
       .parse(data),
   )

@@ -44,7 +44,7 @@ export function mapPlantNet(json: PlantNetResponse): SpeciesSuggestion[] {
 
 export async function identifyPlant(
   imageBase64: string,
-  locale: "en" | "ar",
+  locale: "en" | "ar" | "fr",
 ): Promise<SpeciesSuggestion[]> {
   const key = process.env["PLANTNET_API_KEY"];
   if (!key) throw new Error("PLANTNET_API_KEY is not set (see .env.example).");
@@ -65,6 +65,10 @@ export async function identifyPlant(
     body: form,
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
   });
-  if (!res.ok) throw new Error(`PlantNet responded ${res.status}`);
+  if (!res.ok) {
+    // Include the status: 429 (quota), 401 (bad key), 400 (bad image) are
+    // all worth distinguishing in the log — the UI stays a quiet null.
+    throw new Error(`PlantNet responded ${res.status} (${(await res.text()).slice(0, 140)})`);
+  }
   return mapPlantNet((await res.json()) as PlantNetResponse);
 }
