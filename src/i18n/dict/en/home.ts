@@ -192,4 +192,13 @@ export const home = {
     needsAttention: "Needs attention",
     update: "Update",
   },
+  confirm: {
+    title: "Community check",
+    verified: "Verified",
+    yes: "I see it",
+    no: "I don't",
+    unsure: "Not sure",
+    counts: "{yes} confirm · {no} say no · {unsure} not sure",
+    note: "One vote per device. Confirmations help everyone trust the map — they never replace Protection Civile (14 / 1021).",
+  },
 };

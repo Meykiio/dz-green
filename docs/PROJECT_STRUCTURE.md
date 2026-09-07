@@ -104,6 +104,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `map/HeroMap.tsx` | The hero map: MapLibre GL + OpenFreeMap, theme/data/locale/toggle effects. No clustering â€” every tree/care/fire is its own dot at every zoom. Mount logic lives in `useHeroMapMount.ts` (2026-09-01 split). |
 | `map/hotspots-layer.ts` | The satellite hotspot layer: amber hollow rings (no pulse â€” that stays the community-fire signature), radius by FRP, click â†’ hotspot detail. |
 | `map/risk-layer.ts` | The fire-risk model layer (2026-09-05): small circles colored by risk score (green to dark red ramp), no pulse, click to risk detail. |
+| `map/FireConfirmations.tsx` | Community confirmation block on the fire detail panel (2026-09-05): vote buttons with active/busy states, live counts, community-verified badge, honest note. |
 | `map/detail-bodies.tsx` | `HotspotBody` (satellite hotspot detail sheet) + `RiskBody` (fire-risk grid-point detail). |
 | `map/map-failure.tsx` | The WebGL2 probe + map failure overlay (extracted from HeroMap 2026-08-31). |
 | `map/useHeroMapMount.ts` | The HeroMap mount effect (WebGL2 probe, map construction, control placement, style.load init, context-loss + style-fetch failure guards — BUG-04 2026-09-02) as a hook. Extracted 2026-09-01. |
@@ -153,6 +154,8 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `hotspots.server.ts` | NASA FIRMS server lib: area URL, CSV parser, confidence filter, EOG-generated static flare mask (`data/flare-zones.ts`), southern persistence mask, GeoJSON builder. Fail-loud `FIRMS_MAP_KEY`. |
 | `risk.ts` | Fire-risk model lib (2026-09-05): `RiskPoint` type + `riskGeoJSON` builder over the generated `data/risk-grid.ts` grid. |
 | `ai-consent.ts` | AI-training consent state (2026-09-05): get/set/shouldShow over localStorage (`ga-ai-consent`), corrupt-value safe. |
+| `confirmations.server.ts` | Community fire confirmations server lib (2026-09-05): vote upsert + daily limit (HMAC device-hash voter_key), counts, my-vote, `isCommunityVerified` helper. New tables cast via `supabaseAdmin as any` until the migration lands. |
+| `confirmations.functions.ts` | createServerFn + zod for confirmations: submitFireVote, getFireCounts, getMyVote. |
 | `data/risk-grid.ts` | Generated from the Kabylie fire-risk model (v7 champion, AUC 0.826): 3,882 tuples [lng, lat, risk 0-1] at 1 km over Bejaia + Jijel, climatological typical-summer estimate. Regenerate from the model output - do not hand-edit. |
 | `pwa.ts` | Production-only service-worker registration. |
 | `geo-hint.ts` | Coarse IP-geolocation hint (Vercel headers): `getGeoHint()` reads `window.__GA_GEO__` (client) / the request-global (server). Never stored. |

@@ -192,4 +192,13 @@ export const home = {
     needsAttention: "Besoin d'attention",
     update: "Mise à jour",
   },
+  confirm: {
+    title: "Vérification communautaire",
+    verified: "Vérifié",
+    yes: "Je le vois",
+    no: "Je ne le vois pas",
+    unsure: "Pas sûr",
+    counts: "{yes} confirment · {no} nient · {unsure} pas sûrs",
+    note: "Un vote par appareil. Les confirmations aident tout le monde à faire confiance à la carte — elles ne remplacent jamais la Protection Civile (14 / 1021).",
+  },
 };

@@ -8,6 +8,7 @@ import { directionsUrl } from "@/lib/maps-link";
 import { needsWater, type CareLog } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
 import { FireWeatherBlock, HotspotBody, RiskBody } from "./detail-bodies";
+import { FireConfirmations } from "./FireConfirmations";
 
 import type { MapFeature } from "@/lib/types";
 
@@ -236,6 +237,7 @@ function FireBody({ feature }: { feature: Extract<MapFeature, { kind: "fire" }> 
       )}
       {fire.description && <p className="text-sm text-muted-foreground">{fire.description}</p>}
       <FireWeatherBlock lat={fire.lat} lng={fire.lng} />
+      <FireConfirmations fireReportId={fire.id} />
       <p className="rounded-lg border border-fire/40 bg-fire/10 px-3 py-2 text-sm">
         {t("home.detail.fireDisclaimer")}
       </p>
