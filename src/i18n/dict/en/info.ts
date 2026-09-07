@@ -66,6 +66,11 @@ export const info = {
       body:
         "The database runs on Supabase and the site on Vercel — your submissions may be stored on servers outside Algeria. Anonymous usage statistics (page views) are collected by Vercel Analytics; there is no advertising and no tracking across other sites. Theme and preferences stay in your own browser's local storage.",
     },
+    ai: {
+      title: "AI training",
+      body:
+        "We use anonymized data (fire locations, terrain, weather history — never your name, phone or IP) to train AI models that predict wildfire risk and suggest the best places to plant trees. This only happens if you accept the consent banner; you can decline or change your mind anytime, and it never affects what you can do on the map.",
+    },
     rights: {
       title: "Your rights",
       body:

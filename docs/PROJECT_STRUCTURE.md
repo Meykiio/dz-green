@@ -68,6 +68,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | Path | Purpose |
 |---|---|
 | `AppShell.tsx` | Global chrome, split by route: public pages get a top nav-bar (hamburger drawer, `inert` when closed); app pages (`/moderate`, `/admin`, `/activity`) get the sidebar shell. The drawer and the locale dropdown are extracted (2026-09-01): `AppDrawer.tsx`, `LocaleDropdown.tsx`. |
+| `ConsentBanner.tsx` | First-visit AI-training consent banner (2026-09-05): bottom-pinned, accept/decline/dismiss, localStorage-backed, never reappears after a choice. Wired into AppShell after main. |
 | `AppDrawer.tsx` | The navigation drawer (brand header, role-scoped nav rows, theme/auth footer) — starts below the announcement strip when one is live, `inert` when closed. Extracted from AppShell 2026-09-01. |
 | `LocaleDropdown.tsx` | 3-way locale dropdown (عربي/English/Français, check on current, outside-click + Escape close). Replaced the cycle button 2026-09-01. |
 | `volunteer/VolunteerForm.tsx` | The `/volunteer` form: name/email/phone-whatsapp/wilaya dropdown (58)/extra-wilayas/intent chips (preselected "Review plantings")/availability/message, honeypot, success state. |
@@ -151,6 +152,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `privacy-mode.tsx` | Filming privacy mode: `PrivacyModeProvider`/`usePrivacyMode` + `maskEmail`/`maskPhone`/`maskName` — masked-by-default PII on staff pages, top-bar Show/Hide infos toggle (persisted `ga-privacy`). |
 | `hotspots.server.ts` | NASA FIRMS server lib: area URL, CSV parser, confidence filter, EOG-generated static flare mask (`data/flare-zones.ts`), southern persistence mask, GeoJSON builder. Fail-loud `FIRMS_MAP_KEY`. |
 | `risk.ts` | Fire-risk model lib (2026-09-05): `RiskPoint` type + `riskGeoJSON` builder over the generated `data/risk-grid.ts` grid. |
+| `ai-consent.ts` | AI-training consent state (2026-09-05): get/set/shouldShow over localStorage (`ga-ai-consent`), corrupt-value safe. |
 | `data/risk-grid.ts` | Generated from the Kabylie fire-risk model (v7 champion, AUC 0.826): 3,882 tuples [lng, lat, risk 0-1] at 1 km over Bejaia + Jijel, climatological typical-summer estimate. Regenerate from the model output - do not hand-edit. |
 | `pwa.ts` | Production-only service-worker registration. |
 | `geo-hint.ts` | Coarse IP-geolocation hint (Vercel headers): `getGeoHint()` reads `window.__GA_GEO__` (client) / the request-global (server). Never stored. |

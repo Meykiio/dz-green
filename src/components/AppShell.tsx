@@ -29,6 +29,7 @@ import { announcementQuery } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { usePrivacyMode } from "@/lib/privacy-mode";
 import { AppDrawer } from "@/components/AppDrawer";
+import { ConsentBanner } from "@/components/ConsentBanner";
 import { EmergencyContacts } from "@/components/EmergencyContacts";
 import { LocaleDropdown } from "@/components/LocaleDropdown";
 import { FeedbackDialog } from "@/components/FeedbackDialog";
@@ -244,6 +245,7 @@ function Shell({
       <main className={cn("flex-1", hasAnnouncement ? "pt-[5.75rem]" : "pt-14", isAppPage && "md:ms-60")}>
         {children}
       </main>
+      <ConsentBanner />
     </div>
   );
 }

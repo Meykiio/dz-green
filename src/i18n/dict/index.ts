@@ -5,12 +5,13 @@ import { info } from "./ar/info";
 import { moderation } from "./ar/moderation";
 import { meta } from "./ar/meta";
 import { errors } from "./ar/errors";
+import { consent } from "./ar/consent";
 
 import { en } from "./en/index";
 import { fr } from "./fr/index";
 
 export type Dict = typeof en;
 
-export const ar = { chrome, home, forms, info, moderation, meta, errors };
+export const ar = { chrome, home, forms, info, moderation, meta, errors, consent };
 
 export { en, fr };

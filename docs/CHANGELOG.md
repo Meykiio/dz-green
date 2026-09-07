@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-05 (ninety-first pass) — AI-training consent banner (Phase F, feat/fire-ai-layers) — BUILT
+
+- **First-visit AI-training consent, honest and non-blocking.** A small banner pinned to the bottom of the viewport (not a modal): "Help us build a fire-free Algeria — we use anonymized data to train AI that predicts wildfires and finds the best places to plant. Accept or decline, both fine, change your mind anytime." One tap each way, both respected, stored in `localStorage` (`ga-ai-consent`, no account needed). Decline and dismiss both honored; the banner never reappears once a choice is stored. Required by Algeria's Loi 25-11 framing anyway.
+- **Implementation:** `src/lib/ai-consent.ts` (get/set/shouldShow over localStorage, corrupt-value safe), `src/components/ConsentBanner.tsx` (Sparkles icon, title/body/privacy-link/accept/decline/dismiss), wired into `AppShell` after `<main>` so it appears on every page. Full i18n as a new `consent` dict section in AR/EN/FR.
+- **Privacy page gains an "AI training" section** (`info.privacy.ai`, AR/EN/FR): what we use (fire locations, terrain, weather history), what we never use (name, phone, IP), that it only happens on consent, and that it never gates the map.
+- **Verified:** tsc clean, 213/213 tests (4 new in `ai-consent.test.ts` — show-on-empty, accept/decline persistence, corrupt-value handling; the node env needed a localStorage stub), build green, live browser probes — banner renders in Arabic, accept stores "accepted" and hides, decline stores "declined" and hides, no reappear after reload, privacy AI section renders. No page errors.
+
 ## 2026-09-05 (ninetieth pass) — Fire-risk model layer (Phase A, feat/fire-ai-layers) — BUILT
 
 - **The Kabylie fire-risk model is a live map layer.** The 0.826-AUC model (built and validated against the unseen summer 2026 in the `fire_prediction_project` workspace) now renders on the home map as a fifth layer: a soft fill of small circles colored by risk score (green → yellow → orange → dark red), 3,882 points at 1 km over Béjaïa + Jijel, generated as `src/data/risk-grid.ts` from the scored grid. Distinct by design from the pulsing red community fires and the amber satellite rings — the ramp never reads as a live fire.

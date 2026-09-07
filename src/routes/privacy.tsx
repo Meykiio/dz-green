@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Eye, EyeOff, Scale, Server, Trash2 } from "lucide-react";
+import { Eye, EyeOff, Scale, Server, Sparkles, Trash2 } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { ssrT, useI18n } from "@/i18n";
@@ -46,6 +46,10 @@ function PrivacyPage() {
 
           <Section icon={<Server className="size-5 text-care" />} title={t("info.privacy.where.title")}>
             {t("info.privacy.where.body")}
+          </Section>
+
+          <Section icon={<Sparkles className="size-5 text-plant" />} title={t("info.privacy.ai.title")}>
+            {t("info.privacy.ai.body")}
           </Section>
 
           <Section icon={<Trash2 className="size-5 text-muted-foreground" />} title={t("info.privacy.rights.title")}>

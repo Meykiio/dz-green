@@ -66,6 +66,11 @@ export const info = {
       body:
         "La base de données tourne sur Supabase et le site sur Vercel — vos signalements peuvent être stockés sur des serveurs hors d'Algérie. Des statistiques d'usage anonymes (pages vues) sont collectées par Vercel Analytics ; il n'y a ni publicité ni suivi sur d'autres sites. Le thème et les préférences restent dans le stockage local de votre navigateur.",
     },
+    ai: {
+      title: "Entraînement de l'IA",
+      body:
+        "Nous utilisons des données anonymisées (localisation des feux, terrain, historique météo — jamais votre nom, téléphone ou IP) pour entraîner des modèles d'IA qui prédisent le risque d'incendie et suggèrent les meilleurs endroits où planter. Cela n'arrive que si vous acceptez la bannière de consentement ; vous pouvez refuser ou changer d'avis à tout moment, et cela n'affecte jamais ce que vous pouvez faire sur la carte.",
+    },
     rights: {
       title: "Vos droits",
       body:

@@ -5,5 +5,6 @@ import { info } from "./info";
 import { moderation } from "./moderation";
 import { meta } from "./meta";
 import { errors } from "./errors";
+import { consent } from "./consent";
 
-export const fr = { chrome, home, forms, info, moderation, meta, errors };
+export const fr = { chrome, home, forms, info, moderation, meta, errors, consent };
