@@ -19,6 +19,7 @@ export const home = {
     care: "Soins",
     fires: "Feux",
     hotspots: "Satellite",
+    risk: "Risque",
   },
   tooltip: {
     layers: {
@@ -26,6 +27,7 @@ export const home = {
       care: "Afficher ou masquer les soins",
       fires: "Afficher ou masquer les feux signalés",
       hotspots: "Afficher ou masquer les points chauds des satellites NASA",
+      risk: "Afficher ou masquer l'estimation du modèle de risque d'incendie (Kabylie, été typique)",
     },
     board: "Course mensuelle des wilayas — les plantations approuvées sont additionnées par wilaya, remise à zéro le 1er.",
     needsWater: "Aucun soin enregistré pour ce site depuis 14 jours.",
@@ -95,6 +97,7 @@ export const home = {
       care: "Soin",
       site: "Site de plantation",
       hotspot: "NASA FIRMS",
+      risk: "Modèle de risque d'incendie",
     },
     weather: {
       title: "Météo actuelle",
@@ -136,6 +139,18 @@ export const home = {
       disclaimer:
         "Détection satellite — non vérifiée sur le terrain. Il peut s'agir d'un petit feu, d'un front de feu ou d'une source de chaleur industrielle. En danger immédiat, appelez la Protection Civile (14) ou le 1021.",
       attribution: "Données :",
+    },
+    risk: {
+      title: "Estimation du risque d'incendie",
+      score: "Score de risque",
+      band: "Niveau",
+      bandValue: {
+        low: "Faible",
+        medium: "Moyen",
+        high: "Élevé",
+      },
+      disclaimer:
+        "Estimation du modèle pour un été typique — pas une prévision en direct, non vérifiée sur le terrain. Basée sur le terrain, la végétation, l'historique météo et la distance aux fermes et villages. En danger immédiat, appelez la Protection Civile (14) ou le 1021.",
     },
     field: {
       wilaya: "Wilaya",

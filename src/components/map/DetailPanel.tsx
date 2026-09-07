@@ -1,4 +1,4 @@
-import { Droplets, Flame, Navigation, Satellite, Sprout, X } from "lucide-react";
+import { Droplets, Flame, Navigation, Satellite, Sprout, TrendingUp, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { photoUrl } from "@/lib/data";
 import { directionsUrl } from "@/lib/maps-link";
 import { needsWater, type CareLog } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
-import { FireWeatherBlock, HotspotBody } from "./detail-bodies";
+import { FireWeatherBlock, HotspotBody, RiskBody } from "./detail-bodies";
 
 import type { MapFeature } from "@/lib/types";
 
@@ -54,6 +54,8 @@ export function DetailPanel({
         <FireBody feature={feature} />
       ) : feature.kind === "hotspot" ? (
         <HotspotBody hotspot={feature.hotspot} />
+      ) : feature.kind === "risk" ? (
+        <RiskBody risk={feature.risk} />
       ) : (
         site && (
           <div className="mt-4 space-y-4">
@@ -152,6 +154,17 @@ function Header({ feature }: { feature: MapFeature }) {
         <div>
           <p className="eyebrow">{t("home.detail.eyebrow.hotspot")}</p>
           <h2 className="text-lg font-semibold">{t("home.detail.hotspot.title")}</h2>
+        </div>
+      </div>
+    );
+  }
+  if (feature.kind === "risk") {
+    return (
+      <div className="flex items-center gap-2">
+        <TrendingUp className="size-5 text-orange-500" />
+        <div>
+          <p className="eyebrow">{t("home.detail.eyebrow.risk")}</p>
+          <h2 className="text-lg font-semibold">{t("home.detail.risk.title")}</h2>
         </div>
       </div>
     );

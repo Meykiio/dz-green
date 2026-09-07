@@ -19,6 +19,7 @@ export const home = {
     care: "Care",
     fires: "Fires",
     hotspots: "Satellite",
+    risk: "Risk",
   },
   tooltip: {
     layers: {
@@ -26,6 +27,7 @@ export const home = {
       care: "Show or hide care updates",
       fires: "Show or hide fire reports",
       hotspots: "Show or hide NASA satellite hotspot detections",
+      risk: "Show or hide the fire-risk model estimate (Kabylie, typical summer)",
     },
     board: "Monthly wilaya race — approved plantings are summed per wilaya, reset on the 1st.",
     needsWater: "No care logged for this site in the last 14 days.",
@@ -95,6 +97,7 @@ export const home = {
       care: "Care update",
       site: "Planting site",
       hotspot: "NASA FIRMS",
+      risk: "Fire-risk model",
     },
     weather: {
       title: "Weather now",
@@ -136,6 +139,18 @@ export const home = {
       disclaimer:
         "Satellite detection — not verified on the ground. It may be a small fire, a fire front, or an industrial heat source. For immediate danger call Protection Civile (14) or 1021.",
       attribution: "Data:",
+    },
+    risk: {
+      title: "Fire-risk estimate",
+      score: "Risk score",
+      band: "Level",
+      bandValue: {
+        low: "Low",
+        medium: "Medium",
+        high: "High",
+      },
+      disclaimer:
+        "Model estimate for typical summer conditions — not a live forecast, not ground-verified. Based on terrain, vegetation, weather history and distance to farms and villages. For immediate danger call Protection Civile (14) or 1021.",
     },
     field: {
       wilaya: "Wilaya",

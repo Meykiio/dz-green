@@ -69,7 +69,8 @@ export type MapFeature =
   | { kind: "site"; site: Site }
   | { kind: "care"; log: CareLog; site: Site }
   | { kind: "fire"; fire: FireReport }
-  | { kind: "hotspot"; hotspot: Hotspot };
+  | { kind: "hotspot"; hotspot: Hotspot }
+  | { kind: "risk"; risk: import("./risk").RiskPoint };
 
 export const CARE_WINDOW_DAYS = 14;
 

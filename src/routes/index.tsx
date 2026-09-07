@@ -46,6 +46,7 @@ function HomePage() {
     care: true,
     fires: true,
     hotspots: true,
+    risk: false,
   });
   const [view, setView] = useState<HomeView>("map");
   const [feature, setFeature] = useState<MapFeature | null>(null);

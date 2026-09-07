@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Droplets, Flame, Satellite, Sprout, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Droplets, Flame, Satellite, Sprout, TrendingUp, X } from "lucide-react";
 
 import { Chip } from "@/components/home/HomeBits";
 import { useI18n } from "@/i18n";
@@ -100,6 +100,7 @@ export function ActionCard({
             <Chip active={layers.care} tone="care" icon={<Droplets className="size-4" />} label={t("home.layers.care")} onClick={() => onToggleLayer("care")} />
             <Chip active={layers.fires} tone="fire" icon={<Flame className="size-4" />} label={t("home.layers.fires")} onClick={() => onToggleLayer("fires")} />
             <Chip active={layers.hotspots} tone="hotspot" icon={<Satellite className="size-4" />} label={t("home.layers.hotspots")} onClick={() => onToggleLayer("hotspots")} />
+            <Chip active={layers.risk} tone="risk" icon={<TrendingUp className="size-4" />} label={t("home.layers.risk")} onClick={() => onToggleLayer("risk")} />
           </div>
           <Link
             to="/about"

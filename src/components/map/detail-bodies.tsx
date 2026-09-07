@@ -1,10 +1,11 @@
-import { Navigation, Wind } from "lucide-react";
+import { Navigation, TrendingUp, Wind } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n";
 import { directionsUrl } from "@/lib/maps-link";
 import type { Hotspot } from "@/lib/types";
+import type { RiskPoint } from "@/lib/risk";
 import { wilayaCodeForPoint } from "@/lib/geo";
 import { compass, pm25Band } from "@/lib/weather";
 import { getAirQuality, getFireWeather } from "@/lib/weather.functions";
@@ -111,6 +112,33 @@ function Field({ label, value }: { label: string; value: string }) {
     <div>
       <dt className="eyebrow">{label}</dt>
       <dd className="mt-0.5 font-medium">{value}</dd>
+    </div>
+  );
+}
+
+/** Detail body for a fire-risk grid point (Kabylie model, climatological estimate). */
+export function RiskBody({ risk }: { risk: RiskPoint }) {
+  const { t } = useI18n();
+  const wilayaCode = wilayaCodeForPoint(risk.lat, risk.lng);
+  const pct = Math.round(risk.risk * 100);
+  const band = risk.risk >= 0.7 ? "high" : risk.risk >= 0.4 ? "medium" : "low";
+  return (
+    <div className="mt-4 space-y-4">
+      <dl className="grid grid-cols-2 gap-3 text-sm">
+        {wilayaCode && <Field label={t("home.detail.field.wilaya")} value={wilayaName(wilayaCode)} />}
+        <Field label={t("home.detail.risk.score")} value={`${pct}%`} />
+        <Field label={t("home.detail.risk.band")} value={t(`home.detail.risk.bandValue.${band}`)} />
+      </dl>
+      <FireWeatherBlock lat={risk.lat} lng={risk.lng} />
+      <p className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
+        {t("home.detail.risk.disclaimer")}
+      </p>
+      <Button asChild variant="outline" className="w-full">
+        <a href={directionsUrl(risk.lat, risk.lng)} target="_blank" rel="noopener noreferrer">
+          <Navigation className="size-4" />
+          {t("home.detail.fireDirections")}
+        </a>
+      </Button>
     </div>
   );
 }

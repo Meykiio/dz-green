@@ -13,6 +13,8 @@ import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
 import { DARK_STYLE, LIGHT_STYLE, NORTH_BOUNDS, RecenterControl, colorsFor } from "./map-style";
 import { applyAlgeriaLabelFilter, addDataLayers, wireInteractions, startPulse, type Layer } from "./map-layers";
 import { addHotspotLayers, setHotspotsData } from "./hotspots-layer";
+import { addRiskLayers, setRiskData } from "./risk-layer";
+import { riskGeoJSON } from "@/lib/risk";
 import { webgl2Available, type MapFailure } from "./map-failure";
 
 export type MapFeatureCollection = FeatureCollection<Geometry, GeoJsonProperties>;
@@ -156,6 +158,8 @@ export function useHeroMapMount({
         refs.selectRef.current(f),
       );
       setHotspotsData(map, hotspotsRef.current);
+      addRiskLayers(map, (f) => refs.selectRef.current(f));
+      setRiskData(map, riskGeoJSON());
       startPulse(map, pulseRef, cancelledRef);
     };
     // "load" can stall forever when a sub-resource (sprite/glyphs) is

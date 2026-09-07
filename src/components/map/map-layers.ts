@@ -12,7 +12,7 @@ import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
 import { colorsFor } from "./map-style";
 import { featureFor, onlyKind, withoutKind } from "./map-data";
 
-export type Layer = "trees" | "care" | "fires" | "hotspots";
+export type Layer = "trees" | "care" | "fires" | "hotspots" | "risk";
 
 interface LayerRefs {
   dataRef: MutableRefObject<FeatureCollection>;
@@ -156,6 +156,14 @@ export function applyLayerVisibility(
       "ga-hotspots-points",
       "visibility",
       layersRef.current.hotspots ? "visible" : "none",
+    );
+  }
+  // Risk layer: same no-pulse treatment.
+  if (map.getLayer("ga-risk-points")) {
+    map.setLayoutProperty(
+      "ga-risk-points",
+      "visibility",
+      layersRef.current.risk ? "visible" : "none",
     );
   }
 }

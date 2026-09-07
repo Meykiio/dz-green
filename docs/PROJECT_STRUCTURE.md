@@ -102,7 +102,8 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `activity/ActivitySections.tsx` | The three "my activity" sections (plantings/care/fires + empty states) — pure presentation, data stays in the route. Extracted 2026-09-01. |
 | `map/HeroMap.tsx` | The hero map: MapLibre GL + OpenFreeMap, theme/data/locale/toggle effects. No clustering â€” every tree/care/fire is its own dot at every zoom. Mount logic lives in `useHeroMapMount.ts` (2026-09-01 split). |
 | `map/hotspots-layer.ts` | The satellite hotspot layer: amber hollow rings (no pulse â€” that stays the community-fire signature), radius by FRP, click â†’ hotspot detail. |
-| `map/detail-bodies.tsx` | `HotspotBody` â€” the satellite hotspot detail sheet (confidence/FRP/pixel temp/acquisition/satellite, disclaimer, NASA attribution). |
+| `map/risk-layer.ts` | The fire-risk model layer (2026-09-05): small circles colored by risk score (green to dark red ramp), no pulse, click to risk detail. |
+| `map/detail-bodies.tsx` | `HotspotBody` (satellite hotspot detail sheet) + `RiskBody` (fire-risk grid-point detail). |
 | `map/map-failure.tsx` | The WebGL2 probe + map failure overlay (extracted from HeroMap 2026-08-31). |
 | `map/useHeroMapMount.ts` | The HeroMap mount effect (WebGL2 probe, map construction, control placement, style.load init, context-loss + style-fetch failure guards — BUG-04 2026-09-02) as a hook. Extracted 2026-09-01. |
 | `home/LegendDots.tsx` | The floating 4-dot legend (trees/care/fires/satellite) with tooltips (extracted from the home route 2026-08-31). |
@@ -149,6 +150,8 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `volunteers.functions.ts` / `volunteers.server.ts` | `volunteerSchema` + `submitVolunteer` server fn and its impl — service-role insert into the zero-grant `volunteers` table, links `user_id` when signed in, throttled 5/hour via the shared gate. |
 | `privacy-mode.tsx` | Filming privacy mode: `PrivacyModeProvider`/`usePrivacyMode` + `maskEmail`/`maskPhone`/`maskName` — masked-by-default PII on staff pages, top-bar Show/Hide infos toggle (persisted `ga-privacy`). |
 | `hotspots.server.ts` | NASA FIRMS server lib: area URL, CSV parser, confidence filter, EOG-generated static flare mask (`data/flare-zones.ts`), southern persistence mask, GeoJSON builder. Fail-loud `FIRMS_MAP_KEY`. |
+| `risk.ts` | Fire-risk model lib (2026-09-05): `RiskPoint` type + `riskGeoJSON` builder over the generated `data/risk-grid.ts` grid. |
+| `data/risk-grid.ts` | Generated from the Kabylie fire-risk model (v7 champion, AUC 0.826): 3,882 tuples [lng, lat, risk 0-1] at 1 km over Bejaia + Jijel, climatological typical-summer estimate. Regenerate from the model output - do not hand-edit. |
 | `pwa.ts` | Production-only service-worker registration. |
 | `geo-hint.ts` | Coarse IP-geolocation hint (Vercel headers): `getGeoHint()` reads `window.__GA_GEO__` (client) / the request-global (server). Never stored. |
 | `gps.ts` | `medianFix()` — robust final GPS fix: median of the last 3 ±100 m readings (rejects lucky outliers), single-best fallback. Unit-tested. |
@@ -175,6 +178,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `data/wilaya-species.ts` | Auto-generated from GBIF occurrence evidence (exact WKT wilaya polygons, Plantae only): top-10 recorded plant species per wilaya with counts. Do not hand-edit. |
 | `data/species-guide.ts` | Curated planting guide: `WILAYA_CLIMATE` (climate class per wilaya) + `SPECIES_GUIDE` (19 species: AR/EN names, climate fits, notes, cautions). Hand-curated — edit with sources. |
 | `data/flare-zones.ts` | Auto-generated from the EOG Global Gas Flare Analysis 2024 (eogdata.mines.edu): 185 clustered Algerian flare zones (radius = clamp(spread + 2, 6, 12) km) + 5 live-feed supplements. The FIRMS static-source mask. Regenerate from the KML — do not hand-edit. |
+| `data/risk-grid.ts` | Generated from the Kabylie fire-risk model (v7 champion, AUC 0.826): 3,882 tuples [lng, lat, risk 0-1] at 1 km over Bejaia + Jijel, climatological typical-summer estimate. Regenerate from the model output - do not hand-edit. |
 | `integrations/supabase/client.ts` | Browser client (publishable key). Auto-generated â€” never edit. |
 | `integrations/supabase/client.server.ts` | Service-role admin client. Server-only. Auto-generated. |
 | `integrations/supabase/auth-attacher.ts` | Client middleware attaching the bearer token to server-fn calls. Auto-generated. |
