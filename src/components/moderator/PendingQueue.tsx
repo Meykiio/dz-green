@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Sprout } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { PhotoThumb } from "@/components/PhotoThumb";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { localizeError, useI18n } from "@/i18n";
@@ -67,18 +67,13 @@ export function PendingQueue() {
     <ul className="space-y-3">
       {list.map((site) => (
         <li key={site.id} className="flex gap-3 rounded-lg border border-border bg-card p-3">
-          {photoUrl(site.photo_url) ? (
-            <img
-              src={photoUrl(site.photo_url)!}
-              alt={t("moderation.queue.alt", { wilaya: wilayaName(site.wilaya_code) })}
-              className="size-24 shrink-0 rounded-lg object-cover"
-              loading="lazy"
-            />
-          ) : (
-            <span className="grid size-24 shrink-0 place-items-center rounded-lg bg-plant/15 text-plant">
-              <Sprout className="size-6" />
-            </span>
-          )}
+          <PhotoThumb
+            src={photoUrl(site.photo_url)}
+            alt={t("moderation.queue.alt", { wilaya: wilayaName(site.wilaya_code) })}
+            tone="plant"
+            className="size-24 shrink-0 rounded-lg"
+            iconClassName="size-6"
+          />
           <div className="min-w-0 flex-1 space-y-1">
             <p className="font-medium">
               {count(site.tree_count, "tree")}

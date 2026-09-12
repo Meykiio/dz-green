@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { PhotoThumb } from "@/components/PhotoThumb";
 import { localizeError, useI18n } from "@/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -79,20 +80,13 @@ export function RejectedQueue() {
     <ul className="space-y-3">
       {list.map((site) => (
         <li key={site.id} className="flex gap-3 rounded-lg border border-border bg-card p-3">
-          {photoUrl(site.photo_url) && (
-            <img
-              src={photoUrl(site.photo_url)!}
-              alt={t("moderation.queue.alt", { wilaya: wilayaName(site.wilaya_code) })}
-              className="size-24 shrink-0 rounded-lg object-cover"
-              loading="lazy"
-              // Reject deletes the photo object (immutable-cache rule), so the
-              // proxy 404s for older rejected rows â€” hide the broken thumbnail
-              // instead of showing a black box.
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
-            />
-          )}
+          <PhotoThumb
+            src={photoUrl(site.photo_url)}
+            alt={t("moderation.queue.alt", { wilaya: wilayaName(site.wilaya_code) })}
+            tone="plant"
+            className="size-24 shrink-0 rounded-lg"
+            iconClassName="size-6"
+          />
           <div className="min-w-0 flex-1 space-y-1">
             <p className="font-medium">
               {count(site.tree_count, "tree")}

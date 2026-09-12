@@ -3,14 +3,12 @@ import {
   GPUInitializationError,
   GeolocateControl,
   Map as MapLibreMap,
-  NavigationControl,
-  ScaleControl,
   type ErrorEvent,
 } from "maplibre-gl";
 import type { FeatureCollection, Feature, Geometry, GeoJsonProperties } from "geojson";
 
 import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
-import { DARK_STYLE, LIGHT_STYLE, NORTH_BOUNDS, RecenterControl, colorsFor } from "./map-style";
+import { DARK_STYLE, LIGHT_STYLE, NORTH_BOUNDS, colorsFor } from "./map-style";
 import { applyAlgeriaLabelFilter, addDataLayers, startPulse, type Layer } from "./map-layers";
 import { wireInteractions } from "./map-interactions";
 import { addHotspotLayers, setHotspotsData } from "./hotspots-layer";
@@ -62,12 +60,7 @@ export function useHeroMapMount({
   refs: MapRefs;
   hotspotsRef: RefObject<MapFeatureCollection>;
   ctrlPos: "top-left" | "top-right";
-  controlsRef: RefObject<{
-    nav: NavigationControl;
-    recenter: RecenterControl;
-    geolocate: GeolocateControl;
-    scale: ScaleControl;
-  } | null>;
+  controlsRef: RefObject<{ geolocate: GeolocateControl } | null>;
   onFailure: (failure: MapFailure | null) => void;
 }) {
   useEffect(() => {
@@ -119,18 +112,12 @@ export function useHeroMapMount({
       onFailure("webgl2");
       return;
     }
-    // Controls live in the two corners that are always free: buttons at
-    // top-start (legend is top-end, action card is bottom-start), the scale
-    // at bottom-end. They follow locale switches (see the isRtl effect).
-    const nav = new NavigationControl({ showCompass: false });
-    const recenter = new RecenterControl();
+    // Single map control: "find my location", parked at bottom-end (the
+    // Google-Maps spot; legend is top-end, action card is bottom-start,
+    // detail panel is end-top). Mirrors with the locale (isRtl effect).
     const geolocate = new GeolocateControl({ trackUserLocation: false });
-    const scale = new ScaleControl({ maxWidth: 90, unit: "metric" });
-    controlsRef.current = { nav, recenter, geolocate, scale };
-    map.addControl(nav, ctrlPos);
-    map.addControl(recenter, ctrlPos);
-    map.addControl(geolocate, ctrlPos);
-    map.addControl(scale, ctrlPos === "top-left" ? "bottom-right" : "bottom-left");
+    controlsRef.current = { geolocate };
+    map.addControl(geolocate, ctrlPos === "top-left" ? "bottom-right" : "bottom-left");
 
     // BUG-04 belt: style.load must fire within STYLE_TIMEOUT_MS. The
     // fail-fast path below covers fetches that *error*; this catches the

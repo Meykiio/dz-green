@@ -2,6 +2,7 @@ import { Navigation, TrendingUp, Wind } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
+import { PhotoThumb } from "@/components/PhotoThumb";
 import { useI18n } from "@/i18n";
 import { photoUrl } from "@/lib/data";
 import { directionsUrl } from "@/lib/maps-link";
@@ -124,14 +125,13 @@ export function FireBody({ fire }: { fire: FireReport }) {
   const { t, formatDate } = useI18n();
   return (
     <div className="mt-4 space-y-4">
-      {photoUrl(fire.photo_url) && (
-        <img
-          src={photoUrl(fire.photo_url)!}
-          alt={t("home.detail.altFire")}
-          loading="lazy"
-          className="max-h-44 w-full rounded-xl object-cover md:max-h-52"
-        />
-      )}
+      <PhotoThumb
+        src={photoUrl(fire.photo_url)}
+        alt={t("home.detail.altFire")}
+        tone="fire"
+        className="max-h-44 w-full rounded-xl md:max-h-52"
+        iconClassName="size-10"
+      />
       <dl className="grid grid-cols-2 gap-3 text-sm">
         <Field
           label={t("home.detail.field.status")}

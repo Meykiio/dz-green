@@ -2,6 +2,7 @@ import { Droplets, Flame, Navigation, Satellite, Sprout, TrendingUp, X } from "l
 import { Link } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
+import { PhotoThumb } from "@/components/PhotoThumb";
 import { useI18n } from "@/i18n";
 import { photoUrl } from "@/lib/data";
 import { directionsUrl } from "@/lib/maps-link";
@@ -59,14 +60,13 @@ export function DetailPanel({
       ) : (
         site && (
           <div className="mt-4 space-y-4">
-            {photoUrl(site.photo_url) && (
-              <img
-                src={photoUrl(site.photo_url)!}
-                alt={t("home.detail.altPlanting", { wilaya: wilayaName(site.wilaya_code) })}
-                loading="lazy"
-                className="max-h-44 w-full rounded-xl object-cover md:max-h-52"
-              />
-            )}
+            <PhotoThumb
+              src={photoUrl(site.photo_url)}
+              alt={t("home.detail.altPlanting", { wilaya: wilayaName(site.wilaya_code) })}
+              tone="plant"
+              className="max-h-44 w-full rounded-xl md:max-h-52"
+              iconClassName="size-10"
+            />
             <dl className="grid grid-cols-2 gap-3 text-sm">
               <Field label={t("home.detail.field.wilaya")} value={wilayaName(site.wilaya_code)} />
               {site.commune && (

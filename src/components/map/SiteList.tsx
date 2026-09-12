@@ -1,5 +1,6 @@
-import { Droplets, Flame, Sprout } from "lucide-react";
+import { Droplets, Flame } from "lucide-react";
 
+import { PhotoThumb } from "@/components/PhotoThumb";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useI18n } from "@/i18n";
 import { photoUrl } from "@/lib/data";
@@ -7,9 +8,9 @@ import { needsWater, type CareLog, type FireReport, type MapFeature, type Site }
 import { wilayaName } from "@/lib/wilayas";
 
 const FIRE_STATUS_KEY: Record<FireReport["status"], string> = {
-  active: "triage.badge.active",
-  resolved: "triage.badge.resolved",
-  false_alarm: "triage.badge.falseAlarm",
+  active: "moderation.triage.badge.active",
+  resolved: "moderation.triage.badge.resolved",
+  false_alarm: "moderation.triage.badge.falseAlarm",
 };
 
 interface Props {
@@ -128,18 +129,13 @@ function SiteRow({
       onClick={() => onSelectFeature({ kind: "site", site })}
       className="tap-target flex w-full items-center gap-3 bg-card px-4 py-3 text-left transition-colors hover:bg-plant/5 rtl:text-right"
     >
-      {photo ? (
-        <img
-          src={photo}
-          alt=""
-          loading="lazy"
-          className="size-12 shrink-0 rounded-lg object-cover"
-        />
-      ) : (
-        <span className="grid size-12 shrink-0 place-items-center rounded-lg bg-plant/15 text-plant">
-          <Sprout className="size-5" />
-        </span>
-      )}
+      <PhotoThumb
+        src={photo}
+        alt=""
+        tone="plant"
+        className="size-12 shrink-0 rounded-lg"
+        iconClassName="size-5"
+      />
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-medium">
           {count(site.tree_count, "tree")}
