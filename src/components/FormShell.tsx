@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { Reveal } from "@/components/Reveal";
 import { useI18n } from "@/i18n";
 
 export function FormShell({
@@ -30,9 +31,9 @@ export function FormShell({
       <div className={`mt-4 h-1 w-16 rounded-full ${bar}`} />
       <h1 className="mt-3 text-2xl font-semibold tracking-tight">{title}</h1>
       <p className="mt-1 text-sm text-muted-foreground">{intro}</p>
-      <div className="mt-6 rounded-2xl border border-border bg-card p-4 md:p-6">
+      <Reveal className="mt-6 rounded-2xl border border-border bg-card p-4 md:p-6">
         {children}
-      </div>
+      </Reveal>
     </div>
   );
 }

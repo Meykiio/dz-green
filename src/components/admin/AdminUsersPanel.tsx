@@ -108,7 +108,11 @@ export function AdminUsersPanel() {
         </p>
       )}
       {users.isLoading && offset === 0 && (
-        <p className="mt-6 text-muted-foreground">{t("moderation.adm.loadingUsers")}</p>
+        <div className="mt-6 space-y-3" aria-hidden>
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="h-20 animate-pulse rounded-lg border border-border bg-card" />
+          ))}
+        </div>
       )}
 
       <div className="mt-4 space-y-3">

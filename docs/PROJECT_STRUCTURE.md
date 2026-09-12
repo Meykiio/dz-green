@@ -67,9 +67,9 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 
 | Path | Purpose |
 |---|---|
-| `AppShell.tsx` | Global chrome, split by route: public pages get a top nav-bar (hamburger drawer, `inert` when closed); app pages (`/moderate`, `/admin`, `/activity`) get the sidebar shell. The drawer and the locale dropdown are extracted (2026-09-01): `AppDrawer.tsx`, `LocaleDropdown.tsx`. |
+| `AppShell.tsx` | Global chrome, split by route (Canopy, 2026-09-12): public pages get the slim top bar + drawer; staff pages get `shell/StaffSidebar.tsx` (280px → 78px persisted rail, sliding active indicator, nav groups) and drop the top bar from lg up. Nav items + groups shared via `shell/nav.ts`. GitHub + theme hide from the mobile top bar (drawer footer carries them). |
 | `ConsentBanner.tsx` | First-visit AI-training consent banner (2026-09-05): bottom-pinned, accept/decline/dismiss, localStorage-backed, never reappears after a choice. Wired into AppShell after main. |
-| `AppDrawer.tsx` | The navigation drawer (brand header, role-scoped nav rows, theme/auth footer) — starts below the announcement strip when one is live, `inert` when closed. Extracted from AppShell 2026-09-01. |
+| `AppDrawer.tsx` | The navigation drawer (brand header, grouped nav rows with a staggered RTL-safe reveal, theme + privacy + auth footer) — starts below the announcement strip when one is live, `inert` when closed. Extracted from AppShell 2026-09-01; Canopy restyle 2026-09-12. |
 | `LocaleDropdown.tsx` | 3-way locale dropdown (عربي/English/Français, check on current, outside-click + Escape close). Replaced the cycle button 2026-09-01. |
 | `volunteer/VolunteerForm.tsx` | The `/volunteer` form: name/email/phone-whatsapp/wilaya dropdown (58)/extra-wilayas/intent chips (preselected "Review plantings")/availability/message, honeypot, success state. |
 | `admin/AdminUsersPanel.tsx` | Users, roles and wilayas panel: paginated list ("Show more"), role buttons, sign-out, "New account" — all one tab. |
@@ -94,7 +94,8 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `PlantingGuide.tsx` | "What to plant here" chips on /plant: evidence-first species suggestions per wilaya (climate fit + GBIF evidence), tap-to-fill. |
 | `SpeciesSuggest.tsx` | "Identify from the photo" button + one-tap species chips on the plant form (PlantNet). |
 | `EmergencyContacts.tsx` | SOS pill + popover in the top bar: Protection Civile 14/1021, Police 17, Gendarmerie Nationale 1055, SAMU 16, `tel:` links. |
-| `home/HomeBits.tsx` | Home helpers: `Stat`, `Chip`, `HomeCtas`. |
+| `PhotoThumb.tsx` | Photo with a Canopy fallback: tinted sprout/flame block instead of the browser's broken-image icon (404-safe, resets on src change). Used in list, queues, detail panels. |
+| `Reveal.tsx` | One-time scroll reveal wrapper (IntersectionObserver, reduced-motion safe) — Canopy life layer. |
 | `home/ActionCard.tsx` | The home action card (hero copy, live stats, three CTAs, layer chips, hide/reveal) — extracted from the home route 2026-09-01. |
 | `home/ViewToggle.tsx` | Map / List / Board switch (floats top-right over the home view). |
 | `home/Leaderboard.tsx` | Monthly wilaya race â€” approved plantings summed per wilaya, resets on the 1st, client-computed. |
@@ -108,7 +109,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `map/detail-bodies.tsx` | `HotspotBody` (satellite hotspot detail sheet) + `RiskBody` (fire-risk grid-point detail). |
 | `map/map-failure.tsx` | The WebGL2 probe + map failure overlay (extracted from HeroMap 2026-08-31). |
 | `map/useHeroMapMount.ts` | The HeroMap mount effect (WebGL2 probe, map construction, control placement, style.load init, context-loss + style-fetch failure guards — BUG-04 2026-09-02) as a hook. Extracted 2026-09-01. |
-| `home/LegendDots.tsx` | The floating 4-dot legend (trees/care/fires/satellite) with tooltips (extracted from the home route 2026-08-31). |
+| `LegendDots.tsx` | (deleted 2026-09-12, Canopy Sprint 6/99: the 4-dot legend is gone; layer states live in the action-card toggles and chips). |
 | `map/map-style.ts` | Map style constants, theme-aware colors, the RTL text plugin call (browser-guarded), and the RecenterControl. |
 | `map/map-data.ts` | GeoJSON builders (feature collection, kind filters, feature lookup). |
 | `map/map-layers.ts` | Source/layer setup (wilaya borders, per-kind points, fire pulse), layer visibility, the pulse rAF loop, click/hover interactions. |
@@ -202,7 +203,7 @@ Fixtures are SQL-seeded per the recipe in `docs/SYSTEM_INSTRUCTIONS.md` Â§E2E 
 
 ## Known structural notes
 
-- **The 250-line rule has zero hand-written exceptions** (2026-09-01 cleanup): `LocationField.tsx` 332→227 (+ `location-gps.ts`, `location-maps-link.tsx`), `admin/AdminAnnouncementsPanel.tsx` 317→193 (+ `announce-form-bits.tsx`), `AppShell.tsx` 290→249 (+ `AppDrawer.tsx`, `LocaleDropdown.tsx`), `routes/index.tsx` 271→168 (+ `home/ActionCard.tsx`), `_authenticated/activity.tsx` 269→102 (+ `activity/ActivitySections.tsx`), `map/HeroMap.tsx` 262→154 (+ `map/useHeroMapMount.ts`). Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`, `src/data/*` auto-generated) are exempt.
+- **The 250-line rule has zero hand-written exceptions** (re-zeroed 2026-09-12 in the Canopy sprints): DetailPanel 253→189 (FireBody + Field → detail-bodies), map-layers 255→191 (+ `map-interactions.ts`), AppShell 251→206 (+ `shell/StaffSidebar.tsx`, `shell/nav.ts`). Earlier splits (2026-09-01): LocationField, AdminAnnouncementsPanel, routes/index, activity route, HeroMap. Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`, `src/data/*` auto-generated) are exempt; `src/styles.css` is the token stylesheet.
 - `src/components/ui/` is template surface area, not project code; treat it as vendored. `chart.tsx` and `sidebar.tsx` currently have zero consumers (flagged in `docs/AUDIT.md` P2 #7).
 - Test suite: 137 unit tests + 16 live E2E tests, plus a 40-check RLS role-matrix battery run from a session script kept out of the repo. See `docs/CHANGELOG.md` for the full verification round-up.
 

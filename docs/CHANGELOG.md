@@ -2,6 +2,14 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-12 (hundred-first pass) — Canopy Sprint 6: life layer, a11y, RTL audit, docs — branch `feat/canopy-redesign` (NOT merged)
+
+- **Life layer:** `components/Reveal.tsx` (Canopy scroll-reveal: one-time fade/slide on viewport entry, reduced-motion renders visible immediately) — wired into `FormShell`, so every submission form enters with the Canopy ease. Skeleton loaders in the pending queue, fire triage, and admin users list (content-shaped shimmer cards instead of bare text). Global keyboard focus ring in the base layer (`:where(...):focus-visible`, zero-specificity so component styles win).
+- **RTL audit against the research checklist:** app code is clean — logical properties throughout, the only physical values left are the honeypot off-screen hack (direction-irrelevant), explicit `isRtl` swaps in `ReceiptLink`, and `rtl:` overrides on the drawer/marquee. Vendored `ui/*` untouched (unused by app flows).
+- **A11y posture:** every new token pair documented with its contrast intent in `DESIGN.md`; touch targets 44px preserved; keyboard paths: tab order + the new queue shortcuts (A/R/arrows) + global focus ring.
+- **Docs:** `DESIGN.md` fully rewritten to Canopy (the live truth is `src/styles.css` + `docs/design-system/canopy.html`); `PROJECT_STRUCTURE.md` updated (new shell/, PhotoThumb, Reveal, map-interactions; LegendDots/HomeBits deleted; 250-line record); `FEATURES.md` §12 rewritten; `ROADMAP.md` notes the redesign branch; `SYSTEM_INSTRUCTIONS.md` carries the token rule.
+- **Verified:** `bunx tsc --noEmit` clean, 219/219 unit tests, client + SSR + Nitro build green. **Not verified:** the 16-test live E2E suite (needs SQL fixtures per `SYSTEM_INSTRUCTIONS.md` — the merge gate), and hands-on visual passes in both themes/locales — queued for the owner's device pass. **Merge is blocked until the owner explicitly approves it.**
+
 ## 2026-09-12 (hundredth pass) — Canopy Sprint 5: staff dashboards — branch `feat/canopy-redesign`
 
 - **Moderation queue, keyboard-first (review-queue research):** arrows/j-k pick the current submission, **A approves, R rejects** — shortcuts never fire while the moderator is typing or holds a modifier. The current card gets a canopy ring. Action buttons carry A/R kbd hints. **No queue-depth banner by design** (research: showing reviewers the backlog size degrades decisions); the count stays in the tab badge only.

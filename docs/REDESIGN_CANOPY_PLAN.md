@@ -157,19 +157,16 @@ recolored.
 - Verify: tsc + 219/219 unit + build green ✓; hands-on keyboard pass +
   E2E admin.spec queued (merge gate)
 
-### Sprint 6 — Life layer, a11y, docs, merge prep
-- Motion: scroll reveals on public pages, draw-underline hero accent,
-  skeleton loaders (map card, queues, tables), empty-state illustrations
-  (existing copy, Canopy surfaces), focus-visible rings everywhere.
-- Accessibility pass: contrast of every new token pair (AA), keyboard
-  walk of all staff actions, reduced-motion honored.
-- RTL audit against the research checklist (physical properties, icons,
-  animations, grid positions, `dir="ltr"` inputs, `dir="auto"` UGC).
-- Docs: rewrite `docs/DESIGN.md` (Canopy), update `PROJECT_STRUCTURE.md`,
-  `FEATURES.md`, `CHANGELOG.md`, `SYSTEM_INSTRUCTIONS.md` (design-token
-  rule now points at Canopy), `ROADMAP.md` (redesign shipped).
-- Full E2E suite (16 tests) + unit suite + build + owner device pass.
-- Commit: `feat(canopy): motion, a11y, RTL audit, docs` → PR → merge.
+### Sprint 6 — Life layer, a11y, docs, merge prep — **DONE 2026-09-12 (branch only, NOT merged)**
+- `components/Reveal.tsx` + `.ga-reveal` CSS; wired into FormShell ✓
+- Skeletons: pending queue, fire triage, admin users ✓
+- Global focus-visible ring (zero-specificity base rule) ✓
+- RTL audit: app code clean (logical properties; honeypot/isRtl-swap
+  exceptions verified intentional) ✓
+- Docs: DESIGN.md rewritten to Canopy, PROJECT_STRUCTURE, FEATURES §12,
+  CHANGELOG 101st ✓
+- Not verified: live E2E suite (fixture gate) + owner device pass.
+- **MERGE BLOCKED until the owner explicitly approves.**
 
 ## 4. Do-NOT-touch list (breakage guards)
 

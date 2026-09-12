@@ -195,16 +195,9 @@ First-visit AI-training consent, honest and non-blocking: a small banner pinned 
 
 Community fire confirmations: "I see it / I don't / Not sure" vote buttons on every fire report's detail panel, live counts, and a community-verified badge (3+ yes and >70% yes ratio). One vote per device per report (re-vote replaces), 20 votes/device/day. The trust layer from `docs/FEATURE_community_confirmations.md` and the SEC-01 audit. `src/lib/confirmations.server.ts` (upsert + daily limit via the HMAC device-hash pattern, counts, my-vote, `isCommunityVerified` helper) + `src/lib/confirmations.functions.ts` (createServerFn + zod). `src/components/map/FireConfirmations.tsx` wired into `FireBody`. Full i18n (`home.confirm`, AR/EN/FR). Schema in `supabase/migrations/20260905120000_fire_confirmations.sql` (table + RLS deny-all + public `fire_confirmation_counts` view) — **not applied to the live database; schema changes wait for owner approval.** Verified: tsc clean, 219/219 tests (6 new in `confirmations.test.ts`), build green. Not verified end-to-end: vote write + live counts need the migration applied (counts fail soft to zeros, voting errors server-side until then).
 
-## 12. Design system (2026-08-18, post-viral Sprint 4 + owner-directed revision)
+## 12. Design system (2026-09-12, Canopy — `feat/canopy-redesign`)
 
-The app runs its own design system (`docs/DESIGN.md`), built for Green Algeria and revised against the `design-taste-frontend` and `impeccable` rubrics:
-
-- **Light theme default** — sage canvas, white cards, ink text, lime `#9fe870` on primary CTAs only. **Dark theme** via toggle (persisted, no-flash script) — same system repolarized.
-- **Typography:** Manrope 900 for the hero display (Inter 900 was judged generic by the taste rubric), Inter for body. 900 hero-only, 600 below.
-- **Shell split:** public pages (home, about, forms, `/my/*`) get a top nav-bar; app pages (`/moderate`, `/admin`, `/activity`) get the sidebar shell with a lime-dot active indicator (the 4px side-stripe was dropped — it's on the impeccable ban list).
-- **Anti-slop pass:** numbered 3-card strips, hero-metric stat cards, decorative tracked eyebrows and default glassmorphism were all removed from the home (they're on the rubrics' ban lists). Buttons get `:active` tactile feedback; transitions use exponential ease-out curves; reduced-motion respected.
-- **Semantic mapping:** plant → positive green, care → cyan, fire → negative red. Lime is never a semantic color.
-- Verified visually across home (desktop + mobile), `/plant`, `/moderate`, `/admin`, `/activity` in both themes; full E2E suite green after the revision.
+The platform runs **Canopy** (`docs/design-system/canopy.html`, the owner-made SSOT; tokens in `src/styles.css`; doc in `docs/DESIGN.md`; sprint record in `docs/REDESIGN_CANOPY_PLAN.md`): warm-paper light default (owner D1) + night-soil dark toggle; one green accent (canopy `#2F6B3F` / sprout `#6ED08A`) for primary CTAs; terracotta as the structural second color; wildfire amber reserved strictly for the fire-report system; wadi blue for care; sand for info/hotspots; an independent error red for destructive actions. Sora display + DM Sans body (Latin), Noto Kufi/Sans Arabic (Arabic-first, D2). Radius scale 4/8/16/24 (D4), Canopy motion tokens (expo-out + spring), Canopy staff sidebar (280px → 78px rail, sliding indicator, D5), keyboard-first moderation queue, `PhotoThumb` fallbacks, skeleton loaders, scroll reveals, global focus-visible ring, and one global input-focus rule. Token-first implementation: sprints 0-6, zero logic or schema changes, 219/219 unit tests + build green each sprint; merge waits for the owner's explicit approval.
 
 ## 13. Scale posture (2026-08-18, Sprint 8)
 

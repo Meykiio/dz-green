@@ -256,6 +256,14 @@
     box-shadow: 0 0 0 4px var(--primary-glow-sm);
     outline: none;
   }
+
+  /* Keyboard focus ring everywhere it isn't already handled (shadcn ring
+     classes override via higher specificity). :where() keeps this at zero
+     specificity so component styles always win. */
+  :where(a, button, [role="button"], input, textarea, select, summary):focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
 }
 
 @utility glass-panel {
@@ -431,6 +439,26 @@ html.staff-nav-collapsed {
 }
 .staff-scroll:hover::-webkit-scrollbar-thumb {
   background: var(--muted-foreground);
+}
+
+/* Canopy life layer: scroll reveal (SSOT §LIFE LAYER) */
+.ga-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.6s var(--ease-out),
+    transform 0.6s var(--ease-out);
+}
+.ga-revealed {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ga-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 /* Drawer staggered group reveal (Canopy §mobile drawer) */
