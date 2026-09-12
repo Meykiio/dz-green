@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Droplets, Flame, Satellite, Sprout, TrendingUp, X } from "lucide-react";
 
-import { Chip } from "@/components/home/HomeBits";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useI18n } from "@/i18n";
+import { cn } from "@/lib/utils";
 import type { Layer } from "@/components/map/HeroMap";
 
 export interface HomeStats {
@@ -98,13 +99,14 @@ export function ActionCard({
           </div>
         </div>
 
-        {/* Layer toggles + how-it-works: one scrollable row, no ragged wrap. */}
-        <div className="no-scrollbar mt-3 flex items-center gap-1.5 overflow-x-auto">
-          <Chip active={layers.trees} tone="plant" icon={<Sprout className="size-4" />} label={t("home.layers.trees")} onClick={() => onToggleLayer("trees")} />
-          <Chip active={layers.care} tone="care" icon={<Droplets className="size-4" />} label={t("home.layers.care")} onClick={() => onToggleLayer("care")} />
-          <Chip active={layers.fires} tone="fire" icon={<Flame className="size-4" />} label={t("home.layers.fires")} onClick={() => onToggleLayer("fires")} />
-          <Chip active={layers.hotspots} tone="hotspot" icon={<Satellite className="size-4" />} label={t("home.layers.hotspots")} onClick={() => onToggleLayer("hotspots")} />
-          <Chip active={layers.risk} tone="risk" icon={<TrendingUp className="size-4" />} label={t("home.layers.risk")} onClick={() => onToggleLayer("risk")} />
+        {/* Layer toggles + how-it-works: one compact row, icon-only with
+            tooltips (the app's own pattern: icons always, labels on hover). */}
+        <div className="no-scrollbar mt-3 flex items-center gap-1 overflow-x-auto">
+          <LayerToggle active={layers.trees} tone="plant" icon={<Sprout className="size-4" />} label={t("home.layers.trees")} tooltip={t("home.tooltip.layers.trees")} onClick={() => onToggleLayer("trees")} />
+          <LayerToggle active={layers.care} tone="care" icon={<Droplets className="size-4" />} label={t("home.layers.care")} tooltip={t("home.tooltip.layers.care")} onClick={() => onToggleLayer("care")} />
+          <LayerToggle active={layers.fires} tone="fire" icon={<Flame className="size-4" />} label={t("home.layers.fires")} tooltip={t("home.tooltip.layers.fires")} onClick={() => onToggleLayer("fires")} />
+          <LayerToggle active={layers.hotspots} tone="hotspot" icon={<Satellite className="size-4" />} label={t("home.layers.hotspots")} tooltip={t("home.tooltip.layers.hotspots")} onClick={() => onToggleLayer("hotspots")} />
+          <LayerToggle active={layers.risk} tone="risk" icon={<TrendingUp className="size-4" />} label={t("home.layers.risk")} tooltip={t("home.tooltip.layers.risk")} onClick={() => onToggleLayer("risk")} />
           <Link
             to="/about"
             className="tap-target ms-1 inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
@@ -115,6 +117,54 @@ export function ActionCard({
         </div>
       </div>
     </div>
+  );
+}
+
+/** Icon-only map-layer toggle with a hover tooltip — compact by design. */
+function LayerToggle({
+  active,
+  tone,
+  icon,
+  label,
+  tooltip,
+  onClick,
+}: {
+  active: boolean;
+  tone: "plant" | "care" | "fire" | "hotspot" | "risk";
+  icon: React.ReactNode;
+  label: string;
+  tooltip: string;
+  onClick: () => void;
+}) {
+  const on =
+    tone === "plant"
+      ? "border-plant/50 bg-plant/15 text-plant"
+      : tone === "care"
+        ? "border-care/50 bg-care/15 text-care"
+        : tone === "fire"
+          ? "border-fire/50 bg-fire/15 text-fire"
+          : tone === "risk"
+            ? "border-terracotta/50 bg-terracotta/10 text-terracotta"
+            : "border-sand/50 bg-sand/10 text-sand";
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          onClick={onClick}
+          aria-pressed={active}
+          aria-label={label}
+          title={tooltip}
+          className={cn(
+            "tap-target grid size-11 shrink-0 place-items-center rounded-sm border transition-[color,background-color,border-color,transform] duration-200 ease-[var(--ease-out)] active:scale-[0.94]",
+            active ? on : "border-border bg-card text-muted-foreground",
+          )}
+        >
+          {icon}
+        </button>
+      </TooltipTrigger>
+      <TooltipContent>{tooltip}</TooltipContent>
+    </Tooltip>
   );
 }
 
