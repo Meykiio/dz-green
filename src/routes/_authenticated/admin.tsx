@@ -47,7 +47,7 @@ function AdminPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-5xl px-4 py-8">
+      <div className="w-full px-4 py-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="eyebrow">{t("moderation.adm.eyebrow")}</p>

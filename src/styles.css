@@ -401,8 +401,29 @@ html.staff-nav-collapsed {
   padding-inline: 0;
 }
 [data-collapsed="true"] .staff-row-label,
-[data-collapsed="true"] .staff-group-label {
+[data-collapsed="true"] .staff-group-label,
+[data-collapsed="true"] .staff-rail-hide {
   display: none;
+}
+
+/* Clean slim scrollbar for nav surfaces (sidebar, drawer): transparent
+   track, rounded thumb that darkens on hover — smooth, not flashy. */
+.staff-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.staff-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.staff-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.staff-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: var(--r-full, 9999px);
+}
+.staff-scroll:hover::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
 }
 
 /* Drawer staggered group reveal (Canopy §mobile drawer) */

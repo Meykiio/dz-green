@@ -59,7 +59,7 @@ function ModeratePage() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-6xl px-4 py-8">
+      <div className="w-full px-4 py-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h1 className="text-2xl font-semibold tracking-tight">{t(SECTION_KEY[section])}</h1>
           <ModTabs section={section} onSelect={setSection} counts={counts} />

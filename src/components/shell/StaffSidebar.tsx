@@ -95,7 +95,7 @@ export function StaffSidebar({
       <nav
         ref={navRef}
         aria-label={t("chrome.aria.sections")}
-        className="relative flex-1 overflow-y-auto px-3 pb-4 [scrollbar-width:thin]"
+        className="staff-scroll relative flex-1 overflow-y-auto px-3 pb-4"
       >
         <div
           aria-hidden
@@ -112,7 +112,7 @@ export function StaffSidebar({
         ))}
       </nav>
 
-      <div className={cn("flex items-center gap-1 border-t border-sidebar-border px-3 py-3", collapsed && "flex-col")}>
+      <div className={cn("flex items-center gap-1 border-t border-sidebar-border px-3 py-3", collapsed && "flex-col items-center")}>
         <button
           type="button"
           onClick={toggleCollapsed}

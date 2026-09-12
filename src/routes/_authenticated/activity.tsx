@@ -72,7 +72,7 @@ function ActivityPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-3xl px-4 py-8">
+      <div className="w-full px-4 py-6 lg:px-8">
         <p className="eyebrow">{t("moderation.act.eyebrow")}</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">
           {t("moderation.act.heading")}

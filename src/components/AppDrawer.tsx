@@ -67,7 +67,7 @@ export function AppDrawer({
         <nav
           data-open={open}
           aria-label={t("chrome.aria.main")}
-          className="flex-1 overflow-y-auto px-3 py-2"
+          className="staff-scroll flex-1 overflow-y-auto px-3 py-2"
         >
           {visible.map((g, gi) => (
             <div key={g.key} className="pb-2 pt-3 first:pt-1">
