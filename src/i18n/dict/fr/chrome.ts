@@ -13,6 +13,11 @@ export const chrome = {
     moderate: "Modération",
     admin: "Admin",
   },
+  navGroup: {
+    explore: "Explorer",
+    contribute: "Contribuer",
+    workspace: "Espace de travail",
+  },
   aria: {
     openMenu: "Ouvrir le menu",
     closeMenu: "Fermer le menu",
@@ -25,6 +30,8 @@ export const chrome = {
     privacyShow: "Afficher les données sensibles (mode discret actif)",
     privacyHide: "Masquer les données sensibles (mode discret)",
     switchLocale: "Changer de langue",
+    collapseNav: "Replier la barre latérale",
+    expandNav: "Déplier la barre latérale",
   },
   auth: {
     signout: "Se déconnecter",

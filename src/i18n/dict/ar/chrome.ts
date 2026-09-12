@@ -13,6 +13,11 @@ export const chrome: typeof import("../en/chrome").chrome = {
     moderate: "المراجعة",
     admin: "الإدارة",
   },
+  navGroup: {
+    explore: "استكشف",
+    contribute: "ساهم",
+    workspace: "مساحة العمل",
+  },
   aria: {
     openMenu: "فتح القائمة",
     closeMenu: "إغلاق القائمة",
@@ -25,6 +30,8 @@ export const chrome: typeof import("../en/chrome").chrome = {
     privacyShow: "إظهار البيانات الحساسة (وضع التصوير مفعّل)",
     privacyHide: "إخفاء البيانات الحساسة (وضع التصوير)",
     switchLocale: "تغيير اللغة",
+    collapseNav: "طيّ الشريط الجانبي",
+    expandNav: "توسيع الشريط الجانبي",
   },
   auth: {
     signout: "تسجيل الخروج",

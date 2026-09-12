@@ -385,6 +385,62 @@
   --dur-fast: 0.18s;
   --dur-med: 0.3s;
   --dur-slow: 0.55s;
+
+  /* Staff sidebar (plan D5): 280px expanded / 78px icon rail */
+  --staff-w: 280px;
+}
+
+html.staff-nav-collapsed {
+  --staff-w: 78px;
+}
+
+/* Collapsed rail: icons only, labels + group labels hidden */
+[data-collapsed="true"] .staff-row {
+  justify-content: center;
+  gap: 0;
+  padding-inline: 0;
+}
+[data-collapsed="true"] .staff-row-label,
+[data-collapsed="true"] .staff-group-label {
+  display: none;
+}
+
+/* Drawer staggered group reveal (Canopy §mobile drawer) */
+@keyframes ga-drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes ga-drawer-in-rtl {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.ga-drawer-row {
+  opacity: 0;
+}
+[data-open="true"] .ga-drawer-row {
+  animation: ga-drawer-in 0.5s var(--ease-out) both;
+  animation-delay: calc(0.08s + var(--i, 0) * 45ms);
+}
+[dir="rtl"] [data-open="true"] .ga-drawer-row {
+  animation-name: ga-drawer-in-rtl;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ga-drawer-row {
+    opacity: 1;
+    animation: none !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

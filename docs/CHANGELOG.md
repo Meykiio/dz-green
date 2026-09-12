@@ -2,6 +2,15 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-12 (ninety-fifth pass) — Canopy Sprint 2: chrome — staff sidebar + drawers — branch `feat/canopy-redesign`
+
+- **Staff sidebar (plan D5, Canopy §SIDEBAR NAVIGATION + review research):** new `components/shell/StaffSidebar.tsx` — 280px expanding / 78px icon rail (persisted `ga-staff-nav`, toggle in the footer), sliding 3px active indicator on the inline-start edge (ease-spring, measured from the `[data-active]` row), labeled nav groups (Explore 5 / Contribute 3 / Workspace 3 — Miller's law), footer carries collapse + theme + privacy; auth row below. Off-canvas navigation below **lg** (1024px) is the existing drawer (Canopy's own responsive table: sidebar becomes a drawer under 1024). Fully RTL-mirrored: logical properties, indicator `rounded-e-full`, hover nudge flips via `rtl:`.
+- **Shell split:** `AppShell` mounts `StaffSidebar` on `/moderate` + `/admin` + `/activity` instead of the old static `w-60` aside; public pages keep the slim top bar + drawer. The filming privacy toggle moved out of the top bar into the chrome footers (drawer + sidebar). Nav items + group spec extracted to `components/shell/nav.ts` (single source for drawer and sidebar). AppShell 251 → **206 lines** (back under the 250 cap).
+- **Drawer (Canopy):** `AppDrawer` renders the same grouped nav with a staggered reveal (`ga-drawer-in` keyframes, 45ms/row, direction-aware for RTL, reduced-motion off) and now carries privacy in its footer too.
+- **i18n:** new keys `chrome.navGroup.{explore,contribute,workspace}` + `chrome.aria.{collapseNav,expandNav}` in AR/EN/FR (typed parity enforced by tsc).
+- **Behavior unchanged:** nav targets, role gates, sign-out, announcement offset, consent banner, all routes. Sidebar collapse only affects layout width.
+- **Verified:** `bunx tsc --noEmit` clean, 219/219 unit tests, client + SSR + Nitro build green. Not verified: hands-on nav walk (anonymous → user → moderator → admin, 390px drawer, RTL mirror) — owner device pass queued at merge.
+
 ## 2026-09-12 (ninety-fourth pass) — Canopy Sprint 1: primitives — branch `feat/canopy-redesign`
 
 - **Buttons** (`ui/button.tsx`): Canopy button — 8px radius (`rounded-md` at the new scale), expo-out motion (`--ease-out`, 200ms), soft hover lift + tactile press (`active:scale-[0.96]`), shadow-sm on primary hover. Variants keep their semantics (default/destructive/outline/secondary/ghost/link).

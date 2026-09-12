@@ -111,21 +111,18 @@ recolored.
   remain outside the map pipeline ✓
 - Verify: tsc + 219/219 unit + build green ✓; visual pass queued (merge)
 
-### Sprint 2 — Chrome: public top bar + staff sidebar
-- New `components/shell/StaffSidebar.tsx`: 280px, collapsible to 78px icon
-  rail (persisted), sliding 3px active indicator (ease-spring), nav groups
-  (Map / Submit / Staff), theme + privacy + auth in footer; off-canvas drawer
-  under 1024px with backdrop + staggered group reveal; fully RTL-mirrored
-  (logical properties, indicator on the inline-start edge, directional-icon
-  flip).
-- `AppShell` split: public routes keep the slim top bar + `AppDrawer`;
-  `/moderate`, `/admin`, `/activity` mount `StaffSidebar` instead of the
-  current `w-60` aside. `AppDrawer` restyled to Canopy.
-- Keep `EmergencyContacts`, `FeedbackDialog`, `LocaleDropdown` in the top bar
-  on public pages; staff sidebar footer gets theme/privacy/auth.
-- Verify: nav flows anonymous → user → moderator → admin; drawer on 390px;
-  RTL mirror check; `tsc` + unit + build.
-- Commit: `feat(canopy): chrome — staff sidebar, public top bar, drawers`
+### Sprint 2 — Chrome: public top bar + staff sidebar — **DONE 2026-09-12**
+- `components/shell/StaffSidebar.tsx`: 280px → 78px persisted rail, sliding
+  3px inline-start indicator (ease-spring), nav groups, footer (collapse +
+  theme + privacy), auth row; `lg:` breakpoint (drawer below 1024) ✓
+- `AppShell` split: public routes keep top bar + drawer; staff pages mount
+  the sidebar (old `w-60` aside removed); privacy toggle moved to the
+  chrome footers; `AppShell` back under the 250 cap (206) ✓
+- `AppDrawer`: grouped nav + staggered RTL-safe reveal, privacy in footer ✓
+- `nav.ts`: shared NAV_ITEMS + GROUP_SPECS for drawer and sidebar ✓
+- i18n: `navGroup.*` + `aria.{collapseNav,expandNav}` in AR/EN/FR ✓
+- Verify: tsc + 219/219 unit + build green ✓; nav walk + 390px + RTL
+  queued (merge)
 
 ### Sprint 3 — Home map surface
 - `ActionCard` (hero copy in Sora display, stat line, CTA hierarchy:

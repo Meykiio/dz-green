@@ -1,24 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import {
-  Droplets,
-  Eye,
-  EyeOff,
-  FileText,
-  Flame,
-  Github,
-  HandHeart,
-  Info,
-  LayoutDashboard,
-  ListChecks,
-  LogOut,
-  Map as MapIcon,
-  Menu,
-  Moon,
-  ScrollText,
-  ShieldCheck,
-  Sprout,
-  Sun,
-} from "lucide-react";
+import { Eye, EyeOff, Github, LogOut, Menu, Moon, Sun } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -33,23 +14,11 @@ import { ConsentBanner } from "@/components/ConsentBanner";
 import { EmergencyContacts } from "@/components/EmergencyContacts";
 import { LocaleDropdown } from "@/components/LocaleDropdown";
 import { FeedbackDialog } from "@/components/FeedbackDialog";
+import { StaffSidebar } from "@/components/shell/StaffSidebar";
+import { GROUP_SPECS, NAV_ITEMS, type NavItem } from "@/components/shell/nav";
 import { useI18n } from "@/i18n";
 
 const APP_PATHS = ["/moderate", "/admin", "/activity"];
-
-const NAV_ITEMS = [
-  { to: "/", key: "map", icon: MapIcon },
-  { to: "/plant", key: "plant", icon: Sprout, tone: "text-plant" },
-  { to: "/care", key: "care", icon: Droplets, tone: "text-care" },
-  { to: "/fire", key: "fire", icon: Flame, tone: "text-fire" },
-  { to: "/about", key: "about", icon: Info },
-  { to: "/volunteer", key: "volunteer", icon: HandHeart },
-  { to: "/privacy", key: "privacy", icon: ScrollText },
-  { to: "/terms", key: "terms", icon: FileText },
-  { to: "/activity", key: "activity", icon: ListChecks, requires: "user" },
-  { to: "/moderate", key: "moderate", icon: ShieldCheck, requires: "moderator" },
-  { to: "/admin", key: "admin", icon: LayoutDashboard, requires: "admin" },
-] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -79,7 +48,6 @@ function Shell({
   const { masked, toggle: togglePrivacy } = usePrivacyMode();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const isStaffPage = isAppPage || pathname.startsWith("/moderate");
 
   useEffect(() => {
     setDrawerOpen(false);
@@ -93,15 +61,21 @@ function Shell({
     }
   }
 
-  const rows = NAV_ITEMS.filter((r) => {
-    if (!("requires" in r)) return true;
-    const q = r.requires;
-    return q === "user" ? !!user : q === "moderator" ? isModerator : isAdmin;
-  }).map((r) => ({
-    to: r.to,
-    label: t(`chrome.nav.${r.key}`),
-    icon: r.icon,
-    tone: "tone" in r ? r.tone : undefined,
+  // Role-filtered nav, grouped Miller-style (5 / 3 / 3) for drawer + sidebar.
+  const byKey = new Map(
+    NAV_ITEMS.filter((r) => {
+      if (!r.requires) return true;
+      const q = r.requires;
+      return q === "user" ? !!user : q === "moderator" ? isModerator : isAdmin;
+    }).map((r) => [r.key, r]),
+  );
+  const groups = GROUP_SPECS.map((g) => ({
+    key: g.key,
+    label: t(`chrome.navGroup.${g.key}`),
+    rows: g.items
+      .map((item) => byKey.get(item))
+      .filter((item): item is NavItem => Boolean(item))
+      .map(navRow),
   }));
 
   const brandName = isRtl ? "الجزائر الخضراء" : "Green Algeria";
@@ -111,49 +85,63 @@ function Shell({
       type="button"
       onClick={toggle}
       aria-label={theme === "dark" ? t("chrome.aria.themeLight") : t("chrome.aria.themeDark")}
-      className="tap-target grid size-10 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.96]"
+      className="tap-target grid size-10 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.96]"
     >{theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}</button>
   );
 
-  // Locale picker: a real dropdown with all three languages (2026-09-01).
+  // Filming privacy mode: staff screens mask PII by default (top bar on
+  // public chrome, sidebar footer on app pages).
+  const privacyButton = (
+    <button
+      type="button"
+      onClick={togglePrivacy}
+      aria-label={masked ? t("chrome.aria.privacyShow") : t("chrome.aria.privacyHide")}
+      className="tap-target grid size-10 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
+    >
+      {masked ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+    </button>
+  );
 
   const authAction = user ? (
     <button
       type="button"
       onClick={() => void signOut()}
-      className="tap-target inline-flex items-center gap-1.5 rounded-full px-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      className="tap-target inline-flex items-center gap-1.5 rounded-lg px-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
     >
       <LogOut className="size-4" />
-      <span className="hidden sm:inline">{t("chrome.auth.signout")}</span>
+      <span className="staff-row-label hidden sm:inline">{t("chrome.auth.signout")}</span>
     </button>
   ) : (
     <Link
       to="/auth"
-      className="tap-target inline-flex items-center rounded-full px-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      className="tap-target inline-flex items-center rounded-lg px-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
     >
-      {t("chrome.auth.signin")}
+      <span className="staff-row-label">{t("chrome.auth.signin")}</span>
     </Link>
   );
 
-  const navRow = ({ to, label, icon: Icon, ...rest }: (typeof rows)[number]) => {
-    const active = to === "/" ? pathname === "/" : pathname.startsWith(to);
+  function navRow(item: NavItem) {
+    const label = t(`chrome.nav.${item.key}`);
+    const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
     return (
       <Link
-        key={to}
-        to={to}
+        key={item.to}
+        to={item.to}
+        data-active={active ? "true" : undefined}
+        aria-label={label}
+        aria-current={active ? "page" : undefined}
         className={cn(
-          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+          "staff-row flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-[color,background-color,transform] duration-200 ease-[var(--ease-out)] hover:translate-x-[3px] rtl:hover:-translate-x-[3px]",
           active
-            ? "bg-accent font-semibold text-foreground"
-            : "text-muted-foreground hover:bg-accent hover:text-foreground",
+            ? "bg-sidebar-accent font-semibold text-sidebar-accent-foreground"
+            : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         )}
       >
-        <span className={cn("size-1.5 rounded-full", active ? "bg-primary" : "bg-transparent")} />
-        <Icon className={cn("size-4", rest.tone)} />
-        {label}
+        <item.icon className={cn("size-4 shrink-0", item.tone)} />
+        <span className="staff-row-label truncate">{label}</span>
       </Link>
     );
-  };
+  }
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">
@@ -180,24 +168,6 @@ function Shell({
           </Link>
         </div>
         <div className="flex items-center gap-1">
-          {isStaffPage && (
-            <button
-              type="button"
-              onClick={togglePrivacy}
-              aria-label={masked ? t("chrome.aria.privacyShow") : t("chrome.aria.privacyHide")}
-              className={cn(
-                "tap-target inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold transition-transform active:scale-[0.97]",
-                masked
-                  ? "border-plant/40 bg-plant/10 text-plant"
-                  : "border-border bg-card text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {masked ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
-              <span className="hidden sm:inline">
-                {masked ? t("chrome.privacy.showInfos") : t("chrome.privacy.hideInfos")}
-              </span>
-            </button>
-          )}
           <EmergencyContacts />
           <FeedbackDialog />
           <a
@@ -220,29 +190,30 @@ function Shell({
         onClose={() => setDrawerOpen(false)}
         hasAnnouncement={hasAnnouncement}
         brandName={brandName}
-        rows={rows.map(navRow)}
+        groups={groups}
         themeButton={themeButton}
+        privacyButton={privacyButton}
         authAction={authAction}
       />
 
-      {/* Desktop static sidebar on app pages only. */}
+      {/* Staff pages: the Canopy sidebar (280px → 78px rail, lg+ only). */}
       {isAppPage && (
-        <aside
-          className={cn(
-            "fixed inset-y-0 start-0 z-30 hidden w-60 flex-col border-e border-sidebar-border bg-sidebar md:flex",
-            hasAnnouncement ? "pt-[5.75rem]" : "pt-14",
-          )}
-        >
-          <nav aria-label={t("chrome.aria.sections")} className="mt-2 flex-1 space-y-1 px-3 py-2">
-            {rows.map(navRow)}
-          </nav>
-          <div className="flex items-center gap-2 border-t border-sidebar-border px-4 py-3">
-            {authAction}
-          </div>
-        </aside>
+        <StaffSidebar
+          groups={groups}
+          hasAnnouncement={hasAnnouncement}
+          themeButton={themeButton}
+          privacyButton={privacyButton}
+          authAction={authAction}
+        />
       )}
 
-      <main className={cn("flex-1", hasAnnouncement ? "pt-[5.75rem]" : "pt-14", isAppPage && "md:ms-60")}>
+      <main
+        className={cn(
+          "flex-1 transition-[margin] duration-[450ms] ease-[var(--ease-out)]",
+          hasAnnouncement ? "pt-[5.75rem]" : "pt-14",
+          isAppPage && "lg:ms-[var(--staff-w)]",
+        )}
+      >
         {children}
       </main>
       <ConsentBanner />

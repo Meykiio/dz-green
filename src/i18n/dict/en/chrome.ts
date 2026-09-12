@@ -13,6 +13,11 @@ export const chrome = {
     moderate: "Moderate",
     admin: "Admin",
   },
+  navGroup: {
+    explore: "Explore",
+    contribute: "Contribute",
+    workspace: "Workspace",
+  },
   aria: {
     openMenu: "Open menu",
     closeMenu: "Close menu",
@@ -25,6 +30,8 @@ export const chrome = {
     privacyShow: "Show sensitive data (filming mode is on)",
     privacyHide: "Hide sensitive data (filming mode)",
     switchLocale: "Switch language",
+    collapseNav: "Collapse the navigation rail",
+    expandNav: "Expand the navigation rail",
   },
   auth: {
     signout: "Sign out",
