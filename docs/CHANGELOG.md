@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-12 (ninety-seventh pass) — Canopy Sprint 4: action card redesign + submission flows — branch `feat/canopy-redesign`
+
+- **ActionCard redesigned (owner request, Canopy UX principles):** the ragged chip-wrap layout is gone. New structure — Sora display title, a four-number stat strip on a hairline (number + tiny label, Stripe discipline), one full-width primary CTA ("I planted a tree" — the only emphasized element, Von Restorff), care/fire as neutral secondary halves, and the five layer toggles in a single scrollable row with "How it works" at the serial end (Miller + serial position). No new i18n keys (reuses `home.stats.*`).
+- **Fire system colors:** the fire submit button now carries wildfire amber (`bg-fire text-fire-foreground`) — the fire system's color per Canopy — instead of generic destructive red; error red stays for actual destructive admin actions. `FireAlertsCard` enable button matches (`text-fire-foreground` token swap), its buttons join the 4px chip shape.
+- **Form chips → Canopy shape:** `PlantingGuide` and `SpeciesSuggest` suggestion chips move from pills to the 4px chip radius. All remaining form surfaces (plant/care/fire/volunteer/auth/receipt, `FormShell`, `LocationField`, `CommuneField`, `PhotoInput`) inherit Canopy tokens unchanged.
+- **Verified:** `bunx tsc --noEmit` clean, 219/219 unit tests, client + SSR + Nitro build green. Not verified: end-to-end submissions on the branch (E2E live suite needs SQL fixtures — merge gate), visual pass of the redesigned card on 320-390px.
+
 ## 2026-09-12 (ninety-sixth pass) — Canopy Sprint 3: home map surface — branch `feat/canopy-redesign`
 
 - **Map colors remapped to Canopy** (`map-style.ts colorsFor`): trees canopy/sprout green, care wadi blue, fires wildfire amber (light `#C24A1C` / dark `#E8622C`), hotspots sand, wilaya borders green, the outside-Algeria mask now paper `#fdfbf8` (light) / night soil `#100d0a` (dark) — the dark map finally reads as the night-satellite look Canopy was designed around. `PrecisionPicker` pin + accuracy circle follow the same palette (the risk layer keeps its perceptual green-to-red ramp — data-viz, on-system).

@@ -277,6 +277,13 @@
   min-inline-size: 44px;
 }
 
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @utility display-hero {
   font-family: var(--font-display);
   font-weight: 700; /* Canopy display weight — Sora 700 */

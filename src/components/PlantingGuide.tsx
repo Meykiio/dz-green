@@ -33,7 +33,7 @@ export function PlantingGuide({
             <button
               type="button"
               onClick={() => onPick(locale === "ar" ? `${species.ar} (${species.latin})` : `${species.en} (${species.latin})`)}
-              className="tap-target rounded-full border border-plant/40 bg-plant/10 px-3 py-1.5 text-xs font-semibold text-plant transition-transform active:scale-[0.97]"
+              className="tap-target rounded-sm border border-plant/40 bg-plant/10 px-3 py-1.5 text-xs font-semibold text-plant transition-transform active:scale-[0.97]"
             >
               {locale === "ar" ? species.ar : species.en}
               <span className="font-normal italic"> · {species.latin}</span>

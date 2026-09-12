@@ -74,7 +74,7 @@ export function SpeciesSuggest({
           type="button"
           onClick={identify}
           disabled={busy}
-          className="tap-target inline-flex items-center gap-1.5 rounded-full border border-plant/40 bg-plant/10 px-3 py-1.5 text-xs font-semibold text-plant transition-transform active:scale-[0.97] disabled:opacity-60"
+          className="tap-target inline-flex items-center gap-1.5 rounded-sm border border-plant/40 bg-plant/10 px-3 py-1.5 text-xs font-semibold text-plant transition-transform active:scale-[0.97] disabled:opacity-60"
         >
           {busy ? <Loader2 className="size-3.5 animate-spin" /> : <Leaf className="size-3.5" />}
           {busy ? t("forms.plant.identifying") : t("forms.plant.identify")}
@@ -87,7 +87,7 @@ export function SpeciesSuggest({
               key={s.scientific}
               type="button"
               onClick={() => onPick(s.label)}
-              className="tap-target rounded-full border border-plant/40 bg-plant/10 px-3 py-1.5 text-xs font-semibold text-plant transition-transform active:scale-[0.97]"
+              className="tap-target rounded-sm border border-plant/40 bg-plant/10 px-3 py-1.5 text-xs font-semibold text-plant transition-transform active:scale-[0.97]"
             >
               {s.label}
             </button>

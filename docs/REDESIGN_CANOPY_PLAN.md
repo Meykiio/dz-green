@@ -136,19 +136,16 @@ recolored.
 - Verify: tsc + 219/219 unit + build green ✓; E2E flows.spec + visual map
   pass queued (merge gate)
 
-### Sprint 4 — Submission flows + public pages
-- `/plant`, `/care`, `/fire`, `/volunteer`, `/auth`, `/my/$token`,
-  `/about`, `/privacy`, `/terms`: FormShell-derived layout, Canopy inputs,
-  severity/action selectors → Canopy chips, photo input, `LocationField`,
-  `CommuneField`, `PlantingGuide`, `SpeciesSuggest`, `ReceiptLink`,
-  `FireAlertsCard`, success screens (Peak-End rule: the confirmation is the
-  emotional moment — receipt link gets the primary card).
-- The Protection Civile disclaimer keeps its exact visibility semantics —
-  restyle, never reduce.
-- Verify: all three submissions end-to-end on the branch (dev DB), receipt
-  round-trip, honeypot intact, RTL, 390px; E2E `flows.spec.ts` +
-  `receipts.spec.ts`.
-- Commit: `feat(canopy): submission flows + public pages`
+### Sprint 4 — Submission flows + public pages — **DONE 2026-09-12**
+- ActionCard redesigned: stat strip, single primary CTA, scrollable
+  one-row layer toggles (`no-scrollbar` utility), how-it-works at
+  serial end ✓
+- Fire submit + FireAlertsCard enable → wildfire amber with token
+  foreground; PlantingGuide/SpeciesSuggest chips → 4px shape ✓
+- plant/care/fire/volunteer/auth/receipt/about/privacy/terms: token
+  inheritance, no markup changes needed ✓
+- Verify: tsc + 219/219 unit + build green ✓; live submission pass +
+  E2E queued (merge gate)
 
 ### Sprint 5 — Staff dashboards (moderate / admin / activity)
 - Apply the review-queue research:

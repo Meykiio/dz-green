@@ -195,7 +195,14 @@ function FirePage() {
             </label>
           </div>
 
-          <Button type="submit" size="lg" variant="destructive" className="w-full" disabled={mutation.isPending}>
+          {/* The fire submit carries the wildfire amber — the fire system's
+              color (Canopy rule), not generic destructive red. */}
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full bg-fire text-fire-foreground hover:bg-fire/90"
+            disabled={mutation.isPending}
+          >
             {mutation.isPending ? t("forms.fire.sending") : t("forms.fire.submit")}
           </Button>
         </form>

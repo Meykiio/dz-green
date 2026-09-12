@@ -145,7 +145,7 @@ export function FireAlertsCard() {
                 <button
                   type="button"
                   onClick={disable}
-                  className="tap-target inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-1.5 text-xs font-semibold text-muted-foreground transition-transform active:scale-[0.97]"
+                  className="tap-target inline-flex items-center gap-1.5 rounded-sm border border-border bg-card px-4 py-1.5 text-xs font-semibold text-muted-foreground transition-transform active:scale-[0.97]"
                 >
                   <BellOff className="size-3.5" />
                   {t("forms.fireAlerts.disable")}
@@ -155,7 +155,7 @@ export function FireAlertsCard() {
                   type="button"
                   onClick={enable}
                   disabled={state === "busy"}
-                  className="tap-target inline-flex items-center gap-1.5 rounded-full bg-fire px-4 py-1.5 text-xs font-semibold text-white transition-transform active:scale-[0.97] disabled:opacity-60"
+                  className="tap-target inline-flex items-center gap-1.5 rounded-sm bg-fire px-4 py-1.5 text-xs font-semibold text-fire-foreground transition-transform active:scale-[0.97] disabled:opacity-60"
                 >
                   <Bell className="size-3.5" />
                   {state === "busy" ? t("forms.fireAlerts.enabling") : t("forms.fireAlerts.enable")}
