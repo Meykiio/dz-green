@@ -89,9 +89,9 @@ function Shell({
     >{theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}</button>
   );
 
-  // Filming privacy mode: staff screens mask PII by default (top bar on
-  // public chrome, sidebar footer on app pages).
-  const privacyButton = (
+  // Filming privacy mode: staff screens mask PII by default. Staff-only —
+  // it never renders for signed-out visitors or plain users.
+  const privacyButton = isModerator ? (
     <button
       type="button"
       onClick={togglePrivacy}
@@ -100,7 +100,7 @@ function Shell({
     >
       {masked ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
     </button>
-  );
+  ) : null;
 
   const authAction = user ? (
     <button
@@ -153,11 +153,16 @@ function Shell({
         )}
       >
         <div className="flex items-center gap-1">
+          {/* On staff pages the sidebar IS the nav from lg up — the drawer
+              (and its hamburger) only exists below that. */}
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
             aria-label={t("chrome.aria.openMenu")}
-            className="tap-target grid size-10 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.96]"
+            className={cn(
+              "tap-target grid size-10 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.96]",
+              isAppPage && "lg:hidden",
+            )}
           >
             <Menu className="size-5" />
           </button>
@@ -201,6 +206,7 @@ function Shell({
         <StaffSidebar
           groups={groups}
           hasAnnouncement={hasAnnouncement}
+          brandName={brandName}
           themeButton={themeButton}
           privacyButton={privacyButton}
           authAction={authAction}

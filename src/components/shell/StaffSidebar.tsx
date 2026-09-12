@@ -15,12 +15,14 @@ import { cn } from "@/lib/utils";
 export function StaffSidebar({
   groups,
   hasAnnouncement,
+  brandName,
   themeButton,
   privacyButton,
   authAction,
 }: {
   groups: { key: string; label: string; rows: ReactNode[] }[];
   hasAnnouncement: boolean;
+  brandName: string;
   themeButton: ReactNode;
   privacyButton: ReactNode;
   authAction: ReactNode;
@@ -87,9 +89,7 @@ export function StaffSidebar({
         )}
       >
         <img src="/logo.png" alt="" className="size-5 shrink-0" />
-        <span className="staff-row-label text-sm font-semibold tracking-tight">
-          {t("chrome.navGroup.workspace")}
-        </span>
+        <span className="staff-row-label text-sm font-semibold tracking-tight">{brandName}</span>
       </div>
 
       <nav
