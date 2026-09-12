@@ -147,22 +147,15 @@ recolored.
 - Verify: tsc + 219/219 unit + build green ✓; live submission pass +
   E2E queued (merge gate)
 
-### Sprint 5 — Staff dashboards (moderate / admin / activity)
-- Apply the review-queue research:
-  - `/moderate`: KPI strip (pending / approved today / active fires / total),
-    queue cards redesigned (photo, metadata grid, contact reveal, note,
-    Approve/Reject as the one primary + one destructive action), keyboard
-    shortcuts (A approve / R reject / arrows navigate, never while typing),
-    age-of-submission visible; **no total-queue-depth banner** (research:
-    it degrades decisions). Fire triage gets status urgency color.
-  - `/admin`: five sections in the sidebar (users, volunteers, feedback,
-    announcements, overview); users list → proper table (sticky header,
-    48px rows, left text / center badges); dialogs restyled.
-  - `/activity`: three sections as Canopy cards with empty states.
-- Verify: moderator approve/reject/reopen flows, admin role/wilaya actions,
-  volunteer onboard, announcement publish; E2E `admin.spec.ts` +
-  `activity.spec.ts`; RTL; 390px.
-- Commit: `feat(canopy): staff dashboards — queues, tables, shortcuts`
+### Sprint 5 — Staff dashboards — **DONE 2026-09-12**
+- PendingQueue: keyboard-first review (arrows/j-k pick, A approve, R
+  reject; never while typing), age urgency chip, no queue-depth banner,
+  reject = outlined fire-toned action, kbd hints ✓
+- FireTriage: PhotoThumb + 4px filter chips; AdminUsersPanel: role
+  StatusBadges + join-string mojibake fix ✓
+- /activity: token inheritance (no changes needed) ✓
+- Verify: tsc + 219/219 unit + build green ✓; hands-on keyboard pass +
+  E2E admin.spec queued (merge gate)
 
 ### Sprint 6 — Life layer, a11y, docs, merge prep
 - Motion: scroll reveals on public pages, draw-underline hero accent,

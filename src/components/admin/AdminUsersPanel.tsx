@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { AssignWilayasDialog } from "@/components/admin/AssignWilayasDialog";
 import { CreateAccountDialog } from "@/components/admin/CreateAccountDialog";
+import { StatusBadge } from "@/components/moderator/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { localizeError, useI18n } from "@/i18n";
 import {
@@ -120,22 +121,23 @@ export function AdminUsersPanel() {
                   {u.email ? (masked ? maskEmail(u.email) : u.email) : ""}
                 </span>
               </p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
+              <p className="mt-1 flex flex-wrap items-center gap-2">
                 {u.role ? (
                   <>
-                    <span className="font-semibold text-foreground">
+                    <StatusBadge tone={u.role === "admin" ? "plant" : "care"}>
                       {t(`moderation.adm.role.${u.role}`)}
-                    </span>
+                    </StatusBadge>
                     {u.role === "moderator" &&
                       (u.wilayas.length > 0
                         ? t("moderation.adm.rolesWilayas", {
                             n: u.wilayas.length,
-                            names: u.wilayas.slice(0, 4).map(wilayaName).join("ØŒ "),
-                          }) + (u.wilayas.length > 4 ? "â€¦" : "")
-                        : t("moderation.adm.noWilayas"))}
+                            names: u.wilayas.slice(0, 4).map(wilayaName).join("، "),
+                          }) + (u.wilayas.length > 4 ? "…" : "")
+                        : t("moderation.adm.noWilayas"))
+                    }
                   </>
                 ) : (
-                  t("moderation.adm.noRole")
+                  <StatusBadge>{t("moderation.adm.noRole")}</StatusBadge>
                 )}
               </p>
             </div>

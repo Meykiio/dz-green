@@ -2,6 +2,14 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-12 (hundredth pass) — Canopy Sprint 5: staff dashboards — branch `feat/canopy-redesign`
+
+- **Moderation queue, keyboard-first (review-queue research):** arrows/j-k pick the current submission, **A approves, R rejects** — shortcuts never fire while the moderator is typing or holds a modifier. The current card gets a canopy ring. Action buttons carry A/R kbd hints. **No queue-depth banner by design** (research: showing reviewers the backlog size degrades decisions); the count stays in the tab badge only.
+- **Submission age as urgency:** a compact `3h`/`2d` chip next to the submitted-at time — neutral under 24h, sand amber 24-72h, wildfire amber past 72h (title carries the exact timestamp).
+- **Reject becomes the outlined fire-toned action** (all destructive actions look alike, Canopy similarity rule); Approve stays the single primary.
+- **Fire triage:** photo uses `PhotoThumb` (fire fallback), filter chips take the 4px shape. **Admin users panel:** role + no-role render as `StatusBadge` (admin plant / moderator care / none muted) instead of raw text; the mojibake in the wilaya-join string fixed.
+- **Verified:** `bunx tsc --noEmit` clean, 219/219 unit tests, client + SSR + Nitro build green. Not verified: hands-on keyboard review with seeded pending rows (E2E `admin.spec.ts` covers the scoped flow at the merge gate); /activity cards were already token-driven (no changes needed).
+
 ## 2026-09-12 (ninety-ninth pass) — Canopy mobile map cleanup — branch `feat/canopy-redesign`
 
 - **Legend dots removed (owner), view toggle centered:** the 4-dot legend is gone (it overlapped the geolocate control on mobile and duplicated the chip row); Map/List/Board now sits centered at the top of the map, leaving both top corners free. `LegendDots.tsx` and the now-consumerless `HomeBits.tsx` are deleted.

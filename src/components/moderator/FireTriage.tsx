@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Flame, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { PhotoThumb } from "@/components/PhotoThumb";
 import { Button } from "@/components/ui/button";
 import { localizeError, useI18n } from "@/i18n";
 import { useAuth } from "@/hooks/useAuth";
@@ -87,7 +88,7 @@ export function FireTriage() {
             type="button"
             onClick={() => setFilter(f)}
             aria-pressed={filter === f}
-            className={`tap-target rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`tap-target rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors ${
               filter === f
                 ? "border-fire/50 bg-fire/10 text-fire"
                 : "border-border bg-card text-muted-foreground"
@@ -102,18 +103,13 @@ export function FireTriage() {
       <ul className="space-y-3">
       {filtered.map((fire) => (
         <li key={fire.id} className="flex gap-3 rounded-lg border border-border bg-card p-3">
-          {photoUrl(fire.photo_url) ? (
-            <img
-              src={photoUrl(fire.photo_url)!}
-              alt={t("moderation.triage.alt", { wilaya: wilayaName(fire.wilaya_code) })}
-              className="size-24 shrink-0 rounded-lg object-cover"
-              loading="lazy"
-            />
-          ) : (
-            <span className="grid size-24 shrink-0 place-items-center rounded-lg bg-fire/15 text-fire">
-              <Flame className="size-6" />
-            </span>
-          )}
+          <PhotoThumb
+            src={photoUrl(fire.photo_url)}
+            alt={t("moderation.triage.alt", { wilaya: wilayaName(fire.wilaya_code) })}
+            tone="fire"
+            className="size-24 shrink-0 rounded-lg"
+            iconClassName="size-6"
+          />
           <div className="min-w-0 flex-1 space-y-1">
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge tone={STATUS_TONE[fire.status]}>
