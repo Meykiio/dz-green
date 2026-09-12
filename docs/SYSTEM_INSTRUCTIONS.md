@@ -22,7 +22,7 @@ Standing rules for anyone — human or AI — working on Green Algeria. Owner: S
 - All public writes go through the abuse gate in `submissions.server.ts`. There is no client-side insert path and there must not be one — no INSERT RLS policy exists for `anon`/`authenticated` on any table.
 - The hero map is **MapLibre GL + OpenFreeMap vector tiles** (open-source, no API key) — owner decision 2026-08-18, superseding the old hand-built-SVG-only rule. Algeria stays framed via `maxBounds` and a recenter control; wilaya boundaries come from the converted polygon data (`src/lib/wilaya-geo.ts`). The RTL text plugin is mandatory (Arabic labels render broken without it). Dev note: `optimizeDeps.exclude: ["maplibre-gl"]` in `vite.config.ts` is load-bearing — without it the maplibre worker 404s in dev and every GeoJSON source silently never renders.
 - Photos live in the private `photos` bucket and are served only through `/api/public/photo/*`. Never make the bucket public.
-- Design tokens live in `src/styles.css`. Use `--plant` / `--care` / `--fire` semantic tokens; no hardcoded colour utilities.
+- Design tokens live in `src/styles.css` and follow **Canopy** (SSOT: `docs/design-system/canopy.html`; refactor plan: `docs/REDESIGN_CANOPY_PLAN.md`). Use `--plant` / `--care` / `--fire` semantic tokens (green / wadi blue / wildfire amber — amber is the fire system only) plus `--sand` / `--terracotta`; no hardcoded colour utilities.
 
 ## Data and privacy rules
 

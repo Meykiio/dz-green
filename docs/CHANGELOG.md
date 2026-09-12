@@ -2,6 +2,14 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-12 (ninety-third pass) — Canopy Sprint 0: token foundation — branch `feat/canopy-redesign`
+
+- **The platform re-themes to Canopy** (`docs/design-system/canopy.html`, the owner-made SSOT; full plan + decisions in `docs/REDESIGN_CANOPY_PLAN.md`). Sprint 0 is tokens-only: `src/styles.css` rewritten to the Canopy palette — light default (owner D1): warm paper `#fdfbf8`, white cards, canopy green `#2F6B3F` primary; `.dark` carries the canonical night-soil palette (`#100d0a`, sprout `#6ED08A`). Semantic remap: `--plant` green (same family as primary), `--care` wadi blue `#206E86`/`#6FB8CC`, `--fire` wildfire amber `#C24A1C`/`#E8622C` (Canopy rule: fire color is the fire system only), `--destructive` independent error red, new `--sand`/`--terracotta` supporting tokens.
+- **Fonts (owner D2):** Sora (display) + DM Sans (body) for Latin, self-hosted via `@fontsource-variable/sora` + `@fontsource-variable/dm-sans`; Noto Kufi Arabic + Noto Sans Arabic stay for Arabic (Sora/DM Sans carry no Arabic glyphs; stacks fall through per glyph). `display-hero` drops Manrope 900 for Sora 700.
+- **Radius (owner D4):** Canopy scale 4/8/16/24 — `rounded-md` = 8px (buttons/inputs), `rounded-lg` = 16px, `rounded-xl/2xl/3xl/4xl` cap at 24px. Motion tokens added: `--ease-out` (expo-out), `--ease-spring` (overshoot), `--dur-fast/med/slow`.
+- **Misc:** theme-color meta `#2ead4b` → `#2F6B3F`; SSOT HTML vendored to `docs/design-system/canopy.html`; `DESIGN.md` marked superseded (full rewrite in Sprint 6); `PROJECT_STRUCTURE.md`, `SYSTEM_INSTRUCTIONS.md` updated.
+- **Verified:** `bunx tsc --noEmit` clean, 219/219 unit tests, client + SSR + Nitro build green. Not verified: in-browser visual pass of every page in both themes (owner device pass queued at merge); map layer colors still the old hex values — dedicated Sprint 3 pass (plan §3).
+
 ## 2026-09-05 (ninety-second pass) — Community fire confirmations (Phase E, feat/fire-ai-layers) — CODE BUILT, migration pending owner apply
 
 - **Community fire confirmations: "I see it / I don't / Not sure" on every fire report.** Vote buttons on the fire detail panel, live counts, and a community-verified badge (3+ yes and >70% yes ratio). One vote per device per report (re-vote replaces), 20 votes/device/day. This is the trust layer the spec (`docs/FEATURE_community_confirmations.md`) and the SEC-01 audit both called for — confirmations help everyone trust the map, and they never replace Protection Civile.

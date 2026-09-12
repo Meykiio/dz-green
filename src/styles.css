@@ -1,41 +1,50 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
-@import "@fontsource-variable/inter";
-@import "@fontsource-variable/manrope";
+@import "@fontsource-variable/sora";
+@import "@fontsource-variable/dm-sans";
 @import "@fontsource-variable/noto-sans-arabic";
 @import "@fontsource-variable/noto-kufi-arabic";
 
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Green Algeria design system (docs/DESIGN.md).
+ * Green Algeria design system — CANOPY (docs/design-system/canopy.html).
+ * Owner SSOT: C:\Users\DELL\Desktop\greendz-design-system.html (vendored copy
+ * at docs/design-system/canopy.html). Refactor plan: docs/REDESIGN_CANOPY_PLAN.md.
  *
- * Light theme is the default: sage canvas (#e8ebe6) with white cards, ink
- * text, and a single lime-green accent (#9fe870) reserved for primary CTAs.
- * The .dark block repolarizes the same system — same shapes, same spacing,
- * same radius — it is not a separate design language.
+ * Light theme is the default (owner decision D1, 2026-09-12): warm paper
+ * canvas (#fdfbf8), white cards, canopy green accent (#2F6B3F). The .dark
+ * block carries Canopy's canonical night-soil palette (#100d0a, sprout green
+ * #6ED08A) — same scale, same shapes, not a separate language.
  *
- * Semantic mapping (deliberate, per the doc's "don't repurpose the lime"):
- *   plant → positive green family   (never the lime CTA color)
- *   care  → accent cyan
- *   fire  → negative red family
+ * Semantic mapping (Canopy rules):
+ *   plant → canopy/sprout green (the one accent)
+ *   care  → wadi blue (the watering system)
+ *   fire  → wildfire amber (the fire-report system ONLY — never decoration)
+ *   error → independent red (never reused from wildfire amber)
+ *   sand / terracotta → Canopy quaternary + secondary, supporting UI accents
  *
- * Typography: Manrope 900 for hero-scale display only, Inter for everything
- * below (weight 600). Both self-hosted via @fontsource-variable.
+ * Typography: Sora (display) + DM Sans (body) for Latin; Noto Kufi Arabic
+ * (display) + Noto Sans Arabic (body) for Arabic — Sora/DM Sans carry no
+ * Arabic glyphs (owner decision D2). Font stacks fall through per glyph.
  *
- * Radius: 24px (--radius) is the canonical button + card radius; 12px for
- * inputs; full pill for badges/chips.
+ * Radius (D4): 4 / 8 / 12 / 16 / 24 px — buttons 8px (rounded-md), cards
+ * 16-24px (rounded-lg/xl), chips 4px (rounded-sm), pills keep full.
+ *
+ * Motion: --ease-out (signature expo) + --ease-spring (soft overshoot),
+ * durations .18s / .3s / .55s — applied to interactive elements sprint by
+ * sprint (plan §3 Sprint 1+).
  */
 
 @theme inline {
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 12px);
-  --radius-3xl: calc(var(--radius) + 16px);
-  --radius-4xl: calc(var(--radius) + 20px);
+  --radius-sm: 0.25rem; /* Canopy r-xs — chips, tags */
+  --radius-md: 0.5rem; /* Canopy r-sm — buttons, inputs */
+  --radius-lg: var(--radius); /* Canopy r-lg — mid cards */
+  --radius-xl: 1.5rem; /* Canopy r-xl — canonical cards */
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 1.5rem;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -73,13 +82,13 @@
 
 @theme inline {
   --font-sans:
-    "Inter Variable", "Inter", "Noto Sans Arabic Variable", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+    "DM Sans Variable", "DM Sans", "Noto Sans Arabic Variable", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
   --font-sans-ar:
-    "Noto Sans Arabic Variable", "Noto Sans Arabic", "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+    "Noto Sans Arabic Variable", "Noto Sans Arabic", "DM Sans Variable", "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display:
-    "Manrope Variable", "Inter Variable", "Inter", "Noto Sans Arabic Variable", ui-sans-serif, system-ui, sans-serif;
+    "Sora Variable", "Sora", "DM Sans Variable", "DM Sans", "Noto Kufi Arabic Variable", "Noto Sans Arabic Variable", ui-sans-serif, system-ui, sans-serif;
   --font-display-ar:
-    "Noto Kufi Arabic Variable", "Noto Sans Arabic Variable", "Noto Sans Arabic", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+    "Noto Kufi Arabic Variable", "Noto Sans Arabic Variable", "Noto Sans Arabic", "Sora Variable", "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
   --color-plant: var(--plant);
   --color-plant-foreground: var(--plant-foreground);
   --color-care: var(--care);
@@ -90,117 +99,123 @@
   --color-glass: var(--glass);
   --color-primary-pale: var(--primary-pale);
   --color-positive-deep: var(--positive-deep);
+  --color-sand: var(--sand);
+  --color-terracotta: var(--terracotta);
 }
 
 :root {
-  --radius: 1.5rem;
+  --radius: 1rem; /* Canopy r-lg 16px — the card-scale base */
 
-  /* Light palette */
-  --canvas: oklch(0.93 0.012 130); /* sage page canvas (#e8ebe6) */
-  --background: oklch(0.93 0.012 130);
-  --foreground: oklch(0.17 0.008 120); /* ink (#0e0f0c) */
-  --card: oklch(1 0 0); /* white cards */
-  --card-foreground: oklch(0.17 0.008 120);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.17 0.008 120);
+  /* ── Light (default): warm paper, canopy green ── */
+  --canvas: #fdfbf8; /* Canopy --bg */
+  --background: #fdfbf8;
+  --foreground: #211c14; /* Canopy --on-surface */
+  --card: #ffffff; /* Canopy --surface */
+  --card-foreground: #211c14;
+  --popover: #ffffff;
+  --popover-foreground: #211c14;
 
-  --primary: oklch(0.87 0.21 137); /* lime CTA (#9fe870) */
-  --primary-foreground: oklch(0.17 0.008 120); /* on-primary ink */
-  --primary-pale: oklch(0.94 0.085 130); /* #e2f6d5 badge/soft tint */
-  --secondary: oklch(0.93 0.012 130); /* sage secondary button */
-  --secondary-foreground: oklch(0.17 0.008 120);
-  --muted: oklch(0.9 0.012 130);
-  --muted-foreground: oklch(0.58 0.008 120); /* #868685 */
-  --accent: oklch(0.9 0.012 130);
-  --accent-foreground: oklch(0.17 0.008 120);
-  --destructive: oklch(0.55 0.2 25); /* #d03238 */
-  --destructive-foreground: oklch(0.98 0.005 20);
+  --primary: #2f6b3f; /* Canopy green, AA on white */
+  --primary-foreground: #ffffff; /* Canopy --on-primary */
+  --primary-pale: #eaf3e6; /* soft green tint for badges (derived) */
+  --secondary: #faf7f1; /* Canopy --surface-mid — neutral secondary button */
+  --secondary-foreground: #211c14;
+  --muted: #f0ebe0; /* Canopy --surface-high */
+  --muted-foreground: #6e6353; /* Canopy --on-surface-muted */
+  --accent: #f0ebe0;
+  --accent-foreground: #211c14;
+  --destructive: #d13438; /* Canopy --error, independent of wildfire amber */
+  --destructive-foreground: #ffffff;
 
-  --border: oklch(0.17 0.008 120 / 14%);
-  --input: oklch(0.17 0.008 120); /* inputs carry a 1px ink hairline */
-  --ring: oklch(0.63 0.17 145 / 60%);
+  --border: #e2d9c8; /* Canopy --outline */
+  --input: #e2d9c8;
+  --ring: rgba(47, 107, 63, 0.45); /* Canopy --primary-glow */
 
-  /* plant → positive green, care → cyan, fire → negative red */
-  --plant: oklch(0.63 0.17 145); /* #2ead4b */
-  --plant-foreground: oklch(0.98 0.01 140);
-  --positive-deep: oklch(0.35 0.08 155); /* #054d28 */
-  --care: oklch(0.66 0.13 235); /* #38c8ff darkened for light surfaces */
-  --care-foreground: oklch(0.98 0.01 240);
-  --fire: oklch(0.55 0.2 25); /* #d03238 */
-  --fire-foreground: oklch(0.98 0.005 20);
-  --glass: oklch(1 0 0 / 78%);
+  /* plant → green, care → wadi blue, fire → wildfire amber */
+  --plant: #2f6b3f;
+  --plant-foreground: #ffffff;
+  --positive-deep: #24522f; /* text on pale-green surfaces */
+  --care: #206e86; /* Canopy --brand-blue (light) */
+  --care-foreground: #ffffff;
+  --fire: #c24a1c; /* Canopy --tertiary (light) */
+  --fire-foreground: #ffffff;
+  --sand: #96751f; /* Canopy --quaternary (light) */
+  --terracotta: #b5652e; /* Canopy --secondary (light) */
+  --glass: rgba(255, 255, 255, 0.82);
 
-  /* Map surface (light): sage-to-pale landmass, ink hairline borders */
-  --map-land-1: oklch(0.94 0.085 130);
-  --map-land-2: oklch(0.91 0.05 132);
-  --map-land-3: oklch(0.87 0.03 134);
-  --map-stroke: oklch(0.35 0.03 140);
-  --map-halo: oklch(0.87 0.21 137);
-  --map-canvas: oklch(1 0 0);
+  /* Map surface (light): warm-paper landmass, clay hairlines */
+  --map-land-1: #f6f2eb;
+  --map-land-2: #f0e9dc;
+  --map-land-3: #e7dfcd;
+  --map-stroke: #b3a488;
+  --map-halo: #2f6b3f;
+  --map-canvas: #fdfbf8;
 
   --chart-1: var(--plant);
   --chart-2: var(--care);
   --chart-3: var(--fire);
-  --chart-4: oklch(0.8 0.15 90);
-  --chart-5: oklch(0.7 0.1 200);
-  --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0.17 0.008 120);
+  --chart-4: var(--sand);
+  --chart-5: var(--terracotta);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #211c14;
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: oklch(0.93 0.012 130);
-  --sidebar-accent-foreground: oklch(0.17 0.008 120);
-  --sidebar-border: oklch(0.17 0.008 120 / 10%);
+  --sidebar-accent: #f0ebe0;
+  --sidebar-accent-foreground: #211c14;
+  --sidebar-border: rgba(33, 28, 20, 0.1);
   --sidebar-ring: var(--ring);
 }
 
 .dark {
-  /* Repolarized — same system, dark polarity */
-  --canvas: oklch(0.17 0.008 120);
-  --background: oklch(0.17 0.008 120);
-  --foreground: oklch(0.95 0.01 130);
-  --card: oklch(0.22 0.012 130);
-  --card-foreground: oklch(0.95 0.01 130);
-  --popover: oklch(0.22 0.012 130);
-  --popover-foreground: oklch(0.95 0.01 130);
+  /* ── Dark (toggle): Canopy's canonical night-soil palette ── */
+  --canvas: #100d0a; /* Canopy --bg night soil */
+  --background: #100d0a;
+  --foreground: #f2ede4;
+  --card: #17130f; /* Canopy --surface */
+  --card-foreground: #f2ede4;
+  --popover: #17130f;
+  --popover-foreground: #f2ede4;
 
-  --primary: oklch(0.87 0.21 137); /* the lime CTA survives the flip */
-  --primary-foreground: oklch(0.17 0.008 120);
-  --primary-pale: oklch(0.3 0.06 140);
-  --secondary: oklch(0.26 0.012 130);
-  --secondary-foreground: oklch(0.95 0.01 130);
-  --muted: oklch(0.26 0.012 130);
-  --muted-foreground: oklch(0.66 0.01 130);
-  --accent: oklch(0.28 0.015 130);
-  --accent-foreground: oklch(0.95 0.01 130);
-  --destructive: oklch(0.6 0.21 25);
-  --destructive-foreground: oklch(0.98 0.005 20);
+  --primary: #6ed08a; /* Canopy --primary sprout */
+  --primary-foreground: #062712; /* Canopy --on-primary */
+  --primary-pale: #14291a; /* dark soft-green tint (derived) */
+  --secondary: #1c1712;
+  --secondary-foreground: #f2ede4;
+  --muted: #1c1712;
+  --muted-foreground: #a89c8a; /* Canopy --on-surface-muted */
+  --accent: #241d16; /* Canopy --surface-high */
+  --accent-foreground: #f2ede4;
+  --destructive: #ff6b6b;
+  --destructive-foreground: #2b0d02;
 
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 45%);
-  --ring: oklch(0.87 0.21 137 / 60%);
+  --border: #2e2519; /* Canopy --outline */
+  --input: #52432c; /* Canopy --outline-hi — visible on night soil */
+  --ring: rgba(110, 208, 138, 0.4);
 
-  --plant: oklch(0.72 0.17 145);
-  --plant-foreground: oklch(0.17 0.03 150);
-  --positive-deep: oklch(0.85 0.12 145);
-  --care: oklch(0.76 0.13 235);
-  --care-foreground: oklch(0.16 0.03 240);
-  --fire: oklch(0.67 0.21 25);
-  --fire-foreground: oklch(0.98 0.005 20);
-  --glass: oklch(0.21 0.01 130 / 72%);
+  --plant: #6ed08a;
+  --plant-foreground: #062712;
+  --positive-deep: #a9e8bd; /* text on dark green-tint surfaces */
+  --care: #6fb8cc; /* Canopy --brand-blue (dark) */
+  --care-foreground: #0a222c;
+  --fire: #e8622c; /* Canopy --tertiary (dark) */
+  --fire-foreground: #2b0d02;
+  --sand: #e0b65c;
+  --terracotta: #d99b6c;
+  --glass: rgba(23, 19, 15, 0.78);
 
-  /* Map surface (dark): the original near-black treatment */
-  --map-land-1: oklch(0.315 0.05 165);
-  --map-land-2: oklch(0.292 0.035 170);
-  --map-land-3: oklch(0.258 0.022 174);
-  --map-stroke: oklch(0.85 0.12 155);
-  --map-halo: oklch(0.42 0.07 160);
-  --map-canvas: oklch(0.1 0.005 175);
+  /* Map surface (dark): night-soil landmass, sprout strokes */
+  --map-land-1: #17130f;
+  --map-land-2: #1c1712;
+  --map-land-3: #241d16;
+  --map-stroke: #52432c;
+  --map-halo: #6ed08a;
+  --map-canvas: #100d0a;
 
-  --sidebar: oklch(0.2 0.01 130);
-  --sidebar-foreground: oklch(0.95 0.01 130);
-  --sidebar-accent: oklch(0.26 0.012 130);
-  --sidebar-accent-foreground: oklch(0.95 0.01 130);
-  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar: #0a0807; /* Canopy --nav-bg */
+  --sidebar-foreground: #f2ede4;
+  --sidebar-accent: #1c1712;
+  --sidebar-accent-foreground: #f2ede4;
+  --sidebar-border: rgba(242, 237, 228, 0.1);
 }
 
 @layer base {
@@ -229,10 +244,10 @@
 
 @utility eyebrow {
   text-transform: uppercase;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.12em;
   font-size: 0.6875rem;
   font-weight: 600;
-  color: var(--muted-foreground);
+  color: var(--terracotta);
 }
 
 @utility tap-target {
@@ -242,9 +257,9 @@
 
 @utility display-hero {
   font-family: var(--font-display);
-  font-weight: 900;
+  font-weight: 700; /* Canopy display weight — Sora 700 */
   letter-spacing: -0.02em;
-  line-height: 0.95;
+  line-height: 1.05;
   text-wrap: balance;
 }
 
@@ -252,7 +267,7 @@
   font-family: var(--font-display-ar);
   font-weight: 700;
   letter-spacing: 0;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 [dir="rtl"] body {
@@ -333,12 +348,21 @@
 }
 
 .ga-pin-in {
-  animation: ga-pin-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: ga-pin-in 420ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) both;
   transform-origin: center;
 }
 
 .ga-ease {
-  transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 550ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+/* Canopy motion tokens (SSOT §SIDEBAR NAVIGATION) */
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+  --dur-fast: 0.18s;
+  --dur-med: 0.3s;
+  --dur-slow: 0.55s;
 }
 
 @media (prefers-reduced-motion: reduce) {

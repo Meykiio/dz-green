@@ -25,7 +25,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `supabase/config.toml` | Platform-managed Supabase project config. Do not hand-edit. |
 | `supabase/migrations/*.sql` + `README.md` | Chronological **change record** (9 files, 2026-08-12 â†’ 2026-08-18). NOT a bootstrap path â€” the canonical schema source is `docs/FULL_SCHEMA_EXPORT.sql`. |
 | `public/` | `favicon.ico`, `logo.png` (128px brand mark used in the chrome), `og.png`, `robots.txt` (allows all), `manifest.webmanifest` + `icon-192/512.png` + `apple-touch-icon.png` (PWA), `sw.js` (tiny service worker: static-asset cache + pre-wired push handlers, no page caching). |
-| `docs/` | `AUDIT.md`, `CHANGELOG.md`, `DATABASE.md`, `DESIGN.md` (active design system), `FEATURES.md`, `FULL_SCHEMA_EXPORT.sql`, `I18N_AR_MASTER.md`, `MOBILE.md`, `PROJECT_STRUCTURE.md`, `ROADMAP.md`, `SYSTEM_INSTRUCTIONS.md`, plus `archive/` (superseded planning docs). |
+| `docs/` | `AUDIT.md`, `CHANGELOG.md`, `DATABASE.md`, `DESIGN.md` (pre-Canopy reference; superseded by `design-system/canopy.html`), `FEATURES.md`, `FULL_SCHEMA_EXPORT.sql`, `I18N_AR_MASTER.md`, `MOBILE.md`, `PROJECT_STRUCTURE.md`, `REDESIGN_CANOPY_PLAN.md` (full-platform redesign sprints), `ROADMAP.md`, `SYSTEM_INSTRUCTIONS.md`, `design-system/canopy.html` (Canopy SSOT), plus `archive/` (superseded planning docs). |
 | `e2e/` | 4 Playwright specs, 16 tests total (see below). |
 | `src/` | Application source (below). |
 
@@ -36,7 +36,7 @@ Last verified against the working tree on 2026-08-31. Stack as actually installe
 | `router.tsx` | Creates the TanStack Router instance with a QueryClient in router context. |
 | `start.ts` | TanStack Start instance: request middleware (error capture) + client function middleware (attaches the Supabase bearer token to server-fn calls). |
 | `server.ts` | Server entry / SSR handler. |
-| `styles.css` | Tailwind v4 entry + the design system (see `docs/DESIGN.md`): light default (sage canvas, white cards, lime CTA-only accent), `.dark` repolarized, Inter body + Manrope 900 display (`display-hero`), semantic `--plant`/`--care`/`--fire` tokens, `--radius` 24px canonical, `.tap-target`/`.eyebrow` utilities. |
+| `styles.css` | Tailwind v4 entry + the **Canopy** token system (SSOT: `docs/design-system/canopy.html`; plan: `docs/REDESIGN_CANOPY_PLAN.md`): light default (warm paper `#fdfbf8`, white cards, canopy green `#2F6B3F` accent), `.dark` carries Canopy's canonical night-soil palette (`#100d0a`, sprout `#6ED08A`), Sora display + DM Sans body (Latin) with Noto Kufi/Sans Arabic, semantic `--plant`/`--care`/`--fire` (green / wadi blue / wildfire amber) + `--sand`/`--terracotta`, radius scale 4/8/16/24, Canopy motion tokens (`--ease-out`, `--ease-spring`, `--dur-*`). |
 | `routeTree.gen.ts` | Generated route tree. Never edit by hand. |
 
 ## `src/routes/` (file-based routing, see `src/routes/README.md`)

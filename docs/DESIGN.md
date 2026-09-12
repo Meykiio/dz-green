@@ -227,6 +227,12 @@ components:
 
 ---
 
+> **SUPERSEDED (2026-09-12).** The platform has been re-themed to **Canopy**
+> (`docs/design-system/canopy.html` — the owner-made SSOT; plan and decisions in
+> `docs/REDESIGN_CANOPY_PLAN.md`). This file is the pre-Canopy reference and is
+> kept until the Sprint 6 docs pass rewrites it. The live token truth is
+> `src/styles.css`.
+
 ## Overview
 
 Green Algeria wears its identity in a single signature pairing: a vivid lime-green `{colors.primary}` (`#9fe870`) used as the CTA pill and brand accent, set against a pale sage-tinted canvas `{colors.canvas-soft}` (`#e8ebe6`) that runs across the hero band, and a near-black ink `{colors.ink}` (`#0e0f0c`) with a hint of olive warmth. The whole system reads calm and civic — generous whitespace, large rounded cards, and a heavy display sans at weight 900 carrying every hero headline. The interface is map-first: the interactive Algeria map IS the hero, and user-submitted photos carry the visual proof.

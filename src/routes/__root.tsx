@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Green Algeria" },
       { name: "twitter:description", content: "a crowdsourced public platform for Algeria's tree-planting and environmental-protection movement" },
-      { name: "theme-color", content: "#2ead4b" },
+      { name: "theme-color", content: "#2F6B3F" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-title", content: "الجزائر الخضراء" },
     ],
