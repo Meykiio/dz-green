@@ -178,19 +178,15 @@ function Shell({
         <div className="flex items-center gap-1">
           <EmergencyContacts />
           <FeedbackDialog />
-          {/* GitHub + theme live in the drawer footer on phones — the mobile
-              top bar carries only SOS, feedback and language. */}
-          <span className="hidden sm:inline">
-            <a
-              href="https://github.com/Meykiio/dz-green"
-              target="_blank"
-              rel="noreferrer"
-              aria-label={t("chrome.aria.github")}
-              className="tap-target grid size-10 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.96]"
-            >
-              <Github className="size-5" />
-            </a>
-          </span>
+          <a
+            href="https://github.com/Meykiio/dz-green"
+            target="_blank"
+            rel="noreferrer"
+            aria-label={t("chrome.aria.github")}
+            className="tap-target grid size-10 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.96]"
+          >
+            <Github className="size-5" />
+          </a>
           <LocaleDropdown />
           <span className="hidden sm:inline">{themeButton}</span>
         </div>

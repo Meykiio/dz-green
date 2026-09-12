@@ -7,6 +7,7 @@ import {
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useTheme } from "@/hooks/useTheme";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useI18n } from "@/i18n";
 import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
 import type { FeatureCollection } from "geojson";
@@ -43,6 +44,7 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
   const [failure, setFailure] = useState<MapFailure | null>(null);
   const { t, isRtl } = useI18n();
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
   const themeRef = useRef(theme);
   themeRef.current = theme;
   const data = useMemo(() => featureCollection(sites, careLogs, fires), [sites, careLogs, fires]);
@@ -107,16 +109,19 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
     map.setStyle(style);
   }, [theme]);
 
-  // Locale switch: the geolocate control was added at mount with the
-  // mount-time locale — reposition it when it flips.
+  // Locale switch + viewport flips: the geolocate control repositions —
+  // top-end on phones (the card owns the bottom), bottom-end on desktop,
+  // mirrored for RTL. The mount effect set the correct initial corner.
   useEffect(() => {
     const map = mapRef.current;
     const controls = controlsRef.current;
     if (!map || !controls) return;
-    const geoPos = ctrlPosRef.current === "top-left" ? "bottom-right" : "bottom-left";
+    const geoPos = isMobile
+      ? isRtl ? "top-left" : "top-right"
+      : isRtl ? "bottom-left" : "bottom-right";
     map.removeControl(controls.geolocate);
     map.addControl(controls.geolocate, geoPos);
-  }, [isRtl]);
+  }, [isRtl, isMobile]);
 
   // Data updates.
   useEffect(() => {

@@ -117,12 +117,23 @@ export function useHeroMapMount({
       onFailure("webgl2");
       return;
     }
-    // Single map control: "find my location", parked at bottom-end (the
-    // Google-Maps spot; legend is top-end, action card is bottom-start,
-    // detail panel is end-top). Mirrors with the locale (isRtl effect).
+    // Single map control: "find my location". Desktop: bottom-end (the
+    // Google-Maps spot). Phones: top-end — the action card owns the bottom,
+    // so the control would overlap it there (owner report 2026-09-12).
+    // Attribution sits top-start; legend is gone; card is bottom-start.
     const geolocate = new GeolocateControl({ trackUserLocation: false });
     controlsRef.current = { geolocate };
-    map.addControl(geolocate, ctrlPos === "top-left" ? "bottom-right" : "bottom-left");
+    const isDesktopAtMount = window.matchMedia("(min-width: 768px)").matches;
+    map.addControl(
+      geolocate,
+      isDesktopAtMount
+        ? ctrlPos === "top-left"
+          ? "bottom-right"
+          : "bottom-left"
+        : ctrlPos === "top-left"
+          ? "top-right"
+          : "top-left",
+    );
 
     // BUG-04 belt: style.load must fire within STYLE_TIMEOUT_MS. The
     // fail-fast path below covers fetches that *error*; this catches the
