@@ -2,6 +2,15 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-12 (ninety-ninth pass) — Canopy mobile map cleanup — branch `feat/canopy-redesign`
+
+- **Legend dots removed (owner), view toggle centered:** the 4-dot legend is gone (it overlapped the geolocate control on mobile and duplicated the chip row); Map/List/Board now sits centered at the top of the map, leaving both top corners free. `LegendDots.tsx` and the now-consumerless `HomeBits.tsx` are deleted.
+- **Map attribution (OSM license) repositioned, not removed:** the compact "i" moves from bottom-end (where it collided with the action card) to top-start — the corner freed by the control cleanup.
+- **Mobile stacking fixed:** the action card lifts to `bottom-14` on phones so "find my location" (bottom-end) no longer overlaps it; the activity ticker moves below the top bar on phones (`top-16`), staying bottom-center on desktop.
+- **Top bar de-clutter (mobile):** GitHub and the theme toggle hide below sm (both live in the drawer footer); the mobile bar carries SOS, feedback, and language only.
+- **Canopy shapes:** SOS, feedback, and language triggers move from pills to the 4px chip radius.
+- **Verified:** `bunx tsc --noEmit` clean, 219/219 unit tests, client + SSR + Nitro build green.
+
 ## 2026-09-12 (ninety-eighth pass) — Canopy polish fixes — branch `feat/canopy-redesign`
 
 - **Action card layer toggles → icon-only with tooltips** (owner): the labeled chips truncated on 320px; now icon-only Canopy buttons (`size-11`, tone states, aria-label + hover tooltip, tap-to-toggle). No truncation at any width.

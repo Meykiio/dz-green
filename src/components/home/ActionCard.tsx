@@ -53,7 +53,8 @@ export function ActionCard({
   }
 
   return (
-    <div className="absolute inset-x-3 bottom-3 md:inset-x-auto md:bottom-6 md:start-6 md:w-88">
+    // bottom-14 on phones clears the geolocate control below the card.
+    <div className="absolute inset-x-3 bottom-14 md:inset-x-auto md:bottom-6 md:start-6 md:w-88">
       <div className="relative rounded-2xl border border-border bg-card/95 p-4 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] backdrop-blur md:p-5">
         <button
           type="button"

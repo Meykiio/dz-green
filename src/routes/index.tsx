@@ -6,7 +6,6 @@ import { AppShell } from "@/components/AppShell";
 import { ActionCard } from "@/components/home/ActionCard";
 import { ActivityTicker } from "@/components/home/ActivityTicker";
 import { Leaderboard } from "@/components/home/Leaderboard";
-import { LegendDots } from "@/components/home/LegendDots";
 import { useMapRealtime } from "@/components/home/useMapRealtime";
 import { ViewToggle, type HomeView } from "@/components/home/ViewToggle";
 import { DetailPanel } from "@/components/map/DetailPanel";
@@ -138,9 +137,8 @@ function HomePage() {
           />
         )}
 
-        {/* Legend + view toggle, floating top-right */}
-        <div className="absolute end-3 top-3 flex items-center gap-2">
-          <LegendDots />
+        {/* View toggle, centered — top corners stay free for the map. */}
+        <div className="absolute inset-x-0 top-3 z-10 flex justify-center">
           <ViewToggle view={view} onChange={setView} />
         </div>
 

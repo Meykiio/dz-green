@@ -1,5 +1,6 @@
 import { useEffect, type RefObject } from "react";
 import {
+  AttributionControl,
   GPUInitializationError,
   GeolocateControl,
   Map as MapLibreMap,
@@ -104,8 +105,12 @@ export function useHeroMapMount({
       // tile-fade animation work.
       maxTileCacheSize: 20,
       fadeDuration: 0,
-      attributionControl: { compact: true },
+      // Attribution stays (OSM data license) but parked at top-start where
+      // nothing else lives — it overlapped the action card at bottom-end.
+      attributionControl: false,
     });
+    const attribution = new AttributionControl({ compact: true });
+    map.addControl(attribution, ctrlPos);
     if (creationError) {
       map.remove();
       mapRef.current = null;

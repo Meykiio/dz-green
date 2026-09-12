@@ -26,7 +26,7 @@ export function EmergencyContacts() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label={t("chrome.emergency.label")}
-        className="tap-target inline-flex items-center gap-1.5 rounded-full border border-fire/40 bg-card px-3 py-1.5 text-sm font-semibold text-fire transition-transform active:scale-[0.97]"
+        className="tap-target inline-flex items-center gap-1.5 rounded-sm border border-fire/40 bg-card px-3 py-1.5 text-sm font-semibold text-fire transition-transform active:scale-[0.97]"
       >
         <Phone className="size-3.5" />
         <span className="hidden sm:inline">{t("chrome.emergency.sosFull")}</span>

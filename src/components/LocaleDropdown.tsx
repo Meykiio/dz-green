@@ -44,7 +44,7 @@ export function LocaleDropdown({ dropUp = false }: { dropUp?: boolean }) {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label={t("chrome.aria.switchLocale")}
-        className="tap-target inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+        className="tap-target inline-flex items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
       >
         <Languages className="size-4" />
         <span className="staff-rail-hide hidden sm:inline">

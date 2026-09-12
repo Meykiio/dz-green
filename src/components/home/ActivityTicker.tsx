@@ -7,7 +7,7 @@ export function ActivityTicker({ message }: { message: { id: number; text: strin
     <div
       key={message.id}
       aria-live="polite"
-      className="absolute inset-x-0 bottom-16 z-10 mx-auto w-fit max-w-[90vw] rounded-full border border-border bg-card/95 px-4 py-2 text-center text-xs font-medium shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] backdrop-blur md:bottom-8"
+      className="absolute inset-x-0 top-16 z-10 mx-auto w-fit max-w-[90vw] rounded-full border border-border bg-card/95 px-4 py-2 text-center text-xs font-medium shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] backdrop-blur md:bottom-8 md:top-auto"
     >
       {message.text}
     </div>

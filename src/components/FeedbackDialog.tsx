@@ -57,7 +57,7 @@ export function FeedbackDialog() {
         <button
           type="button"
           aria-label={t("chrome.feedback.aria")}
-          className="tap-target inline-flex items-center gap-1.5 rounded-full border border-plant/30 bg-plant/10 px-3 py-1.5 text-sm font-semibold text-plant transition-transform active:scale-[0.97]"
+          className="tap-target inline-flex items-center gap-1.5 rounded-sm border border-plant/30 bg-plant/10 px-3 py-1.5 text-sm font-semibold text-plant transition-transform active:scale-[0.97]"
         >
           <MessageSquareText className="size-3.5" />
           <span className="hidden sm:inline">{t("chrome.feedback.label")}</span>
