@@ -11,7 +11,8 @@ import type { FeatureCollection, Feature, Geometry, GeoJsonProperties } from "ge
 
 import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
 import { DARK_STYLE, LIGHT_STYLE, NORTH_BOUNDS, RecenterControl, colorsFor } from "./map-style";
-import { applyAlgeriaLabelFilter, addDataLayers, wireInteractions, startPulse, type Layer } from "./map-layers";
+import { applyAlgeriaLabelFilter, addDataLayers, startPulse, type Layer } from "./map-layers";
+import { wireInteractions } from "./map-interactions";
 import { addHotspotLayers, setHotspotsData } from "./hotspots-layer";
 import { addRiskLayers, setRiskData } from "./risk-layer";
 import { riskGeoJSON } from "@/lib/risk";

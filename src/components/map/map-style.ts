@@ -31,25 +31,28 @@ export interface ThemeColors {
   mask: string;
 }
 
+/** Canopy map palette (docs/design-system/canopy.html): green trees, wadi
+ *  blue care, wildfire amber fires, sand hotspots — theme-matched to the
+ *  paper light / night-soil dark basemaps. */
 export function colorsFor(theme: "light" | "dark"): ThemeColors {
   return theme === "dark"
     ? {
-        trees: "#4ade80",
-        care: "#38c8ff",
-        fires: "#ff6b6b",
-        hotspots: "#fbbf24",
-        wilayaLine: "#7ee2a8",
-        wilayaFill: "#4ade80",
-        mask: "#0e0f0c",
+        trees: "#6ED08A",
+        care: "#6FB8CC",
+        fires: "#E8622C",
+        hotspots: "#E0B65C",
+        wilayaLine: "#6ED08A",
+        wilayaFill: "#6ED08A",
+        mask: "#100d0a",
       }
     : {
-        trees: "#2ead4b",
-        care: "#1d9fe0",
-        fires: "#d03238",
-        hotspots: "#d97706",
-        wilayaLine: "#2ead4b",
-        wilayaFill: "#2ead4b",
-        mask: "#e8ebe6",
+        trees: "#2F6B3F",
+        care: "#206E86",
+        fires: "#C24A1C",
+        hotspots: "#96751F",
+        wilayaLine: "#2F6B3F",
+        wilayaFill: "#2F6B3F",
+        mask: "#fdfbf8",
       };
 }
 

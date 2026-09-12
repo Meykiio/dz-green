@@ -7,8 +7,7 @@ import { photoUrl } from "@/lib/data";
 import { directionsUrl } from "@/lib/maps-link";
 import { needsWater, type CareLog } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
-import { FireWeatherBlock, HotspotBody, RiskBody } from "./detail-bodies";
-import { FireConfirmations } from "./FireConfirmations";
+import { FireBody, FireWeatherBlock, Field, HotspotBody, RiskBody } from "./detail-bodies";
 
 import type { MapFeature } from "@/lib/types";
 
@@ -52,7 +51,7 @@ export function DetailPanel({
       </div>
 
       {feature.kind === "fire" ? (
-        <FireBody feature={feature} />
+        <FireBody fire={feature.fire} />
       ) : feature.kind === "hotspot" ? (
         <HotspotBody hotspot={feature.hotspot} />
       ) : feature.kind === "risk" ? (
@@ -199,67 +198,3 @@ function Header({ feature }: { feature: MapFeature }) {
   );
 }
 
-function FireBody({ feature }: { feature: Extract<MapFeature, { kind: "fire" }> }) {
-  const { t, formatDate } = useI18n();
-  const fire = feature.fire;
-  return (
-    <div className="mt-4 space-y-4">
-      {photoUrl(fire.photo_url) && (
-        <img
-          src={photoUrl(fire.photo_url)!}
-          alt={t("home.detail.altFire")}
-          loading="lazy"
-          className="max-h-44 w-full rounded-xl object-cover md:max-h-52"
-        />
-      )}
-      <dl className="grid grid-cols-2 gap-3 text-sm">
-        <Field
-          label={t("home.detail.field.status")}
-          value={t(
-            `home.detail.status.${fire.status.replace("_", "") === "falsealarm" ? "falseAlarm" : fire.status}`,
-          )}
-        />
-        <Field label={t("home.detail.field.reported")} value={formatDate(fire.created_at)} />
-        {fire.severity && (
-          <Field
-            label={t("home.detail.field.severity")}
-            value={t(`home.detail.severity.${fire.severity}`)}
-          />
-        )}
-        {fire.commune && (
-          <Field label={t("home.detail.field.commune")} value={fire.commune} />
-        )}
-      </dl>
-      {fire.location_approximate && (
-        <p className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
-          {t("home.detail.fireApproxNotice")}
-        </p>
-      )}
-      {fire.description && <p className="text-sm text-muted-foreground">{fire.description}</p>}
-      <FireWeatherBlock lat={fire.lat} lng={fire.lng} />
-      <FireConfirmations fireReportId={fire.id} />
-      <p className="rounded-lg border border-fire/40 bg-fire/10 px-3 py-2 text-sm">
-        {t("home.detail.fireDisclaimer")}
-      </p>
-      <Button asChild variant="outline" className="w-full">
-        <a
-          href={directionsUrl(fire.lat, fire.lng)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Navigation className="size-4" />
-          {t("home.detail.fireDirections")}
-        </a>
-      </Button>
-    </div>
-  );
-}
-
-function Field({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <dt className="eyebrow">{label}</dt>
-      <dd className="mt-0.5 font-medium capitalize">{value}</dd>
-    </div>
-  );
-}

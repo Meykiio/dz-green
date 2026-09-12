@@ -1,20 +1,19 @@
 import type {
   FilterSpecification,
   Map as MapLibreMap,
-  MapLayerMouseEvent,
   SymbolLayerSpecification,
 } from "maplibre-gl";
+
+import { algeriaMultiPolygon, wilayaBoundariesGeoJSON, wilayaMaskGeoJSON } from "@/lib/wilaya-geo";
+import { colorsFor } from "./map-style";
+import { onlyKind, withoutKind } from "./map-data";
 import type { FeatureCollection } from "geojson";
 import type { MutableRefObject } from "react";
-
-import { algeriaMultiPolygon, wilayaBoundariesGeoJSON, wilayaBounds, wilayaMaskGeoJSON } from "@/lib/wilaya-geo";
 import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
-import { colorsFor } from "./map-style";
-import { featureFor, onlyKind, withoutKind } from "./map-data";
 
 export type Layer = "trees" | "care" | "fires" | "hotspots" | "risk";
 
-interface LayerRefs {
+export interface LayerRefs {
   dataRef: MutableRefObject<FeatureCollection>;
   layersRef: MutableRefObject<Record<Layer, boolean>>;
   themeRef: MutableRefObject<"light" | "dark">;
@@ -202,54 +201,3 @@ export function startPulse(
   pulseRef.current = requestAnimationFrame(tick);
 }
 
-export function wireInteractions(map: MapLibreMap, refs: LayerRefs) {
-  map.on("click", "ga-wilaya-fill", (e: MapLayerMouseEvent) => {
-    const code = e.features?.[0]?.properties?.["code"] as string | undefined;
-    const bounds = code ? wilayaBounds(code) : null;
-    if (bounds) map.fitBounds(bounds, { padding: 60, duration: 500 });
-  });
-
-  for (const kind of ["trees", "care"] as const) {
-    map.on("click", `ga-${kind}-points`, (e: MapLayerMouseEvent) => {
-      const props = e.features?.[0]?.properties;
-      if (!props) return;
-      const feature = featureFor(
-        kind,
-        props["id"] as string,
-        refs.sitesRef.current,
-        refs.careLogsRef.current,
-        refs.firesRef.current,
-      );
-      // Gone between render and click (refetch swap, fire resolved) —
-      // a quiet no-op, never a crash.
-      if (!feature) return;
-      refs.selectRef.current(feature);
-    });
-    map.on("mouseenter", `ga-${kind}-points`, () => {
-      map.getCanvas().style.cursor = "pointer";
-    });
-    map.on("mouseleave", `ga-${kind}-points`, () => {
-      map.getCanvas().style.cursor = "";
-    });
-  }
-
-  map.on("click", "ga-fires-points", (e: MapLayerMouseEvent) => {
-    const props = e.features?.[0]?.properties;
-    if (!props) return;
-    const feature = featureFor(
-      "fires",
-      props["id"] as string,
-      refs.sitesRef.current,
-      refs.careLogsRef.current,
-      refs.firesRef.current,
-    );
-    if (!feature) return;
-    refs.selectRef.current(feature);
-  });
-  map.on("mouseenter", "ga-fires-points", () => {
-    map.getCanvas().style.cursor = "pointer";
-  });
-  map.on("mouseleave", "ga-fires-points", () => {
-    map.getCanvas().style.cursor = "";
-  });
-}

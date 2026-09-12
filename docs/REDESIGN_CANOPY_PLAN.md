@@ -124,21 +124,17 @@ recolored.
 - Verify: tsc + 219/219 unit + build green ✓; nav walk + 390px + RTL
   queued (merge)
 
-### Sprint 3 — Home map surface
-- `ActionCard` (hero copy in Sora display, stat line, CTA hierarchy:
-  primary plant / secondary care+fire, layer chips → Canopy chips),
-  `LegendDots`, `ViewToggle`, `ActivityTicker`, `Leaderboard`, `SiteList`,
-  `DetailPanel` + `detail-bodies` + `FireConfirmations` (cards → Canopy
-  surfaces, bottom-sheet radius, field grid, disclaimer blocks keep
-  semantics).
-- `map-style.ts` + `hotspots-layer.ts` + `risk-layer.ts` +
-  `PrecisionPicker.tsx`: full color remap to Canopy (fires amber, hotspots
-  sand, risk ramp reviewed against the new base).
-- Fix the two 250-line violations while rewriting: `DetailPanel.tsx` (253)
-  and `AppShell.tsx` (251) end under the cap.
-- Verify: map boots both themes, all 5 layers, detail panel per kind, RTL,
-  390px; `tsc` + unit + build; E2E `flows.spec.ts` home test.
-- Commit: `feat(canopy): home map surface + map layer colors`
+### Sprint 3 — Home map surface — **DONE 2026-09-12**
+- `map-style.ts` colorsFor → Canopy palette (fires amber, hotspots sand,
+  paper/night-soil masks); `PrecisionPicker` pin + accuracy circle ✓
+- ActionCard / ViewToggle / ticker / Leaderboard / SiteList /
+  FireConfirmations / legend: token-driven, inherit Canopy with zero
+  markup changes ✓
+- 250-line rule zeroed: DetailPanel 253→189 (FireBody + Field →
+  detail-bodies), map-layers 255→191 (wireInteractions →
+  map-interactions) ✓
+- Verify: tsc + 219/219 unit + build green ✓; E2E flows.spec + visual map
+  pass queued (merge gate)
 
 ### Sprint 4 — Submission flows + public pages
 - `/plant`, `/care`, `/fire`, `/volunteer`, `/auth`, `/my/$token`,

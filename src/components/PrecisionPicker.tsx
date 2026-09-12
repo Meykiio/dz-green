@@ -74,7 +74,7 @@ export default function PrecisionPicker({ lat, lng, accuracy, hint, onChange }: 
       setTileState((s) => (s === "ok" ? s : "failed"));
     });
 
-    const marker = new Marker({ color: "#4ade80", draggable: true })
+    const marker = new Marker({ color: "#2F6B3F", draggable: true })
       .setLngLat(start)
       .addTo(map);
 
@@ -112,10 +112,10 @@ export default function PrecisionPicker({ lat, lng, accuracy, hint, onChange }: 
         source: ACCURACY_SOURCE,
         paint: {
           "circle-radius": 0,
-          "circle-color": "#f59e0b",
+          "circle-color": "#96751F",
           "circle-opacity": 0,
           "circle-stroke-width": 1,
-          "circle-stroke-color": "#f59e0b",
+          "circle-stroke-color": "#96751F",
           "circle-stroke-opacity": 0.6,
         },
       });

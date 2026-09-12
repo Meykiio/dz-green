@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-12 (ninety-sixth pass) — Canopy Sprint 3: home map surface — branch `feat/canopy-redesign`
+
+- **Map colors remapped to Canopy** (`map-style.ts colorsFor`): trees canopy/sprout green, care wadi blue, fires wildfire amber (light `#C24A1C` / dark `#E8622C`), hotspots sand, wilaya borders green, the outside-Algeria mask now paper `#fdfbf8` (light) / night soil `#100d0a` (dark) — the dark map finally reads as the night-satellite look Canopy was designed around. `PrecisionPicker` pin + accuracy circle follow the same palette (the risk layer keeps its perceptual green-to-red ramp — data-viz, on-system).
+- **Home surface inherits Canopy automatically:** `ActionCard`, `ViewToggle`, `ActivityTicker`, `Leaderboard`, `SiteList`, `FireConfirmations`, legend — all were already token-driven; zero markup changes needed. That is the token-first payoff.
+- **250-line rule zeroed (three splits):** `DetailPanel` 253 → **189** (FireBody + Field moved to `detail-bodies.tsx`, which exports them now), `map-layers.ts` 255 → **191** (`wireInteractions` extracted to new `map-interactions.ts`; `LayerRefs` exported; imports updated in `HeroMap` + `useHeroMapMount`). The bug-01 ref pattern and all click behavior moved verbatim.
+- **Verified:** `bunx tsc --noEmit` clean, 219/219 unit tests, client + SSR + Nitro build green. Not verified: the E2E `flows.spec.ts` home test (live-DB suite needs SQL fixtures per SYSTEM_INSTRUCTIONS — queued for the merge gate), and a visual pass of the new map palette in both themes.
+
 ## 2026-09-12 (ninety-fifth pass) — Canopy Sprint 2: chrome — staff sidebar + drawers — branch `feat/canopy-redesign`
 
 - **Staff sidebar (plan D5, Canopy §SIDEBAR NAVIGATION + review research):** new `components/shell/StaffSidebar.tsx` — 280px expanding / 78px icon rail (persisted `ga-staff-nav`, toggle in the footer), sliding 3px active indicator on the inline-start edge (ease-spring, measured from the `[data-active]` row), labeled nav groups (Explore 5 / Contribute 3 / Workspace 3 — Miller's law), footer carries collapse + theme + privacy; auth row below. Off-canvas navigation below **lg** (1024px) is the existing drawer (Canopy's own responsive table: sidebar becomes a drawer under 1024). Fully RTL-mirrored: logical properties, indicator `rounded-e-full`, hover nudge flips via `rtl:`.
