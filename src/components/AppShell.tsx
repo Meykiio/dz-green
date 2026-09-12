@@ -145,11 +145,14 @@ function Shell({
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">
-      {/* Slim top bar everywhere: hamburger + brand left, SOS + feedback + theme right. */}
+      {/* Slim top bar on public pages, and on staff pages below lg. From lg
+          up on staff pages the sidebar IS the shell (Canopy: topbar is the
+          mobile pattern) — SOS/feedback/GitHub stay public-chrome only. */}
       <header
         className={cn(
           "fixed inset-x-0 z-40 flex h-14 items-center justify-between border-b border-border bg-card/80 px-3 backdrop-blur-md",
           hasAnnouncement ? "top-9" : "top-0",
+          isAppPage && "lg:hidden",
         )}
       >
         <div className="flex items-center gap-1">
@@ -208,6 +211,7 @@ function Shell({
           hasAnnouncement={hasAnnouncement}
           brandName={brandName}
           themeButton={themeButton}
+          localePicker={<LocaleDropdown />}
           privacyButton={privacyButton}
           authAction={authAction}
         />
@@ -216,7 +220,13 @@ function Shell({
       <main
         className={cn(
           "flex-1 transition-[margin] duration-[450ms] ease-[var(--ease-out)]",
-          hasAnnouncement ? "pt-[5.75rem]" : "pt-14",
+          isAppPage
+            ? hasAnnouncement
+              ? "pt-[5.75rem] lg:pt-9"
+              : "pt-14 lg:pt-0"
+            : hasAnnouncement
+              ? "pt-[5.75rem]"
+              : "pt-14",
           isAppPage && "lg:ms-[var(--staff-w)]",
         )}
       >

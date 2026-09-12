@@ -17,6 +17,7 @@ export function StaffSidebar({
   hasAnnouncement,
   brandName,
   themeButton,
+  localePicker,
   privacyButton,
   authAction,
 }: {
@@ -24,6 +25,7 @@ export function StaffSidebar({
   hasAnnouncement: boolean;
   brandName: string;
   themeButton: ReactNode;
+  localePicker: ReactNode;
   privacyButton: ReactNode;
   authAction: ReactNode;
 }) {
@@ -80,14 +82,12 @@ export function StaffSidebar({
     <aside
       data-collapsed={collapsed}
       style={{ width: "var(--staff-w)" }}
-      className="fixed inset-y-0 start-0 z-30 hidden w-[var(--staff-w)] flex-col border-e border-sidebar-border bg-sidebar transition-[width] duration-[450ms] ease-[var(--ease-out)] lg:flex"
+      className={cn(
+        "fixed bottom-0 start-0 z-30 hidden w-[var(--staff-w)] flex-col border-e border-sidebar-border bg-sidebar transition-[width] duration-[450ms] ease-[var(--ease-out)] lg:flex",
+        hasAnnouncement ? "top-9" : "top-0",
+      )}
     >
-      <div
-        className={cn(
-          "flex items-center gap-2 px-4 pb-2",
-          hasAnnouncement ? "pt-[5.75rem]" : "pt-14",
-        )}
-      >
+      <div className="flex items-center gap-2 px-4 py-4">
         <img src="/logo.png" alt="" className="size-5 shrink-0" />
         <span className="staff-row-label text-sm font-semibold tracking-tight">{brandName}</span>
       </div>
@@ -123,6 +123,7 @@ export function StaffSidebar({
           {collapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
         </button>
         {themeButton}
+        {localePicker}
         {privacyButton}
       </div>
       <div className={cn("border-t border-sidebar-border px-3 py-3", collapsed && "flex justify-center")}>
