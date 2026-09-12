@@ -1,5 +1,7 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
+import { pinEnglish } from "./locale";
+
 const API = "https://jnunqilxiajinylgehuh.supabase.co";
 const ANON_KEY = "sb_publishable_qkH7kzDc8Dohru5j--104A_afZPeMmc";
 const MOD_EMAIL = "e2e.moderator@test.local";
@@ -37,13 +39,24 @@ async function modFetch(path: string, token: string): Promise<Response> {
 async function freshPage(browser: BrowserContext): Promise<Page> {
   const context = await browser.newContext({
     baseURL: "http://localhost:8081",
-    geolocation: { latitude: 36.7538, longitude: 3.0588, accuracy: 20 },
+    // accuracy 10m: the GPS best-fix watch stops early at ±15m — a 20m mock
+    // would always burn the full 12s budget and outlast the 8s expect windows.
+    geolocation: { latitude: 36.7538, longitude: 3.0588, accuracy: 10 },
     permissions: ["geolocation"],
   });
+  await pinEnglish(context);
   return context.newPage();
 }
 
 test.describe.configure({ mode: "serial" });
+
+// Resource hygiene: every test mints fresh contexts (locale cookie,
+// geolocation, sessions). Without closing them, leaked websockets (realtime)
+// and MapLibre instances accumulate and starve the worker by test ~6+ —
+// the rotating blank-page failures. Close everything after each test.
+test.afterEach(async ({ browser }) => {
+  for (const context of browser.contexts()) await context.close();
+});
 
 test.describe("Green Algeria core flows (live)", () => {
   let plantedId = "";
@@ -151,7 +164,9 @@ test.describe("Green Algeria core flows (live)", () => {
     await expect(page).toHaveURL("/");
 
     await page.goto("/moderate");
-    await expect(page.getByRole("heading", { name: "Pending plantings" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Pending plantings" })).toBeVisible({
+      timeout: 30_000,
+    });
 
     const row = page.locator("li").filter({ hasText: plantMarker });
     await expect(row).toHaveCount(1, { timeout: 30_000 });

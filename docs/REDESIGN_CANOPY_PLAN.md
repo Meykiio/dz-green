@@ -157,7 +157,7 @@ recolored.
 - Verify: tsc + 219/219 unit + build green ✓; hands-on keyboard pass +
   E2E admin.spec queued (merge gate)
 
-### Sprint 6 — Life layer, a11y, docs, merge prep — **DONE 2026-09-12 (branch only, NOT merged)**
+### Sprint 6 — Life layer, a11y, docs, merge prep — **DONE 2026-09-12 + E2E gate GREEN (102nd pass)**
 - `components/Reveal.tsx` + `.ga-reveal` CSS; wired into FormShell ✓
 - Skeletons: pending queue, fire triage, admin users ✓
 - Global focus-visible ring (zero-specificity base rule) ✓
@@ -165,7 +165,10 @@ recolored.
   exceptions verified intentional) ✓
 - Docs: DESIGN.md rewritten to Canopy, PROJECT_STRUCTURE, FEATURES §12,
   CHANGELOG 101st ✓
-- Not verified: live E2E suite (fixture gate) + owner device pass.
+- **E2E gate: 16/16 green** (first full pass since the 2026-08-28 i18n
+  drift; all root causes were test-infra, zero app fixes; CHANGELOG 102nd) ✓
+- Live cleanup verified by query: zero marker rows / meta / photos /
+  fixture users ✓
 - **MERGE BLOCKED until the owner explicitly approves.**
 
 ## 4. Do-NOT-touch list (breakage guards)

@@ -1,5 +1,7 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
+import { pinEnglish } from "./locale";
+
 const API = "https://jnunqilxiajinylgehuh.supabase.co";
 const ANON_KEY = "sb_publishable_qkH7kzDc8Dohru5j--104A_afZPeMmc";
 const MOD_EMAIL = "e2e.moderator@test.local";
@@ -13,9 +15,10 @@ const ONE_PX_JPEG = Buffer.from(
 async function freshPage(browser: BrowserContext): Promise<Page> {
   const context = await browser.newContext({
     baseURL: "http://localhost:8081",
-    geolocation: { latitude: 36.7538, longitude: 3.0588, accuracy: 20 },
+    geolocation: { latitude: 36.7538, longitude: 3.0588, accuracy: 10 },
     permissions: ["geolocation"],
   });
+  await pinEnglish(context);
   return context.newPage();
 }
 
@@ -60,6 +63,12 @@ async function fillPlantForm(page: Page, marker: string): Promise<void> {
 
 test.describe.configure({ mode: "serial" });
 
+// Resource hygiene (see flows.spec.ts afterEach): close all contexts so
+// leaked websockets and map instances can't starve the worker.
+test.afterEach(async ({ browser }) => {
+  for (const context of browser.contexts()) await context.close();
+});
+
 test.describe("Receipt links and silent drops (live)", () => {
   let receiptToken = "";
   let marker = "";
@@ -93,7 +102,9 @@ test.describe("Receipt links and silent drops (live)", () => {
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveURL("/", { timeout: 30_000 });
     await page.goto("/moderate");
-    await expect(page.getByRole("heading", { name: "Pending plantings" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Pending plantings" })).toBeVisible({
+      timeout: 30_000,
+    });
     const row = page.locator("li").filter({ hasText: marker });
     await expect(row).toHaveCount(1, { timeout: 30_000 });
     await row.getByRole("button", { name: "Approve" }).click();
