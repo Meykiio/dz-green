@@ -2,6 +2,14 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-12 (ninety-eighth pass) — Canopy polish fixes — branch `feat/canopy-redesign`
+
+- **Action card layer toggles → icon-only with tooltips** (owner): the labeled chips truncated on 320px; now icon-only Canopy buttons (`size-11`, tone states, aria-label + hover tooltip, tap-to-toggle). No truncation at any width.
+- **Photo fallbacks (`PhotoThumb`)** (owner): no surface may render the browser's broken-image icon. New reusable component — tinted plant/fire block with a sprout/flame icon — used in the list view, pending queue, rejected queue (previously hid the img), site detail, and fire detail. The broken state resets on src change.
+- **Leaking i18n key fixed:** the list fire badge showed raw `triage.badge.active`; the map now uses the full path (`moderation.triage.badge.*`).
+- **Hero map controls (owner):** the zoom +/- stack, the recenter button, and the "50 km" scale are gone. Only "find my location" remains, parked at bottom-end (Google-Maps spot), mirroring with RTL. The dead `RecenterControl` class is deleted; `HeroMap`'s locale-reposition effect updated (would have crashed on a locale switch with stale control references).
+- **Verified:** `bunx tsc --noEmit` clean, 219/219 unit tests, client + SSR + Nitro build green, each fix in its own commit (`e13b9df`, `96798c0`, `fd5ef4b`).
+
 ## 2026-09-12 (ninety-seventh pass) — Canopy Sprint 4: action card redesign + submission flows — branch `feat/canopy-redesign`
 
 - **ActionCard redesigned (owner request, Canopy UX principles):** the ragged chip-wrap layout is gone. New structure — Sora display title, a four-number stat strip on a hairline (number + tiny label, Stripe discipline), one full-width primary CTA ("I planted a tree" — the only emphasized element, Von Restorff), care/fire as neutral secondary halves, and the five layer toggles in a single scrollable row with "How it works" at the serial end (Miller + serial position). No new i18n keys (reuses `home.stats.*`).
