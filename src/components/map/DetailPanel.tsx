@@ -151,7 +151,7 @@ function Header({ feature }: { feature: MapFeature }) {
   if (feature.kind === "hotspot") {
     return (
       <div className="flex items-center gap-2">
-        <Satellite className="size-5 text-amber-500" />
+        <Satellite className="size-5 text-sand" />
         <div>
           <p className="eyebrow">{t("home.detail.eyebrow.hotspot")}</p>
           <h2 className="text-lg font-semibold">{t("home.detail.hotspot.title")}</h2>
@@ -162,7 +162,7 @@ function Header({ feature }: { feature: MapFeature }) {
   if (feature.kind === "risk") {
     return (
       <div className="flex items-center gap-2">
-        <TrendingUp className="size-5 text-orange-500" />
+        <TrendingUp className="size-5 text-terracotta" />
         <div>
           <p className="eyebrow">{t("home.detail.eyebrow.risk")}</p>
           <h2 className="text-lg font-semibold">{t("home.detail.risk.title")}</h2>

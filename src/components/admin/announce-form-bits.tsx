@@ -34,7 +34,7 @@ export const SWATCH: Record<Color, string> = {
   plant: "bg-plant",
   care: "bg-care",
   fire: "bg-fire",
-  amber: "bg-amber-500",
+  amber: "bg-sand",
 };
 
 export function formValid(f: AnnouncementFormState): boolean {

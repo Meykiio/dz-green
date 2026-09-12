@@ -13,9 +13,9 @@ const SITE_STATUS_KEY: Record<string, "pending" | "approved" | "rejected"> = {
 };
 
 const STATUTS_TONE: Record<string, string> = {
-  pending: "text-amber-400",
+  pending: "text-sand",
   approved: "text-plant",
-  rejected: "text-fire",
+  rejected: "text-destructive",
   active: "text-fire",
   resolved: "text-care",
   false_alarm: "text-muted-foreground",

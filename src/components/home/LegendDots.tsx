@@ -18,7 +18,7 @@ export function LegendDots() {
                       ? "bg-care"
                       : key === "fires"
                         ? "bg-fire"
-                        : "bg-amber-500"
+                        : "bg-sand"
                 }`}
               />
               <span className="hidden sm:inline">{t(`home.layers.${key}`)}</span>

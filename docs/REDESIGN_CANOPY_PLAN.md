@@ -100,17 +100,16 @@ recolored.
   check; map colors remap in Sprint 3 ✓ (limits noted)
 - Commit: `feat(canopy): token foundation — colors, fonts, radius, motion`
 
-### Sprint 1 — Primitives
-- Restyle to Canopy shapes/motion: `ui/button.tsx` (8px radius, ease tokens,
-  tactile `:active`), `SectionTabs`, `StatusBadge`, `Chip`/`Stat` (HomeBits),
-  `FormShell` (accent bar → terracotta section-label style), inputs
-  (44px, focus glow `0 0 0 4px primary-glow`), `ui/textarea`, toast
-  (`ui/sonner` theme), `AnnouncementBanner` palette, `ConsentBanner`.
-- Replace stray `text-amber-*`/`text-orange-*` utilities with semantic tokens
-  (`--sand`, `--tertiary`).
-- Verify: unit + build; visual pass of one form + one staff page, both
-  themes, both directions.
-- Commit: `feat(canopy): primitives — buttons, chips, tabs, inputs, toast`
+### Sprint 1 — Primitives — **DONE 2026-09-12**
+- `ui/button.tsx` (8px radius, ease tokens, tactile press), `SectionTabs`
+  picks up tokens automatically (primary fill + counts), `StatusBadge`,
+  `Chip`/`Stat` (HomeBits), inputs via one global focus-glow rule +
+  `text-align: start`, `ui/textarea`, toast (`ui/sonner`), announcement
+  palette + color-picker swatch + legend dot → sand/terracotta semantics ✓
+- Stray `text-amber-*`/`text-orange-*` utilities replaced with semantic
+  tokens (`--sand`, `--terracotta`, `--destructive`); zero palette classes
+  remain outside the map pipeline ✓
+- Verify: tsc + 219/219 unit + build green ✓; visual pass queued (merge)
 
 ### Sprint 2 — Chrome: public top bar + staff sidebar
 - New `components/shell/StaffSidebar.tsx`: 280px, collapsible to 78px icon

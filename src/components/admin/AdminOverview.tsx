@@ -25,7 +25,7 @@ export function AdminOverview() {
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <Stat label={t("moderation.ovr.stat.users")} value={s.users} />
-        <Stat label={t("moderation.ovr.stat.pending")} value={s.sites.pending} tone="text-amber-400" />
+        <Stat label={t("moderation.ovr.stat.pending")} value={s.sites.pending} tone="text-sand" />
         <Stat label={t("moderation.ovr.stat.approved")} value={s.sites.approved} tone="text-plant" />
         <Stat label={t("moderation.ovr.stat.activeFires")} value={s.fires.active} tone="text-fire" />
         <Stat label={t("moderation.ovr.stat.care")} value={s.careLogs} tone="text-care" />
@@ -46,7 +46,7 @@ export function AdminOverview() {
                 <span className="font-medium">{wilayaName(w.code)}</span>
                 <span className="text-muted-foreground">
                   {w.pending > 0 && (
-                    <span className="text-amber-400">{t("moderation.ovr.pending", { n: w.pending })}</span>
+                    <span className="text-sand">{t("moderation.ovr.pending", { n: w.pending })}</span>
                   )}
                   {w.pending > 0 && w.activeFires > 0 && " · "}
                   {w.activeFires > 0 && (

@@ -18,10 +18,10 @@ export const Route = createFileRoute("/my/$token")({
 });
 
 const STATUS_TONE: Record<string, string> = {
-  pending: "text-amber-400",
+  pending: "text-sand",
   approved: "text-plant",
   published: "text-plant",
-  rejected: "text-fire",
+  rejected: "text-destructive",
   active: "text-fire",
   resolved: "text-care",
   false_alarm: "text-muted-foreground",

@@ -2,6 +2,15 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-12 (ninety-fourth pass) — Canopy Sprint 1: primitives — branch `feat/canopy-redesign`
+
+- **Buttons** (`ui/button.tsx`): Canopy button — 8px radius (`rounded-md` at the new scale), expo-out motion (`--ease-out`, 200ms), soft hover lift + tactile press (`active:scale-[0.96]`), shadow-sm on primary hover. Variants keep their semantics (default/destructive/outline/secondary/ghost/link).
+- **Chips + badges**: `HomeBits.Chip` and `StatusBadge` move from pills to Canopy's 4px chip radius, 600 weight with 0.04em tracking, motion tokens. Chip tones remapped: risk → terracotta, hotspots → sand (fire stays wildfire amber, plant/care unchanged).
+- **Toast** (`ui/sonner.tsx`): Canopy pill toast on the card surface.
+- **Forms**: one global base rule covers every hand-rolled input — `text-align: start` (RTL-native) + Canopy focus state (primary border + 4px glow ring, `--primary-glow-sm` added light/dark). `ui/textarea` drops its shadcn ring in favor of the shared glow.
+- **Hardcoded palette eliminated from the UI surface:** `AnnouncementBanner` palette now uses semantic tokens (`text-on-sand` added for the sand strip), announce color-picker swatch → sand, legend satellite dot → sand, receipt/activity status tones: pending → sand, rejected → destructive red (error is no longer wildfire amber), admin overview pending counts → sand, detail-panel hotspot icon → sand, risk icon → terracotta. Remaining hexes are the map pipeline only (Sprint 3).
+- **Verified:** `bunx tsc --noEmit` clean, 219/219 unit tests, client + SSR + Nitro build green. Not verified: in-browser visual pass (both themes, both directions) — owner device pass queued at merge.
+
 ## 2026-09-12 (ninety-third pass) — Canopy Sprint 0: token foundation — branch `feat/canopy-redesign`
 
 - **The platform re-themes to Canopy** (`docs/design-system/canopy.html`, the owner-made SSOT; full plan + decisions in `docs/REDESIGN_CANOPY_PLAN.md`). Sprint 0 is tokens-only: `src/styles.css` rewritten to the Canopy palette — light default (owner D1): warm paper `#fdfbf8`, white cards, canopy green `#2F6B3F` primary; `.dark` carries the canonical night-soil palette (`#100d0a`, sprout `#6ED08A`). Semantic remap: `--plant` green (same family as primary), `--care` wadi blue `#206E86`/`#6FB8CC`, `--fire` wildfire amber `#C24A1C`/`#E8622C` (Canopy rule: fire color is the fire system only), `--destructive` independent error red, new `--sand`/`--terracotta` supporting tokens.

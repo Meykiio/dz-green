@@ -9,11 +9,11 @@ const TONES: Record<Tone, string> = {
   muted: "border-border bg-card text-muted-foreground",
 };
 
-/** Pill status badge (13px/600, pill, 4px 10px padding). */
+/** Status badge (Canopy chip: 4px radius, 13px/600). */
 export function StatusBadge({ tone = "muted", children }: { tone?: Tone; children: ReactNode }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[13px] font-semibold leading-4 ${TONES[tone]}`}
+      className={`inline-flex items-center gap-1 whitespace-nowrap rounded-sm border px-2.5 py-0.5 text-[13px] font-semibold leading-4 tracking-[0.02em] ${TONES[tone]}`}
     >
       {children}
     </span>

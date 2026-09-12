@@ -8,10 +8,10 @@ import { announcementQuery, localizedAnnouncement } from "@/lib/data";
 /** Admin-picked palette: bg + text, contrast-safe by construction. */
 const COLOR_STYLE = {
   ink: "bg-foreground text-background",
-  plant: "bg-plant text-white",
-  care: "bg-care text-white",
-  fire: "bg-fire text-white",
-  amber: "bg-amber-500 text-white",
+  plant: "bg-plant text-plant-foreground",
+  care: "bg-care text-care-foreground",
+  fire: "bg-fire text-fire-foreground",
+  amber: "bg-sand text-on-sand",
 } as const;
 
 const ICON_TONE = {

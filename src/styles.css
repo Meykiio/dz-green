@@ -100,6 +100,7 @@
   --color-primary-pale: var(--primary-pale);
   --color-positive-deep: var(--positive-deep);
   --color-sand: var(--sand);
+  --color-on-sand: var(--on-sand);
   --color-terracotta: var(--terracotta);
 }
 
@@ -117,6 +118,7 @@
 
   --primary: #2f6b3f; /* Canopy green, AA on white */
   --primary-foreground: #ffffff; /* Canopy --on-primary */
+  --primary-glow-sm: rgba(47, 107, 63, 0.1); /* focus glow */
   --primary-pale: #eaf3e6; /* soft green tint for badges (derived) */
   --secondary: #faf7f1; /* Canopy --surface-mid — neutral secondary button */
   --secondary-foreground: #211c14;
@@ -140,6 +142,7 @@
   --fire: #c24a1c; /* Canopy --tertiary (light) */
   --fire-foreground: #ffffff;
   --sand: #96751f; /* Canopy --quaternary (light) */
+  --on-sand: #ffffff; /* Canopy --on-quaternary (light) */
   --terracotta: #b5652e; /* Canopy --secondary (light) */
   --glass: rgba(255, 255, 255, 0.82);
 
@@ -178,6 +181,7 @@
 
   --primary: #6ed08a; /* Canopy --primary sprout */
   --primary-foreground: #062712; /* Canopy --on-primary */
+  --primary-glow-sm: rgba(110, 208, 138, 0.12); /* focus glow */
   --primary-pale: #14291a; /* dark soft-green tint (derived) */
   --secondary: #1c1712;
   --secondary-foreground: #f2ede4;
@@ -200,6 +204,7 @@
   --fire: #e8622c; /* Canopy --tertiary (dark) */
   --fire-foreground: #2b0d02;
   --sand: #e0b65c;
+  --on-sand: #2e1e00; /* Canopy --on-quaternary (dark) */
   --terracotta: #d99b6c;
   --glass: rgba(23, 19, 15, 0.78);
 
@@ -233,6 +238,23 @@
     font-family: var(--font-sans);
     font-feature-settings: "calt";
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Canopy forms: direction-native alignment + the green focus glow
+     (SSOT §FORM ELEMENTS — border primary + 4px glow ring). One rule here
+     covers every hand-rolled input in the app. */
+  input,
+  textarea,
+  select {
+    text-align: start;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-glow-sm);
+    outline: none;
   }
 }
 
