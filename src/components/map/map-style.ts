@@ -75,30 +75,3 @@ if (typeof document !== "undefined") {
   );
 }
 
-/** "Back to Algeria" control — recenters the camera when the user gets lost. */
-export class RecenterControl {
-  private container?: HTMLElement;
-  constructor(private map?: MapLibreMap) {}
-  onAdd(map: MapLibreMap) {
-    this.map = map;
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "maplibregl-ctrl-icon";
-    button.title = "Back to Algeria";
-    button.setAttribute("aria-label", "Back to Algeria");
-    button.innerHTML =
-      '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>';
-    button.addEventListener("click", () => {
-      this.map?.fitBounds(NORTH_BOUNDS, { padding: 24, duration: 500 });
-    });
-    const group = document.createElement("div");
-    group.className = "maplibregl-ctrl maplibregl-ctrl-group";
-    group.appendChild(button);
-    this.container = group;
-    return group;
-  }
-  onRemove() {
-    this.container?.remove();
-    this.map = undefined;
-  }
-}

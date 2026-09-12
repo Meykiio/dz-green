@@ -2,8 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   GeolocateControl,
   Map as MapLibreMap,
-  NavigationControl,
-  ScaleControl,
   type GeoJSONSource,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -12,7 +10,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { useI18n } from "@/i18n";
 import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
 import type { FeatureCollection } from "geojson";
-import { DARK_STYLE, LIGHT_STYLE, RecenterControl, colorsFor } from "./map-style";
+import { DARK_STYLE, LIGHT_STYLE, colorsFor } from "./map-style";
 import { featureCollection, onlyKind, withoutKind } from "./map-data";
 import { applyAlgeriaLabelFilter, addDataLayers, applyLayerVisibility, type Layer } from "./map-layers";
 import { wireInteractions } from "./map-interactions";
@@ -63,17 +61,12 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
   careLogsRef.current = careLogs;
   const firesRef = useRef(fires);
   firesRef.current = fires;
-  // The action card anchors to `start` and the legend to `end` (top), so
-  // control buttons go to top-start and the scale to bottom-end — always
-  // free in both locales. Kept in a ref so locale switches can reposition.
+  // The action card anchors to `start` and the legend to `end` (top); the
+  // single geolocate control lives bottom-end. Kept in a ref so locale
+  // switches can reposition it.
   const ctrlPosRef = useRef<"top-left" | "top-right">(isRtl ? "top-right" : "top-left");
   ctrlPosRef.current = isRtl ? "top-right" : "top-left";
-  const controlsRef = useRef<{
-    nav: NavigationControl;
-    recenter: RecenterControl;
-    geolocate: GeolocateControl;
-    scale: ScaleControl;
-  } | null>(null);
+  const controlsRef = useRef<{ geolocate: GeolocateControl } | null>(null);
 
   const refs = { dataRef, layersRef, themeRef, selectRef, sitesRef, careLogsRef, firesRef };
   const hotspotsRef = useRef(hotspots);
@@ -114,20 +107,15 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
     map.setStyle(style);
   }, [theme]);
 
-  // Locale switch: controls were added at mount with the mount-time locale —
-  // reposition them when it flips (the stale-corner bug in the owner report).
+  // Locale switch: the geolocate control was added at mount with the
+  // mount-time locale — reposition it when it flips.
   useEffect(() => {
     const map = mapRef.current;
     const controls = controlsRef.current;
     if (!map || !controls) return;
-    const pos = ctrlPosRef.current;
-    const scalePos = pos === "top-left" ? "bottom-right" : "bottom-left";
-    for (const c of [controls.nav, controls.recenter, controls.geolocate]) {
-      map.removeControl(c);
-      map.addControl(c, pos);
-    }
-    map.removeControl(controls.scale);
-    map.addControl(controls.scale, scalePos);
+    const geoPos = ctrlPosRef.current === "top-left" ? "bottom-right" : "bottom-left";
+    map.removeControl(controls.geolocate);
+    map.addControl(controls.geolocate, geoPos);
   }, [isRtl]);
 
   // Data updates.
