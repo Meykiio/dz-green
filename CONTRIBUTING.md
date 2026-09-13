@@ -43,9 +43,10 @@ CI runs the first three on every PR and push to `main`
   `fix(auth): …`, `docs: …`. Types: feat, fix, docs, chore, test, refactor.
 - Fill the PR template's verification checklist honestly — "not verified"
   is an acceptable line; a false "done" is not.
-- Schema changes stay rare and explicit: a new dated file in
-  `supabase/migrations/` **and** a new numbered section in
-  `docs/FULL_SCHEMA_EXPORT.sql`, in the same commit, with GRANTs + RLS +
+- Schema changes stay rare and explicit: **propose them in an issue first**
+  (owner approval is required), then update
+  `supabase/migrations/00000000000000_master_schema.sql` in place and
+  `docs/DATABASE.md`, in the same commit, with GRANTs + RLS +
   policies together.
 
 ## Rules that bite

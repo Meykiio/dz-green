@@ -4,14 +4,15 @@ Standing rules for anyone — human or AI — working on Green Algeria. Owner: S
 
 ## Non-negotiables
 
-1. **Read before writing.** Read the relevant code and the live schema before changing anything. Do not work from the original spec in the README or from a migration file — both drift from reality.
+1. **Read before writing.** Read the relevant code and the live schema before changing anything. The doc index is `docs/README.md`; `docs/DATABASE.md` is verified against the live DB, `docs/ARCHITECTURE.md` + `docs/PLATFORM.md` orient new agents fast. Both still drift less than a migration file — verify against code.
 2. **Never break working code.** The map, the three submission flows, and the moderation queue all work today. Any change that risks them needs to be justified, not assumed safe.
 3. **No unrequested features.** If you notice something missing, raise it as a question or a roadmap item. Do not build it.
 4. **Never assume — ask.** Ambiguity gets a question, not a best guess presented as fact.
-5. **Max 250 lines per file.** Split when a file grows past it. Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`) are exempt.
+5. **Max 250 lines per file.** Split when a file grows past it. Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`, `src/data/*`, the master schema SQL) are exempt.
 6. **Commit after every phase.** Uncommitted work does not count as done. Never report a task complete while it is uncommitted.
-7. **Keep `/docs` current.** `PROJECT_STRUCTURE.md`, `DATABASE.md`, `FEATURES.md`, `CHANGELOG.md`, `SYSTEM_INSTRUCTIONS.md`, `ROADMAP.md` get updated in the same change that makes them stale.
+7. **Keep `/docs` current.** `PROJECT_STRUCTURE.md`, `DATABASE.md`, `FEATURES.md`, `CHANGELOG.md`, `SYSTEM_INSTRUCTIONS.md`, `ROADMAP.md` get updated in the same change that makes them stale. History lives only in CHANGELOG.md; never create one-off doc files — fold content into the file it belongs to (index: `docs/README.md`).
 8. **Do not mark anything "done" you have not verified.** Trace the code path or run it. "Not verified" is an acceptable answer; a false "done" is not.
+9. **Schema changes edit the master in place.** `supabase/migrations/00000000000000_master_schema.sql` is the single schema file — update it to the new final state (never append incremental migrations), keep `docs/DATABASE.md` in sync, and never without owner approval. Pending SQL lives in `docs/pending-migrations/`.
 
 ## Architecture rules
 
@@ -22,7 +23,7 @@ Standing rules for anyone — human or AI — working on Green Algeria. Owner: S
 - All public writes go through the abuse gate in `submissions.server.ts`. There is no client-side insert path and there must not be one — no INSERT RLS policy exists for `anon`/`authenticated` on any table.
 - The hero map is **MapLibre GL + OpenFreeMap vector tiles** (open-source, no API key) — owner decision 2026-08-18, superseding the old hand-built-SVG-only rule. Algeria stays framed via `maxBounds` and a recenter control; wilaya boundaries come from the converted polygon data (`src/lib/wilaya-geo.ts`). The RTL text plugin is mandatory (Arabic labels render broken without it). Dev note: `optimizeDeps.exclude: ["maplibre-gl"]` in `vite.config.ts` is load-bearing — without it the maplibre worker 404s in dev and every GeoJSON source silently never renders.
 - Photos live in the private `photos` bucket and are served only through `/api/public/photo/*`. Never make the bucket public.
-- Design tokens live in `src/styles.css` and follow **Canopy** (SSOT: `docs/design-system/canopy.html`; refactor plan: `docs/REDESIGN_CANOPY_PLAN.md`). Use `--plant` / `--care` / `--fire` semantic tokens (green / wadi blue / wildfire amber — amber is the fire system only) plus `--sand` / `--terracotta`; no hardcoded colour utilities.
+- Design tokens live in `src/styles.css` and follow **Canopy** (SSOT: `docs/design-system/canopy.html`; refactor record: `docs/archive/REDESIGN_CANOPY_PLAN.md`). Use `--plant` / `--care` / `--fire` semantic tokens (green / wadi blue / wildfire amber — amber is the fire system only) plus `--sand` / `--terracotta`; no hardcoded colour utilities.
 
 ## Data and privacy rules
 
@@ -80,7 +81,7 @@ How to re-run `rls-audit2`:
 
 ## Portability rule
 
-This project must stay exportable. It is intentionally runnable against a plain Supabase project, with no platform-specific tooling. Keep `docs/FULL_SCHEMA_EXPORT.sql` accurate, and avoid platform-only constructs where a standard alternative exists.
+This project must stay exportable. It is intentionally runnable against a plain Supabase project, with no platform-specific tooling. Keep `supabase/migrations/00000000000000_master_schema.sql` (the single schema file) accurate and verified against the live database, and avoid platform-only constructs where a standard alternative exists.
 
 ## Pending owner dashboard action (2026-08-30): spatial_ref_sys write lock
 

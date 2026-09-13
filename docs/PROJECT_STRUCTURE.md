@@ -1,219 +1,98 @@
-# PROJECT_STRUCTURE.md
+# PROJECT_STRUCTURE
 
-Last verified against the working tree on 2026-08-31. Stack as actually installed (see `package.json`): React 19 + TypeScript, TanStack Start v1 + TanStack Router + TanStack Query, Vite 8, Tailwind CSS v4 (config-less, via `src/styles.css`), shadcn/ui + Radix (vendored), lucide-react, MapLibre GL 6, Supabase JS 2, Zod 3, sonner, date-fns. No Framer Motion, no react-router â€” animations are CSS/SVG transitions.
+Verified against the working tree on 2026-09-12. Stack: React 19 +
+TypeScript, TanStack Start v1 + Router + Query, Vite 8 + Nitro, Tailwind v4,
+shadcn/ui + Radix (vendored), MapLibre GL 6, Supabase JS 2, Zod 3, sonner,
+date-fns. Bun + Vitest + Playwright. Generated files
+(`routeTree.gen.ts`, `integrations/supabase/*`, `src/data/*`) are exempt
+from the 250-line rule.
 
 ## Root
 
 | Path | Purpose |
 |---|---|
-| `package.json` | Metadata (`green-algeria`, AGPL-3.0-only) + scripts: `dev`, `build`, `build:dev`, `preview`, `test` (vitest), `lint` (eslint), `format` (prettier). |
-| `vite.config.ts` | Vite + TanStack Start + React + Tailwind wiring (native `resolve.tsconfigPaths`; `optimizeDeps.exclude: ["maplibre-gl"]` â€” load-bearing, see `SYSTEM_INSTRUCTIONS.md`). |
-| `vitest.config.ts` | Unit test runner config (`src/lib/__tests__/`). |
-| `playwright.config.ts` | E2E runner: dev server on **:8081** (`bun run dev -- --port 8081`, `reuseExistingServer`), chromium only, workers 1. |
-| `tsconfig.json` | TS config, `@/*` path alias to `src/*`. |
+| `package.json` | Scripts: dev, build, build:dev, preview, test (vitest), lint, format. |
+| `vite.config.ts` | TanStack Start + React + Tailwind + Nitro (Vercel build; route rules: security headers + CSP — `optimizeDeps.exclude: ["maplibre-gl"]` is load-bearing, dev-only). |
+| `playwright.config.ts` | Live E2E: dev server on :8081, chromium, workers 1, retries 1, 15-min global cap. |
+| `vitest.config.ts` / `tsconfig.json` / `eslint.config.js` / `.prettierrc` | Test/type/lint/format setup. |
 | `components.json` | shadcn/ui generator config. |
-| `eslint.config.js`, `.prettierrc`, `.prettierignore` | Lint/format setup. |
-| `bunfig.toml`, `bun.lock` | Bun package-manager config + lockfile. |
-| `.env.example` | Every env variable with placeholder values; `.env` (gitignored) holds the real Supabase values. |
-| `AGENTS.md` | Standing rules for AI agents / contributors working in this repo. |
-| `CONTRIBUTING.md` | Setup, checks, branch/PR conventions, binding rules for contributors. |
-| `CODE_OF_CONDUCT.md` | Contributor Covenant v2.1. |
-| `SECURITY.md` | Vulnerability reporting (private GitHub advisories) + the project's security posture. |
-| `.github/` | `workflows/ci.yml` (tsc + unit + build on PRs and main), `ISSUE_TEMPLATE/` (bug + feature forms), `PULL_REQUEST_TEMPLATE.md`. |
-| `README.md` | Project intro, live app link, status, local setup. |
-| `LICENSE` | AGPL-3.0 (owner decision 2026-08-18), copyright Sifeddine Mebarki. |
-| `supabase/config.toml` | Platform-managed Supabase project config. Do not hand-edit. |
-| `supabase/migrations/*.sql` + `README.md` | Chronological **change record** (9 files, 2026-08-12 â†’ 2026-08-18). NOT a bootstrap path â€” the canonical schema source is `docs/FULL_SCHEMA_EXPORT.sql`. |
-| `public/` | `favicon.ico`, `logo.png` (128px brand mark used in the chrome), `og.png`, `robots.txt` (allows all), `manifest.webmanifest` + `icon-192/512.png` + `apple-touch-icon.png` (PWA), `sw.js` (tiny service worker: static-asset cache + pre-wired push handlers, no page caching). |
-| `docs/` | `AUDIT.md`, `CHANGELOG.md`, `DATABASE.md`, `DESIGN.md` (pre-Canopy reference; superseded by `design-system/canopy.html`), `FEATURES.md`, `FULL_SCHEMA_EXPORT.sql`, `I18N_AR_MASTER.md`, `MOBILE.md`, `PROJECT_STRUCTURE.md`, `REDESIGN_CANOPY_PLAN.md` (full-platform redesign sprints), `ROADMAP.md`, `SYSTEM_INSTRUCTIONS.md`, `design-system/canopy.html` (Canopy SSOT), plus `archive/` (superseded planning docs). |
-| `e2e/` | 4 Playwright specs, 16 tests total (see below). |
-| `src/` | Application source (below). |
+| `.env.example` / `.env` / `.env.vercel` | Env variables (Supabase URL/keys, service role — server-only, FIRMS key, VAPID pair, PlantNet key). |
+| `bunfig.toml` / `bun.lock` | Bun config + lockfile. |
+| `AGENTS.md` | How to work in this repo (owner rules, non-negotiables). |
+| `README.md` | Public-facing intro + setup + doc links. |
+| `LICENSE` (AGPL-3.0), `CODE_OF_CONDUCT.md`, `SECURITY.md` (reporting), `CONTRIBUTING.md` | Repo policies. |
+| `.github/` | `workflows/ci.yml` (tsc + unit + build on PRs/main), issue + PR templates. |
+| `public/` | favicon, logo, og, robots, manifest + icons + `sw.js` (PWA). |
+| `supabase/` | `migrations/00000000000000_master_schema.sql` (THE schema; see its README) + platform-managed `config.toml`. |
+| `e2e/` | 4 Playwright specs, 16 tests, live-DB with SQL fixtures (recipe in SYSTEM_INSTRUCTIONS). |
+| `.output/` / `dist/` / `test-results/` / `.tanstack/` / `.vercel/` | Build + tooling artifacts (gitignored where applicable). |
 
-## `src/` top level
+## src/ top level
 
 | Path | Purpose |
 |---|---|
-| `router.tsx` | Creates the TanStack Router instance with a QueryClient in router context. |
-| `start.ts` | TanStack Start instance: request middleware (error capture) + client function middleware (attaches the Supabase bearer token to server-fn calls). |
-| `server.ts` | Server entry / SSR handler. |
-| `styles.css` | Tailwind v4 entry + the **Canopy** token system (SSOT: `docs/design-system/canopy.html`; plan: `docs/REDESIGN_CANOPY_PLAN.md`): light default (warm paper `#fdfbf8`, white cards, canopy green `#2F6B3F` accent), `.dark` carries Canopy's canonical night-soil palette (`#100d0a`, sprout `#6ED08A`), Sora display + DM Sans body (Latin) with Noto Kufi/Sans Arabic, semantic `--plant`/`--care`/`--fire` (green / wadi blue / wildfire amber) + `--sand`/`--terracotta`, radius scale 4/8/16/24, Canopy motion tokens (`--ease-out`, `--ease-spring`, `--dur-*`). |
-| `routeTree.gen.ts` | Generated route tree. Never edit by hand. |
+| `router.tsx` | Router instance + QueryClient context. |
+| `start.ts` | Start instance: error middleware, CSRF, Supabase bearer attacher. |
+| `server.ts` | SSR entry: locale + geo globals per request, h3-swallowed-500 normalization. |
+| `styles.css` | Canopy tokens (light default, night-soil dark), fonts, radius/motion scales, utilities, `ga-*` keyframes. |
+| `routeTree.gen.ts` | Generated route tree — never edit. |
 
-## `src/routes/` (file-based routing, see `src/routes/README.md`)
+## `src/routes/`
 
-| Route file | URL | Purpose |
-|---|---|---|
-| `__root.tsx` | â€” | HTML document shell, head defaults, QueryClientProvider, `<Toaster />`, 404 component, root error boundary, no-flash theme script. |
-| `index.tsx` | `/` | Map-first home: `HeroMap` fills the viewport under the top bar, `ActionCard` (hideable), Map/List toggle, detail panel, realtime subscriptions. Public views show **active fires only** (2026-09-01). |
-| `about.tsx` | `/about` | What the project is, how moderation works, the "not an emergency service" disclaimer. |
-| `privacy.tsx` | `/privacy` | Plain-language data policy: public vs never-public, Law 18-07 rights, hosting. |
-| `terms.tsx` | `/terms` | Plain-language terms: honest submissions, moderation, not an emergency service, no warranty. |
-| `plant.tsx` | `/plant` | Planting submission form â†’ `submitPlanting` server fn. Result is `pending`. |
-| `care.tsx` | `/care` | Care log form (site picker, action, date, optional photo/notes/name) â†’ `submitCare`. Publishes immediately. Accepts `?site=<uuid>`. |
-| `fire.tsx` | `/fire` | Fire report form â†’ `submitFire`. Publishes immediately; Protection Civile disclaimer on form + success screen. |
-| `my/$token.tsx` | `/my/<token>` | Public receipt page: kind, moderation status, date, wilaya for an anonymous submission. No PII. `noindex`. |
-| `auth.tsx` | `/auth` | Email/password sign-in and sign-up. |
-| `volunteer.tsx` | `/volunteer` | Big warm ask: `VolunteerForm` (name/email/phone/wilaya/intents/availability/message, honeypot) â†’ `submitVolunteer`; "not an emergency service; call Protection Civile 14/1021" stays visible. Admin-only: `VolunteerPanel` lists applications (status newâ†’contactedâ†’onboarded). |
-| `_authenticated/route.tsx` | â€” | Auth gate (`ssr: false`), redirects signed-out users to `/auth`. |
-| `_authenticated/moderate.tsx` | `/moderate` | Moderation dashboard: stats strip, segmented tab bar (`ModTabs`), pending queue, fire triage, alert contacts. Wilaya-scoped by RLS. `noindex`. |
-| `_authenticated/admin.tsx` | `/admin` | Admin dashboard: four tabs — Overview (platform stats + wilaya oversight), Users & roles (user list, role actions, create account, assign-wilayas dialog), Volunteers, Feedback — each mounting only when selected. Admin-only guard. `noindex`. |
-| `_authenticated/activity.tsx` | `/activity` | User dashboard: the three data queries + loading/error shell only; the sections live in `components/activity/ActivitySections.tsx` (2026-09-01 split). `noindex`. |
-| `api/public/photo/$.ts` | `/api/public/photo/*` | Server route streaming objects out of the private `photos` bucket with long cache headers. The only public read path for images. |
-| `api/public/hotspots.ts` | `/api/public/hotspots` | NASA FIRMS satellite hotspots GeoJSON — server-side fetch (key stays secret), edge-cached 10 min, 502/no-store on failure. |
-| `api/mobile/submissions.ts` | `/api/mobile/submissions` | POST â€” mobile submissions endpoint (issue #8): Bearer session verified, existing zod schemas, same abuse gate + impls as the web forms. |
-| `README.md` | â€” | Notes on the file-based routing conventions. |
+`__root.tsx` (html shell + providers + boundaries) · `index.tsx` (map home)
+· `plant.tsx` / `care.tsx` / `fire.tsx` (submission flows) ·
+`my/$token.tsx` (receipt) · `auth.tsx` · `volunteer.tsx` ·
+`about/privacy/terms.tsx` · `_authenticated/` (gate + `moderate.tsx`,
+`admin.tsx`, `activity.tsx`) · `api/public/photo/$.ts` (bucket proxy) ·
+`api/public/hotspots.ts` (FIRMS proxy) · `api/mobile/submissions.ts`
+(mobile submissions).
 
 ## `src/components/`
 
-| Path | Purpose |
+| Group | Contents |
 |---|---|
-| `AppShell.tsx` | Global chrome, split by route (Canopy, 2026-09-12): public pages get the slim top bar + drawer; staff pages get `shell/StaffSidebar.tsx` (280px → 78px persisted rail, sliding active indicator, nav groups) and drop the top bar from lg up. Nav items + groups shared via `shell/nav.ts`. GitHub + theme hide from the mobile top bar (drawer footer carries them). |
-| `ConsentBanner.tsx` | First-visit AI-training consent banner (2026-09-05): bottom-pinned, accept/decline/dismiss, localStorage-backed, never reappears after a choice. Wired into AppShell after main. |
-| `AppDrawer.tsx` | The navigation drawer (brand header, grouped nav rows with a staggered RTL-safe reveal, theme + privacy + auth footer) — starts below the announcement strip when one is live, `inert` when closed. Extracted from AppShell 2026-09-01; Canopy restyle 2026-09-12. |
-| `LocaleDropdown.tsx` | 3-way locale dropdown (عربي/English/Français, check on current, outside-click + Escape close). Replaced the cycle button 2026-09-01. |
-| `volunteer/VolunteerForm.tsx` | The `/volunteer` form: name/email/phone-whatsapp/wilaya dropdown (58)/extra-wilayas/intent chips (preselected "Review plantings")/availability/message, honeypot, success state. |
-| `admin/AdminUsersPanel.tsx` | Users, roles and wilayas panel: paginated list ("Show more"), role buttons, sign-out, "New account" — all one tab. |
-| `admin/CreateAccountDialog.tsx` | Admin-created moderator accounts (email, password show/hide + generate, display name, wilayas) via `adminCreateUser`. |
-| `admin/WilayaChecklist.tsx` | Shared wilaya checkbox list (historic parents + post-2019 children) for Assign/Create dialogs. |
-| `admin/VolunteerPanel.tsx` | Admin-only list of volunteer applications: info + intent chips + status select (new/contacted/onboarded) + one-click "Approve & make moderator" (`adminOnboardVolunteer`). Paged. |
-| `admin/FeedbackPanel.tsx` | Admin-only feedback inbox: kind badges (bug/idea/other), message, page, device UA, two-step delete. Paged. |
-| `SectionTabs.tsx` | Shared segmented tab bar for staff pages (moderate, admin): icon + count always, labels from sm up — never overflows 390px. |
-| `pwa-install.tsx` | One-time install banner: native prompt on Chromium, Share → Add to Home Screen instructions on iOS; dismissed state persisted. |
-| `fire/FireAlertsCard.tsx` | Fire-alerts card on `/fire` (form + success screen): enable/disable Web Push, optional wilaya scope, denied/unsupported states. |
-| `moderator/RejectedQueue.tsx` | Rejected plantings tab: rows with Re-approve (scoped service fn) + admin-only delete; broken thumbnails hide on 404. |
-| `FeedbackDialog.tsx` | The site-wide feedback box (home "Feedback" pill): Bug / Feature idea / Other kind selector + message, honeypot, sends `navigator.userAgent` (capped) with bug reports → `submitFeedback`. |
-| `admin/AssignWilayasDialog.tsx` | Wilaya assignment dialog for a moderator (uses the shared checklist). |
-| `FormShell.tsx` | Card-wrapped form container (rounded-2xl family) + the `Honeypot` hidden-field component. |
-| `PhotoInput.tsx` | Camera-capable file input; compresses on-device (max 1024px, WebP/JPEG) before base64 handoff. |
-| `ReceiptLink.tsx` | Success-screen receipt link: copyable `/my/<token>` URL, the only status lookup for anonymous submitters. |
-| `PrecisionPicker.tsx` | MapLibre GL + OpenFreeMap picker for exact pin drops inside forms. Draws an amber accuracy-radius circle from the GPS fix. |
-| `LocationField.tsx` | Wilaya-first location: wilaya/commune selects first (works without GPS), then an optional "Exact location" card â€” GPS button with privacy line, MapLibre picker behind a toggle, Google Maps link input, remove-pin action. GPS + MapsLink extracted 2026-09-01.
-| `location-gps.ts` | `useGpsWatch` — the GPS fix watcher (good-enough 15m, 12s budget, last-best fallback), extracted from LocationField.
-| `location-maps-link.tsx` | `MapsLinkField` — the Google Maps link input + parse/apply row, extracted from LocationField. |
-| `CommuneField.tsx` | Commune dropdown per wilaya (1,541 communes, AR labels, canonical Latin stored) with a free-text "Other" escape hatch. |
-| `PlantingGuide.tsx` | "What to plant here" chips on /plant: evidence-first species suggestions per wilaya (climate fit + GBIF evidence), tap-to-fill. |
-| `SpeciesSuggest.tsx` | "Identify from the photo" button + one-tap species chips on the plant form (PlantNet). |
-| `EmergencyContacts.tsx` | SOS pill + popover in the top bar: Protection Civile 14/1021, Police 17, Gendarmerie Nationale 1055, SAMU 16, `tel:` links. |
-| `PhotoThumb.tsx` | Photo with a Canopy fallback: tinted sprout/flame block instead of the browser's broken-image icon (404-safe, resets on src change). Used in list, queues, detail panels. |
-| `Reveal.tsx` | One-time scroll reveal wrapper (IntersectionObserver, reduced-motion safe) — Canopy life layer. |
-| `home/ActionCard.tsx` | The home action card (hero copy, live stats, three CTAs, layer chips, hide/reveal) — extracted from the home route 2026-09-01. |
-| `home/ViewToggle.tsx` | Map / List / Board switch (floats top-right over the home view). |
-| `home/Leaderboard.tsx` | Monthly wilaya race â€” approved plantings summed per wilaya, resets on the 1st, client-computed. |
-| `home/ActivityTicker.tsx` | Anonymous live-activity pill on the map, auto-dismissed. |
-| `home/useMapRealtime.ts` | The realtime subscription (query invalidation + ticker messages), extracted from the home route. |
-| `activity/ActivitySections.tsx` | The three "my activity" sections (plantings/care/fires + empty states) — pure presentation, data stays in the route. Extracted 2026-09-01. |
-| `map/HeroMap.tsx` | The hero map: MapLibre GL + OpenFreeMap, theme/data/locale/toggle effects. No clustering â€” every tree/care/fire is its own dot at every zoom. Mount logic lives in `useHeroMapMount.ts` (2026-09-01 split). |
-| `map/hotspots-layer.ts` | The satellite hotspot layer: amber hollow rings (no pulse â€” that stays the community-fire signature), radius by FRP, click â†’ hotspot detail. |
-| `map/risk-layer.ts` | The fire-risk model layer (2026-09-05): small circles colored by risk score (green to dark red ramp), no pulse, click to risk detail. |
-| `map/FireConfirmations.tsx` | Community confirmation block on the fire detail panel (2026-09-05): vote buttons with active/busy states, live counts, community-verified badge, honest note. |
-| `map/detail-bodies.tsx` | `HotspotBody` (satellite hotspot detail sheet) + `RiskBody` (fire-risk grid-point detail). |
-| `map/map-failure.tsx` | The WebGL2 probe + map failure overlay (extracted from HeroMap 2026-08-31). |
-| `map/useHeroMapMount.ts` | The HeroMap mount effect (WebGL2 probe, map construction, control placement, style.load init, context-loss + style-fetch failure guards — BUG-04 2026-09-02) as a hook. Extracted 2026-09-01. |
-| `LegendDots.tsx` | (deleted 2026-09-12, Canopy Sprint 6/99: the 4-dot legend is gone; layer states live in the action-card toggles and chips). |
-| `map/map-style.ts` | Map style constants, theme-aware colors, the RTL text plugin call (browser-guarded), and the RecenterControl. |
-| `map/map-data.ts` | GeoJSON builders (feature collection, kind filters, feature lookup). |
-| `map/map-layers.ts` | Source/layer setup (wilaya borders, per-kind points, fire pulse), layer visibility, the pulse rAF loop, click/hover interactions. |
-| `map/DetailPanel.tsx` | Side panel (bottom sheet on mobile) showing feature details, the care timeline, and a Google Maps Directions link. Images capped; no horizontal overflow. |
-| `map/SiteList.tsx` | List view behind the Map/List toggle: plantings + fire reports **grouped by wilaya** (section headers with per-wilaya totals, photo-thumb rows, needs-water and fire-status badges). Rebuilt 2026-08-21. |
-| `moderator/ModTabs.tsx` | Segmented tab bar for the moderation sections, with live count badges. |
-| `moderator/PendingQueue.tsx` | Pending plantings with approve/reject under `sites_moderator_update`; writes `reviewed_by`, `reviewed_at`, `moderator_notes`. Shows exact submitted-at time and the wilaya-level badge. |
-| `moderator/FireTriage.tsx` | Fire report list with status badges and resolved / false-alarm / reopen actions (writes `status` + `resolved_at`). Exact reported/resolved times. |
-| `moderator/ContactReveal.tsx` | On-demand contact reveal button â€” calls the moderator-only server functions, shows name/phone or "no contact info". |
-| `moderation.functions.ts` | `getSiteContact` / `getFireContact` â€” service-role, live role check per call; the only read path for reporter/planter PII. |
-| `moderator/StatusBadge.tsx` | Pill status badge (tone variants: plant/care/fire/muted). |
-| `admin/AdminOverview.tsx` | Admin stats strip + per-wilaya moderation load. |
-| `admin/AssignWilayasDialog.tsx` | Wilaya assignment dialog for a moderator (uses the shared checklist). |
-| `ui/*` | Unmodified shadcn/ui primitives. Most are unused by this app; they ship with the template (vendored â€” see note below). |
-| `AnnouncementBanner.tsx` | The site-wide marquee strip (trilingual, color, speed; never-empty by construction). |
-| `admin/AdminAnnouncementsPanel.tsx` | Admin announcements panel: list, create, edit, multi-publish, color/speed. Form bits live in `admin/announce-form-bits.tsx` (2026-09-01 split). |
-| `admin/announce-form-bits.tsx` | Announcement form state + KindPicker/ColorPicker/SpeedInput/TrilingualFields extracted from the panel. |
+| `AppShell.tsx` | Chrome split: public = top bar + drawer; staff pages = Canopy sidebar (top bar drops from lg up). |
+| `AppDrawer.tsx` | Grouped nav drawer, staggered RTL-safe reveal, footer actions. |
+| `LocaleDropdown.tsx` / `EmergencyContacts.tsx` / `FeedbackDialog.tsx` | Top-bar tools (Canopy chip shapes). |
+| `AnnouncementBanner.tsx`, `ConsentBanner.tsx`, `pwa-install.tsx`, `Reveal.tsx`, `PhotoThumb.tsx`, `FormShell.tsx`, `SectionTabs.tsx` | Shared chrome and primitives. |
+| `shell/` | `StaffSidebar.tsx` (280px → 78px rail, sliding indicator, footer), `nav.ts` (shared NAV_ITEMS + groups). |
+| `map/` | `HeroMap`, `useHeroMapMount`, `map-layers`, `map-interactions`, `map-style`, `map-data`, `hotspots-layer`, `risk-layer`, `DetailPanel`, `detail-bodies` (Hotspot/Risk/Fire bodies), `FireConfirmations`, `SiteList`, `map-failure`. |
+| `home/` | `ActionCard` (stat strip, CTAs, icon layer toggles), `ViewToggle`, `ActivityTicker`, `Leaderboard`, `useMapRealtime`. |
+| `moderator/` | `PendingQueue` (keyboard-first review + age chips), `FireTriage`, `RejectedQueue`, `ContactReveal`, `ModTabs`, `StatusBadge`. |
+| `admin/` | `AdminOverview`, `AdminUsersPanel`, `CreateAccountDialog`, `AssignWilayasDialog`, `WilayaChecklist`, `VolunteerPanel`, `FeedbackPanel`, `AdminAnnouncementsPanel` + `announce-form-bits`. |
+| `activity/` | `ActivitySections` (three dashboards, presentation only). |
+| `fire/`, `volunteer/` | `FireAlertsCard`, `VolunteerForm`. |
+| forms | `LocationField` (+`location-gps`, `location-maps-link`), `PrecisionPicker`, `CommuneField`, `PhotoInput`, `SpeciesSuggest`, `PlantingGuide`, `ReceiptLink`, `SpeciesSuggest`. |
+| `ui/` | Vendored shadcn primitives; most unused (chart/sidebar have zero consumers). |
 
 ## `src/lib/`
 
-| Path | Purpose |
-|---|---|
-| `types.ts` | App-level `Site`, `CareLog`, `FireReport` types (client-safe shapes: no reporter PII) + `needsWater()` 14-day derived flag. |
-| `data.ts` | TanStack Query `queryOptions` for sites/care logs/fire reports with explicit safe column lists (bounds 2000/3000/1000), and `photoUrl()` mapping a storage path to `/api/public/photo/...`. |
-| `moderation.ts` | `useModerationStats()` â€” exact head-count queries (pending, approved today, active fires, total submissions). |
-| `wilayas.ts` | The 58 wilayas (code, Latin + Arabic name) and the mapping to the 48 historic map polygons. |
-| `geo.ts` | Mercator projection helpers, bounding-box math, `wilayaCodeForPoint` point-in-polygon derivation (historic wilayas only), `wilayaCenterLatLng` display centres, `parseRings`, `ALGERIA_CENTER`. |
-| `wilaya-geo.ts` | Wilaya boundaries as GeoJSON (converted from the projected path data back to lat/lng) + `wilayaBounds` â€” the hero map's border layers and wilaya zoom. |
-| `image.ts` | Client-side image compression (max 1024px longest edge, WebP/JPEG, target <400KB). |
-| `offline.ts` | `submitResilient()` â€” retries a submission when the device regains connectivity. |
-| `device.ts` | `getDeviceSecret()` â€” per-browser random secret in localStorage for the rotating device hash. |
-| `maps-link.ts` | Google Maps link helpers: `parseGoogleMapsLink` (unit-tested), `isShortMapsLink`, `directionsUrl`. |
-| `maps.functions.ts` | `resolveMapsLink` server fn: follows short goo.gl/maps.app.goo.gl redirects server-side and parses coordinates. |
-| `submissions.functions.ts` | The three public server functions (`submitPlanting`, `submitCare`, `submitFire`) with Zod validators. Thin wrappers only. |
-| `submissions-impl.server.ts` | Server-only implementations: gate â†’ optional user id â†’ photo upload â†’ service-role insert. `wilaya_code` derived server-side; client value ignored. |
-| `submissions.server.ts` | Abuse gate: silent-drop honeypot, 1.2s submit-timing floor, hashed-IP + rotating device-hash hourly rate limits (planting 6 / care 20 / fire 8) via `submission_meta`, photo storage helper. |
-| `receipts.server.ts` | Receipt links: `mintReceipt` (stores only the token hash) and `getReceiptStatus` (token â†’ public-safe status snapshot). |
-| `admin.functions.ts` | **Barrel** (split 2026-08-31; import path unchanged): re-exports `admin-users.functions.ts` (accounts: `adminListUsers`, `adminCreateUser`, `adminSetRole` with self-guard + last-admin guard, `adminSetWilayas`, `adminSignOutUser`, `adminDeleteUser`), `admin-content.functions.ts` (`adminListFeedback`/`adminListVolunteers` paged, `adminSetVolunteerStatus`, `adminOnboardVolunteer`, `adminDelete*` content deletes), `admin-stats.functions.ts` (`adminStats`). Every call re-checks the caller's admin role live from the request token (`admin-shared.server.ts`). |
-| `activity.functions.ts` | `myFireReports`: a signed-in user's own fire reports â€” `fire_reports.user_id` is not column-granted to clients, so the server filters by the caller's token. |
-| `feedback.functions.ts` / `feedback.server.ts` | `feedbackSchema` + `submitFeedback` server fn and its impl — service-role insert into the zero-grant `feedback` table, throttled 10/hour via the shared hashed-IP gate. |
-| `volunteers.functions.ts` / `volunteers.server.ts` | `volunteerSchema` + `submitVolunteer` server fn and its impl — service-role insert into the zero-grant `volunteers` table, links `user_id` when signed in, throttled 5/hour via the shared gate. |
-| `privacy-mode.tsx` | Filming privacy mode: `PrivacyModeProvider`/`usePrivacyMode` + `maskEmail`/`maskPhone`/`maskName` — masked-by-default PII on staff pages, top-bar Show/Hide infos toggle (persisted `ga-privacy`). |
-| `hotspots.server.ts` | NASA FIRMS server lib: area URL, CSV parser, confidence filter, EOG-generated static flare mask (`data/flare-zones.ts`), southern persistence mask, GeoJSON builder. Fail-loud `FIRMS_MAP_KEY`. |
-| `risk.ts` | Fire-risk model lib (2026-09-05): `RiskPoint` type + `riskGeoJSON` builder over the generated `data/risk-grid.ts` grid. |
-| `ai-consent.ts` | AI-training consent state (2026-09-05): get/set/shouldShow over localStorage (`ga-ai-consent`), corrupt-value safe. |
-| `confirmations.server.ts` | Community fire confirmations server lib (2026-09-05): vote upsert + daily limit (HMAC device-hash voter_key), counts, my-vote, `isCommunityVerified` helper. New tables cast via `supabaseAdmin as any` until the migration lands. |
-| `confirmations.functions.ts` | createServerFn + zod for confirmations: submitFireVote, getFireCounts, getMyVote. |
-| `data/risk-grid.ts` | Generated from the Kabylie fire-risk model (v7 champion, AUC 0.826): 3,882 tuples [lng, lat, risk 0-1] at 1 km over Bejaia + Jijel, climatological typical-summer estimate. Regenerate from the model output - do not hand-edit. |
-| `pwa.ts` | Production-only service-worker registration. |
-| `geo-hint.ts` | Coarse IP-geolocation hint (Vercel headers): `getGeoHint()` reads `window.__GA_GEO__` (client) / the request-global (server). Never stored. |
-| `gps.ts` | `medianFix()` — robust final GPS fix: median of the last 3 ±100 m readings (rejects lucky outliers), single-best fallback. Unit-tested. |
-| `weather.ts` | Shared pure weather helpers: `compass()` (8-wind, i18n'd) + the `FireWeather` type. Client-safe. |
-| `weather.server.ts` | Open-Meteo fetch (no key): current conditions for a point, 8 s timeout, 0.1°/30 min in-memory cache, `mapCurrent` mapper. |
-| `weather.functions.ts` | `getFireWeather` server fn (zod-bounded lat/lng) — returns null on failure, never breaks the panel. |
-| `plantnet.server.ts` | PlantNet identify call (key from env, fail loud) + `mapPlantNet` (top 2, score ≥ 0.15, common-name label). |
-| `plantnet.functions.ts` | `suggestSpecies` server fn (zod data-url + locale) — fails soft to null. |
-| `push.server.ts` | Web Push server lib: VAPID setup (fail loud), subscribe/unsubscribe impls, `shouldNotify` scope match, `notifyFireSubscribers` fan-out (total, prunes stale endpoints). |
-| `push.functions.ts` | `subscribePush` / `unsubscribePush` public server fns (zod). |
-| `error-capture.ts`, `error-page.ts` | Platform error plumbing. |
-| `utils.ts` | `cn()` class merge helper. |
-| `__tests__/` | 19 files, **206 tests** (2026-09-01 run): pure-function units (abuse gate, Zod schemas, geometry incl. 69-wilaya, link parsing, `needsWater` + rain, image sniff, feedback/volunteer/push schemas, FIRMS filters, GPS median, weather/AQ mappers, PlantNet mapper, planting guide, announcements) + **component behavior tests** (testing-library + happy-dom: CommuneField, SpeciesSuggest, FireAlertsCard). |
+Query options + server functions + pure helpers. Key files:
+`data.ts` (queries + safe column lists), `types.ts` (client-safe shapes +
+`needsWater`), `submissions.{functions,server}-impl.server.ts` (gate +
+inserts + receipts + location resolution), `moderation.functions.ts`
+(scope-checked staff actions), `admin-*.functions.ts` +
+`admin-shared.server.ts`, `confirmations.*` (pending migration),
+`receipts.server.ts`, `push.{server,functions}.ts`, `hotspots.server.ts`,
+`weather.*`, `plantnet.*`, `maps.*`, `push.*`, `geo.ts` / `wilaya-geo.ts` /
+`wilayas.ts` / `gps.ts`, `image.ts`, `offline.ts`, `device.ts`,
+`privacy-mode.tsx`, `ai-consent.ts`, `pwa.ts`, `geo-hint.ts`,
+`error-capture.ts` / `error-page.ts`, `utils.ts`.
+`__tests__/` — 22 files, 219 tests (pure functions + component tests).
 
-## `src/hooks/`, `src/data/`, `src/integrations/`
+## `src/data/`, `src/i18n/`, `src/hooks/`, `src/integrations/`
 
-| Path | Purpose |
-|---|---|
-| `hooks/useAuth.tsx` | Supabase session state + `role`/`isModerator`/`isAdmin` read live from the caller's `user_roles` row. `loading` stays true until the role query settles. |
-| `hooks/useTheme.tsx` | Shared light/dark theme store: one module-level value + listeners so every consumer (shell AND map) flips together. localStorage-persisted, `.dark` on `<html>`. |
-| `hooks/use-mobile.tsx` | Viewport breakpoint hook (template). |
-| `data/algeria-wilayas.ts` | Auto-generated from namrouche993/algeria-wilayas-geojson v69 (MIT): Mercator-projected SVG path data for all **69** wilaya polygons (Law 26-06, the 2025 division). Do not hand-edit. |
-| `data/communes.ts` | Auto-generated from islam-re/Algeria-wilayas (MIT, Journal Officiel): `COMMUNES_BY_WILAYA` — 1,541 communes (ar + latin) across all 69 wilayas. Do not hand-edit. |
-| `data/wilaya-species.ts` | Auto-generated from GBIF occurrence evidence (exact WKT wilaya polygons, Plantae only): top-10 recorded plant species per wilaya with counts. Do not hand-edit. |
-| `data/species-guide.ts` | Curated planting guide: `WILAYA_CLIMATE` (climate class per wilaya) + `SPECIES_GUIDE` (19 species: AR/EN names, climate fits, notes, cautions). Hand-curated — edit with sources. |
-| `data/flare-zones.ts` | Auto-generated from the EOG Global Gas Flare Analysis 2024 (eogdata.mines.edu): 185 clustered Algerian flare zones (radius = clamp(spread + 2, 6, 12) km) + 5 live-feed supplements. The FIRMS static-source mask. Regenerate from the KML — do not hand-edit. |
-| `data/risk-grid.ts` | Generated from the Kabylie fire-risk model (v7 champion, AUC 0.826): 3,882 tuples [lng, lat, risk 0-1] at 1 km over Bejaia + Jijel, climatological typical-summer estimate. Regenerate from the model output - do not hand-edit. |
-| `integrations/supabase/client.ts` | Browser client (publishable key). Auto-generated â€” never edit. |
-| `integrations/supabase/client.server.ts` | Service-role admin client. Server-only. Auto-generated. |
-| `integrations/supabase/auth-attacher.ts` | Client middleware attaching the bearer token to server-fn calls. Auto-generated. |
-| `integrations/supabase/types.ts` | Generated database types. Regenerated on migration. |
+- `data/` (generated — do not hand-edit): `algeria-wilayas.ts` (69 polygons),
+  `communes.ts` (1,541), `wilaya-species.ts` (GBIF), `flare-zones.ts` (EOG),
+  `risk-grid.ts` (Kabylie model). Hand-curated: `species-guide.ts`.
+- `i18n/`: provider + locale singleton + format helpers; `dict/en/*` is the
+  typed source of truth, AR/FR locked by tsc.
+- `hooks/`: `useAuth` (live role read), `useTheme`, `use-mobile`.
+- `integrations/supabase/` (generated): browser client, server-only
+  service-role client, `auth-attacher` middleware, generated types.
 
-## `e2e/` (16 tests, run with `bunx playwright test`)
+## Line-rule status (250 cap)
 
-| Spec | Tests | Covers |
-|---|---|---|
-| `flows.spec.ts` | 5 | Home map, plant round-trip, care round-trip, fire flow, moderator approve. |
-| `admin.spec.ts` | 3 | Assign wilaya â†’ scoped queue + approve â†’ remove wilaya/role â†’ demoted lockout. |
-| `receipts.spec.ts` | 4 | Receipt pendingâ†’approved round-trip, unknown-token, honeypot silent drop, wilaya-only submission. |
-| `activity.spec.ts` | 4 | Signed-out redirect, own activity across sections, empty states, admin overview. |
-
-Fixtures are SQL-seeded per the recipe in `docs/SYSTEM_INSTRUCTIONS.md` Â§E2E fixture recipe and cleaned up after every run.
-
-## Known structural notes
-
-- **The 250-line rule has zero hand-written exceptions** (re-zeroed 2026-09-12 in the Canopy sprints): DetailPanel 253→189 (FireBody + Field → detail-bodies), map-layers 255→191 (+ `map-interactions.ts`), AppShell 251→206 (+ `shell/StaffSidebar.tsx`, `shell/nav.ts`). Earlier splits (2026-09-01): LocationField, AdminAnnouncementsPanel, routes/index, activity route, HeroMap. Generated files (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`, `src/data/*` auto-generated) are exempt; `src/styles.css` is the token stylesheet.
-- `src/components/ui/` is template surface area, not project code; treat it as vendored. `chart.tsx` and `sidebar.tsx` currently have zero consumers (flagged in `docs/AUDIT.md` P2 #7).
-- Test suite: 137 unit tests + 16 live E2E tests, plus a 40-check RLS role-matrix battery run from a session script kept out of the repo. See `docs/CHANGELOG.md` for the full verification round-up.
-
-## `src/i18n/` (Arabic-first localization, 2026-08-28)
-
-| Path | Purpose |
-|---|---|
-| `index.tsx` | `I18nProvider`/`useI18n` (locale, `t(path, params)`, `count`, `formatDate*`, `setLocale`, `isRtl`), `localizeError` (rewrites known server strings), `ssrT` for route `head()`, no-flash locale script. |
-| `locale.ts` | Locale singleton (default `ar`), `ga-locale` persistence, `lang`/`dir` side effects. |
-| `format.ts` | `count(n, kind)` with Arabic numeral agreement (1/2/3â€“10/11+), `ar-DZ` date formatting with Latin digits. |
-| `dict/en/*` | English dictionary â€” the key source of truth. |
-| `dict/ar/*` | Arabic dictionary, `typeof`-locked to the EN shape: a missing/mismatched key fails `tsc`. |
-| `dict/fr/*` | French dictionary (2026-09-01), same `typeof` lock. |
+Zero hand-written violations as of 2026-09-12 (DetailPanel 189,
+map-layers 191, AppShell 206 after the Canopy splits). Vendored `ui/*` and
+generated files exempt; `styles.css` is the token stylesheet.

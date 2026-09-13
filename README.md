@@ -60,7 +60,7 @@ bun run test           # 202 unit + component tests
 bun run build          # production build
 ```
 
-Set up the database with [`docs/FULL_SCHEMA_EXPORT.sql`](docs/FULL_SCHEMA_EXPORT.sql) — the canonical schema source (tables, RLS, functions, grants, storage). `supabase/migrations/` is the change record, not a bootstrap path.
+Set up the database with [`supabase/migrations/00000000000000_master_schema.sql`](supabase/migrations/00000000000000_master_schema.sql) — the one schema file to run on a fresh project (tables, RLS, functions, grants, storage). Keep it updated in place when the schema changes.
 
 First admin is seeded in SQL, then everything (roles, wilayas, volunteers, announcements) is managed from `/admin`:
 
@@ -72,11 +72,14 @@ INSERT INTO public.user_roles (user_id, role) VALUES ('<your auth user id>', 'ad
 
 ## Documentation
 
+- [`docs/PLATFORM.md`](docs/PLATFORM.md) — what the product is: purpose, users, flows, rules
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — how it works: stack, data flow, patterns
 - [`docs/FEATURES.md`](docs/FEATURES.md) — every feature, honestly: what works, what's unverified
 - [`docs/DATABASE.md`](docs/DATABASE.md) — tables, columns, every RLS policy in plain English
-- [`docs/AUDIT.md`](docs/AUDIT.md) — the security & performance audit
+- [`docs/SECURITY.md`](docs/SECURITY.md) — security posture and open findings
 - [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md) — every file, one line each
-- [`docs/CHANGELOG.md`](docs/CHANGELOG.md) — what changed and when (81 passes and counting)
+- [`docs/README.md`](docs/README.md) — the documentation index (read this first)
+- [`docs/CHANGELOG.md`](docs/CHANGELOG.md) — what changed and when (100+ passes)
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — what's next, what's parked, and why
 
 ## Contributing

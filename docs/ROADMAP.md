@@ -1,54 +1,80 @@
-# ROADMAP.md
+# ROADMAP
 
-Status: **2026-08-31** (dead items refreshed inline; the numbered backlog below is otherwise the 2026-08-19 snapshot). Live at `green-dz.vercel.app`; the community found the repo and started contributing (3 PRs, 7 issues). This file is the forward-looking list: what blocks launch, what needs an owner decision, and what is parked. Items are ordered by what actually matters first. Nothing here is scheduled â€” the owner calls the sequence, and **no fix starts without owner approval** (standing rule since 2026-08-19).
+Status: 2026-09-12. Live at green-dz.vercel.app. Ordered by what matters.
+Nothing is scheduled — the owner calls the sequence, and **no fix starts
+without owner approval**. Completed work lives in `CHANGELOG.md`.
 
-## Community feedback backlog (2026-08-19) â€” all items wait for owner approval
+## Before anything else (owner actions, not code)
 
-Ordered by impact, not by arrival. **Every item below was verified against the actual code/PR diffs on 2026-08-19** â€” nothing is assigned from titles anymore. Verified details inline; `tsc` clean, 97/97 unit tests, build clean on current `main` (the "91 tests" figure in `PROJECT_STRUCTURE.md` was stale and has been corrected).
-
-1. **Wilayas 58 â†’ 69** (issue #6 â€” **SHIPPED 2026-09-01 (release phase G, not yet pushed).** The 2025 division is real (Law 26-06, JO No. 25, April 2026); the platform now runs all 69 wilayas with official codes, new polygons, expanded moderator assignments and a backfill. See FEATURES.md Â§11n. Our list already ships the 10 delegated wilayas (codes 49â€“58); the 11 new full wilayas (59â€“69: Aflou, Barika, Ksar Chellala, MessaÃ¢d, AÃ¯n Oussara, BoussaÃ¢da, El Abiodh Sidi Cheikh, El Kantara, Bir El Ater, Ksar El Boukhari, El Aricha) are missing everywhere: wilaya list, forms, moderation scoping, map shapes, any DB constraints. Touggourt's official code is 55 (the Algeria-Cities dataset duplicates it under 30 â€” flagged to the reporter). **Blocker pass (2026-08-19): DB is fully additive â€” `wilaya_code` is plain text with zero CHECK constraints/enums on `sites`, `fire_reports`, `moderator_wilayas` (verified live); the real work is two data files (58-entry `wilayas.ts`, **48-polygon** `algeria-wilayas.ts`, auto-generated â€” new source needed for Nov-2025 divisions) + silent misfiling: pins in new-wilaya territory are stored under the parent code (`geo.ts` point-in-polygon over 48 polygons, fires publish immediately) + `.max(48)` cap at `admin.functions.ts:107` + copy at `index.tsx:26`/`README.md:13`. Full plan in `docs/archive/PRE_MOBILE_BLOCKERS.md` Â§Item 4.** **Verified public reply posted on issue #6.**
-2. **PR #9 â€” Arabic/French/English i18n + RTL** (hzemislam4-svg, +2,515/âˆ’584). **CLOSED 2026-08-30 as superseded by the merged Arabic-first PR #35.** Full diff reviewed. **Worker fix preserved** (doesn't touch map files, branch contains `bfa3ce2`). No schema, no scope creep, no new deps; mechanism is solid (inline type-audited catalogues, SSR-safe, cookie-only persistence, honeypot/feedback/disclaimer intact). **Needs changes before merge:** P1 â€” a cookie-less Arabic visitor gets correct SSR `dir="rtl"`, but the first in-app navigation flips `<html dir>` to LTR while the UI stays Arabic (client resolver never reads Accept-Language) â€” this breaks the headline feature for its primary audience; P2 â€” mobile drawer uses physical `translate-x` + `start-0`, so in RTL it's visible mid-screen when closed on wide phones; P3 â€” hardcoded Arabic comma in admin, untranslated severity in activity, English plural keys ship "(s)" into fr/ar. **Status 2026-08-19 (blocker pass):** author has NOT rebased â€” branch is **7 commits behind main and diverged** (not 2); rebase request pinged on the PR 2026-08-19 14:43Z, no action since. P1 fix plan written in `docs/archive/PRE_MOBILE_BLOCKERS.md` Â§Item 1. Conflict resolution must keep Vercel `<Analytics />` in `__root.tsx` and the feedback grant on `main`. Owner decision: **rebase deadline posted 2026-08-20 (comment `5349625809`) â€” rebase by 2026-08-25 or we take over the branch** (copy into repo, apply required changes, open replacement PR).
-3. **PR #10 â€” mobile UX pass 320â€“768px + map/theme fixes** (+2,598/âˆ’610). Full diff reviewed. **Worker fix preserved** (map-style.ts untouched; head byte-identical to main). Map changes small and self-contained (dark-mode-from-DOM, mobile fit padding, wider bounds, controls opposite the card). One edge bug: `isMobile`/`isRtl` are read once at mount, so switching language or rotating after mount leaves controls misplaced â€” **accepted as a fast-follow, not a merge blocker** (2026-08-19 blocker pass). **Merge gotcha:** branch is stacked on #9 and **7 commits behind main, diverged** â€” rebase and re-add `<Analytics />` in `__root.tsx` or Web Analytics silently disappears. **Cannot start until PR #9 verdict is "merged", not "ready".**
-4. **PR #11 â€” user profiles (own + public) + password reset** (+3,287/âˆ’635). Full diff reviewed. **Verified: NO schema change** (zero migrations; the `DATABASE.md` edit is docs-only and accurate). Security posture correct: no RLS loosening, service-role-only server functions with live caller verification, no PII on public pages, worker fix preserved. **Needs changes:** PR is **closed** & dirty â€” rebase (conflicts in `__root.tsx`, `admin.tsx`, `admin.functions.ts`, `CHANGELOG.md`); fix duplicated `currentUserId()` (exists as `optionalUserId` in `submissions.server.ts`); add `robots: noindex` to `/u/$userId`; `publicOnly` over-discloses care/fire counts on pending sites (minor). Author explicitly says it was never runtime-verified â€” a real Supabase session test is mandatory before merge (**procedure written in `docs/archive/PRE_MOBILE_BLOCKERS.md` Â§Item 3: 6 flows, pass criteria, throwaway user, cleanup**). Merge last.
-5. **Issue #2 â€” the list only shows planted trees, not fires. VERIFIED REAL â€” FIXED 2026-08-19** (shipped). `SiteList` only ever received `sites` + `careLogs` (index.tsx:101); fires exist on the map and in the legend but the List view omitted them entirely. Fixed: the list now shows both plantings and fire reports (status + severity badges), sorted by date, and respects the same Trees/Fires layer toggles as the map. Verified against the production bundle (7-check Playwright pass).
-6. **Issue #3 â€” Directions button only partially visible. VERIFIED REAL â€” FIXED 2026-08-19** (shipped). `DetailPanel` was fixed `md:w-[360px]` with `overflow-x-hidden` and two `flex-1` buttons ("Log care for this site" + "Directions"); at 320 px content width the labels clipped â€” worse in French, which is what the reporter used. Fixed: panel widened to 400 px + smaller wrapping buttons. Verified against the production bundle (no horizontal clip, button fully inside the panel).
-7. **Issue #4 â€” filter map/list by clicking the legend color dots. PARTIALLY EXISTS.** The floating legend dots are static spans (index.tsx:118â€“128) â€” not clickable. The action card already has three `Chip` toggles (Trees/Care/Fires) that filter the **map** via `layers` â†’ `applyLayerVisibility`, but nothing filters the **list**, and the legend itself isn't clickable. Medium: make the dots toggle `layers` and apply the same to `SiteList`.
-8. **Issue #7 â€” map "disappears" on some devices. INVESTIGATED + DEFENSIVE FIX SHIPPED 2026-08-20.** v6 is WebGL2-only (`#7453`): a user report ("sometimes it disappears completely and can't be used") matched intermittent WebGL2 context failure, not the pre-v6 context-restore bugs (both already fixed before v6.0.0). Root-cause path verified in the 6.4.0 bundle: creation failure fires `error` + `GPUInitializationError` **synchronously inside the constructor**, and Evented drops listener-less errors â€” so `map.on("error")` alone could never catch it. Fix: pre-construction `webgl2` probe + bubbling `webglcontextcreationerror` listener on the container + `webglcontextlost`/`webglcontextrestored` handling with a clear overlay and a reload fallback. A raster fallback (OpenLayers hybrid) remains unjustified: WebGL2 covers ~97% of browsers. Feedback form now captures the user-agent (2026-08-20) so the next report is diagnosable.
-9. **Issue #8 â€” mobile app. VERIFIED: no mobile code exists; genuine large scope.** Offline queue/sync is the hard part (schema, conflict resolution, photo upload queue). **Research done 2026-08-19 â€” `docs/archive/MOBILE_RESEARCH.md`:** Expo + existing Supabase backend is the right stack; recommended architecture = separate `dz-green-mobile` repo, a new write route in the web app (not RLS, not an Edge Function), expo-sqlite outbox for the offline queue, SecureStore session, MLRN + OpenFreeMap with a device spike before committing. Lock-in flags: write path and repo structure must be decided before any code. **Replied to the contributor 2026-08-20** (comment `5350062315`): ground rules (write path via the existing gate, v1 ships after the PR queue + wilayas update, append-only outbox) vs. everything else delegated to him. **Status 2026-08-31: the app exists** (`dz-green-mobile`, Expo SDK 57 + MapLibre native module), the submissions contract shipped (`POST /api/mobile/submissions`, PR #33), deep-link auth is registered. Blocked on a development build (Android emulator on Windows, or iOS signing) â€” see `docs/MOBILE.md`.
-10. **PR #1 (Vercel bot) â€” close**: Web Analytics was already shipped manually (`a15845b`).
-11. **Bachir's submission (wilaya 41, pending)** â€” owner believes it was a test. Decision: delete or keep pending. Not approved/deleted until the owner says so.
-12. **Feedback messages** â€” two so far ("test", "thansk for the platform"); the admin panel to read them shipped (2026-08-19). No action.
-
-**Demo data (2026-08-19) â€” CLEANED BACK TO ZERO 2026-08-21 (39th/45th passes); kept below for the removal recipe only.** 13 sites (12 approved + 1 pending), 6 care logs, 4 fire reports were seeded live so the map shows everything. All rows are visibly tagged (`planter_display_name`/`submitter_name`/`reporter_name` = "DÃ©mo â€” â€¦", notes/description = "DonnÃ©es de dÃ©monstration â€” Green Algeria") and carry deterministic IDs (`d0000000-â€¦` sites, `d1000000-â€¦` care logs, `d2000000-â€¦` fires). Removal (one command, safe):
-
-```sql
-DELETE FROM public.care_logs WHERE id::text LIKE 'd1%';
-DELETE FROM public.sites WHERE id::text LIKE 'd0%';
-DELETE FROM public.fire_reports WHERE id::text LIKE 'd2%';
-```
-
-## Before launch (owner actions, not code)
-
-1. ~~**Deploy target.**~~ **Done 2026-08-19** â€” live at `green-dz.vercel.app`.
-2. **Supabase dashboard check (2 min).** Auth â†’ Settings: email confirmation ON for signups; password minimum length â‰¥ 8. Not SQL-verifiable (`docs/AUDIT.md` P1 #3).
-3. **Plans + budgets.** Supabase Pro ($25/mo) and Vercel Pro before public launch, per the scale posture in `docs/FEATURES.md` Â§13.
-4. **Load test.** 1k-concurrent home loads against the deployed URL, p95 < 2 s, plus a spam-flood rerun at scale. Needs items 2â€“3 first.
-5. **Real-device testing.** Mid-range Android + slow connection; the Realtime push check on an open map session. The owner's device testing has caught more real bugs than any automated pass.
+1. **Merge decision on `feat/canopy-redesign`** — the Canopy redesign is
+   code-complete: Sprints 0–6, E2E 16/16, unit 219/219, build green, docs
+   current. The owner should do a hands-on pass (both themes, Arabic RTL,
+   phone width, keyboard queue flow) and then explicitly approve the merge.
+2. **Database owner actions** (`docs/DATABASE.md` §Owner dashboard actions):
+   the `spatial_ref_sys` + PostGIS views read-only fix (the 2026-08-30
+   revoke did not stick — verified live 2026-09-12).
+3. **Pending schema:** apply `fire_confirmations` (community vote trust
+   layer; code committed, failing soft until then) — owner approval gates
+   it. SQL: `docs/pending-migrations/`.
+4. **Supabase Pro + Vercel Pro + firewall rules** on public POST endpoints,
+   leaked-password protection toggle, load test (1k concurrent home loads,
+   p95 < 2s) + spam-flood rerun at scale. Per the scale posture.
+5. **Real-device testing:** mid-range Android + slow connection; realtime
+   push check on an open map session.
 
 ## Open decisions (owner call)
 
-- ~~**Arabic/French UI.**~~ **Shipped 2026-08-28** â€” Arabic-first interface with EN toggle (PR #35); PR #9 closed as superseded.
-- **Vendored UI prune.** `src/components/ui/chart.tsx` + `sidebar.tsx` (zero consumers, ~1000 lines) â€” delete or keep as vendored.
-- **Moderator onboarding.** Promotion is admin-driven via `/admin`. Recruiting 58 wilaya moderators is then a people problem, not code â€” plan it separately. (Note: the wilaya count itself is about to become 69.)
+- **Vendored UI prune:** `src/components/ui/chart.tsx` + `sidebar.tsx`
+  (~1000 lines, zero consumers) — delete or keep vendored.
+- **Moderator recruiting:** promotion is admin-driven; recruiting 69 wilaya
+  moderators is a people plan, not code.
+- **Theme default:** Canopy is light-default on the branch (owner D1); the
+  dark token set is canonical in the SSOT — flipping the default later is a
+  one-line change if the owner prefers dark-first.
 
-## Parked (would be real scope, no decision needed yet)
+## Next-up candidates (in rough impact order, all need owner approval)
 
-- **Alerting â€” RESOLVED 2026-09-01 as Web Push (release phase B, not yet pushed).** The old `alert_contacts` design (email/SMS, storage-only, dropped 2026-08-20) was replaced by the delivery-first answer: browser Web Push, free, no provider, no PII beyond the endpoint. `push_subscriptions` table, `FireAlertsCard` on `/fire`, server-side fan-out on fire insert with wilaya scoping. See FEATURES.md Â§11f.
+1. **Canopy follow-ups found during device pass** (whatever the owner's
+   device pass surfaces).
+2. **Client-side scale wall (the launch wall):** the home map loads ALL
+   approved rows client-side (bounded 2000/3000/1000). At ~10k rows the
+   GeoJSON rebuild + realtime invalidation spikes; the designed fix is the
+   `/api/map-data` bounds endpoint (audit Phase B+, designed now, build
+   when needed) — do not pre-build.
+3. **Fire-confirmations follow-ups** once the migration lands: self-vote
+   prevention (submitter excluded — currently only device-hash dedup),
+   reputation weighting (voter_trust), verified_labels export for model
+   retraining.
+4. **Fire-AI plan leftovers** (from the 2026-09-05 plan, archived):
+   coastal/national risk-grid expansion (swap the bundled asset), live
+   forecast instead of climatological estimate.
+5. **submission_meta retention** (opportunistic cleanup in the gate or a
+   cron, keep ~45 days).
+6. **Payload reduction:** first load is tile-heavy (~700-900KB gz);
+   evaluate a lighter basemap style after launch numbers exist.
+7. **Moderator onboarding at scale:** in-app mod guide + training content
+   (people problem, plan separately).
 
-- **`submission_meta` retention policy** (`AUDIT.md` P2 #9): opportunistic cleanup inside the gate insert, or a cron.
-- **Payload reduction** (`AUDIT.md` P2 #8): ~21 MB / 209 requests first load, tile-heavy basemap. Evaluate a lighter basemap style after launch numbers exist.
-- **Field performance data** (`AUDIT.md` P2 #10): PageSpeed Insights / RUM on the deployed URL post-launch.
-- ~~**Commune auto-suggest**~~ **SHIPPED 2026-09-01 (release phase F, not yet pushed)** — the dataset turned out to exist (geoBoundaries ADM3 polygons; islam-re/Algeria-wilayas for the AR+Latin names we actually used). Commune is now a per-wilaya dropdown. See FEATURES.md Â§11l.
-- **Photo CDN**: stay on Supabase storage + proxy + cache headers (current) or move to a dedicated CDN. Cost-vs-simplicity decision, only relevant at scale.
-- **Search, per-wilaya pages, user profiles, leaderboards, sharing cards**: ideas, not plans.
-- **Scale revisit**: the no-auth-hook RLS design (live reads of `user_roles`) is the right call today; revisit if RLS checks ever become a hot path. Same for the 50k-row / 200-concurrent-realtime threshold on the home query.
+## Parked (would be real scope; revisit when relevant)
+
+- Photo CDN beyond Supabase storage + proxy + cache headers.
+- Realtime design check at 500 connections (Pro ceiling); hide ticker
+  behind a client feature flag if limits near.
+- Field performance data (PageSpeed/RUM on the deployed URL post-launch).
+- Search, per-wilaya pages, user profiles, sharing cards (ideas, not plans).
+
+## Mobile app
+
+The companion Expo app exists: `laidanimounir/dz-green-mobile` (Expo SDK 57,
+Expo Router, MapLibre native, sqlite offline outbox, same Supabase). The
+submissions contract shipped (`POST /api/mobile/submissions`, Bearer-authed,
+same gate) and deep-link auth is registered. The one blocker is running a
+development build (Android emulator on Windows is the free path; iOS needs
+Apple Developer signing). Details: `docs/MOBILE.md`.
+
+## Done recently (pointers)
+
+- Canopy redesign Sprints 0–6 + E2E gate repair → `CHANGELOG.md` passes
+  93–102.
+- 69-wilaya division, announcement banner, Web Push, PWA, fire-AI layer
+  phases → `CHANGELOG.md` earlier passes.

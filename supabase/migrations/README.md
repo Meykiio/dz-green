@@ -1,26 +1,24 @@
-# supabase/migrations — change record, NOT a bootstrap path
+# supabase/migrations
 
-**Setting up a fresh project? Do not run this folder.** Use
-[`docs/FULL_SCHEMA_EXPORT.sql`](../../docs/FULL_SCHEMA_EXPORT.sql) — the
-single canonical schema source. It is what actually built the current
-project and it is verified against the live database.
+**This folder holds exactly ONE file: `00000000000000_master_schema.sql`.**
 
-This folder is the chronological record of schema changes. It cannot be
-run in order to reproduce the current project:
+That file is the complete, current database schema (public schema, functions,
+triggers, indexes, RLS, grants, realtime publication, `photos` bucket). It is
+verified against the live database and kept up to date **in place**: whenever
+the schema changes, EDIT the master file to its new final state — do not append
+new incremental migration files.
 
-- The first four files (`20260812…` → `20260815…`) were applied to the
-  **previous** Supabase project (`jvxotfcxolwotcavrluu`), not the current
-  one. The current project (`jnunqilxiajinylgehuh`) was bootstrapped in a
-  single pass from the export file on 2026-08-17 (live migration
-  `20260817012002 green_algeria_full_schema_from_live_export`).
-- The last six files (`20260817…` → `20260818…`) are the real changes
-  since the bootstrap, mirrored into the export as sections 13–18. Their
-  filenames don't match the live migration versions because they were
-  applied through the platform MCP, which assigns its own version labels.
-- Two fixture-DML files (an audit-test insert + its delete, 2026-08-16)
-  were removed from this folder on 2026-08-18 — they were test data, not
-  schema. They remain in git history.
+Rules:
 
-New schema changes land here as a new dated file **and** in
-`docs/FULL_SCHEMA_EXPORT.sql` as a new numbered section, in the same
-commit. `docs/DATABASE.md` tracks what is live.
+1. **A fresh project runs this file once** (postgres/owner role, SQL editor,
+   top to bottom) and ends up with the current schema. Nothing else to run.
+2. **Schema changes edit the master** in the same commit as the code change,
+   and update `docs/DATABASE.md` in the same commit.
+3. **No schema change without the owner's explicit approval** (standing rule).
+4. The live platform project keeps its own migration history in its
+   `schema_migrations` table (platform-managed); this folder is not a replay
+   of it. The one intentional gap is documented in the master header and in
+   `docs/pending-migrations/`.
+
+Pending migrations (owner approval required, NOT yet applied live) live in
+`docs/pending-migrations/`.

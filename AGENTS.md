@@ -57,9 +57,10 @@ fastest real validation path — not a vanity metric.
    are exempt.
 6. **Commit after every phase. Never report a fix complete while it is
    uncommitted.** This is a standing rule from a real, repeated failure.
-7. **Keep `/docs` current** in the same change that makes it stale:
-   `FEATURES.md`, `DATABASE.md`, `PROJECT_STRUCTURE.md`, `CHANGELOG.md`,
-   `SYSTEM_INSTRUCTIONS.md`, `ROADMAP.md`.
+ 7. **Keep `/docs` current** in the same change that makes it stale:
+    `FEATURES.md`, `DATABASE.md`, `PROJECT_STRUCTURE.md`, `CHANGELOG.md`,
+    `SYSTEM_INSTRUCTIONS.md`, `ROADMAP.md` (the doc index is
+    `docs/README.md`; history lives only in CHANGELOG.md).
 8. **No schema change without an explicit request.**
 9. **Instructions meant for another executor go in a `.md` file**, never as
    inline chat text to be copy-pasted.

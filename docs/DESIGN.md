@@ -2,8 +2,8 @@
 
 > **Status: live** on `feat/canopy-redesign` (Sprints 0–6, 2026-09-12). The
 > owner-made SSOT HTML is vendored at `docs/design-system/canopy.html` — that
-> file wins over anything written here. Refactor plan and sprint record:
-> `docs/REDESIGN_CANOPY_PLAN.md`. The token truth is `src/styles.css`.
+> file wins over anything written here. Sprint record:
+> `docs/archive/REDESIGN_CANOPY_PLAN.md`. The token truth is `src/styles.css`.
 
 ## Identity
 
