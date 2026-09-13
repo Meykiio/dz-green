@@ -63,31 +63,31 @@ Layers, outermost first:
 - 2026-09-12: full E2E + unit + build green on the Canopy branch; live
   grants re-verified (see §Open findings for what didn't stick).
 
-## Open findings (owner action required)
+## Open findings (tracked)
 
 1. **PostGIS-owned metadata tables are still client-writable** (verified
    live 2026-09-12): `spatial_ref_sys` (anon INSERT/DELETE allowed), and
-   likely `geometry_columns` / `geography_columns`. The 2026-08-30 revoke
-   ran but did not stick — the tables are extension-owned and the migration
-   role is not the owner. Impact: not reachable through the PostgREST API
-   (metadata tables are not in the API schema), but any client with direct
-   SQL access could corrupt spatial reference data (wilaya derivation
-   DoS). Fix is owner-only SQL: `docs/DATABASE.md` §Owner dashboard
-   actions. GitHub issue #40 tracks it; Supabase support ticket filed
-   2026-08-30.
-2. **Client TRUNCATE/REFERENCES/TRIGGER grant bits** on announcements,
-   receipts, user_roles, moderator_wilayas (Supabase default privileges on
-   newer tables). Not reachable via PostgREST (no TRUNCATE endpoint); RLS
-   blocks row access; the master schema carries the correct revokes for new
-   projects. One-time live cleanup needs an owner-approved migration.
-3. **`fire_reports` INSERT is open to any session by design** (speed over
-   review). The community-confirmations trust layer (pending migration)
-   plus the abuse gate are the mitigation; SEC-01's full answer
-   (reputation weighting) is a follow-up.
-4. **Dashboard toggles that need the owner:** leaked-password protection
+   the `geometry_columns` / `geography_columns` views. Both the migration
+   role (2026-08-30) and the Dashboard SQL editor (2026-09-13,
+   `42501: must be owner of table`) failed — the tables are owned by the
+   PostGIS extension, so only Supabase support can fix it (ticket filed
+   2026-08-30; GitHub issue #40). Not reachable through the PostgREST API.
+   Keep the ticket alive until Supabase confirms the tables are locked.
+2. **`fire_reports` INSERT is open to any session by design** (speed over
+   review). The community-confirmations trust layer (migration pending
+   until the feature ships — see ROADMAP) plus the abuse gate are the
+   mitigation; SEC-01's full answer (reputation weighting) is a follow-up.
+3. **Dashboard toggles that need the owner:** leaked-password protection
    (Pro), email-confirmation setting (deliberately disabled for instant
    signups — emails unverified, staff accounts are admin-created; revisit
    on Pro), custom SMTP if signup volume grows (built-in caps at 2/hour).
+
+## Applied (2026-09-13)
+
+- **Client TRUNCATE/REFERENCES/TRIGGER bits revoked** on announcements,
+  receipts, user_roles, moderator_wilayas (both client roles), verified by
+  `has_table_privilege` = false, read grants untouched. Live now matches
+  the master schema exactly on these tables.
 
 ## Monitoring
 

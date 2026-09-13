@@ -10,12 +10,16 @@ without owner approval**. Completed work lives in `CHANGELOG.md`.
    code-complete: Sprints 0–6, E2E 16/16, unit 219/219, build green, docs
    current. The owner should do a hands-on pass (both themes, Arabic RTL,
    phone width, keyboard queue flow) and then explicitly approve the merge.
-2. **Database owner actions** (`docs/DATABASE.md` §Owner dashboard actions):
-   the `spatial_ref_sys` + PostGIS views read-only fix (the 2026-08-30
-   revoke did not stick — verified live 2026-09-12).
-3. **Pending schema:** apply `fire_confirmations` (community vote trust
-   layer; code committed, failing soft until then) — owner approval gates
-   it. SQL: `docs/pending-migrations/`.
+ 2. **Supabase support ticket (external):** the `spatial_ref_sys` + PostGIS
+    views read-only fix. Not executable by us at all — the tables are owned
+    by the PostGIS extension (Dashboard editor fails with 42501 too);
+    ticket filed 2026-08-30, keep it alive until confirmed fixed
+    (`docs/SECURITY.md` #1).
+ 3. **Pending schema (with the feature's deploy):** apply
+    `fire_confirmations` right before pushing main with the confirmations
+    UI — the code is committed locally but NOT pushed/deployed yet, so the
+    table waits until that push cycle. SQL:
+    `docs/pending-migrations/`.
 4. **Supabase Pro + Vercel Pro + firewall rules** on public POST endpoints,
    leaked-password protection toggle, load test (1k concurrent home loads,
    p95 < 2s) + spam-flood rerun at scale. Per the scale posture.

@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-13 (hundred-fourth pass) — TRUNCATE cleanup applied live; spatial_ref_sys confirmed Supabase-only
+
+- **TRUNCATE/REFERENCES/TRIGGER revoked** on announcements, receipts, user_roles, moderator_wilayas for both client roles (owner approved: "if it's the right thing then do it"). Verified live: `has_table_privilege` = false for anon AND authenticated on all four tables; the read grants they need (announcements SELECT, care_logs SELECT, user_roles column SELECT) untouched. The live database now matches the master schema exactly on every client-role grant. Schema edit policy respected: the master already carried the intended state, so nothing to edit there.
+- **spatial_ref_sys: confirmed beyond our reach.** The Dashboard SQL editor attempt failed with `42501: must be owner of table spatial_ref_sys` — the PostGIS extension owns the table, not even `postgres`. Both the migration path and the Dashboard path are dead ends; the fix is entirely on Supabase support (ticket filed 2026-08-30, GitHub issue #40). DATABASE.md §Owner dashboard actions rewritten to "none executable" + the reference SQL for Supabase; SECURITY.md updated; ROADMAP now tracks the ticket, not an owner action.
+- **fire_confirmations deferred by owner decision** (correct call): the confirmations UI is committed to local main but NOT pushed/deployed, so production never renders vote buttons and the table isn't needed yet. Sequencing rule recorded in ROADMAP: apply the migration in the same cycle as (or just before) the push that deploys the UI. `docs/pending-migrations/` unchanged.
+- **Verified:** live privilege checks (before: 5 × true → after: all false, reads intact); tsc clean, 219/219 unit tests, build green (unchanged code — docs + live grants only).
+
 ## 2026-09-13 (hundred-third pass) — Full documentation audit + restructure — branch `feat/canopy-redesign`
 
 - **Every doc read end to end and re-verified against the code AND the live database** (the MCP now binds correctly to the Green Algeria project; every table, column, policy, grant, function, trigger, index, publication, and bucket checked by SQL). Result: 5 files were substantially stale (DATABASE grant claims false on 4 tables, ROADMAP items closed months ago, FEATURES carried self-contradicting sections, AUDIT was a finished workplan, two planning docs described already-shipped scope).

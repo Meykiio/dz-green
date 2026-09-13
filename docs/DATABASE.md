@@ -145,21 +145,26 @@ bucket — uploads via service role, public reads only via
 - Table-level SELECT: care_logs (anon+authed), announcements (anon+authed).
   Everything else is column-level or absent (see per-table notes).
 - profiles: no anon grants (revoked).
-- **Known excess (hardening gap, open):** `anon` holds grantable
-  TRUNCATE/REFERENCES/TRIGGER table bits on announcements, receipts,
-  user_roles, moderator_wilayas (Supabase default privileges on newer
-  tables; the 2026-08-17 sweep covered only 5 tables). Not reachable via
-  the PostgREST API (no TRUNCATE endpoint), and RLS blocks row access, but
-  the grant surface should be narrowed — owner-approved migration,
-  one-time: see `SECURITY.md` §Open findings. The master schema already
-  carries the correct revokes for new projects.
+- **TRUNCATE/REFERENCES/TRIGGER cleanup (applied live 2026-09-13):** Supabase
+  default privileges had left those bits on announcements, receipts,
+  user_roles, moderator_wilayas for `anon`/`authenticated`; revoked and
+  verified (`has_table_privilege` = false for all), read grants untouched.
+  The master schema already carried the intended state for new projects.
 - PostGIS-owned `spatial_ref_sys` / `geometry_columns` /
-  `geography_columns`: the 2026-08-30 revoke did not stick (extension-owned
-  tables; the migration role is not the owner) — verified live 2026-09-12:
-  anon INSERT/DELETE still allowed. Unreachable through the PostgREST API
-  but a real hardening gap. Fix is owner-only (below).
+  `geography_columns`: still client-writable (verified live 2026-09-12).
+  The 2026-08-30 revoke did not stick AND the Dashboard SQL editor also
+  failed (42501 must be owner of table — the tables are owned by the
+  PostGIS extension, not even `postgres`). Fix is entirely on Supabase
+  support (ticket filed 2026-08-30, GitHub issue #40) — keep the ticket
+  alive until confirmed fixed. Not reachable through the PostgREST API.
 
-## Owner dashboard actions (one-time, postgres role)
+## Owner dashboard actions
+
+None executable: the spatial_ref_sys fix below was attempted from the
+Dashboard SQL editor on 2026-09-13 and failed with `42501: must be owner of
+table spatial_ref_sys` (the PostGIS extension owns the table, not even
+`postgres`). The fix is entirely on Supabase support (ticket filed
+2026-08-30; GitHub issue #40). The SQL for their reference:
 
 ```sql
 -- spatial_ref_sys (+ the PostGIS views) must be read-only for clients:
