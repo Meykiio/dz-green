@@ -214,7 +214,9 @@ function Shell({
           hasAnnouncement={hasAnnouncement}
           brandName={brandName}
           themeButton={themeButton}
-          localePicker={<LocaleDropdown dropUp />}
+          localePicker={
+            <LocaleDropdown dropUp menuClassName="staff-locale-menu" />
+          }
           privacyButton={privacyButton}
           authAction={authAction}
         />

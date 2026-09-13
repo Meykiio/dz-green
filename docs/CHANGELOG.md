@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-13 (hundred-sixth pass) — Collapsed-rail language menu + locate-me alignment — branch `feat/canopy-redesign`
+
+- **Language menu in the collapsed rail** (owner): the anchored panel (144px) overflowed the 78px rail and got cut by the viewport edge. Fixed with a CSS-only rail reposition — when `[data-collapsed="true"]`, the menu opens toward the CONTENT side (logical properties: `inset-inline-start: 100%`, vertically level with the trigger), so it reads correctly in both directions; verified by probe at 1280px: menu at x=69, y=671, 144×118, fully inside the viewport. (The rail only exists at ≥1024px — the earlier 390px probe attempt was a test error, the sidebar is hidden below lg.)
+- **Locate-me alignment** (owner): the geolocate control sat visibly above the centered Map/List/Board bar — a doubled-class specificity rule aligns its center exactly (verified: diff 0px at mobile; the control only ever sits in a top corner on phones, the rule never touches desktop controls).
+- **Verified:** `bunx tsc --noEmit` clean, live privilege/geometry probes, live cleanup by query (fixture user + meta removed, dev server stopped). Docs: CHANGELOG only — DESIGN/ARCHITECTURE describe patterns, not corner coordinates.
+
 ## 2026-09-13 (hundred-fifth pass) — Chrome/chrome fixes: top bar, map top, language menu, the mobile login blocker — branch `feat/canopy-redesign`
 
 - **Root cause of the "mobile login doesn't work" bug (owner report):** the fixed bottom AI-consent banner covers the auth form's submit button on short viewports (the DevTools responsive canvas is ~400-500px tall) — taps hit the banner and vanish. Switching to desktop mode makes the window taller, which is why it "only works there". Fix: while the consent banner is visible, a spacer keeps page content scrollable above it (`ConsentBanner` renders a mobile-only `h-56` flow spacer). Verified by probe: login succeeds at 390×844, 390×480 (short), and desktop 1440. Secondary race also noted and harmless after the fix: tapping before React hydration caused a silent native form reload (`/auth?`).

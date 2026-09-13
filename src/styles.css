@@ -1,4 +1,4 @@
-@import "tailwindcss" source(none);
+﻿@import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
 @import "@fontsource-variable/sora";
@@ -9,39 +9,39 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Green Algeria design system — CANOPY (docs/design-system/canopy.html).
+ * Green Algeria design system â€” CANOPY (docs/design-system/canopy.html).
  * Owner SSOT: C:\Users\DELL\Desktop\greendz-design-system.html (vendored copy
  * at docs/design-system/canopy.html). Refactor plan: docs/REDESIGN_CANOPY_PLAN.md.
  *
  * Light theme is the default (owner decision D1, 2026-09-12): warm paper
  * canvas (#fdfbf8), white cards, canopy green accent (#2F6B3F). The .dark
  * block carries Canopy's canonical night-soil palette (#100d0a, sprout green
- * #6ED08A) — same scale, same shapes, not a separate language.
+ * #6ED08A) â€” same scale, same shapes, not a separate language.
  *
  * Semantic mapping (Canopy rules):
- *   plant → canopy/sprout green (the one accent)
- *   care  → wadi blue (the watering system)
- *   fire  → wildfire amber (the fire-report system ONLY — never decoration)
- *   error → independent red (never reused from wildfire amber)
- *   sand / terracotta → Canopy quaternary + secondary, supporting UI accents
+ *   plant â†’ canopy/sprout green (the one accent)
+ *   care  â†’ wadi blue (the watering system)
+ *   fire  â†’ wildfire amber (the fire-report system ONLY â€” never decoration)
+ *   error â†’ independent red (never reused from wildfire amber)
+ *   sand / terracotta â†’ Canopy quaternary + secondary, supporting UI accents
  *
  * Typography: Sora (display) + DM Sans (body) for Latin; Noto Kufi Arabic
- * (display) + Noto Sans Arabic (body) for Arabic — Sora/DM Sans carry no
+ * (display) + Noto Sans Arabic (body) for Arabic â€” Sora/DM Sans carry no
  * Arabic glyphs (owner decision D2). Font stacks fall through per glyph.
  *
- * Radius (D4): 4 / 8 / 12 / 16 / 24 px — buttons 8px (rounded-md), cards
+ * Radius (D4): 4 / 8 / 12 / 16 / 24 px â€” buttons 8px (rounded-md), cards
  * 16-24px (rounded-lg/xl), chips 4px (rounded-sm), pills keep full.
  *
  * Motion: --ease-out (signature expo) + --ease-spring (soft overshoot),
- * durations .18s / .3s / .55s — applied to interactive elements sprint by
- * sprint (plan §3 Sprint 1+).
+ * durations .18s / .3s / .55s â€” applied to interactive elements sprint by
+ * sprint (plan Â§3 Sprint 1+).
  */
 
 @theme inline {
-  --radius-sm: 0.25rem; /* Canopy r-xs — chips, tags */
-  --radius-md: 0.5rem; /* Canopy r-sm — buttons, inputs */
-  --radius-lg: var(--radius); /* Canopy r-lg — mid cards */
-  --radius-xl: 1.5rem; /* Canopy r-xl — canonical cards */
+  --radius-sm: 0.25rem; /* Canopy r-xs â€” chips, tags */
+  --radius-md: 0.5rem; /* Canopy r-sm â€” buttons, inputs */
+  --radius-lg: var(--radius); /* Canopy r-lg â€” mid cards */
+  --radius-xl: 1.5rem; /* Canopy r-xl â€” canonical cards */
   --radius-2xl: 1.5rem;
   --radius-3xl: 1.5rem;
   --radius-4xl: 1.5rem;
@@ -105,9 +105,9 @@
 }
 
 :root {
-  --radius: 1rem; /* Canopy r-lg 16px — the card-scale base */
+  --radius: 1rem; /* Canopy r-lg 16px â€” the card-scale base */
 
-  /* ── Light (default): warm paper, canopy green ── */
+  /* â”€â”€ Light (default): warm paper, canopy green â”€â”€ */
   --canvas: #fdfbf8; /* Canopy --bg */
   --background: #fdfbf8;
   --foreground: #211c14; /* Canopy --on-surface */
@@ -120,7 +120,7 @@
   --primary-foreground: #ffffff; /* Canopy --on-primary */
   --primary-glow-sm: rgba(47, 107, 63, 0.1); /* focus glow */
   --primary-pale: #eaf3e6; /* soft green tint for badges (derived) */
-  --secondary: #faf7f1; /* Canopy --surface-mid — neutral secondary button */
+  --secondary: #faf7f1; /* Canopy --surface-mid â€” neutral secondary button */
   --secondary-foreground: #211c14;
   --muted: #f0ebe0; /* Canopy --surface-high */
   --muted-foreground: #6e6353; /* Canopy --on-surface-muted */
@@ -133,7 +133,7 @@
   --input: #e2d9c8;
   --ring: rgba(47, 107, 63, 0.45); /* Canopy --primary-glow */
 
-  /* plant → green, care → wadi blue, fire → wildfire amber */
+  /* plant â†’ green, care â†’ wadi blue, fire â†’ wildfire amber */
   --plant: #2f6b3f;
   --plant-foreground: #ffffff;
   --positive-deep: #24522f; /* text on pale-green surfaces */
@@ -170,7 +170,7 @@
 }
 
 .dark {
-  /* ── Dark (toggle): Canopy's canonical night-soil palette ── */
+  /* â”€â”€ Dark (toggle): Canopy's canonical night-soil palette â”€â”€ */
   --canvas: #100d0a; /* Canopy --bg night soil */
   --background: #100d0a;
   --foreground: #f2ede4;
@@ -193,7 +193,7 @@
   --destructive-foreground: #2b0d02;
 
   --border: #2e2519; /* Canopy --outline */
-  --input: #52432c; /* Canopy --outline-hi — visible on night soil */
+  --input: #52432c; /* Canopy --outline-hi â€” visible on night soil */
   --ring: rgba(110, 208, 138, 0.4);
 
   --plant: #6ed08a;
@@ -241,7 +241,7 @@
   }
 
   /* Canopy forms: direction-native alignment + the green focus glow
-     (SSOT §FORM ELEMENTS — border primary + 4px glow ring). One rule here
+     (SSOT Â§FORM ELEMENTS â€” border primary + 4px glow ring). One rule here
      covers every hand-rolled input in the app. */
   input,
   textarea,
@@ -294,7 +294,7 @@
 
 @utility display-hero {
   font-family: var(--font-display);
-  font-weight: 700; /* Canopy display weight — Sora 700 */
+  font-weight: 700; /* Canopy display weight â€” Sora 700 */
   letter-spacing: -0.02em;
   line-height: 1.05;
   text-wrap: balance;
@@ -324,16 +324,16 @@
 }
 
 /* Announcement marquee: two copies loop seamlessly. The track is ALWAYS
-   dir=ltr (geometry identical in both locales — an RTL track blanks out at
+   dir=ltr (geometry identical in both locales â€” an RTL track blanks out at
    -50%, the empty-strip bug the owner caught). Travel direction: LTR
-   right→left (normal 0→-50%), RTL left→right (reverse). Pauses on hover,
+   rightâ†’left (normal 0â†’-50%), RTL leftâ†’right (reverse). Pauses on hover,
    off entirely for reduced-motion. */
 @keyframes ga-marquee {
   from {
     transform: translateX(0);
   }
   to {
-    /* Exactly one copy of two — the copy is guaranteed ≥ window width by the
+    /* Exactly one copy of two â€” the copy is guaranteed â‰¥ window width by the
        repeat logic in the component, so the strip is never empty. */
     transform: translateX(-50%);
   }
@@ -393,7 +393,7 @@
   transition: transform 550ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
-/* Canopy motion tokens (SSOT §SIDEBAR NAVIGATION) */
+/* Canopy motion tokens (SSOT Â§SIDEBAR NAVIGATION) */
 :root {
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
@@ -421,8 +421,29 @@ html.staff-nav-collapsed {
   display: none;
 }
 
+/* Collapsed rail language menu: open toward the CONTENT side (inline-end),
+   vertically level with the trigger â€” inside the narrow rail the default
+   anchored panel overflows the viewport (owner report 2026-09-13).
+   Logical properties keep it mirrored for RTL. */
+[data-collapsed="true"] .staff-locale-menu {
+  inset-inline-start: 100%;
+  inset-inline-end: auto;
+  bottom: auto;
+  top: 0;
+  margin-inline-start: 8px;
+}
+
+/* Mobile: align the geolocate control's center with the centered
+   Map/List/Board bar (toggle: top 12px + ~40px height â†’ center 32px;
+   the default control margin puts the 29px button center at ~24px).
+   Doubled class = specificity over maplibre-gl.css's shorthand margin. */
+.maplibregl-ctrl-top-left .maplibregl-ctrl.maplibregl-ctrl,
+.maplibregl-ctrl-top-right .maplibregl-ctrl.maplibregl-ctrl {
+  margin-block-start: 22px;
+}
+
 /* Clean slim scrollbar for nav surfaces (sidebar, drawer): transparent
-   track, rounded thumb that darkens on hover — smooth, not flashy. */
+   track, rounded thumb that darkens on hover â€” smooth, not flashy. */
 .staff-scroll {
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
@@ -441,7 +462,7 @@ html.staff-nav-collapsed {
   background: var(--muted-foreground);
 }
 
-/* Canopy life layer: scroll reveal (SSOT §LIFE LAYER) */
+/* Canopy life layer: scroll reveal (SSOT Â§LIFE LAYER) */
 .ga-reveal {
   opacity: 0;
   transform: translateY(22px);
@@ -461,7 +482,7 @@ html.staff-nav-collapsed {
   }
 }
 
-/* Drawer staggered group reveal (Canopy §mobile drawer) */
+/* Drawer staggered group reveal (Canopy Â§mobile drawer) */
 @keyframes ga-drawer-in {
   from {
     opacity: 0;
@@ -509,3 +530,4 @@ html.staff-nav-collapsed {
     transition: none;
   }
 }
+

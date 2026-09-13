@@ -16,7 +16,14 @@ const LOCALES: { code: Locale; label: string }[] = [
  * languages one tap away, check on the current one. Closes on outside click
  * and Escape. `dropUp` opens the menu upward (sidebar footer, bottom edge).
  */
-export function LocaleDropdown({ dropUp = false }: { dropUp?: boolean }) {
+export function LocaleDropdown({
+  dropUp = false,
+  menuClassName,
+}: {
+  dropUp?: boolean;
+  /** Extra classes for the menu panel (e.g. the collapsed-rail reposition). */
+  menuClassName?: string;
+}) {
   const { t, locale, setLocale } = useI18n();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -58,6 +65,7 @@ export function LocaleDropdown({ dropUp = false }: { dropUp?: boolean }) {
           className={cn(
             "absolute z-50 w-36 rounded-xl border border-border bg-card p-1 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)]",
             dropUp ? "bottom-full mb-2 end-0" : "end-0 top-full mt-2",
+            menuClassName,
           )}
         >
           {LOCALES.map((l) => (
