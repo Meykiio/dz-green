@@ -178,17 +178,20 @@ function Shell({
         <div className="flex items-center gap-1">
           <EmergencyContacts />
           <FeedbackDialog />
+          {/* GitHub as its own chip, label on sm+ (icon-only on phones — the
+              bar is tight at 320px). Theme lives in the drawer + sidebar
+              footers, not the top bar (owner, 2026-09-13). */}
           <a
             href="https://github.com/Meykiio/dz-green"
             target="_blank"
             rel="noreferrer"
             aria-label={t("chrome.aria.github")}
-            className="tap-target grid size-10 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.96]"
+            className="tap-target inline-flex items-center gap-1.5 rounded-sm border border-border bg-card px-3 py-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           >
-            <Github className="size-5" />
+            <Github className="size-4" />
+            <span className="hidden sm:inline">GitHub</span>
           </a>
           <LocaleDropdown />
-          <span className="hidden sm:inline">{themeButton}</span>
         </div>
       </header>
 
@@ -211,7 +214,7 @@ function Shell({
           hasAnnouncement={hasAnnouncement}
           brandName={brandName}
           themeButton={themeButton}
-          localePicker={<LocaleDropdown />}
+          localePicker={<LocaleDropdown dropUp />}
           privacyButton={privacyButton}
           authAction={authAction}
         />

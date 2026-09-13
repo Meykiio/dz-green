@@ -105,12 +105,14 @@ export function useHeroMapMount({
       // tile-fade animation work.
       maxTileCacheSize: 20,
       fadeDuration: 0,
-      // Attribution stays (OSM data license) but parked at top-start where
-      // nothing else lives — it overlapped the action card at bottom-end.
-      attributionControl: false,
-    });
-    const attribution = new AttributionControl({ compact: true });
-    map.addControl(attribution, ctrlPos);
+    // Attribution (OSM license) at bottom-end: stacks under the geolocate
+    // control on desktop; on phones the geolocate moves to top-end and the
+    // attribution keeps the bottom band clear of the action card. Never
+    // top-start — it collided with the view toggle there.
+    attributionControl: false,
+  });
+  const attribution = new AttributionControl({ compact: true });
+  map.addControl(attribution, ctrlPos === "top-left" ? "bottom-right" : "bottom-left");
     if (creationError) {
       map.remove();
       mapRef.current = null;

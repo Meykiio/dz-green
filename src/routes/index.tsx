@@ -7,6 +7,7 @@ import { ActionCard } from "@/components/home/ActionCard";
 import { ActivityTicker } from "@/components/home/ActivityTicker";
 import { Leaderboard } from "@/components/home/Leaderboard";
 import { useMapRealtime } from "@/components/home/useMapRealtime";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ViewToggle, type HomeView } from "@/components/home/ViewToggle";
 import { DetailPanel } from "@/components/map/DetailPanel";
 import { HeroMap, type Layer } from "@/components/map/HeroMap";
@@ -106,7 +107,7 @@ function HomePage() {
         className={`relative overflow-hidden ${hasAnnouncement ? "h-[calc(100dvh-5.75rem)]" : "h-[calc(100dvh-3.5rem)]"}`}
       >
         {view === "list" ? (
-          <div className="h-full overflow-y-auto bg-background px-3 pb-3 pt-14 md:p-6">
+          <div className="h-full overflow-y-auto bg-background px-3 pb-3 pt-20 md:px-6 md:pb-6 md:pt-20">
             <div className="mx-auto max-w-2xl">
               <SiteList
                 sites={siteList}
@@ -119,7 +120,7 @@ function HomePage() {
             </div>
           </div>
         ) : view === "board" ? (
-          <div className="h-full overflow-y-auto bg-background px-3 pb-3 pt-14 md:p-6">
+          <div className="h-full overflow-y-auto bg-background px-3 pb-3 pt-20 md:px-6 md:pb-6 md:pt-20">
             <div className="mx-auto max-w-2xl">
               <Leaderboard sites={siteList} />
             </div>
@@ -144,14 +145,17 @@ function HomePage() {
 
         {view === "map" && <ActivityTicker message={ticker} />}
 
-        {/* The action card — compact, hideable for a clean map view. */}
-        <ActionCard
-          hidden={cardHidden}
-          onToggle={setCardHidden}
-          stats={stats}
-          layers={layers}
-          onToggleLayer={(layer) => setLayers((l) => ({ ...l, [layer]: !l[layer] }))}
-        />
+        {/* The action card — map view only: in list/board it would float
+            over the scrolled content at narrow desktop widths. */}
+        {view === "map" && (
+          <ActionCard
+            hidden={cardHidden}
+            onToggle={setCardHidden}
+            stats={stats}
+            layers={layers}
+            onToggleLayer={(layer) => setLayers((l) => ({ ...l, [layer]: !l[layer] }))}
+          />
+        )}
       </div>
 
       {feature && (

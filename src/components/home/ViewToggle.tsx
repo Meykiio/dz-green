@@ -11,7 +11,11 @@ const OPTIONS: { value: HomeView; key: "map" | "list" | "board"; icon: typeof Ma
   { value: "board", key: "board", icon: Trophy },
 ];
 
-/** Map / List / Leaderboard switch — floats top-right over the home view. */
+/**
+ * Map / List / Leaderboard switch — centered over the home view.
+ * Icon-only below sm (the bar stays narrow, clear of the map corners and
+ * the locate-me control), labels from sm up, tooltip on every option.
+ */
 export function ViewToggle({
   view,
   onChange,
@@ -32,14 +36,15 @@ export function ViewToggle({
                 onClick={() => onChange(value)}
                 aria-pressed={view === value}
                 aria-label={value === "board" ? t("home.aria.board") : t(`home.aria.${key}`)}
-                className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 transition-colors ${
+                className={`tap-target inline-flex items-center gap-1 rounded-full px-3 py-1.5 transition-colors ${
                   view === value ? "bg-accent text-foreground" : "text-muted-foreground"
                 }`}
               >
-                <Icon className="size-3.5" /> {label}
+                <Icon className="size-3.5" />
+                <span className="hidden sm:inline">{label}</span>
               </button>
             </TooltipTrigger>
-            {value === "board" && <TooltipContent>{t("home.tooltip.board")}</TooltipContent>}
+            <TooltipContent>{label}</TooltipContent>
           </Tooltip>
         );
       })}

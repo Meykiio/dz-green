@@ -26,11 +26,17 @@ export function ConsentBanner() {
   };
 
   return (
-    <div
-      role="dialog"
-      aria-label={t("consent.aria")}
-      className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-lg rounded-2xl border border-border bg-card/95 p-4 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)] backdrop-blur md:inset-x-auto md:bottom-6 md:end-6"
-    >
+    <>
+      {/* While the banner is visible it occupies the mobile viewport's
+          bottom band (fixed); this spacer keeps page content scrollable
+          above it instead of hidden behind it — the short-viewport login
+          bug (submit button covered), 2026-09-13. */}
+      {visible && <div aria-hidden className="h-56 md:hidden" />}
+      <div
+        role="dialog"
+        aria-label={t("consent.aria")}
+        className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-lg rounded-2xl border border-border bg-card/95 p-4 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)] backdrop-blur md:inset-x-auto md:bottom-6 md:end-6"
+      >
       <div className="flex items-start gap-3">
         <Sparkles className="mt-0.5 size-5 shrink-0 text-plant" />
         <div className="min-w-0 flex-1">
@@ -60,5 +66,6 @@ export function ConsentBanner() {
         </button>
       </div>
     </div>
+    </>
   );
 }
