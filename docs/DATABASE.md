@@ -158,16 +158,25 @@ bucket — uploads via service role, public reads only via
   support (ticket filed 2026-08-30, GitHub issue #40) — keep the ticket
   alive until confirmed fixed. Not reachable through the PostgREST API.
 
-## Owner dashboard actions
+### fire_confirmations — community votes, service-role only (applied 2026-09-13)
+fire_report_id (FK CASCADE), voter_key! (daily-rotating device hash), verdict!
+(yes/no/unsure), voter_trust (numeric, default 1.0), created_at!. UNIQUE per
+(report, voter). Zero client grants on the base table; service all. Indexes:
+report_id, voter_key. Plus the public view `fire_confirmation_counts`
+(conf_yes / conf_no / conf_unsure / community_verified — 3+ yes and >70% yes
+ratio) granted to anon + authenticated. The votes write path is the
+service-role server function; no client can read per-voter rows.
 
-None executable: the spatial_ref_sys fix below was attempted from the
-Dashboard SQL editor on 2026-09-13 and failed with `42501: must be owner of
-table spatial_ref_sys` (the PostGIS extension owns the table, not even
-`postgres`). The fix is entirely on Supabase support (ticket filed
-2026-08-30; GitHub issue #40). The SQL for their reference:
+## Supabase support actions (the one thing outside our reach)
+
+`spatial_ref_sys` (+ the PostGIS views) is still client-writable: both the
+migration role (2026-08-30) and the Dashboard SQL editor (2026-09-13) failed
+with `42501: must be owner of table spatial_ref_sys` — the table is owned by
+the PostGIS extension, not even `postgres`. The fix is entirely on Supabase
+support (ticket filed 2026-08-30; GitHub issue #40). Reference SQL for their
+fix:
 
 ```sql
--- spatial_ref_sys (+ the PostGIS views) must be read-only for clients:
 alter table public.spatial_ref_sys enable row level security;
 create policy spatial_ref_sys_read on public.spatial_ref_sys for select using (true);
 revoke insert, update, delete on public.spatial_ref_sys from anon, authenticated, public;
@@ -177,12 +186,6 @@ revoke insert, update, delete on public.geography_columns from anon, authenticat
 select has_table_privilege('anon','public.spatial_ref_sys','delete');  -- must be f
 ```
 Reads keep working (PostGIS transforms unaffected).
-
-## Pending (owner approval)
-
-`fire_confirmations` votes table + public `fire_confirmation_counts` view —
-SQL ready in `pending-migrations/`; app code already committed and failing
-soft until it lands.
 
 ## Deploying to a fresh project
 

@@ -14,8 +14,6 @@
 --
 -- NOT included (intentionally):
 --   * Row data, auth users, Auth provider settings, secrets.
---   * The pending `fire_confirmations` migration — NOT applied to the
---     live project; see docs/pending-migrations/ (owner approval gates it).
 --   * public.spatial_ref_sys hardening: the table is PostGIS-owned; the
 --     RLS/revoke block below only works as the postgres owner. On a fresh
 --     project it may need the same one-time Dashboard run as the source
@@ -497,6 +495,42 @@ DO $$ BEGIN
   EXECUTE 'REVOKE EXECUTE ON FUNCTION public.rls_auto_enable() FROM public';
   EXECUTE 'REVOKE EXECUTE ON FUNCTION public.rls_auto_enable() FROM anon, authenticated';
 EXCEPTION WHEN undefined_function THEN NULL; END $$;
+
+-- ---------------------------------------------------------------------
+-- 14b. fire_confirmations — community votes, service-role only
+-- ---------------------------------------------------------------------
+CREATE TABLE public.fire_confirmations (
+  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  fire_report_id uuid NOT NULL REFERENCES public.fire_reports(id) ON DELETE CASCADE,
+  voter_key      text NOT NULL,   -- daily-rotating device hash, never a raw IP
+  verdict        text NOT NULL CHECK (verdict IN ('yes','no','unsure')),
+  voter_trust    numeric NOT NULL DEFAULT 1.0,
+  created_at     timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (fire_report_id, voter_key)
+);
+
+CREATE INDEX fire_confirmations_report_idx ON public.fire_confirmations (fire_report_id);
+CREATE INDEX fire_confirmations_voter_idx  ON public.fire_confirmations (voter_key);
+
+ALTER TABLE public.fire_confirmations ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON public.fire_confirmations FROM anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.fire_confirmations TO service_role;
+
+-- Public per-fire aggregates only (no per-voter data exposed).
+CREATE OR REPLACE VIEW public.fire_confirmation_counts AS
+SELECT
+  fire_report_id,
+  count(*) FILTER (WHERE verdict = 'yes') AS conf_yes,
+  count(*) FILTER (WHERE verdict = 'no') AS conf_no,
+  count(*) FILTER (WHERE verdict = 'unsure') AS conf_unsure,
+  (count(*) FILTER (WHERE verdict = 'yes') >= 3
+     AND count(*) FILTER (WHERE verdict = 'yes')::numeric
+         / NULLIF(count(*) FILTER (WHERE verdict IN ('yes','no')), 0) > 0.7) AS community_verified
+FROM public.fire_confirmations
+GROUP BY fire_report_id;
+
+GRANT SELECT ON public.fire_confirmation_counts TO anon, authenticated;
 
 -- ---------------------------------------------------------------------
 -- 15. Client-role cleanup on app tables (defense in depth)

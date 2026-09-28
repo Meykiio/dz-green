@@ -2,6 +2,14 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-13 (hundred-seventh pass) — Canopy redesign shipped to production — merged to main + pushed
+
+- **Deploy:** `feat/canopy-redesign` fast-forward-merged into `main` (contains the redesign Sprints 0–6, the fire-AI phases A/E/F, and the community-confirmations feature) and pushed to origin — the Vercel production deploy ships the full Canopy redesign.
+- **`fire_confirmations` migration applied live** (the recorded sequencing rule: it ships with the deploy that carries the UI — the owner's "not yet, I haven't pushed" condition expired with this push). Verified live: table + `fire_confirmation_counts` view exist, service INSERT granted, `anon` denied on the base table, the counts view readable. The feature's whole pipeline is now live: vote buttons, live counts, community-verified badge.
+- **Master schema updated in place** — `fire_confirmations` folded into `00000000000000_master_schema.sql` (§14b: table, indexes, RLS, grants, public counts view); a fresh project gets the full current schema in the one run. `docs/pending-migrations/` is empty again. DATABASE.md gained the table's section; the Supabase-support reference SQL for `spatial_ref_sys` kept in its own section (ticket #40, still with support).
+- **Final pre-push gates, all green:** E2E 16/16 (14 passed + 2 flaky passed on retry) with the documented fixture reset + verified cleanup (zero marker rows/users/emails after the run), unit 219/219, tsc clean, build green.
+- Roadmap updated: pending-schema item resolved; merge decision item resolved (shipped).
+
 ## 2026-09-13 (hundred-sixth pass) — Collapsed-rail language menu + locate-me alignment — branch `feat/canopy-redesign`
 
 - **Language menu in the collapsed rail** (owner): the anchored panel (144px) overflowed the 78px rail and got cut by the viewport edge. Fixed with a CSS-only rail reposition — when `[data-collapsed="true"]`, the menu opens toward the CONTENT side (logical properties: `inset-inline-start: 100%`, vertically level with the trigger), so it reads correctly in both directions; verified by probe at 1280px: menu at x=69, y=671, 144×118, fully inside the viewport. (The rail only exists at ≥1024px — the earlier 390px probe attempt was a test error, the sidebar is hidden below lg.)

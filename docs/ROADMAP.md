@@ -15,16 +15,11 @@ without owner approval**. Completed work lives in `CHANGELOG.md`.
     by the PostGIS extension (Dashboard editor fails with 42501 too);
     ticket filed 2026-08-30, keep it alive until confirmed fixed
     (`docs/SECURITY.md` #1).
- 3. **Pending schema (with the feature's deploy):** apply
-    `fire_confirmations` right before pushing main with the confirmations
-    UI — the code is committed locally but NOT pushed/deployed yet, so the
-    table waits until that push cycle. SQL:
-    `docs/pending-migrations/`.
-4. **Supabase Pro + Vercel Pro + firewall rules** on public POST endpoints,
-   leaked-password protection toggle, load test (1k concurrent home loads,
-   p95 < 2s) + spam-flood rerun at scale. Per the scale posture.
-5. **Real-device testing:** mid-range Android + slow connection; realtime
-   push check on an open map session.
+ 3. **Supabase Pro + Vercel Pro + firewall rules** on public POST endpoints,
+    leaked-password protection toggle, load test (1k concurrent home loads,
+    p95 < 2s) + spam-flood rerun at scale. Per the scale posture.
+ 4. **Real-device testing:** mid-range Android + slow connection; realtime
+    push check on an open map session.
 
 ## Open decisions (owner call)
 
