@@ -593,5 +593,4 @@ ON CONFLICT (id) DO NOTHING;
 --     alter table public.spatial_ref_sys enable row level security;
 --     create policy spatial_ref_sys_read on public.spatial_ref_sys for select using (true);
 --     revoke insert, update, delete on public.spatial_ref_sys from anon, authenticated, public;
--- * The pending fire_confirmations migration (docs/pending-migrations/).
 -- =====================================================================

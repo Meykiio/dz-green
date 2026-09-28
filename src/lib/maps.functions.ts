@@ -26,7 +26,7 @@ export const resolveMapsLink = createServerFn({ method: "POST" })
       const res = await fetch(current, {
         redirect: "manual",
         signal: AbortSignal.timeout(8000),
-        headers: { "user-agent": "GreenAlgeria/1.0 (+https://github.com/notsifeddine/dz-green)" },
+        headers: { "user-agent": "GreenAlgeria/1.0 (+https://github.com/Meykiio/dz-green)" },
       });
 
       if (res.status >= 300 && res.status < 400) {

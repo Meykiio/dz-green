@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-28 (hundred-ninth pass) — stale post-deploy references cleaned
+
+- **Master schema footer:** removed the leftover `-- * The pending fire_confirmations migration (docs/pending-migrations/)` bullet — the migration was applied live and folded into §14b in `abb7b2c`; the comment was the last place still claiming "pending" (header and `docs/pending-migrations/README.md` were already correct). Comment-only change; no SQL semantics touched.
+- **Canonical repo URL in code:** `package.json` `repository.url` and the `resolveMapsLink` user-agent string pointed at `notsifeddine/dz-green` — the frozen archive mirror. Both now point at the canonical `Meykiio/dz-green` (per the 2026-09 home change record).
+- Verified: `bunx tsc --noEmit` clean; live DB still shows `fire_confirmations` + `fire_confirmation_counts` present (checked 2026-09-28).
+
 ## 2026-09-28 (hundred-eighth pass) — runtime architecture diagram in docs
 
 - **`docs/architecture.html` + `docs/architecture.png`** — interactive runtime architecture diagram (browser ↔ Vercel server ↔ Supabase ↔ externals, trust boundaries, reads-via-RLS / writes-via-service-role split) plus a static capture embedded in the root README's developer section. Every node cites source files/lines; pinned to `abb7b2c`; live-DB verified 2026-09-28 (`fire_confirmations` table + `fire_confirmation_counts` view exist). Found while doing this: the master schema's footer comment (line 596) still says the fire_confirmations migration is "pending" — stale after `abb7b2c` applied it; flagged, not changed.
