@@ -2,6 +2,12 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-09-28 (hundred-eighth pass) — runtime architecture diagram in docs
+
+- **`docs/architecture.html` + `docs/architecture.png`** — interactive runtime architecture diagram (browser ↔ Vercel server ↔ Supabase ↔ externals, trust boundaries, reads-via-RLS / writes-via-service-role split) plus a static capture embedded in the root README's developer section. Every node cites source files/lines; pinned to `abb7b2c`; live-DB verified 2026-09-28 (`fire_confirmations` table + `fire_confirmation_counts` view exist). Found while doing this: the master schema's footer comment (line 596) still says the fire_confirmations migration is "pending" — stale after `abb7b2c` applied it; flagged, not changed.
+- Auto-gates green (schema validation, strict provenance against the pinned commit, real-browser checks at 4 viewports × light/dark); 3 minor route crossings remain, advisory only. Diagram working files live in `.archify/` (now gitignored).
+- Docs touched: root `README.md` (image + links), `docs/README.md` (index row 3). `PROJECT_STRUCTURE.md` has no `/docs` section at all (pre-existing gap, left as is).
+
 ## 2026-09-13 (hundred-seventh pass) — Canopy redesign shipped to production — merged to main + pushed
 
 - **Deploy:** `feat/canopy-redesign` fast-forward-merged into `main` (contains the redesign Sprints 0–6, the fire-AI phases A/E/F, and the community-confirmations feature) and pushed to origin — the Vercel production deploy ships the full Canopy redesign.

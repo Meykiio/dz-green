@@ -7,7 +7,7 @@ human or AI agent — can orient in minutes. Read in this order:
 |---|---|---|
 | 1 | `README.md` (this file) | Where everything lives. |
 | 2 | `PLATFORM.md` | What the product IS: purpose, users, flows, rules, trust model. |
-| 3 | `ARCHITECTURE.md` | How it works technically: stack, data flow, request lifecycle, patterns. |
+| 3 | `ARCHITECTURE.md` | How it works technically: stack, data flow, request lifecycle, patterns. Runtime diagram: `architecture.html` (interactive, source-linked) + `architecture.png`. |
 | 4 | `FEATURES.md` | What exists today, feature by feature, with honest verified/unverified status. |
 | 5 | `DATABASE.md` | The live schema truth: every table, RLS policy, grant, function — verified against the live database. |
 | 6 | `DESIGN.md` | The Canopy design system (owner SSOT: `design-system/canopy.html`). |

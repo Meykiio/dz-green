@@ -32,6 +32,9 @@ playwright-report
 .wrangler/
 .dev.vars
 
+# Architecture diagram working files (candidate spec + render receipts)
+.archify/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

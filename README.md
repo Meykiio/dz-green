@@ -52,6 +52,12 @@ Volunteers review plantings and triage fires for their own wilaya — a few minu
 
 React 19 + TypeScript, TanStack Start (SSR + server functions), Vite, Tailwind CSS v4, MapLibre GL, Supabase (Postgres + PostGIS, Auth, Storage, Realtime, RLS).
 
+**Runtime architecture at a glance** — reads go through RLS, writes through service-role server functions:
+
+![Runtime architecture diagram](docs/architecture.png)
+
+Interactive version (pan/zoom, source-linked evidence on every node): [`docs/architecture.html`](docs/architecture.html)
+
 ```bash
 bun install
 cp .env.example .env   # fill in your Supabase values (all vars listed inside)
@@ -74,6 +80,7 @@ INSERT INTO public.user_roles (user_id, role) VALUES ('<your auth user id>', 'ad
 
 - [`docs/PLATFORM.md`](docs/PLATFORM.md) — what the product is: purpose, users, flows, rules
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — how it works: stack, data flow, patterns
+- [`docs/architecture.html`](docs/architecture.html) — interactive runtime architecture diagram (source-linked)
 - [`docs/FEATURES.md`](docs/FEATURES.md) — every feature, honestly: what works, what's unverified
 - [`docs/DATABASE.md`](docs/DATABASE.md) — tables, columns, every RLS policy in plain English
 - [`docs/SECURITY.md`](docs/SECURITY.md) — security posture and open findings
