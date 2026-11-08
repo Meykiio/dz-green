@@ -7,7 +7,6 @@ import { ActionCard } from "@/components/home/ActionCard";
 import { ActivityTicker } from "@/components/home/ActivityTicker";
 import { Leaderboard } from "@/components/home/Leaderboard";
 import { useMapRealtime } from "@/components/home/useMapRealtime";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ViewToggle, type HomeView } from "@/components/home/ViewToggle";
 import { DetailPanel } from "@/components/map/DetailPanel";
 import { HeroMap, type Layer } from "@/components/map/HeroMap";
@@ -15,6 +14,7 @@ import { SiteList } from "@/components/map/SiteList";
 import { ssrT, useI18n } from "@/i18n";
 import { announcementQuery, careLogsQuery, fireReportsQuery, hotspotsQuery, rainFallbackQuery, sitesQuery } from "@/lib/data";
 import { needsWater, type MapFeature, type Site } from "@/lib/types";
+import { useHydrated } from "@/hooks/useHydrated";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,7 +39,8 @@ function HomePage() {
   const careLogs = useQuery(careLogsQuery);
   const fires = useQuery(fireReportsQuery);
   const hotspots = useQuery(hotspotsQuery);
-  const hasAnnouncement = (useQuery(announcementQuery).data ?? []).length > 0;
+  const announcements = useQuery(announcementQuery).data ?? [];
+  const hasAnnouncement = useHydrated() && announcements.length > 0;
 
   const [layers, setLayers] = useState<Record<Layer, boolean>>({
     trees: true,

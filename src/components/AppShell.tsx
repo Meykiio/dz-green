@@ -17,6 +17,7 @@ import { FeedbackDialog } from "@/components/FeedbackDialog";
 import { StaffSidebar } from "@/components/shell/StaffSidebar";
 import { GROUP_SPECS, NAV_ITEMS, type NavItem } from "@/components/shell/nav";
 import { useI18n } from "@/i18n";
+import { useHydrated } from "@/hooks/useHydrated";
 
 const APP_PATHS = ["/moderate", "/admin", "/activity"];
 
@@ -42,7 +43,8 @@ function Shell({
   const { user, isModerator, isAdmin } = useAuth();
   // The announcement strip (when live) sits above the top bar — the chrome
   // yields to it here (same query key as the banner, one shared fetch).
-  const hasAnnouncement = (useQuery(announcementQuery).data ?? []).length > 0;
+  const announcements = useQuery(announcementQuery).data ?? [];
+  const hasAnnouncement = useHydrated() && announcements.length > 0;
   const { theme, toggle } = useTheme();
   const { t, isRtl } = useI18n();
   const { masked, toggle: togglePrivacy } = usePrivacyMode();
