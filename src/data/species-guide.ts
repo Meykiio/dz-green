@@ -39,26 +39,29 @@ export interface GuideSpecies {
   noteEn: string;
   cautionAr?: string;
   cautionEn?: string;
+  /** Fire behaviour (forestry consensus): "resilient" survives or regrows after fire
+   *  (cork bark, resprouting); "prone" is highly flammable and feeds fires. */
+  fire?: "resilient" | "prone";
 }
 
 export const SPECIES_GUIDE: GuideSpecies[] = [
-  { latin: "Pinus halepensis", ar: "صنوبر حلبي", en: "Aleppo pine", fits: ["mediterranean", "semi-arid"], noteAr: "صنوبر التشجير الأول في الجزائر — يتحمل الجفاف", noteEn: "Algeria's main reforestation pine — drought-tolerant" },
-  { latin: "Pinus pinaster", ar: "صنوبر بحري", en: "Maritime pine", fits: ["mediterranean"], noteAr: "خشب سريع النمو — يحتاج الشمال الرطب", noteEn: "Fast timber — needs the humid north" },
+  { latin: "Pinus halepensis", fire: "prone", ar: "صنوبر حلبي", en: "Aleppo pine", fits: ["mediterranean", "semi-arid"], noteAr: "صنوبر التشجير الأول في الجزائر — يتحمل الجفاف", noteEn: "Algeria's main reforestation pine — drought-tolerant" },
+  { latin: "Pinus pinaster", fire: "prone", ar: "صنوبر بحري", en: "Maritime pine", fits: ["mediterranean"], noteAr: "خشب سريع النمو — يحتاج الشمال الرطب", noteEn: "Fast timber — needs the humid north" },
   { latin: "Cedrus atlantica", ar: "أرز أطلسي", en: "Atlas cedar", fits: ["mediterranean"], noteAr: "للجبال العالية فقط — الأطلس والأوراس", noteEn: "High mountains only — Atlas and Aurès ranges" },
-  { latin: "Quercus suber", ar: "بلوط فليني", en: "Cork oak", fits: ["mediterranean"], noteAr: "شجرة القبيلة والشراقة — لحاء الفلين", noteEn: "Kabylie and the far north-east — cork bark" },
-  { latin: "Quercus ilex", ar: "بلوط كبير", en: "Holm oak", fits: ["mediterranean", "semi-arid"], noteAr: "بلوط صلب دائم الخضرة", noteEn: "Hardy evergreen oak" },
-  { latin: "Olea europaea", ar: "زيتون", en: "Olive", fits: ["mediterranean", "semi-arid"], noteAr: "أيقونة الجزائر — مقاوم للجفاف ومثمر", noteEn: "Algeria's icon — drought-hardy and productive" },
-  { latin: "Ceratonia siliqua", ar: "خروب", en: "Carob", fits: ["mediterranean"], noteAr: "مقاوم جدًا للجفاف — تلال الساحل", noteEn: "Very drought-tolerant — coastal hills" },
+  { latin: "Quercus suber", fire: "resilient", ar: "بلوط فليني", en: "Cork oak", fits: ["mediterranean"], noteAr: "شجرة القبيلة والشراقة — لحاء الفلين", noteEn: "Kabylie and the far north-east — cork bark" },
+  { latin: "Quercus ilex", fire: "resilient", ar: "بلوط كبير", en: "Holm oak", fits: ["mediterranean", "semi-arid"], noteAr: "بلوط صلب دائم الخضرة", noteEn: "Hardy evergreen oak" },
+  { latin: "Olea europaea", fire: "resilient", ar: "زيتون", en: "Olive", fits: ["mediterranean", "semi-arid"], noteAr: "أيقونة الجزائر — مقاوم للجفاف ومثمر", noteEn: "Algeria's icon — drought-hardy and productive" },
+  { latin: "Ceratonia siliqua", fire: "resilient", ar: "خروب", en: "Carob", fits: ["mediterranean"], noteAr: "مقاوم جدًا للجفاف — تلال الساحل", noteEn: "Very drought-tolerant — coastal hills" },
   { latin: "Ficus carica", ar: "تين", en: "Fig", fits: ["mediterranean", "semi-arid"], noteAr: "فاكهة قليلة الماء وشديدة التحمل", noteEn: "Water-frugal, very hardy fruit tree" },
   { latin: "Prunus dulcis", ar: "لوز", en: "Almond", fits: ["mediterranean", "semi-arid"], noteAr: "يزهر مبكرًا — يناسب الهضاب", noteEn: "Early blossom — suits the high plateaus" },
-  { latin: "Pistacia lentiscus", ar: "مصطكى", en: "Mastic", fits: ["mediterranean", "semi-arid"], noteAr: "شجيرة محلية شديدة التحمل", noteEn: "Native, extremely hardy shrub" },
+  { latin: "Pistacia lentiscus", fire: "resilient", ar: "مصطكى", en: "Mastic", fits: ["mediterranean", "semi-arid"], noteAr: "شجيرة محلية شديدة التحمل", noteEn: "Native, extremely hardy shrub" },
   { latin: "Pistacia vera", ar: "فستق", en: "Pistachio", fits: ["semi-arid", "arid"], noteAr: "قيمة عالية للهضاب الجافة", noteEn: "High-value crop for dry plateaus", cautionAr: "يحتاج سقيًا تكميليًا في المناطق الجافة", cautionEn: "Needs irrigation in dry zones" },
   { latin: "Phoenix dactylifera", ar: "نخلة", en: "Date palm", fits: ["arid"], noteAr: "سيّدة الواحات الصحراوية", noteEn: "The Saharan oasis staple", cautionAr: "تحتاج مياهًا جوفية — للواحات فقط", cautionEn: "Needs groundwater — oases only" },
   { latin: "Argania spinosa", ar: "أركان", en: "Argan", fits: ["semi-arid"], noteAr: "كنز مستوطن للسغاية الجنوبية الغربية", noteEn: "Endemic treasure of the south-western steppe" },
   { latin: "Ziziphus lotus", ar: "سدر", en: "Christ's thorn jujube", fits: ["semi-arid", "arid"], noteAr: "محلي — من أشد الأشجار تحملًا للجفاف", noteEn: "Native — among the most drought-hardy trees" },
   { latin: "Tamarix aphylla", ar: "أثل", en: "Tamarisk", fits: ["semi-arid", "arid"], noteAr: "مصد رياح يتحمل الملوحة والجفاف", noteEn: "Salt- and drought-tolerant windbreak" },
   { latin: "Vachellia tortilis", ar: "سنط مظلي", en: "Umbrella thorn acacia", fits: ["arid"], noteAr: "شجرة الصحراء العميقة الجذور", noteEn: "Deep-rooted desert tree" },
-  { latin: "Eucalyptus globulus", ar: "كالبتوس", en: "Eucalyptus", fits: ["mediterranean"], noteAr: "سريع النمو جدًا", noteEn: "Very fast growing", cautionAr: "شره للماء — لا تغرسه قرب مصادر المياه", cautionEn: "Water-hungry — keep away from water sources" },
+  { latin: "Eucalyptus globulus", fire: "prone", ar: "كالبتوس", en: "Eucalyptus", fits: ["mediterranean"], noteAr: "سريع النمو جدًا", noteEn: "Very fast growing", cautionAr: "شره للماء — لا تغرسه قرب مصادر المياه", cautionEn: "Water-hungry — keep away from water sources" },
   { latin: "Cupressus sempervirens", ar: "سرو", en: "Italian cypress", fits: ["mediterranean", "semi-arid"], noteAr: "مصد رياح قليل الماء", noteEn: "Low-water windbreak" },
   { latin: "Juniperus phoenicea", ar: "عرعر فينيقي", en: "Phoenician juniper", fits: ["semi-arid", "arid"], noteAr: "صنوبرية محلية لجبال الأطلس والأوراس", noteEn: "Native conifer of the Atlas and Aurès mountains" },
 ];

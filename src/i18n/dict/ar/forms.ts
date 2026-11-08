@@ -22,6 +22,7 @@ export const forms: typeof import("../en/forms").forms = {
     identifyFailed: "تعذّر التعرف على هذه الصورة — اكتب النوع إن كنت تعرفه.",
     guideTitle: "ماذا تغرس في {wilaya}",
     guideEvidence: "مسجّلة تنمو في ولايتك ({count} سجل)",
+    guideFireProne: "سريع الاشتعال: تجنّبه قرب الغابات وفي الأراضي التي احترقت سابقًا.",
     guideFit: "تناسب مناخ ولايتك",
     guideNote: "اقتراحات من ملاءمة المناخ وما هو مسجّل ينمو هناك — ونصيحة المحليين تبقى أولى.",
     notes: "ملاحظات (اختياري)",

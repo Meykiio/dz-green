@@ -22,6 +22,7 @@ export const forms = {
     identifyFailed: "Couldn't identify this one — type it if you know it.",
     guideTitle: "What to plant in {wilaya}",
     guideEvidence: "recorded growing in your wilaya ({count} records)",
+    guideFireProne: "Burns easily: avoid it near forests and on land that has already burned.",
     guideFit: "fits your wilaya's climate",
     guideNote: "Suggestions from climate fit + what's recorded growing there — local advice always wins.",
     notes: "Notes (optional)",

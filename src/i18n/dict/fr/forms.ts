@@ -22,6 +22,7 @@ export const forms = {
     identifyFailed: "Impossible d'identifier celle-ci — tapez-la si vous la connaissez.",
     guideTitle: "Que planter dans {wilaya}",
     guideEvidence: "observée poussant dans votre wilaya ({count} relevés)",
+    guideFireProne: "Brûle facilement : à éviter près des forêts et sur les terres déjà brûlées.",
     guideFit: "adaptée au climat de votre wilaya",
     guideNote: "Suggestions d'après le climat et ce qui y pousse déjà — l'avis des gens du coin reste prioritaire.",
     notes: "Notes (optionnel)",

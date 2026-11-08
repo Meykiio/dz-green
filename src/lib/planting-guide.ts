@@ -40,3 +40,27 @@ export function suggestForWilaya(code: string): PlantSuggestion[] {
   });
   return out.slice(0, MAX_SUGGESTIONS);
 }
+
+/**
+ * Restoration suggestions for land exposed to fire: highly flammable species
+ * (pines, eucalyptus) are left out, and fire-resilient natives (cork and holm
+ * oak, carob, olive, mastic) come first, then the usual evidence ordering.
+ * Used by the "Where to plant" page when the wilaya has notable fire risk.
+ */
+export function suggestForFireExposed(code: string): PlantSuggestion[] {
+  const climate = WILAYA_CLIMATE[code];
+  if (!climate) return [];
+  const evidenceLatin = new Map(
+    (WILAYA_SPECIES[code] ?? []).map((e) => [binomial(e.latin), e.count]),
+  );
+  const out: PlantSuggestion[] = [];
+  for (const species of SPECIES_GUIDE) {
+    if (!species.fits.includes(climate) || species.fire === "prone") continue;
+    const count = evidenceLatin.get(binomial(species.latin));
+    out.push(count != null ? { species, reason: "evidence", count } : { species, reason: "fit" });
+  }
+  const rank = (s: PlantSuggestion) =>
+    (s.species.fire === "resilient" ? 0 : 2) + (s.reason === "evidence" ? 0 : 1);
+  out.sort((a, b) => rank(a) - rank(b) || (b.count ?? 0) - (a.count ?? 0));
+  return out.slice(0, MAX_SUGGESTIONS);
+}
