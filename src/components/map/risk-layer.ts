@@ -4,7 +4,7 @@ import type { FeatureCollection } from "geojson";
 import type { MapFeature } from "@/lib/types";
 
 /**
- * Fire-risk layer (Kabylie model, climatological estimate). Distinct from
+ * Fire-risk layer (Kabylie priority map, relative rank). Distinct from
  * everything else on the map: a soft fill of small circles colored by risk
  * (yellow -> orange -> dark red), no pulse — the pulsing stays the
  * community-fire signature, and the ramp must never read as a live fire.
@@ -21,10 +21,12 @@ export function addRiskLayers(
     "interpolate",
     ["linear"],
     ["get", "risk"],
+    // Stops follow the rank bands (src/lib/risk.ts): dark red = top 10% of
+    // land, orange = top 30%, yellow-green below.
     0, "#1a9850",
-    0.3, "#fee08b",
-    0.6, "#f46d43",
-    0.85, "#a50026",
+    0.5, "#fee08b",
+    0.7, "#f46d43",
+    0.9, "#a50026",
   ];
   map.addLayer({
     id: "ga-risk-points",

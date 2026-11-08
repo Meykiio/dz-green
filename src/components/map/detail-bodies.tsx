@@ -7,7 +7,7 @@ import { useI18n } from "@/i18n";
 import { photoUrl } from "@/lib/data";
 import { directionsUrl } from "@/lib/maps-link";
 import type { FireReport, Hotspot } from "@/lib/types";
-import type { RiskPoint } from "@/lib/risk";
+import { riskBand, riskTopShare, type RiskPoint } from "@/lib/risk";
 import { wilayaCodeForPoint } from "@/lib/geo";
 import { compass, pm25Band } from "@/lib/weather";
 import { getAirQuality, getFireWeather } from "@/lib/weather.functions";
@@ -173,13 +173,13 @@ export function FireBody({ fire }: { fire: FireReport }) {
 export function RiskBody({ risk }: { risk: RiskPoint }) {
   const { t } = useI18n();
   const wilayaCode = wilayaCodeForPoint(risk.lat, risk.lng);
-  const pct = Math.round(risk.risk * 100);
-  const band = risk.risk >= 0.7 ? "high" : risk.risk >= 0.4 ? "medium" : "low";
+  const pct = riskTopShare(risk.risk);
+  const band = riskBand(risk.risk);
   return (
     <div className="mt-4 space-y-4">
       <dl className="grid grid-cols-2 gap-3 text-sm">
         {wilayaCode && <Field label={t("home.detail.field.wilaya")} value={wilayaName(wilayaCode)} />}
-        <Field label={t("home.detail.risk.score")} value={`${pct}%`} />
+        <Field label={t("home.detail.risk.score")} value={t("home.detail.risk.rankValue", { pct })} />
         <Field label={t("home.detail.risk.band")} value={t(`home.detail.risk.bandValue.${band}`)} />
       </dl>
       <FireWeatherBlock lat={risk.lat} lng={risk.lng} />

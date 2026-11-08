@@ -1,6 +1,27 @@
 import { describe, expect, it } from "vitest";
 
-import { RISK_POINTS, riskGeoJSON } from "@/lib/risk";
+import { RISK_POINTS, riskBand, riskGeoJSON, riskTopShare } from "@/lib/risk";
+
+describe("risk rank (relative priority, not a probability)", () => {
+  it("is spread evenly: about 10% of cells are High, 20% Medium", () => {
+    const high = RISK_POINTS.filter((p) => riskBand(p.risk) === "high").length;
+    const medium = RISK_POINTS.filter((p) => riskBand(p.risk) === "medium").length;
+    expect(high / RISK_POINTS.length).toBeGreaterThan(0.09);
+    expect(high / RISK_POINTS.length).toBeLessThan(0.12);
+    expect(medium / RISK_POINTS.length).toBeGreaterThan(0.18);
+    expect(medium / RISK_POINTS.length).toBeLessThan(0.22);
+  });
+
+  it("maps rank to bands and top-share", () => {
+    expect(riskBand(0.95)).toBe("high");
+    expect(riskBand(0.9)).toBe("high");
+    expect(riskBand(0.75)).toBe("medium");
+    expect(riskBand(0.5)).toBe("low");
+    expect(riskTopShare(0.95)).toBe(5);
+    expect(riskTopShare(1)).toBe(1);
+    expect(riskTopShare(0)).toBe(100);
+  });
+});
 
 describe("risk points data", () => {
   it("exposes the Kabylie grid with valid coordinates and scores", () => {
