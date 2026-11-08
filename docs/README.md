@@ -16,6 +16,8 @@ human or AI agent — can orient in minutes. Read in this order:
 | 9 | `SECURITY.md` | Security posture, hardening history, open findings. |
 | 10 | `SYSTEM_INSTRUCTIONS.md` | Standing rules for anyone working in this repo (process, not product). |
 | 11 | `CHANGELOG.md` | Append-only work log, newest first. History lives here, nowhere else. |
+| 12 | `HANDOFF_FIRE_AI_CONTEXT.md` | The fire-prediction work: data inventory, what was wrong with the old model, the rebuild, the national model. Start at its top note. |
+| 13 | `../ml/fire-risk/README.md` | How to run and update the fire-risk models (every January). |
 
 ## Special folders
 
