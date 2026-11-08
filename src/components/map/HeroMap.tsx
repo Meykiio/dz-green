@@ -11,12 +11,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useI18n } from "@/i18n";
 import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
 import type { FeatureCollection } from "geojson";
-import { DARK_STYLE, LIGHT_STYLE, colorsFor } from "./map-style";
+import { DARK_STYLE, LIGHT_STYLE } from "./map-style";
 import { featureCollection, onlyKind, withoutKind } from "./map-data";
-import { applyAlgeriaLabelFilter, addDataLayers, applyLayerVisibility, type Layer } from "./map-layers";
-import { wireInteractions } from "./map-interactions";
+import { applyLayerVisibility, type Layer } from "./map-layers";
+import { installLayers } from "./map-setup";
 import { useHeroMapMount } from "./useHeroMapMount";
-import { addHotspotLayers, setHotspotsData } from "./hotspots-layer";
+import { setHotspotsData } from "./hotspots-layer";
 import { MapFailureOverlay, type MapFailure } from "./map-failure";
 
 export type { Layer };
@@ -96,15 +96,7 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
     const style = theme === "dark" ? DARK_STYLE : LIGHT_STYLE;
     if (style === styleRef.current) return;
     styleRef.current = style;
-    const once = () => {
-      applyAlgeriaLabelFilter(map);
-      addDataLayers(map, refs);
-      wireInteractions(map, refs);
-      addHotspotLayers(map, colorsFor(themeRef.current).hotspots, (f) =>
-        selectRef.current(f),
-      );
-      setHotspotsData(map, hotspotsRef.current);
-    };
+    const once = () => installLayers(map, refs, hotspotsRef.current);
     map.once("style.load", once);
     map.setStyle(style);
   }, [theme]);

@@ -53,8 +53,6 @@ export function LocationField({
 }: Props) {
   const { t, locale } = useI18n();
   const [showMap, setShowMap] = useState(showMapByDefault);
-  const [locating, setLocating] = useState(false);
-  const [bestAccuracy, setBestAccuracy] = useState<number | null>(null);
   const [wilayaTouched, setWilayaTouched] = useState(false);
   const [autoFilled, setAutoFilled] = useState<"pin" | "ip" | null>(null);
   const wilayaRef = useRef(wilaya);
@@ -150,7 +148,7 @@ export function LocationField({
               {t("forms.location.useNow")}
             </Button>
           )}
-          {hasPin && !locating && onClearLocation && (
+          {hasPin && !gps.locating && onClearLocation && (
             <Button type="button" variant="ghost" onClick={onClearLocation} className="tap-target">
               {t("forms.location.removePin")}
             </Button>
@@ -166,6 +164,11 @@ export function LocationField({
             </Button>
           )}
         </div>
+        {!gps.locating && gps.error && (
+          <p className="mt-1 text-xs text-destructive" role="alert">
+            {t(gps.error === "denied" ? "forms.location.gpsDenied" : "forms.location.gpsUnavailable")}
+          </p>
+        )}
         {gps.locating && (
           <p className="mt-1 text-xs text-muted-foreground" aria-live="polite">
             {gps.bestAccuracy != null

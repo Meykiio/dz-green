@@ -12,6 +12,9 @@ export function addHotspotLayers(
   map: MapLibreMap,
   color: string,
   onSelect: (feature: MapFeature) => void,
+  /** Attach click/hover handlers. False on re-adds after a style swap:
+   *  layer-id handlers survive setStyle, re-adding stacks duplicates. */
+  wire = true,
 ) {
   map.addSource("ga-hotspots", {
     type: "geojson",
@@ -51,6 +54,7 @@ export function addHotspotLayers(
       ],
     },
   });
+  if (!wire) return;
   map.on("click", "ga-hotspots-points", (e: MapLayerMouseEvent) => {
     const props = e.features?.[0]?.properties;
     if (!props) return;
@@ -71,8 +75,3 @@ export function setHotspotsData(map: MapLibreMap, data: FeatureCollection) {
   }
 }
 
-export function applyHotspotVisibility(map: MapLibreMap, visible: boolean) {
-  if (map.getLayer("ga-hotspots-points")) {
-    map.setLayoutProperty("ga-hotspots-points", "visibility", visible ? "visible" : "none");
-  }
-}

@@ -4,7 +4,8 @@ import { Sparkles, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n";
-import { getAiConsent, setAiConsent, shouldShowConsent } from "@/lib/ai-consent";
+import { setAiConsent, shouldShowConsent } from "@/lib/ai-consent";
+import { useHydrated } from "@/hooks/useHydrated";
 
 /**
  * First-visit AI-training consent banner (Phase F). A small, honest banner
@@ -14,15 +15,17 @@ import { getAiConsent, setAiConsent, shouldShowConsent } from "@/lib/ai-consent"
  */
 export function ConsentBanner() {
   const { t } = useI18n();
-  const [visible, setVisible] = useState(shouldShowConsent);
-  const [choice, setChoice] = useState<"accepted" | "declined" | null>(getAiConsent());
+  // The stored choice lives in localStorage, which the server cannot see:
+  // decide only after hydration so server and first client render match.
+  const hydrated = useHydrated();
+  const [dismissed, setDismissed] = useState(false);
+  const visible = hydrated && !dismissed && shouldShowConsent();
 
   if (!visible) return null;
 
   const decide = (value: "accepted" | "declined") => {
     setAiConsent(value);
-    setChoice(value);
-    setVisible(false);
+    setDismissed(true);
   };
 
   return (
@@ -58,7 +61,7 @@ export function ConsentBanner() {
         </div>
         <button
           type="button"
-          onClick={() => setVisible(false)}
+          onClick={() => setDismissed(true)}
           aria-label={t("consent.dismiss")}
           className="tap-target -me-1 -mt-1 grid shrink-0 place-items-center rounded-full text-muted-foreground hover:text-foreground"
         >

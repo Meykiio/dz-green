@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { latestAcceptedISO } from "@/lib/dates";
 
 const gateShape = {
   hp: z.string().optional().nullable(),
@@ -12,7 +13,7 @@ const pastDate = z
   .string()
   .min(8)
   .max(10)
-  .refine((s) => s <= new Date().toISOString().slice(0, 10), {
+  .refine((s) => s <= latestAcceptedISO(), {
     message: "Date can't be in the future.",
   });
 

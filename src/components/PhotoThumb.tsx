@@ -1,7 +1,6 @@
 import { Flame, Sprout } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { cn } from "@/lib/utils";
 
 /**
  * Photo with a Canopy fallback: when a photo is missing or its storage

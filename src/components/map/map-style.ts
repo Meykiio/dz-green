@@ -1,7 +1,6 @@
 import {
   setRTLTextPlugin,
   setWorkerUrl,
-  type Map as MapLibreMap,
 } from "maplibre-gl";
 import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 

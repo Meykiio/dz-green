@@ -16,6 +16,8 @@ export const WATCH_BUDGET_MS = 12000;
 export function useGpsWatch(onFix: (lat: number, lng: number, accuracy: number) => void) {
   const [locating, setLocating] = useState(false);
   const [bestAccuracy, setBestAccuracy] = useState<number | null>(null);
+  /** Why the last attempt produced no fix (it used to fail silently). */
+  const [error, setError] = useState<"denied" | "unavailable" | null>(null);
   const watchIdRef = useRef<number | null>(null);
   const watchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bestFixRef = useRef<GpsFix | null>(null);
@@ -43,7 +45,11 @@ export function useGpsWatch(onFix: (lat: number, lng: number, accuracy: number) 
   }
 
   function start() {
-    if (typeof navigator === "undefined" || !navigator.geolocation) return;
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      setError("unavailable");
+      return;
+    }
+    setError(null);
     setLocating(true);
     setBestAccuracy(null);
     bestFixRef.current = null;
@@ -60,7 +66,11 @@ export function useGpsWatch(onFix: (lat: number, lng: number, accuracy: number) 
         }
         if (acc <= GOOD_ENOUGH_M) finish();
       },
-      () => finish(),
+      (err) => {
+        const noFix = fixesRef.current.length === 0 && !bestFixRef.current;
+        if (noFix) setError(err.code === err.PERMISSION_DENIED ? "denied" : "unavailable");
+        finish();
+      },
       { enableHighAccuracy: true, maximumAge: 0 },
     );
     watchTimeoutRef.current = setTimeout(finish, WATCH_BUDGET_MS);
@@ -69,5 +79,5 @@ export function useGpsWatch(onFix: (lat: number, lng: number, accuracy: number) 
   const isAndroid =
     typeof navigator !== "undefined" && /android/i.test(navigator.userAgent);
 
-  return { locating, bestAccuracy, isAndroid, start, finish };
+  return { locating, bestAccuracy, error, isAndroid, start, finish };
 }

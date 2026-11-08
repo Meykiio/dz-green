@@ -44,6 +44,15 @@ function ReceiptPage() {
 
         {receipt.isLoading && <p className="mt-6 text-muted-foreground">{t("info.receipt.checking")}</p>}
 
+        {receipt.isError && (
+          <div className="mt-6 rounded-lg border border-border bg-card p-5" role="alert">
+            <p className="font-medium">{t("info.receipt.loadError")}</p>
+            <Button variant="outline" className="mt-3" onClick={() => void receipt.refetch()}>
+              {t("info.receipt.retry")}
+            </Button>
+          </div>
+        )}
+
         {receipt.data === null && (
           <div className="mt-6 rounded-lg border border-border bg-card p-5">
             <p className="font-medium">{t("info.receipt.notFound")}</p>
@@ -55,11 +64,10 @@ function ReceiptPage() {
           <div className="mt-6 space-y-4 rounded-lg border border-border bg-card p-5">
             <div className="flex items-center justify-between gap-3">
               <p className="font-medium">
-                {t(`info.receipt.kind.${receipt.data.kind}`) ||
-                  t("info.receipt.kind.fallback")}
+                {t(`info.receipt.kind.${receipt.data.kind}`)}
               </p>
               <p className={`text-sm font-semibold ${STATUS_TONE[receipt.data.status] ?? ""}`}>
-                {t(`info.receipt.status.${receipt.data.status}`) || receipt.data.status}
+                {t(`info.receipt.status.${receipt.data.status === "false_alarm" ? "falseAlarm" : receipt.data.status}`)}
               </p>
             </div>
             <p className="text-sm text-muted-foreground">
@@ -82,9 +90,11 @@ function ReceiptPage() {
         )}
 
         <div className="mt-6">
-          <Link to="/">
-            <Button variant="secondary">{t("info.receipt.back")}</Button>
-          </Link>
+          {/* asChild: one link, not a button nested inside a link (invalid HTML,
+              two tab stops for one action). */}
+          <Button asChild variant="secondary">
+            <Link to="/">{t("info.receipt.back")}</Link>
+          </Button>
         </div>
       </div>
     </AppShell>

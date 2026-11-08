@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CARE_WINDOW_DAYS, needsWater, type CareLog, type Site } from "@/lib/types";
+import { needsWater, type CareLog, type Site } from "@/lib/types";
 
 const DAY = 86400000;
 

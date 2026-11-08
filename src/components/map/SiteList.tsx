@@ -33,7 +33,7 @@ type Item =
  * hero; this is the scannable fallback for visitors the map frustrates.
  */
 export function SiteList({ sites, careLogs, fires, layers, rainBySiteId, onSelectFeature }: Props) {
-  const { t, count, formatDateShort } = useI18n();
+  const { t, count } = useI18n();
   const items: Item[] = [
     ...(layers.trees
       ? sites.map((site) => ({ kind: "site" as const, date: site.created_at, site }))
@@ -53,7 +53,10 @@ export function SiteList({ sites, careLogs, fires, layers, rainBySiteId, onSelec
 
   // Group by wilaya; groups ordered by their most recent activity.
   const groups = new Map<string, Item[]>();
-  for (const item of items.slice(0, 60)) {
+  // Newest 60 overall. The slice used to run on the unsorted array (all
+  // sites, then fires), so with 60+ sites no fire was ever listed.
+  const recent = [...items].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 60);
+  for (const item of recent) {
     const code = item.kind === "site" ? item.site.wilaya_code : item.fire.wilaya_code;
     const list = groups.get(code) ?? [];
     list.push(item);

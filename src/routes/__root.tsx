@@ -125,7 +125,9 @@ function RootShell({ children }: { children: ReactNode }) {
   initLocale();
   const locale = getLocale();
   return (
-    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>
+    // suppressHydrationWarning: the no-flash theme script sets class="dark"
+    // on <html> before React loads, on purpose (this element only).
+    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{

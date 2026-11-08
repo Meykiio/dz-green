@@ -178,11 +178,9 @@ function Empty({ text, cta }: { text: string; cta: { to: string; label: string }
   return (
     <div className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-dashed border-border px-4 py-4">
       <p className="text-sm text-muted-foreground">{text}</p>
-      <Link to={cta.to}>
-        <Button size="sm" variant="secondary">
-          {cta.label}
-        </Button>
-      </Link>
+      <Button asChild size="sm" variant="secondary">
+        <Link to={cta.to}>{cta.label}</Link>
+      </Button>
     </div>
   );
 }

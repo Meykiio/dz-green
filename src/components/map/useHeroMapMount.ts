@@ -6,15 +6,12 @@ import {
   Map as MapLibreMap,
   type ErrorEvent,
 } from "maplibre-gl";
-import type { FeatureCollection, Feature, Geometry, GeoJsonProperties } from "geojson";
+import type { FeatureCollection, Geometry, GeoJsonProperties } from "geojson";
 
 import type { CareLog, FireReport, MapFeature, Site } from "@/lib/types";
-import { DARK_STYLE, LIGHT_STYLE, NORTH_BOUNDS, colorsFor } from "./map-style";
-import { applyAlgeriaLabelFilter, addDataLayers, startPulse, type Layer } from "./map-layers";
-import { wireInteractions } from "./map-interactions";
-import { addHotspotLayers, setHotspotsData } from "./hotspots-layer";
-import { addRiskLayers, setRiskData } from "./risk-layer";
-import { riskGeoJSON } from "@/lib/risk";
+import { DARK_STYLE, LIGHT_STYLE, NORTH_BOUNDS } from "./map-style";
+import { startPulse, type Layer, type LayerRefs } from "./map-layers";
+import { installLayers } from "./map-setup";
 import { webgl2Available, type MapFailure } from "./map-failure";
 
 export type MapFeatureCollection = FeatureCollection<Geometry, GeoJsonProperties>;
@@ -157,15 +154,7 @@ export function useHeroMapMount({
       // failure — clear it and continue (same state the context-restore
       // path uses).
       onFailure(null);
-      applyAlgeriaLabelFilter(map);
-      addDataLayers(map, refs);
-      wireInteractions(map, refs);
-      addHotspotLayers(map, colorsFor(refs.themeRef.current).hotspots, (f) =>
-        refs.selectRef.current(f),
-      );
-      setHotspotsData(map, hotspotsRef.current);
-      addRiskLayers(map, (f) => refs.selectRef.current(f));
-      setRiskData(map, riskGeoJSON());
+      installLayers(map, refs as LayerRefs, hotspotsRef.current);
       startPulse(map, pulseRef, cancelledRef);
     };
     // "load" can stall forever when a sub-resource (sprite/glyphs) is

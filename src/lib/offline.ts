@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 
 import { getLocale } from "@/i18n/locale";
-import { ar, en } from "@/i18n/dict";
+import { ar, en, fr } from "@/i18n/dict";
 
 /**
  * Submits with offline tolerance: if the device is offline (or the request
@@ -25,7 +25,8 @@ export async function submitResilient<T>(run: () => Promise<T>): Promise<T | "qu
 }
 
 function toastText(path: "offlineQueued" | "offlineSent" | "offlineFailed"): string {
-  const dict = getLocale() === "ar" ? ar : en;
+  const locale = getLocale();
+  const dict = locale === "ar" ? ar : locale === "fr" ? fr : en;
   const bucket = dict.errors.toasts as Record<string, string>;
   return bucket[path] ?? path;
 }

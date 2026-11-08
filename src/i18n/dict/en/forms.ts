@@ -97,6 +97,8 @@ export const forms = {
       "Alerts aren't available here — they need a secure connection (HTTPS) and a modern browser. They work on the live site.",
   },
   location: {
+    gpsDenied: "Location is blocked for this site. Allow it in your browser settings, or pick the spot on the map or choose a wilaya.",
+    gpsUnavailable: "Could not get your location. Try again outdoors, or pick the spot on the map or choose a wilaya.",
     wilaya: "Wilaya *",
     chooseWilaya: "Choose a wilaya",
     detected: "Detected from your pin — change it here if it's wrong.",

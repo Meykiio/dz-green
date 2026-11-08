@@ -4,6 +4,7 @@ import { getLocale, initLocale, setLocale as persistLocale, type Locale } from "
 import { count, formatDate, type CountKind } from "./format";
 import { errors as enErrors } from "./dict/en/errors";
 import { errors as arErrors } from "./dict/ar/errors";
+import { errors as frErrors } from "./dict/fr/errors";
 
 export type { Locale, CountKind };
 
@@ -99,13 +100,14 @@ export function useI18n(): I18n {
 /** Rewrite a known server error string into a localized message. */
 export function localizeError(raw: string, locale: Locale = getLocale()): string {
   if (locale === "en") return raw;
-  const entries = Object.entries(enErrors.mapServer);
-  const found = entries.find(([, v]) => v === raw);
+  // French used to receive the Arabic strings (only ar was looked up).
+  const target = locale === "fr" ? frErrors : arErrors;
+  const found = Object.entries(enErrors.mapServer).find(([, v]) => v === raw);
   if (found) {
-    const target = (arErrors.mapServer as Record<string, string>)[found[0]];
-    if (target) return target;
+    const text = (target.mapServer as Record<string, string>)[found[0]];
+    if (text) return text;
   }
-  if (raw === enErrors.toasts.generic) return arErrors.toasts.generic;
+  if (raw === enErrors.toasts.generic) return target.toasts.generic;
   return raw;
 }
 

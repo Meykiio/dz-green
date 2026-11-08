@@ -46,8 +46,13 @@ export function useMapRealtime(
         { event: "*", schema: "public", table: "sites", filter: "status=eq.approved" },
         (payload) => {
           schedule("sites");
-          if (payload.eventType === "INSERT") {
-            const row = payload.new as { wilaya_code?: string; tree_count?: number };
+          // Plantings are inserted as pending and reach the map through an
+          // approval UPDATE, so INSERT alone never fired (the ticker never
+          // announced a tree). Announce any approved site the map has not
+          // shown yet; edits to sites already on the map stay silent.
+          const row = payload.new as { id?: string; wilaya_code?: string; tree_count?: number };
+          const isNew = !!row.id && !sitesRef.current.some((s) => s.id === row.id);
+          if (payload.eventType !== "DELETE" && isNew) {
             if (row.wilaya_code) {
               const count = row.tree_count ?? 1;
               activityRef.current(
