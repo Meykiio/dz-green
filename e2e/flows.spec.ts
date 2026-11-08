@@ -1,11 +1,10 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
 import { pinEnglish } from "./locale";
+import { MOD_EMAIL, MOD_PASSWORD } from "./fixtures";
 
 const API = "https://jnunqilxiajinylgehuh.supabase.co";
 const ANON_KEY = "sb_publishable_qkH7kzDc8Dohru5j--104A_afZPeMmc";
-const MOD_EMAIL = "e2e.moderator@test.local";
-const MOD_PASSWORD = "ModeratorPass123!";
 const MOD_ID = "11111111-1111-4111-8111-111111111111";
 
 const ONE_PX_JPEG = Buffer.from(
@@ -23,7 +22,7 @@ async function moderatorToken(): Promise<string> {
   const res = await fetch(`${API}/auth/v1/token?grant_type=password`, {
     method: "POST",
     headers: { apikey: ANON_KEY, "Content-Type": "application/json" },
-    body: JSON.stringify({ email: MOD_EMAIL, password: MOD_PASSWORD }),
+    body: JSON.stringify({ email: MOD_EMAIL, password: MOD_PASSWORD() }),
   });
   const json = (await res.json()) as { access_token?: string };
   if (!json.access_token) throw new Error("Could not mint moderator token for E2E checks");
@@ -149,7 +148,7 @@ test.describe("Green Algeria core flows (live)", () => {
     const signIn = page.getByRole("button", { name: "Sign in" });
     for (let attempt = 0; attempt < 3; attempt += 1) {
       await emailInput.fill(MOD_EMAIL);
-      await passwordInput.fill(MOD_PASSWORD);
+      await passwordInput.fill(MOD_PASSWORD());
       await signIn.click();
       try {
         await expect(page).toHaveURL("/", { timeout: 30_000 });

@@ -1,11 +1,10 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
 import { pinEnglish } from "./locale";
+import { MOD_EMAIL, MOD_PASSWORD } from "./fixtures";
 
 const API = "https://jnunqilxiajinylgehuh.supabase.co";
 const ANON_KEY = "sb_publishable_qkH7kzDc8Dohru5j--104A_afZPeMmc";
-const MOD_EMAIL = "e2e.moderator@test.local";
-const MOD_PASSWORD = "ModeratorPass123!";
 
 const ONE_PX_JPEG = Buffer.from(
   "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AVN//2Q==",
@@ -26,7 +25,7 @@ async function moderatorToken(): Promise<string> {
   const res = await fetch(`${API}/auth/v1/token?grant_type=password`, {
     method: "POST",
     headers: { apikey: ANON_KEY, "Content-Type": "application/json" },
-    body: JSON.stringify({ email: MOD_EMAIL, password: MOD_PASSWORD }),
+    body: JSON.stringify({ email: MOD_EMAIL, password: MOD_PASSWORD() }),
   });
   const json = (await res.json()) as { access_token?: string };
   if (!json.access_token) throw new Error("Could not mint moderator token for E2E checks");
@@ -98,7 +97,7 @@ test.describe("Receipt links and silent drops (live)", () => {
     await page.goto("/auth");
     await page.waitForLoadState("networkidle");
     await page.locator('input[type="email"]').fill(MOD_EMAIL);
-    await page.locator('input[type="password"]').fill(MOD_PASSWORD);
+    await page.locator('input[type="password"]').fill(MOD_PASSWORD());
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveURL("/", { timeout: 30_000 });
     await page.goto("/moderate");

@@ -1,3 +1,5 @@
+import { requestStore } from "@/lib/request-context";
+
 /**
  * Coarse geo hint from Vercel's IP-geolocation headers (free, per-request,
  * never stored). The server reads the headers (src/server.ts) and SSR
@@ -19,5 +21,5 @@ declare global {
 
 export function getGeoHint(): GeoHint | null {
   if (typeof window !== "undefined") return window.__GA_GEO__ ?? null;
-  return (globalThis as { __GA_GEO_SSR__?: GeoHint | null }).__GA_GEO_SSR__ ?? null;
+  return requestStore()?.geo ?? null;
 }

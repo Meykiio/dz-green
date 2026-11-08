@@ -2,11 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { identifyPlant } from "@/lib/plantnet.server";
+import { throttle } from "@/lib/submissions.server";
 
 /**
- * Species suggestion from a planting photo (PlantNet). Unthrottled in v1 by
- * design: worst case is quota burn (500/day free tier) which fails soft to
- * null — no data, no cost. Revisit with a throttle if it ever gets abused.
+ * Species suggestion from a planting photo (PlantNet). Throttled per IP
+ * (20/hour): the free tier is 500 identifications/day for the whole site,
+ * so one client must not be able to burn it. Over the limit fails soft to
+ * null, same as a PlantNet error.
  */
 export const suggestSpecies = createServerFn({ method: "POST" })
   .validator((data: unknown) =>
@@ -23,6 +25,7 @@ export const suggestSpecies = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     try {
+      await throttle("identify", 20);
       return await identifyPlant(data.image, data.locale);
     } catch (error) {
       console.error("[plantnet] identify failed:", error);
