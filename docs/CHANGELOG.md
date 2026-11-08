@@ -1,5 +1,10 @@
 # CHANGELOG.md
 
+## 2026-11-08 (contributor): correct MapLibre Arabic-rendering guidance
+
+- Updated `docs/SYSTEM_INSTRUCTIONS.md` to match the shipped MapLibre 6.16 behavior: Arabic text shaping is native, the legacy RTL plugin is not required, and its CSP exception must not be reintroduced.
+- Documentation-only correction; runtime code and database unchanged. Not locally test-run.
+
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
 ## 2026-11-08 (hundred-fourteenth pass): Phase 2a migration applied live, folded into the master schema
