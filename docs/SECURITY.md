@@ -74,13 +74,44 @@ Layers, outermost first:
    2026-08-30; GitHub issue #40). Not reachable through the PostgREST API.
    Keep the ticket alive until Supabase confirms the tables are locked.
 2. **`fire_reports` INSERT is open to any session by design** (speed over
-   review). The community-confirmations trust layer (migration pending
-   until the feature ships — see ROADMAP) plus the abuse gate are the
-   mitigation; SEC-01's full answer (reputation weighting) is a follow-up.
+   review). The community-confirmations trust layer (live since
+   2026-09-13) plus the abuse gate are the mitigation; SEC-01's full answer
+   (reputation weighting) is a follow-up.
 3. **Dashboard toggles that need the owner:** leaked-password protection
    (Pro), email-confirmation setting (deliberately disabled for instant
    signups — emails unverified, staff accounts are admin-created; revisit
    on Pro), custom SMTP if signup volume grows (built-in caps at 2/hour).
+4. **Rate limits are check-then-insert**, so a fast parallel burst can
+   exceed an hourly limit, and they fail open on a database error. The
+   atomic fix is a Postgres function (schema change, in ROADMAP). New
+   throttle kinds (`push`, `vote`, `identify`) are counted in memory per
+   server instance until `docs/pending-migrations/2026-11-08_throttle_kinds.sql`
+   is applied.
+5. **A moderator can update `sites` through PostgREST directly** (column
+   grant + policy), bypassing `moderateSite`'s transition rules and photo
+   deletion. Narrow by revoking the UPDATE grant and routing all moderation
+   through the server function (schema change, needs owner approval).
+6. **The E2E fixture passwords were in the public repo until 2026-11-08.**
+   They are env vars now; any fixture account still present in the live
+   project must be deleted (ROADMAP, deploy step 5).
+
+## Applied (2026-11-08, in code, not yet deployed)
+
+- **Push alerts:** endpoint allowlist (FCM, Mozilla, Apple, WNS only; any
+  other URL used to be accepted, a blind-SSRF and stall vector on every
+  fire report), 5 s send timeout, batched fan-out past the row cap,
+  subscribe/unsubscribe throttled.
+- **Throttles:** fire votes 30/h per IP on top of the per-device cap;
+  PlantNet identification 20/h per IP (protects the 500/day quota).
+- **SSR isolation:** locale and geo hint moved from process globals into
+  AsyncLocalStorage; concurrent renders could leak another visitor's
+  language or coarse location.
+- **CSP:** the Arabic text plugin is self-hosted as an ES module (the unpkg
+  .js version was blocked by our own CSP in production); only
+  `'wasm-unsafe-eval'` added, no `unsafe-eval`. HSTS header added.
+- **CI:** least-privilege `permissions`, actions pinned to commit SHAs,
+  fire-risk model tests in CI.
+- **E2E fixtures:** passwords read from env vars.
 
 ## Applied (2026-09-13)
 

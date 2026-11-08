@@ -63,7 +63,11 @@ GitHub Actions CI (tsc + tests + build). Deploy: Vercel.
 `HeroMap` mounts MapLibre once (`useHeroMapMount`): WebGL2 probe, 15s style
 budget, context-loss guards, StrictMode-safe cancellation. Layers come from
 `map-layers.ts` (data + wilaya borders + pulse loop), `hotspots-layer.ts`
-(server-proxied NASA FIRMS), `risk-layer.ts` (bundled Kabylie model grid).
+(server-proxied NASA FIRMS), `risk-layer.ts` (the national fire-risk
+priority map, fetched from `public/data/fire-risk-2027.json` only when the
+layer is turned on). `map-setup.ts#installLayers` adds every layer on the
+first load and after a theme switch (setStyle), attaches click handlers
+once per map, and applies visibility last.
 The mount effect reads row arrays through REFS, never frozen props (BUG-01
 lesson: dots added after mount must be clickable). Realtime
 (`useMapRealtime`): one channel, filtered (approved sites, all fires, care
@@ -89,7 +93,8 @@ display centre with `location_approximate = true`) → `storePhoto` (data URL
 | Open-Meteo | fire weather, air quality, rain fallback | keyless, fail-soft |
 | PlantNet | species suggestion from photos | server-held, fail-soft |
 | Web Push (VAPID) | fire alerts | public key in bundle, private server-only |
-| mapbox-gl-rtl-text CDN | Arabic map labels | loaded client-side |
+| mapbox-gl-rtl-text (self-hosted) | Arabic map labels | `public/vendor/*.mjs`, loaded by MapLibre with import(); CSP allows only `'wasm-unsafe-eval'` for it |
+| NASA FIRMS yearly archive | fire-risk model training (offline, `ml/fire-risk/`) | public files, no key; never called by the app |
 
 ## Conventions an agent must follow
 

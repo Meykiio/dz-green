@@ -12,7 +12,10 @@ verified, the model history is what the repo recorded.
 
 ## 1. TL;DR
 
-**Read sections 12 then 11 first (2026-11-08).** Section 12: the model was
+**Read section 13 first (2026-11-08): the national model now feeds the app.**
+Then 12 and 11 for how we got there.
+
+**Older note:** sections 12 then 11 (2026-11-08). Section 12: the model was
 rebuilt as a reproducible pipeline in `ml/fire-risk/` (model kabylie-v8),
 after finding that a third of the v7 "fire" labels were one industrial
 heat source. Section 11: the v7 re-test that led there. Sections 1 to 10
@@ -306,3 +309,33 @@ Owner delegated all modeling decisions. Everything is in `ml/fire-risk/`
   read).
 - **Not done:** coastal/national (needs a new Earth Engine export; the
   original script is lost), burned-area labels, device test of the layer.
+
+## 13. National model national-v1 (2026-11-08, merged to local main)
+
+Owner direction: the Bejaia/Jijel work was a test; the goal is next-year
+fire prediction across far more wilayas. Built in `ml/fire-risk/`
+(`run_national.py`, README has every decision).
+
+- **Data:** NASA FIRMS MODIS yearly country files, 2001-2025, public, no key
+  (`fetch_firms.py`). MODIS's own `type` field separates vegetation fires
+  from static industrial sources, which fixes the El Milia problem at the
+  source; persistent squares (8+ days in one season) are excluded too.
+- **Grid:** 63,460 squares of 2 x 2 km over the 49 wilayas north of 34.5 N,
+  from the app's own 69 wilaya polygons (`scripts/export-wilayas.ts`).
+- **Design:** every square every year (no sampling); inputs are fire
+  history (own square and Gaussian neighbourhoods at 2/6/16 km, recency
+  decay 0.85) plus latitude/longitude; a two-year gap in every test because
+  the 2026 file is not published yet.
+- **Honest result (2014-2025):** AUC 0.886 (worst 0.831); the riskiest 10%
+  of northern land held 63% of the next season's burned squares (worst
+  44%), the riskiest 20% held 80%. A no-model rule ("recent fires nearby")
+  scores almost the same AUC; the model is kept for its small edge at the
+  very top. Both are reported side by side in `results/national/report.md`.
+- **App:** `public/data/fire-risk-2027.json` (top 30% of land, 19,040
+  squares, 32 KB gzipped, loaded only when the risk layer is turned on) and
+  `public/data/fire-risk-wilayas-2027.json` (per-wilaya figures feeding the
+  `/restore` page). The bundled Kabylie grid is gone.
+- **Not done:** terrain (elevation APIs rate-limited or unreachable; the
+  switch is `USE_TERRAIN`), land cover, burned-area labels, south of 34.5 N.
+- **Yearly:** rerun after NASA publishes the previous year (ROADMAP,
+  "Every January").

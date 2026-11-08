@@ -3,7 +3,8 @@
 Verified against the **live** database via the platform MCP (tables, columns,
 policies, grants, functions, triggers, indexes, publication, bucket) on
 **2026-09-12** (documentation audit). Anything not verifiable from SQL is
-marked as such.
+marked as such. Not re-verified on 2026-11-08: the live project is not
+reachable from the Supabase account connected to the coding tools.
 
 **Schema source of truth:** `supabase/migrations/00000000000000_master_schema.sql`
 — the ONE runnable bootstrap for a fresh project (verified current). The live
@@ -69,7 +70,8 @@ Indexes: location GiST, status, created_at DESC, (status, created_at DESC),
 user_id. Realtime: yes.
 
 ### submission_meta — abuse ledger, deny-all
-kind! (CHECK planting/care/fire/feedback/volunteer), ip_hash!
+kind! (CHECK planting/care/fire/feedback/volunteer; widening to push/vote/identify
+is pending: `docs/pending-migrations/2026-11-08_throttle_kinds.sql`), ip_hash!
 (SHA-256 of `<project-id>:<ip>`), device_fingerprint (daily-rotating HMAC),
 created_at!. Zero client grants, RLS on, zero policies. Indexes:
 (ip_hash, created_at), (kind, created_at), (device_fingerprint, kind,

@@ -1,81 +1,94 @@
 # ROADMAP
 
-Status: 2026-09-12. Live at green-dz.vercel.app. Ordered by what matters.
-Nothing is scheduled — the owner calls the sequence, and **no fix starts
-without owner approval**. Completed work lives in `CHANGELOG.md`.
+Status: 2026-11-08. Live at green-dz.vercel.app (production still runs the
+2026-09-28 build until the owner deploys the November work; see "Deploy the
+November release" below). Ordered by what matters. Completed work lives in
+`CHANGELOG.md`.
 
-## Before anything else (owner actions, not code)
+## Deploy the November release (owner, about 15 minutes)
 
-1. **Merge decision on `feat/canopy-redesign`** — the Canopy redesign is
-   code-complete: Sprints 0–6, E2E 16/16, unit 219/219, build green, docs
-   current. The owner should do a hands-on pass (both themes, Arabic RTL,
-   phone width, keyboard queue flow) and then explicitly approve the merge.
- 2. **Supabase support ticket (external):** the `spatial_ref_sys` + PostGIS
-    views read-only fix. Not executable by us at all — the tables are owned
-    by the PostGIS extension (Dashboard editor fails with 42501 too);
-    ticket filed 2026-08-30, keep it alive until confirmed fixed
-    (`docs/SECURITY.md` #1).
- 3. **Supabase Pro + Vercel Pro + firewall rules** on public POST endpoints,
-    leaked-password protection toggle, load test (1k concurrent home loads,
-    p95 < 2s) + spam-flood rerun at scale. Per the scale posture.
- 4. **Real-device testing:** mid-range Android + slow connection; realtime
-    push check on an open map session.
+Everything below is committed on local `main`, tested, and NOT pushed.
 
-## Open decisions (owner call)
+1. Review: `git log origin/main..main --oneline` (the sprint merges are the
+   chapters: fire-risk pipeline, security, bug fixes, national model,
+   Where to plant, docs).
+2. Push `main` to GitHub. Vercel deploys production from it automatically.
+3. Apply the one pending migration (safe, relaxes a CHECK, touches no rows):
+   `docs/pending-migrations/2026-11-08_throttle_kinds.sql`, in Supabase
+   Dashboard > SQL Editor. The app works without it (in-memory limits apply).
+4. Check on a phone: the map in Arabic (place names joined correctly), the
+   risk layer toggle and its legend, `/restore`, one test planting.
+5. If any E2E fixture accounts still exist in the live project, delete them;
+   their passwords were public in the repo until 2026-11-08 (now env vars).
 
-- **Vendored UI prune:** `src/components/ui/chart.tsx` + `sidebar.tsx`
-  (~1000 lines, zero consumers) — delete or keep vendored.
-- **Moderator recruiting:** promotion is admin-driven; recruiting 69 wilaya
-  moderators is a people plan, not code.
-- **Theme default:** Canopy is light-default on the branch (owner D1); the
-  dark token set is canonical in the SSOT — flipping the default later is a
-  one-line change if the owner prefers dark-first.
+## Owner actions (not code)
 
-## Next-up candidates (in rough impact order, all need owner approval)
+- **Supabase account access for agents:** the live project
+  (`jnunqilxiajinylgehuh`) is not in the Supabase account connected to the
+  coding tools, so live-schema checks are impossible from a session. Connect
+  the owning account, or keep running SQL by hand.
+- **Supabase support ticket** for the PostGIS-owned `spatial_ref_sys`
+  (still client-writable; `docs/SECURITY.md` #1). Keep it alive.
+- **Pro plans + firewall rules** on public POST endpoints, leaked-password
+  protection, a load test (1k concurrent home loads, p95 < 2 s).
+- **Real-device pass:** mid-range Android on 4G, both themes, Arabic.
+- **Native-speaker read** of the new Arabic and French copy (risk layer,
+  Where to plant, GPS and receipt messages).
+- **Show the 2027 priority map to one forest office** (Conservation des
+  forêts, Bejaia or Tizi Ouzou) and ask whether they would plan clearing
+  with it. Their answer decides the next model investment more than any
+  metric.
 
-1. **Canopy follow-ups found during device pass** (whatever the owner's
-   device pass surfaces).
-2. **Client-side scale wall (the launch wall):** the home map loads ALL
-   approved rows client-side (bounded 2000/3000/1000). At ~10k rows the
-   GeoJSON rebuild + realtime invalidation spikes; the designed fix is the
-   `/api/map-data` bounds endpoint (audit Phase B+, designed now, build
-   when needed) — do not pre-build.
-3. **Fire-confirmations follow-ups** once the migration lands: self-vote
-   prevention (submitter excluded — currently only device-hash dedup),
-   reputation weighting (voter_trust), verified_labels export for model
-   retraining.
-4. **Fire-AI plan leftovers** (from the 2026-09-05 plan, archived):
-   coastal/national expansion (needs a rewritten Earth Engine export,
-   then `ml/fire-risk/run.py`), a burned-area label source instead of
-   satellite hotspots, and a live forecast. The 2027 Kabylie map is
-   rebuilt and reproducible (`ml/fire-risk/`).
-5. **submission_meta retention** (opportunistic cleanup in the gate or a
-   cron, keep ~45 days).
-6. **Payload reduction:** first load is tile-heavy (~700-900KB gz);
-   evaluate a lighter basemap style after launch numbers exist.
-7. **Moderator onboarding at scale:** in-app mod guide + training content
-   (people problem, plan separately).
+## Every January (owner or agent, 30 minutes)
 
-## Parked (would be real scope; revisit when relevant)
+NASA publishes the previous year's fire file. In `ml/fire-risk/`: run
+`fetch_firms.py` and `run_national.py`, bump `TARGET_YEAR` (pipeline config)
+and `RISK_TARGET_YEAR` (`src/lib/risk.ts`), commit the regenerated
+`public/data/*.json` and `results/national/`. Publish the new map before
+spring, then grade last year's map against what burned (that is the
+credibility story).
+
+## Next-up candidates (impact order, need owner approval)
+
+1. **Model inputs:** land cover and terrain for the national model (the
+   free elevation APIs were rate-limited or unreachable on 2026-11-08), and
+   a burned-area label source (MODIS MCD64A1 or EFFIS) instead of hotspot
+   squares. Keep each only if the honest test improves.
+2. **Campaign support (needs schema):** organisations and campaigns
+   (a school, an association, a wilaya forest office) that group plantings,
+   with a goal and survival follow-up. Design first; owner approval for the
+   migration.
+3. **Atomic rate limiting:** the gate's check-then-insert lets a fast burst
+   exceed the hourly limit. Fix with a Postgres function doing count+insert
+   in one statement (schema change).
+4. **Client-side scale wall:** the home map loads all approved rows
+   (bounded 2000/3000/1000). At ~10k rows build the `/api/map-data` bounds
+   endpoint (designed, do not pre-build).
+5. **Fire-confirmations follow-ups:** submitter self-vote prevention,
+   reputation weighting, `verified_labels` export for model retraining.
+6. **submission_meta retention** (~45 days).
+7. **Vendored UI prune:** 40 of 46 `src/components/ui/*` files have no
+   consumer.
+8. **Moderator recruiting for 69 wilayas** (people plan, not code).
+
+## Explicitly deferred (from the fire-AI plan)
+
+- Fire spread prediction: a separate project, after the layers prove useful.
+- Live daily forecasts (WeatherNext or similar): the yearly priority map is
+  v1; a forecast is v2 and needs a provider.
+- Burn-severity layer and NDVI tree-health job (Phases B and D): data and
+  plan in `docs/HANDOFF_FIRE_AI_CONTEXT.md`.
+
+## Parked
 
 - Photo CDN beyond Supabase storage + proxy + cache headers.
-- Realtime design check at 500 connections (Pro ceiling); hide ticker
-  behind a client feature flag if limits near.
-- Field performance data (PageSpeed/RUM on the deployed URL post-launch).
-- Search, per-wilaya pages, user profiles, sharing cards (ideas, not plans).
+- Realtime at 500 connections (Pro ceiling).
+- Field performance data (RUM on the deployed URL).
+- Search, per-wilaya pages, public profiles, sharing cards.
 
 ## Mobile app
 
-The companion Expo app exists: `laidanimounir/dz-green-mobile` (Expo SDK 57,
-Expo Router, MapLibre native, sqlite offline outbox, same Supabase). The
-submissions contract shipped (`POST /api/mobile/submissions`, Bearer-authed,
-same gate) and deep-link auth is registered. The one blocker is running a
-development build (Android emulator on Windows is the free path; iOS needs
-Apple Developer signing). Details: `docs/MOBILE.md`.
-
-## Done recently (pointers)
-
-- Canopy redesign Sprints 0–6 + E2E gate repair → `CHANGELOG.md` passes
-  93–102.
-- 69-wilaya division, announcement banner, Web Push, PWA, fire-AI layer
-  phases → `CHANGELOG.md` earlier passes.
+The companion Expo app: `laidanimounir/dz-green-mobile` (Expo SDK 57,
+MapLibre native, sqlite outbox, same Supabase). It submits through
+`POST /api/mobile/submissions` (Bearer-authed, same gate). Blocker: running
+a development build (`docs/MOBILE.md`).

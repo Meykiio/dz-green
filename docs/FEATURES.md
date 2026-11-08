@@ -1,8 +1,9 @@
 # FEATURES — current state
 
 What exists today, feature by feature. "Verified" = traced or executed
-against the live app (latest full pass: 2026-09-12, E2E 16/16 + unit 219/219
-+ build). Status of every flow is checked by the live E2E suite
+against the live app (latest full pass: 2026-09-12, E2E 16/16). Unit suite
+and build re-run 2026-11-08: unit 245/245, build green; E2E not re-run (needs
+live SQL fixtures). Status of every flow is checked by the live E2E suite
 (`e2e/`, run per `SYSTEM_INSTRUCTIONS.md` §fixture recipe). History lives in
 `CHANGELOG.md`.
 
@@ -13,10 +14,11 @@ against the live app (latest full pass: 2026-09-12, E2E 16/16 + unit 219/219
 | Home map (5 layers) | verified | MapLibre + OpenFreeMap; trees/care/fires/satellite/risk; realtime; active fires only on public views; detail panel per kind; action card (stats strip, CTAs, icon toggles); Map/List/Board views; monthly wilaya leaderboard; activity ticker. |
 | Plant flow (`/plant`) | verified | Photo required (on-device compression), wilaya-first location (GPS best-fix watch, map picker, Google Maps link parse, wilaya-only → approximate), species suggestion (PlantNet) + planting guide (GBIF evidence × climate), contact phone (PII-protected), receipt link. E2E-covered. |
 | Care flow (`/care`) | verified | Approved-sites picker, 4 actions, date/photo/notes, publishes instantly, receipt link. E2E-covered. |
-| Fire flow (`/fire`) | verified | Publishes instantly, Protection Civile disclaimer on form + success screen (asserted by E2E), severity chips, reporter PII server-only, Web Push fan-out, receipt link, community confirmations (vote buttons + counts + verified badge — UI live, **schema pending owner approval**, see `pending-migrations/`). |
+| Fire flow (`/fire`) | verified | Publishes instantly, Protection Civile disclaimer on form + success screen (asserted by E2E), severity chips, reporter PII server-only, Web Push fan-out, receipt link, community confirmations (vote buttons + counts + verified badge; labels fixed 2026-11-08, they showed raw keys; per-IP vote cap added). |
 | Receipt links (`/my/<token>`) | verified | Anonymous status lookup; only the salted token hash stored; noindex. E2E round-trip covered. |
 | Satellite hotspots | verified | Server-proxied NASA FIRMS (4-day window), flare-zone + persistence masks, edge-cached 10 min, fail-soft. |
-| Fire-risk layer | verified (code), not device-tested | Kabylie priority map for summer 2027 (model kabylie-v8, built by `ml/fire-risk/`): relative rank, High = top 10% of land. Honest test AUC 0.70, riskiest 20% of land held 50% of next-year fires. Default OFF, "not a forecast" copy. |
+| Fire-risk layer | verified (browser), not device-tested | National 2027 priority map for the 49 northern wilayas (model national-v1, `ml/fire-risk/run_national.py`, NASA FIRMS 2001-2025). Only the riskiest 30% of land is drawn: High = top 10%, Medium = next 20%, with a legend. Loaded on demand from `public/data/fire-risk-2027.json` (32 KB gzipped). Honest test (two-year gap, 2014-2025): AUC 0.886, riskiest 10% of land held 63% of the next season's burned squares. Default OFF, "not a forecast" copy. |
+| Where to plant (`/restore`) | verified (browser) | The 49 northern wilayas ranked by land where fires were detected (2016-2025), High-risk land 2027 and community trees; sort and wilaya in the URL; a wilaya panel with fire-resilient species and a Plant here link that pre-fills `/plant?wilaya=N`. Loading/error/empty states; phone layout. |
 | Fire weather + air quality | verified | Open-Meteo on fire/hotspot/risk panels, fail-soft. |
 | Web Push fire alerts | verified (delivery not device-tested) | Subscribe card on `/fire`, wilaya-scoped fan-out on fire insert, stale endpoints pruned. |
 | PWA | verified | Manifest, tiny service worker (no page caching), install banner (Chromium native + iOS instructions). |
@@ -34,7 +36,7 @@ against the live app (latest full pass: 2026-09-12, E2E 16/16 + unit 219/219
 | Offline tolerance | built, not verified | `submitResilient` retries on reconnect. |
 | IP-geo pre-fill | verified | Vercel headers pre-select wilaya/center the picker; suggestion only, never stored. |
 
-## Canopy design system (2026-09-12, branch `feat/canopy-redesign`)
+## Canopy design system (shipped 2026-09-13)
 
 The full platform redesign shipped as Sprints 0–6 (13+ commits): Canopy
 tokens (light default / night-soil dark), Sora + DM Sans with Arabic Noto
@@ -43,7 +45,7 @@ rail, sliding indicator), Canopy chips/buttons/forms/tables, PhotoThumb
 fallbacks, skeleton loaders, Reveal entrances, global focus ring, RTL-mirrored
 patterns. Zero logic or schema changes; full E2E + unit suites green.
 Doc: `DESIGN.md`; SSOT: `design-system/canopy.html`; plan + sprint record:
-`archive/` (REDESIGN_CANOPY_PLAN.md). **Merge awaits owner approval.**
+`archive/` (REDESIGN_CANOPY_PLAN.md).
 
 ## Not built (deliberate)
 
