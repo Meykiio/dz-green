@@ -68,10 +68,11 @@ setWorkerUrl(maplibreWorkerUrl);
 // Arabic labels need the RTL shaping plugin or they render reversed and
 // detached. Browser-only (SSR has no document); module scope so maplibre's
 // "cannot be called multiple times" can't trip on StrictMode remounts.
+// Self-hosted .mjs (2026-11-08): the old unpkg .js URL was blocked by our
+// CSP in production (maplibre fetches a .js plugin and eval()s it); an .mjs
+// from our origin is loaded with import(), which script-src 'self' allows.
+// The plugin compiles WebAssembly, hence 'wasm-unsafe-eval' in the CSP.
 if (typeof document !== "undefined") {
-  setRTLTextPlugin(
-    "https://unpkg.com/@mapbox/mapbox-gl-rtl-text@0.3.0/dist/mapbox-gl-rtl-text.js",
-    true,
-  );
+  setRTLTextPlugin(new URL("/vendor/mapbox-gl-rtl-text-0.3.0.mjs", location.origin).href, true);
 }
 

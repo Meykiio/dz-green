@@ -26,12 +26,13 @@ export default defineConfig({
         // Safari/iPhone visitor. font-src gains data: for build-inlined woff2.
         "/**": {
           headers: {
+            "strict-transport-security": "max-age=63072000; includeSubDomains",
             "x-frame-options": "SAMEORIGIN",
             "x-content-type-options": "nosniff",
             "referrer-policy": "strict-origin-when-cross-origin",
             "permissions-policy": "camera=(), microphone=(), geolocation=(self)",
             "content-security-policy":
-              "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; worker-src 'self' blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.openfreemap.org https://vitals.vercel-insights.com; font-src 'self' data:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'",
+              "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; worker-src 'self' blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.openfreemap.org https://vitals.vercel-insights.com; font-src 'self' data:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'",
           },
         },
         // Static informational pages: SSR once, cache at the edge (audit 2026-08-28).
