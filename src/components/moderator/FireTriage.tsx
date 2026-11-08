@@ -10,7 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { adminDeleteFire } from "@/lib/admin.functions";
 import { fireReportsQuery, photoUrl } from "@/lib/data";
-import type { FireReport, FireStatus } from "@/lib/types";
+import type { FireStatus } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
 import { ContactReveal } from "./ContactReveal";
 import { StatusBadge } from "./StatusBadge";
