@@ -2,6 +2,15 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-11-08 (hundred-tenth pass): fire-risk model rebuilt as a reproducible pipeline (kabylie-v8), branch `feat/fire-risk-pipeline`
+
+- **Why:** the v7 training code was lost with the OpenCode session; a re-test showed its 0.826 AUC was not the 2026 result (honest held-out: 0.742) and the live grid was not even v7 output. Digging further: 32% of the "fire" labels were one industrial heat source near El Milia (Jijel).
+- **New `ml/fire-risk/`** (Python, deps in its own `requirements.txt`, nothing added to the app bundle): label cleaning (persistent heat sources + built-up dropped, one event per 1 km cell per year), fire-history inputs built from earlier years only, forward-year honest test graded as "riskiest X% of land holds Y% of next-year fires", depth-2 XGBoost, 2027 grid scoring, writes `src/data/risk-grid.ts`. One command: `python run.py`. 6 Python unit tests guard history leakage and label cleaning.
+- **Result:** AUC 0.70 mean over 2020-2026 (worst 0.57, 2026 0.83); riskiest 20% of land held 50% of next-year fires (worst 35%, 2026 67%).
+- **App:** risk grid regenerated (3,716 cells; 166 water/built-up removed). Values are a relative rank, not a probability: detail panel shows "Top N% of mapped land", bands High = top 10% / Medium = next 20% (`src/lib/risk.ts`), color ramp stops aligned to the bands, AR/EN/FR copy rewritten (no "weather history" or "typical summer" claims). Protection Civile line kept.
+- **Verified:** `python -m unittest` 6/6, `python run.py` (numbers above), `bunx tsc --noEmit` clean, `bun run test` 221/221, `bun run build` green. **Not verified:** the layer in a real browser or on a phone; AR/FR wording by a native speaker.
+- Docs: `HANDOFF_FIRE_AI_CONTEXT.md` sections 11-12, FEATURES, PROJECT_STRUCTURE, ROADMAP, PLATFORM.
+
 ## 2026-09-28 (hundred-ninth pass) — stale post-deploy references cleaned
 
 - **Master schema footer:** removed the leftover `-- * The pending fire_confirmations migration (docs/pending-migrations/)` bullet — the migration was applied live and folded into §14b in `abb7b2c`; the comment was the last place still claiming "pending" (header and `docs/pending-migrations/README.md` were already correct). Comment-only change; no SQL semantics touched.

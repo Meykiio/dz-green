@@ -12,9 +12,11 @@ verified, the model history is what the repo recorded.
 
 ## 1. TL;DR
 
-**Read section 11 first (re-test, 2026-11-08).** It corrects three claims
-below: the honest held-out AUC is 0.742, not 0.826; the live map was not
-produced by the saved v7 model; the training workspace was found.
+**Read sections 12 then 11 first (2026-11-08).** Section 12: the model was
+rebuilt as a reproducible pipeline in `ml/fire-risk/` (model kabylie-v8),
+after finding that a third of the v7 "fire" labels were one industrial
+heat source. Section 11: the v7 re-test that led there. Sections 1 to 10
+describe the old v7 state and are kept as history.
 
 - A fire-risk model exists and is documented as **v7 champion, AUC 0.826,
   validated against the unseen summer 2026**. It is real but it is a
@@ -279,3 +281,28 @@ up to 0.96).
 **Answers to section 8:** Q1 found (above). Q2: the bundled grid is
 `risk_map_2027_all_spots.csv`, origin model unknown. Q5: yes, calibration
 is needed before any probability wording.
+
+## 12. Rebuild: model kabylie-v8 (2026-11-08, branch `feat/fire-risk-pipeline`)
+
+Owner delegated all modeling decisions. Everything is in `ml/fire-risk/`
+(README explains each decision; `results/report.md` has the numbers).
+
+- **Label contamination found:** 32% of v7's fire points lie within 3 km
+  of one spot near El Milia (Jijel), detected on 100+ separate days over 7
+  years, much of it on built-up land: a permanent industrial heat source.
+  Every earlier model partly learned to find it. Cleaning drops cells seen
+  on 8+ days or in 4+ years (633 detections, 33 cells) plus built-up points.
+- **Design:** one event per 1 km cell per year; inputs knowable before
+  summer only (fire history from earlier years, land cover, distance to
+  cropland, elevation); trained against random land; depth-2 XGBoost.
+- **Honest result** (each year 2020-2026 predicted from earlier years
+  only): AUC 0.70 mean (0.57 worst, 0.83 in 2026); riskiest 20% of land
+  held 50% of next-year fires (35% worst, 67% in 2026). v7's inputs on
+  the same cleaned labels: AUC 0.62, worst year 4%.
+- **App:** `src/data/risk-grid.ts` regenerated (3,716 cells, water and
+  built-up removed), values are a relative rank. The detail panel shows
+  "Top N% of mapped land"; bands High = top 10%, Medium = next 20%; copy
+  updated in AR/EN/FR (AR/FR wording is machine-quality, worth a native
+  read).
+- **Not done:** coastal/national (needs a new Earth Engine export; the
+  original script is lost), burned-area labels, device test of the layer.

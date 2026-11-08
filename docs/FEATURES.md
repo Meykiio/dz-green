@@ -16,7 +16,7 @@ against the live app (latest full pass: 2026-09-12, E2E 16/16 + unit 219/219
 | Fire flow (`/fire`) | verified | Publishes instantly, Protection Civile disclaimer on form + success screen (asserted by E2E), severity chips, reporter PII server-only, Web Push fan-out, receipt link, community confirmations (vote buttons + counts + verified badge — UI live, **schema pending owner approval**, see `pending-migrations/`). |
 | Receipt links (`/my/<token>`) | verified | Anonymous status lookup; only the salted token hash stored; noindex. E2E round-trip covered. |
 | Satellite hotspots | verified | Server-proxied NASA FIRMS (4-day window), flare-zone + persistence masks, edge-cached 10 min, fail-soft. |
-| Fire-risk layer | verified | Bundled 0.826-AUC Kabylie grid, default OFF, honest "model estimate" copy. |
+| Fire-risk layer | verified (code), not device-tested | Kabylie priority map for summer 2027 (model kabylie-v8, built by `ml/fire-risk/`): relative rank, High = top 10% of land. Honest test AUC 0.70, riskiest 20% of land held 50% of next-year fires. Default OFF, "not a forecast" copy. |
 | Fire weather + air quality | verified | Open-Meteo on fire/hotspot/risk panels, fail-soft. |
 | Web Push fire alerts | verified (delivery not device-tested) | Subscribe card on `/fire`, wilaya-scoped fan-out on fire insert, stale endpoints pruned. |
 | PWA | verified | Manifest, tiny service worker (no page caching), install banner (Chromium native + iOS instructions). |
