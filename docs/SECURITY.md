@@ -106,9 +106,10 @@ Layers, outermost first:
 - **SSR isolation:** locale and geo hint moved from process globals into
   AsyncLocalStorage; concurrent renders could leak another visitor's
   language or coarse location.
-- **CSP:** the Arabic text plugin is self-hosted as an ES module (the unpkg
-  .js version was blocked by our own CSP in production); only
-  `'wasm-unsafe-eval'` added, no `unsafe-eval`. HSTS header added.
+- **CSP:** Arabic map labels were broken in production (our CSP blocked
+  the unpkg RTL plugin). Fixed for good by MapLibre 6.16, which shapes
+  Arabic natively: no plugin, no `wasm-unsafe-eval`, no third-party script.
+  HSTS header added.
 - **CI:** least-privilege `permissions`, actions pinned to commit SHAs,
   fire-risk model tests in CI.
 - **E2E fixtures:** passwords read from env vars.

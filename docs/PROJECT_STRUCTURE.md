@@ -22,7 +22,7 @@ from the 250-line rule.
 | `README.md` | Public-facing intro + setup + doc links. |
 | `LICENSE` (AGPL-3.0), `CODE_OF_CONDUCT.md`, `SECURITY.md` (reporting), `CONTRIBUTING.md` | Repo policies. |
 | `.github/` | `workflows/ci.yml` (tsc + unit + build, plus the fire-risk model tests; actions pinned to SHAs), issue + PR templates. |
-| `public/` | favicon, logo, og, robots, manifest + icons + `sw.js` (PWA); `vendor/` (self-hosted Arabic map-text plugin, BSD-2); `data/` (generated fire-risk map + per-wilaya figures, do not hand-edit). |
+| `public/` | favicon, logo, og, robots, manifest + icons + `sw.js` (PWA); `data/` (generated fire-risk map + per-wilaya figures, do not hand-edit). |
 | `supabase/` | `migrations/00000000000000_master_schema.sql` (THE schema; see its README) + platform-managed `config.toml`. |
 | `ml/fire-risk/` | Python fire-risk models. `run_national.py` (national-v1, NASA FIRMS 2001-2025) writes `public/data/fire-risk-*.json`; `run.py` (Kabylie kabylie-v8) is a research record. `fetch_firms.py` / `fetch_elevation.py` download public data. Own README; Python deps in its `requirements.txt`, not in the app. |
 | `e2e/` | 4 Playwright specs, 16 tests, live-DB with SQL fixtures (recipe in SYSTEM_INSTRUCTIONS); fixture passwords from env vars (`e2e/fixtures.ts`). |
