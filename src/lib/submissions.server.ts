@@ -2,6 +2,7 @@ import { getRequest } from "@tanstack/react-start/server";
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sniffImageMime } from "@/lib/image";
+import { SlidingWindowLimiter } from "@/lib/rate-limit";
 
 /**
  * Abuse gate for anonymous public writes.
@@ -85,11 +86,20 @@ export class GateError extends Error {}
  * hashed-IP counting the submission gate uses, for endpoints that have no
  * full gate (feedback, volunteers). Records the attempt on pass.
  */
-export async function throttle(
-  kind: "feedback" | "volunteer",
-  limitPerHour: number,
-): Promise<void> {
+export type ThrottleKind = "feedback" | "volunteer" | "push" | "vote" | "identify";
+
+const memoryLimiters = new Map<ThrottleKind, SlidingWindowLimiter>();
+
+export async function throttle(kind: ThrottleKind, limitPerHour: number): Promise<void> {
   const ipHash = await hashIp(clientIp());
+  let limiter = memoryLimiters.get(kind);
+  if (!limiter) {
+    limiter = new SlidingWindowLimiter(limitPerHour, 3600_000);
+    memoryLimiters.set(kind, limiter);
+  }
+  if (!limiter.allow(ipHash)) {
+    throw new GateError("Too many requests in the last hour. Please try again later.");
+  }
   const since = new Date(Date.now() - 3600_000).toISOString();
   const { count, error } = await supabaseAdmin
     .from("submission_meta")
@@ -100,6 +110,8 @@ export async function throttle(
   if (!error && (count ?? 0) >= limitPerHour) {
     throw new GateError("You've sent a lot of messages in the last hour. Please try again later.");
   }
+  // Kinds newer than the live check constraint fail this insert quietly
+  // (pending migration); the in-memory window above still applies.
   await supabaseAdmin.from("submission_meta").insert({ kind, ip_hash: ipHash });
 }
 

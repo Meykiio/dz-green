@@ -30,7 +30,34 @@ export interface PushSubscriptionInput {
   wilaya_code?: string | null | undefined;
 }
 
+/**
+ * Real browser push services only. Before this check any URL was accepted,
+ * so a caller could register thousands of arbitrary hosts and make every
+ * fire report POST to them (blind SSRF, and slow hosts stalled the fire
+ * submission). Chrome/Edge-Chromium/Opera/Samsung use FCM, Firefox uses
+ * Mozilla autopush, Safari uses Apple, legacy Edge uses WNS.
+ */
+const PUSH_HOSTS = [/^fcm\.googleapis\.com$/, /^updates\.push\.services\.mozilla\.com$/,
+  /^web\.push\.apple\.com$/, /^[a-z0-9-]+\.push\.apple\.com$/, /^[a-z0-9-]+\.notify\.windows\.com$/];
+
+export function isAllowedPushEndpoint(endpoint: string): boolean {
+  try {
+    const url = new URL(endpoint);
+    return url.protocol === "https:" && url.port === "" && PUSH_HOSTS.some((re) => re.test(url.hostname));
+  } catch {
+    return false;
+  }
+}
+
+/** Per-send timeout: a slow push service must not hold up a fire report. */
+const SEND_TIMEOUT_MS = 5000;
+/** Subscribers fetched and sent per batch (PostgREST caps unpaged selects). */
+const BATCH = 500;
+
 export async function subscribePushImpl(data: PushSubscriptionInput) {
+  if (!isAllowedPushEndpoint(data.endpoint)) {
+    throw new Error("Unsupported push service.");
+  }
   const { error } = await supabaseAdmin.from("push_subscriptions").upsert(
     {
       endpoint: data.endpoint,
@@ -70,11 +97,20 @@ function wilayaNameAr(code: string): string {
 export async function notifyFireSubscribers(fire: { id: string; wilaya_code: string }): Promise<void> {
   try {
     ensureVapid();
-    const { data: subs, error } = await supabaseAdmin
-      .from("push_subscriptions")
-      .select("endpoint, keys, wilaya_code");
-    if (error) throw error;
-    const targets = (subs ?? []).filter((s) => shouldNotify(s.wilaya_code, fire.wilaya_code));
+    const subs: { endpoint: string; keys: unknown; wilaya_code: string | null }[] = [];
+    for (let from = 0; ; from += BATCH) {
+      const { data, error } = await supabaseAdmin
+        .from("push_subscriptions")
+        .select("endpoint, keys, wilaya_code")
+        .order("endpoint")
+        .range(from, from + BATCH - 1);
+      if (error) throw error;
+      subs.push(...(data ?? []));
+      if (!data || data.length < BATCH) break;
+    }
+    const targets = subs.filter(
+      (s) => shouldNotify(s.wilaya_code, fire.wilaya_code) && isAllowedPushEndpoint(s.endpoint),
+    );
     if (targets.length === 0) return;
 
     const payload = JSON.stringify({
@@ -88,7 +124,7 @@ export async function notifyFireSubscribers(fire: { id: string; wilaya_code: str
         webpush.sendNotification(
           { endpoint: s.endpoint, keys: s.keys as { p256dh: string; auth: string } },
           payload,
-          { TTL: 86400, urgency: "high", topic: `fire-${fire.wilaya_code}` },
+          { TTL: 86400, urgency: "high", topic: `fire-${fire.wilaya_code}`, timeout: SEND_TIMEOUT_MS },
         ),
       ),
     );

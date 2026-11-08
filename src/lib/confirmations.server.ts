@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { GateError } from "@/lib/submissions.server";
+import { GateError, throttle } from "@/lib/submissions.server";
 
 export type Verdict = "yes" | "no" | "unsure";
 
@@ -29,6 +29,9 @@ export async function submitFireVoteImpl(input: {
   verdict: Verdict;
   deviceSecret: string;
 }): Promise<{ ok: true }> {
+  // Per-IP cap on top of the per-device one: a new device secret is free to
+  // mint, an IP is not (stops scripted vote stuffing from one machine).
+  await throttle("vote", 30);
   const voterKey = await hashVoter(input.deviceSecret);
 
   const since = new Date(Date.now() - 24 * 3600_000).toISOString();
