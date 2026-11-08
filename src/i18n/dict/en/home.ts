@@ -27,7 +27,7 @@ export const home = {
       care: "Show or hide care updates",
       fires: "Show or hide fire reports",
       hotspots: "Show or hide NASA satellite hotspot detections",
-      risk: "Show or hide the fire-risk model estimate (Kabylie, typical summer)",
+      risk: "Show or hide the fire-risk priority map (Kabylie, summer 2027)",
     },
     board: "Monthly wilaya race — approved plantings are summed per wilaya, reset on the 1st.",
     needsWater: "No care logged for this site in the last 14 days.",
@@ -141,8 +141,9 @@ export const home = {
       attribution: "Data:",
     },
     risk: {
-      title: "Fire-risk estimate",
-      score: "Risk score",
+      title: "Fire-risk priority",
+      score: "Priority",
+      rankValue: "Top {pct}% of mapped land",
       band: "Level",
       bandValue: {
         low: "Low",
@@ -150,7 +151,7 @@ export const home = {
         high: "High",
       },
       disclaimer:
-        "Model estimate for typical summer conditions — not a live forecast, not ground-verified. Based on terrain, vegetation, weather history and distance to farms and villages. For immediate danger call Protection Civile (14) or 1021.",
+        "Ranks this spot against the rest of the mapped Kabylie land for summer 2027. It is a model estimate for planning prevention, not a forecast of any specific day and not ground-verified. Based on where fires burned in past years, land cover, elevation and distance to farmland. For immediate danger call Protection Civile (14) or 1021.",
     },
     field: {
       wilaya: "Wilaya",

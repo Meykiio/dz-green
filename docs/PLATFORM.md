@@ -38,7 +38,7 @@ care visit, every fire — posted by ordinary people, visible to everyone.
    public trust signal.
 
 Around those: a full-viewport MapLibre home map with five layers (trees,
-care, fires, NASA FIRMS satellite hotspots, the Kabylie fire-risk model),
+care, fires, NASA FIRMS satellite hotspots, the Kabylie fire-risk priority map),
 realtime updates, monthly wilaya leaderboard, Web Push fire alerts, installable
 PWA, trilingual UI (Arabic default with full RTL), and anonymous receipt links
 (`/my/<token>`) as the only way back to an anonymous submission.

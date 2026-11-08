@@ -27,7 +27,7 @@ export const home = {
       care: "Afficher ou masquer les soins",
       fires: "Afficher ou masquer les feux signalés",
       hotspots: "Afficher ou masquer les points chauds des satellites NASA",
-      risk: "Afficher ou masquer l'estimation du modèle de risque d'incendie (Kabylie, été typique)",
+      risk: "Afficher ou masquer la carte des priorités de risque d'incendie (Kabylie, été 2027)",
     },
     board: "Course mensuelle des wilayas — les plantations approuvées sont additionnées par wilaya, remise à zéro le 1er.",
     needsWater: "Aucun soin enregistré pour ce site depuis 14 jours.",
@@ -141,8 +141,9 @@ export const home = {
       attribution: "Données :",
     },
     risk: {
-      title: "Estimation du risque d'incendie",
-      score: "Score de risque",
+      title: "Priorité de risque d'incendie",
+      score: "Priorité",
+      rankValue: "Dans les {pct}% de terres les plus à risque",
       band: "Niveau",
       bandValue: {
         low: "Faible",
@@ -150,7 +151,7 @@ export const home = {
         high: "Élevé",
       },
       disclaimer:
-        "Estimation du modèle pour un été typique — pas une prévision en direct, non vérifiée sur le terrain. Basée sur le terrain, la végétation, l'historique météo et la distance aux fermes et villages. En danger immédiat, appelez la Protection Civile (14) ou le 1021.",
+        "Classe ce point par rapport au reste des terres cartographiées de Kabylie pour l'été 2027. C'est une estimation du modèle pour planifier la prévention, pas une prévision d'un jour précis, et non vérifiée sur le terrain. Basée sur les zones brûlées les années passées, l'occupation du sol, l'altitude et la distance aux terres agricoles. En danger immédiat, appelez la Protection Civile (14) ou le 1021.",
     },
     field: {
       wilaya: "Wilaya",

@@ -45,8 +45,10 @@ without owner approval**. Completed work lives in `CHANGELOG.md`.
    reputation weighting (voter_trust), verified_labels export for model
    retraining.
 4. **Fire-AI plan leftovers** (from the 2026-09-05 plan, archived):
-   coastal/national risk-grid expansion (swap the bundled asset), live
-   forecast instead of climatological estimate.
+   coastal/national expansion (needs a rewritten Earth Engine export,
+   then `ml/fire-risk/run.py`), a burned-area label source instead of
+   satellite hotspots, and a live forecast. The 2027 Kabylie map is
+   rebuilt and reproducible (`ml/fire-risk/`).
 5. **submission_meta retention** (opportunistic cleanup in the gate or a
    cron, keep ~45 days).
 6. **Payload reduction:** first load is tile-heavy (~700-900KB gz);
