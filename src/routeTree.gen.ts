@@ -17,6 +17,7 @@ import { Route as CareRouteImport } from './routes/care'
 import { Route as FireRouteImport } from './routes/fire'
 import { Route as PlantRouteImport } from './routes/plant'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as RestoreRouteImport } from './routes/restore'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as VolunteerRouteImport } from './routes/volunteer'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
@@ -64,6 +65,11 @@ const PlantRoute = PlantRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RestoreRoute = RestoreRouteImport.update({
+  id: '/restore',
+  path: '/restore',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/fire': typeof FireRoute
   '/plant': typeof PlantRoute
   '/privacy': typeof PrivacyRoute
+  '/restore': typeof RestoreRoute
   '/terms': typeof TermsRoute
   '/volunteer': typeof VolunteerRoute
   '/activity': typeof AuthenticatedActivityRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/fire': typeof FireRoute
   '/plant': typeof PlantRoute
   '/privacy': typeof PrivacyRoute
+  '/restore': typeof RestoreRoute
   '/terms': typeof TermsRoute
   '/volunteer': typeof VolunteerRoute
   '/activity': typeof AuthenticatedActivityRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/fire': typeof FireRoute
   '/plant': typeof PlantRoute
   '/privacy': typeof PrivacyRoute
+  '/restore': typeof RestoreRoute
   '/terms': typeof TermsRoute
   '/volunteer': typeof VolunteerRoute
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/fire'
     | '/plant'
     | '/privacy'
+    | '/restore'
     | '/terms'
     | '/volunteer'
     | '/activity'
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/fire'
     | '/plant'
     | '/privacy'
+    | '/restore'
     | '/terms'
     | '/volunteer'
     | '/activity'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/fire'
     | '/plant'
     | '/privacy'
+    | '/restore'
     | '/terms'
     | '/volunteer'
     | '/_authenticated/activity'
@@ -235,6 +247,7 @@ export interface RootRouteChildren {
   FireRoute: typeof FireRoute
   PlantRoute: typeof PlantRoute
   PrivacyRoute: typeof PrivacyRoute
+  RestoreRoute: typeof RestoreRoute
   TermsRoute: typeof TermsRoute
   VolunteerRoute: typeof VolunteerRoute
   MyTokenRoute: typeof MyTokenRoute
@@ -299,6 +312,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/restore': {
+      id: '/restore'
+      path: '/restore'
+      fullPath: '/restore'
+      preLoaderRoute: typeof RestoreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -391,6 +411,7 @@ const rootRouteChildren: RootRouteChildren = {
   FireRoute: FireRoute,
   PlantRoute: PlantRoute,
   PrivacyRoute: PrivacyRoute,
+  RestoreRoute: RestoreRoute,
   TermsRoute: TermsRoute,
   VolunteerRoute: VolunteerRoute,
   MyTokenRoute: MyTokenRoute,

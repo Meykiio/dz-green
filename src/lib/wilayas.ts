@@ -2,6 +2,8 @@
 // division, Law 26-06 / JO No. 25). Every wilaya has its own polygon in
 // data/algeria-wilayas.ts, so mapCode is the identity mapping (kept for
 // interface compatibility with pre-69 code paths).
+import { z } from "zod";
+
 import { getLocale } from "@/i18n/locale";
 export interface Wilaya {
   code: string;
@@ -89,7 +91,10 @@ export const WILAYA_BY_CODE: Record<string, Wilaya> = Object.fromEntries(
 
 /** Display name for the current UI language (Arabic names in AR mode). */
 export function wilayaName(code: string | null | undefined): string {
-  if (!code) return getLocale() === "ar" ? "غير معروف" : "Unknown";
+  if (!code) {
+    const locale = getLocale();
+    return locale === "ar" ? "غير معروف" : locale === "fr" ? "Inconnue" : "Unknown";
+  }
   const w = WILAYA_BY_CODE[code];
   if (!w) return code;
   return getLocale() === "ar" ? w.nameAr : w.name;
@@ -99,4 +104,20 @@ export function wilayaName(code: string | null | undefined): string {
 export function mapCodeFor(code: string | null | undefined): string | null {
   if (!code) return null;
   return WILAYA_BY_CODE[code]?.mapCode ?? null;
+}
+
+/**
+ * A wilaya in a URL search param, stored as a plain number (?w=15, ?w=6).
+ * TanStack Router JSON-parses search values: a string code would serialize
+ * as ?w=%2215%22, and ?w=15 arrives as a number anyway. Accept numbers and
+ * numeric strings ("06" from old links); unknown codes are rejected so a bad
+ * link degrades to "nothing selected". Read it back with wilayaCodeOf().
+ */
+export const wilayaNumParam = z
+  .union([z.number(), z.string()])
+  .transform((v) => Number(v))
+  .refine((n) => Number.isInteger(n) && wilayaCodeOf(n) in WILAYA_BY_CODE);
+
+export function wilayaCodeOf(n: number): string {
+  return String(n).padStart(2, "0");
 }

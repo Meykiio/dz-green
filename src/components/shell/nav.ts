@@ -11,6 +11,7 @@ import {
   ScrollText,
   ShieldCheck,
   Sprout,
+  TreePine,
 } from "lucide-react";
 
 /** App-wide nav items, shared by the top-bar drawer and the staff sidebar. */
@@ -25,6 +26,7 @@ export interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   { to: "/", key: "map", icon: MapIcon },
+  { to: "/restore", key: "restore", icon: TreePine, tone: "text-plant" },
   { to: "/plant", key: "plant", icon: Sprout, tone: "text-plant" },
   { to: "/care", key: "care", icon: Droplets, tone: "text-care" },
   { to: "/fire", key: "fire", icon: Flame, tone: "text-fire" },
@@ -37,9 +39,9 @@ export const NAV_ITEMS: NavItem[] = [
   { to: "/admin", key: "admin", icon: LayoutDashboard, requires: "admin" },
 ];
 
-/** Miller's law: three labeled groups of 5 / 3 / 3. Keys → chrome.navGroup.* */
+/** Three labeled groups of 6 / 3 / 3. Keys → chrome.navGroup.* */
 export const GROUP_SPECS: { key: "explore" | "contribute" | "workspace"; items: string[] }[] = [
-  { key: "explore", items: ["map", "about", "volunteer", "privacy", "terms"] },
+  { key: "explore", items: ["map", "restore", "about", "volunteer", "privacy", "terms"] },
   { key: "contribute", items: ["plant", "care", "fire"] },
   { key: "workspace", items: ["activity", "moderate", "admin"] },
 ];

@@ -1,6 +1,7 @@
 export const chrome: typeof import("../en/chrome").chrome = {
   brandTagline: "خريطة مجتمعية لغرس الأشجار في الجزائر",
   nav: {
+    restore: "أين نغرس",
     map: "الخريطة",
     plant: "غرست شجرة",
     care: "سجّل متابعة",

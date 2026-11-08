@@ -6,6 +6,7 @@ import { getRainFallback } from "@/lib/weather.functions";
 
 import type { CareLog, FireReport, Site } from "./types";
 import { RISK_MAP_URL, RISK_TARGET_YEAR, decodeRiskMap, riskGeoJSON, type RiskMapFile } from "@/lib/risk";
+import { WILAYA_RISK_URL, type WilayaRiskFile } from "@/lib/restore";
 
 export const SITE_COLUMNS =
   "id,lat,lng,wilaya_code,location_approximate,commune,photo_url,species,tree_count,planted_date,notes,planter_display_name,status,created_at";
@@ -92,6 +93,17 @@ export const riskMapQuery = queryOptions({
   },
   staleTime: Infinity,
   gcTime: Infinity,
+});
+
+/** Per-wilaya fire history and 2027 risk (static file from ml/fire-risk). */
+export const wilayaRiskQuery = queryOptions({
+  queryKey: ["wilaya-risk", RISK_TARGET_YEAR],
+  queryFn: async (): Promise<WilayaRiskFile> => {
+    const res = await fetch(WILAYA_RISK_URL);
+    if (!res.ok) throw new Error(`wilaya risk ${res.status}`);
+    return (await res.json()) as WilayaRiskFile;
+  },
+  staleTime: Infinity,
 });
 
 /**
