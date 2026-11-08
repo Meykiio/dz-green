@@ -1,0 +1,126 @@
+{
+  "model_version": "kabylie-v8",
+  "target_year": 2027,
+  "features": [
+    "hist_km",
+    "hist_density",
+    "landcover",
+    "dist_to_cropland",
+    "elevation"
+  ],
+  "params": {
+    "n_estimators": 300,
+    "max_depth": 2,
+    "learning_rate": 0.05,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "min_child_weight": 5,
+    "eval_metric": "logloss",
+    "random_state": 0
+  },
+  "labels": {
+    "raw_fire_detections": 1676,
+    "dropped_persistent_heat_sources": 633,
+    "persistent_cells": 33,
+    "dropped_built_up_only": 8,
+    "clean_fire_events": 900,
+    "events_per_year": {
+      "2016": 90,
+      "2017": 136,
+      "2018": 15,
+      "2019": 133,
+      "2020": 140,
+      "2021": 90,
+      "2022": 49,
+      "2023": 52,
+      "2024": 43,
+      "2025": 45,
+      "2026": 107
+    },
+    "random_land_points": 2204
+  },
+  "test": {
+    "mean": {
+      "auc": 0.703,
+      "top10": 0.361,
+      "top20": 0.503,
+      "top30": 0.578
+    },
+    "worst_year": {
+      "auc": 0.568,
+      "top10": 0.212,
+      "top20": 0.346,
+      "top30": 0.404
+    },
+    "per_year": [
+      {
+        "year": 2020,
+        "fires": 140,
+        "auc": 0.725,
+        "top10": 0.336,
+        "top20": 0.5,
+        "top30": 0.6
+      },
+      {
+        "year": 2021,
+        "fires": 90,
+        "auc": 0.668,
+        "top10": 0.333,
+        "top20": 0.478,
+        "top30": 0.533
+      },
+      {
+        "year": 2022,
+        "fires": 49,
+        "auc": 0.651,
+        "top10": 0.327,
+        "top20": 0.408,
+        "top30": 0.49
+      },
+      {
+        "year": 2023,
+        "fires": 52,
+        "auc": 0.568,
+        "top10": 0.212,
+        "top20": 0.346,
+        "top30": 0.404
+      },
+      {
+        "year": 2024,
+        "fires": 43,
+        "auc": 0.765,
+        "top10": 0.326,
+        "top20": 0.581,
+        "top30": 0.674
+      },
+      {
+        "year": 2025,
+        "fires": 45,
+        "auc": 0.715,
+        "top10": 0.422,
+        "top20": 0.533,
+        "top30": 0.578
+      },
+      {
+        "year": 2026,
+        "fires": 107,
+        "auc": 0.831,
+        "top10": 0.57,
+        "top20": 0.673,
+        "top30": 0.766
+      }
+    ]
+  },
+  "importance": {
+    "hist_km": 0.337,
+    "hist_density": 0.128,
+    "landcover": 0.213,
+    "dist_to_cropland": 0.113,
+    "elevation": 0.208
+  },
+  "grid": {
+    "grid_cells": 3882,
+    "dropped_not_burnable": 166,
+    "scored_cells": 3716
+  }
+}
