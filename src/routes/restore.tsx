@@ -12,6 +12,7 @@ import { ssrT, useI18n } from "@/i18n";
 import { sitesQuery, wilayaRiskQuery } from "@/lib/data";
 import { buildRestoreRows, type RestoreSort } from "@/lib/restore";
 import { wilayaCodeOf, wilayaNumParam } from "@/lib/wilayas";
+import { PlantingSeasonNote } from "@/components/PlantingSeasonNote";
 
 // Sort and selection live in the URL so a link to "Bejaia, by fire risk"
 // can be shared (and survives a reload).
@@ -130,6 +131,7 @@ function Advice() {
         <Leaf className="size-4 text-plant" />
         {t("restore.adviceTitle")}
       </h2>
+      <PlantingSeasonNote className="mt-3" />
       <ul className="mt-3 list-disc space-y-1.5 ps-5 text-sm text-muted-foreground">
         <li>{t("restore.advice1")}</li>
         <li>{t("restore.advice2")}</li>

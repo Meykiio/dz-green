@@ -19,6 +19,7 @@ import { submitPlanting } from "@/lib/submissions.functions";
 import { submitResilient } from "@/lib/offline";
 import { todayLocalISO } from "@/lib/dates";
 import { wilayaCodeOf, wilayaNumParam } from "@/lib/wilayas";
+import { PlantingSeasonNote } from "@/components/PlantingSeasonNote";
 
 // ?wilaya=6 pre-selects the wilaya (links from the "Where to plant" page).
 const searchSchema = z.object({ wilaya: wilayaNumParam.optional().catch(undefined) });
@@ -148,6 +149,7 @@ function PlantPage() {
             onWilaya={setWilaya}
             onCommune={setCommune}
           />
+          <PlantingSeasonNote />
           <PlantingGuide wilaya={wilaya} onPick={setSpecies} />
 
           <div className="grid gap-3 sm:grid-cols-2">
