@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Droplets, Flame, Navigation, Satellite, Sprout, TrendingUp, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
@@ -8,7 +9,7 @@ import { photoUrl } from "@/lib/data";
 import { directionsUrl } from "@/lib/maps-link";
 import { needsWater, type CareLog } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
-import { FireBody, FireWeatherBlock, Field, HotspotBody, RiskBody } from "./detail-bodies";
+import { FireBody, Field, HotspotBody, RiskBody } from "./detail-bodies";
 
 import type { MapFeature } from "@/lib/types";
 
@@ -33,6 +34,20 @@ export function DetailPanel({
   const { t, formatDate } = useI18n();
   const site = feature.kind === "site" || feature.kind === "care" ? feature.site : null;
   const logs = site ? careLogs.filter((l) => l.site_id === site.id) : [];
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  // Keyboard: focus moves into the panel when a dot is opened (screen
+  // readers announce it), and Escape closes it. Non-modal, so no trap.
+  useEffect(() => {
+    closeRef.current?.focus({ preventScroll: true });
+  }, [feature]);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   return (
     <aside
@@ -42,6 +57,7 @@ export function DetailPanel({
       <div className="flex items-start justify-between gap-3">
         <Header feature={feature} />
         <button
+          ref={closeRef}
           type="button"
           onClick={onClose}
           aria-label={t("home.detail.close")}

@@ -12,6 +12,9 @@ import type { MapFeature } from "@/lib/types";
 export function addRiskLayers(
   map: MapLibreMap,
   onSelect: (feature: MapFeature) => void,
+  /** Attach click/hover handlers. False on re-adds after a style swap:
+   *  layer-id handlers survive setStyle, re-adding stacks duplicates. */
+  wire = true,
 ) {
   map.addSource("ga-risk", {
     type: "geojson",
@@ -41,6 +44,7 @@ export function addRiskLayers(
       "circle-radius": ["interpolate", ["exponential", 2], ["zoom"], 6, 1.5, 9, 3, 12, 9, 14, 18],
     },
   });
+  if (!wire) return;
   map.on("click", "ga-risk-points", (e: MapLayerMouseEvent) => {
     const props = e.features?.[0]?.properties;
     if (!props) return;
@@ -70,8 +74,3 @@ export function setRiskData(map: MapLibreMap, data: FeatureCollection) {
   }
 }
 
-export function applyRiskVisibility(map: MapLibreMap, visible: boolean) {
-  if (map.getLayer("ga-risk-points")) {
-    map.setLayoutProperty("ga-risk-points", "visibility", visible ? "visible" : "none");
-  }
-}

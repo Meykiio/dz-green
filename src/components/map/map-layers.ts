@@ -186,7 +186,9 @@ export function startPulse(
   const start = performance.now();
   const tick = (now: number) => {
     if (cancelledRef.current) return;
-    const t = ((now - start) % 1800) / 1800;
+    // rAF's timestamp can be slightly earlier than performance.now() at
+    // start; a negative t gave a negative radius (maplibre rejects it).
+    const t = (Math.max(0, now - start) % 1800) / 1800;
     const radius = 8 + t * 22;
     const opacity = 0.45 * (1 - t);
     for (const kind of ["trees", "care", "fires"] as const) {
