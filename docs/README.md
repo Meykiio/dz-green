@@ -18,6 +18,7 @@ human or AI agent — can orient in minutes. Read in this order:
 | 11 | `CHANGELOG.md` | Append-only work log, newest first. History lives here, nowhere else. |
 | 12 | `HANDOFF_FIRE_AI_CONTEXT.md` | The fire-prediction work: data inventory, what was wrong with the old model, the rebuild, the national model. Start at its top note. |
 | 13 | `../ml/fire-risk/README.md` | How to run and update the fire-risk models (every January). |
+| 14 | `archive/RESEARCH_2026-11_NEXT_LEVEL.md` | The November 2026 research behind the roadmap: data, comparable platforms, Algeria context, government requirements. |
 
 ## Special folders
 
