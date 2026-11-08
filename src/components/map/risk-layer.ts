@@ -4,13 +4,14 @@ import type { FeatureCollection } from "geojson";
 import type { MapFeature } from "@/lib/types";
 
 /**
- * Fire-risk layer (Kabylie priority map, relative rank). Distinct from
+ * Fire-risk layer (national priority map, relative rank). Distinct from
  * everything else on the map: a soft fill of small circles colored by risk
  * (yellow -> orange -> dark red), no pulse — the pulsing stays the
  * community-fire signature, and the ramp must never read as a live fire.
  */
 export function addRiskLayers(
   map: MapLibreMap,
+  colors: { riskHigh: string; riskMedium: string },
   onSelect: (feature: MapFeature) => void,
   /** Attach click/hover handlers. False on re-adds after a style swap:
    *  layer-id handlers survive setStyle, re-adding stacks duplicates. */
@@ -20,28 +21,23 @@ export function addRiskLayers(
     type: "geojson",
     data: { type: "FeatureCollection", features: [] },
   });
-  const riskColor: ExpressionSpecification = [
-    "interpolate",
-    ["linear"],
-    ["get", "risk"],
-    // Stops follow the rank bands (src/lib/risk.ts): dark red = top 10% of
-    // land, orange = top 30%, yellow-green below.
-    0, "#1a9850",
-    0.5, "#fee08b",
-    0.7, "#f46d43",
-    0.9, "#a50026",
-  ];
+  // Two bands only (only the riskiest 30% of land is published, see
+  // src/lib/risk.ts): Medium = orange, High = red. A step, not a ramp, so the
+  // legend's two colours (RiskLegend) mean exactly what the panel says. Both read on the
+  // light and the dark basemap; amber-orange stays distinct from the pulsing
+  // community-fire dots and the hollow hotspot rings.
+  const riskColor: ExpressionSpecification = ["step", ["get", "risk"], colors.riskMedium, 0.9, colors.riskHigh];
   map.addLayer({
     id: "ga-risk-points",
     type: "circle",
     source: "ga-risk",
     paint: {
       "circle-color": riskColor,
-      "circle-opacity": 0.55,
+      "circle-opacity": 0.6,
       "circle-stroke-width": 0,
-      // Cells are 1 km apart: grow with the map (exponential) so dots stay
-      // close to their real footprint instead of piling up at low zoom.
-      "circle-radius": ["interpolate", ["exponential", 2], ["zoom"], 6, 1.5, 9, 3, 12, 9, 14, 18],
+      // Cells are 2 km apart: grow with the map (exponential) so each dot
+      // stays close to its real footprint instead of piling up at low zoom.
+      "circle-radius": ["interpolate", ["exponential", 2], ["zoom"], 4, 1, 6, 1.6, 8, 3, 11, 18, 13, 70],
     },
   });
   if (!wire) return;

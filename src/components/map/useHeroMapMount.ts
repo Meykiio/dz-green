@@ -46,6 +46,7 @@ export function useHeroMapMount({
   themeRef,
   refs,
   hotspotsRef,
+  riskRef,
   ctrlPos,
   controlsRef,
   onFailure,
@@ -57,6 +58,7 @@ export function useHeroMapMount({
   themeRef: RefObject<"light" | "dark">;
   refs: MapRefs;
   hotspotsRef: RefObject<MapFeatureCollection>;
+  riskRef: RefObject<MapFeatureCollection>;
   ctrlPos: "top-left" | "top-right";
   controlsRef: RefObject<{ geolocate: GeolocateControl } | null>;
   onFailure: (failure: MapFailure | null) => void;
@@ -154,7 +156,7 @@ export function useHeroMapMount({
       // failure — clear it and continue (same state the context-restore
       // path uses).
       onFailure(null);
-      installLayers(map, refs as LayerRefs, hotspotsRef.current);
+      installLayers(map, refs as LayerRefs, hotspotsRef.current, riskRef.current);
       startPulse(map, pulseRef, cancelledRef);
     };
     // "load" can stall forever when a sub-resource (sprite/glyphs) is

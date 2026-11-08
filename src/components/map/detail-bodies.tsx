@@ -169,7 +169,7 @@ export function FireBody({ fire }: { fire: FireReport }) {
   );
 }
 
-/** Detail body for a fire-risk grid point (Kabylie model, climatological estimate). */
+/** Detail body for a fire-risk map cell (national priority map, relative rank). */
 export function RiskBody({ risk }: { risk: RiskPoint }) {
   const { t } = useI18n();
   const wilayaCode = wilayaCodeForPoint(risk.lat, risk.lng);

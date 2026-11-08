@@ -12,7 +12,9 @@ import { DetailPanel } from "@/components/map/DetailPanel";
 import { HeroMap, type Layer } from "@/components/map/HeroMap";
 import { SiteList } from "@/components/map/SiteList";
 import { ssrT, useI18n } from "@/i18n";
-import { announcementQuery, careLogsQuery, fireReportsQuery, hotspotsQuery, rainFallbackQuery, sitesQuery } from "@/lib/data";
+import { announcementQuery, careLogsQuery, fireReportsQuery, hotspotsQuery, rainFallbackQuery, riskMapQuery, sitesQuery } from "@/lib/data";
+import { EMPTY_RISK } from "@/lib/risk";
+import { RiskLegend } from "@/components/home/RiskLegend";
 import { needsWater, type MapFeature, type Site } from "@/lib/types";
 import { useHydrated } from "@/hooks/useHydrated";
 
@@ -49,6 +51,8 @@ function HomePage() {
     hotspots: true,
     risk: false,
   });
+  // Loaded once, on demand: most visitors never turn the risk layer on.
+  const riskMap = useQuery({ ...riskMapQuery, enabled: layers.risk });
   const [view, setView] = useState<HomeView>("map");
   const [feature, setFeature] = useState<MapFeature | null>(null);
   const [cardHidden, setCardHidden] = useState(false);
@@ -65,7 +69,8 @@ function HomePage() {
   // Public views show ACTIVE fires only (owner 2026-09-01): resolved and
   // false-alarm reports are hidden from the map and list; reopening one in
   // triage makes it active again, so it reappears. Triage keeps its own view.
-  const fireList = (fires.data ?? []).filter((f) => f.status === "active");
+  // Memoized: a fresh array every render rebuilt both map sources each time.
+  const fireList = useMemo(() => (fires.data ?? []).filter((f) => f.status === "active"), [fires.data]);
 
   // Rain-aware watering: one batched 14-day-rainfall lookup for the sites
   // that are thirsty by the time-only rule; enough rain clears the flag.
@@ -134,6 +139,7 @@ function HomePage() {
             careLogs={logList}
             fires={fireList}
             hotspots={hotspots.data ?? { type: "FeatureCollection", features: [] }}
+            risk={riskMap.data ?? EMPTY_RISK}
             layers={layers}
             onSelectFeature={setFeature}
           />
@@ -145,6 +151,7 @@ function HomePage() {
         </div>
 
         {view === "map" && <ActivityTicker message={ticker} />}
+        {view === "map" && layers.risk && <RiskLegend status={riskMap.status} />}
 
         {/* The action card — map view only: in list/board it would float
             over the scrolled content at narrow desktop widths. */}

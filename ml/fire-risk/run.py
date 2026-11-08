@@ -1,14 +1,13 @@
-"""One command: clean labels -> honest test -> final model -> score 2027 -> app grid.
+"""Kabylie test model (kabylie-v8): clean labels -> honest test -> 2027 grid.
 
-    python run.py            full run, rewrites src/data/risk-grid.ts
-    python run.py --no-app   everything except touching the app
+Research record only. The app's map comes from the national model
+(run_national.py), which replaced this one on 2026-11-08.
+
+    python run.py
 """
 import json
-import sys
-
 from fire_risk import config as C
 from fire_risk.evaluate import forward_test, summarize
-from fire_risk.export import write_app_grid
 from fire_risk.features import training_table
 from fire_risk.labels import build_labels, load_points
 from fire_risk.model import fit, importance
@@ -85,10 +84,6 @@ def main() -> None:
     (C.RESULTS / "metrics.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")
     (C.RESULTS / "report.md").write_text(report_md(metrics), encoding="utf-8")
     cells.round(5).to_csv(C.RESULTS / f"grid_{C.TARGET_YEAR}_scored.csv", index=False)
-
-    if "--no-app" not in sys.argv:
-        n = write_app_grid(cells, summary)
-        print(f"app grid: {n} cells -> {C.APP_GRID}")
 
 
 if __name__ == "__main__":
