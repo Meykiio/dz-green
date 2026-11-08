@@ -1,0 +1,222 @@
+# Handoff: Fire AI prediction work (Green DZ)
+
+Status as of 2026-11-08. Owner: Sifeddine Mebarki (Meykiio). Repo:
+`Meykiio/dz-green`, working tree branch `main`, clean. Live app:
+https://green-dz.vercel.app
+
+Read this file first if you are a new agent picking up the fire AI work.
+It records what was extracted, what was modeled, what is already in the
+app, what is only data on disk, and what is still missing. Nothing here
+is a plan for the future: the app state is verified, the folder state is
+verified, the model history is what the repo recorded.
+
+## 1. TL;DR
+
+- A fire-risk model exists and is documented as **v7 champion, AUC 0.826,
+  validated against the unseen summer 2026**. It is real but it is a
+  **climatological estimate for typical summer conditions, not a live
+  forecast and not ground-verified**.
+- It is **already integrated in the app** (Phase A), but only as a
+  **bundled static grid**: 3,882 points at 1 km over Béjaïa + Jijel,
+  `src/data/risk-grid.ts`. There is no server route and no refresh job.
+- The data extraction artifacts (Earth Engine exports, v3fix to v7) live
+  **outside the repo** in the two folders listed in section 3.
+- Not built: live scoring/forecast pipeline, coastal/national grid,
+  burn-damage layer, planting-suitability layer, tree-health layer.
+- The training scripts/notebooks are **not** in these folders or the repo.
+  The changelog names a `fire_prediction_project` workspace that is not
+  present locally. Ask the owner where it is before claiming anything is
+  reproducible.
+
+## 2. Current status table
+
+| Item | Status | Where |
+|---|---|---|
+| Risk model (v7, AUC 0.826) | Trained and validated, documented | Repo docs + data folders |
+| Risk grid in app | Live, Phase A, default OFF | `src/data/risk-grid.ts`, `src/components/map/risk-layer.ts` |
+| Live scoring / daily refresh | Not built | Would need EE export + scoring job + route |
+| Coastal / national expansion | Not built (roadmap next-up) | Needs new EE export + scoring |
+| Burn-damage layer (Phase B) | Data now exists, layer not built | `Data/algeria_burn_severity_2026.csv` |
+| Planting suitability (Phase C) | Not built, no export yet | Needs soil+climate+terrain+land-cover export |
+| Tree health (Phase D) | Not built | Needs MODIS NDVI weekly job |
+| Community confirmations (Phase E) | Live, migration applied 2026-09-13 | `fire_confirmations`, `FireConfirmations.tsx` |
+| AI-training consent (Phase F) | Live | `ai-consent.ts`, `ConsentBanner.tsx` |
+
+The 2026-09-05 plan (`docs/PLAN_FIRE_AI_FEATURES.md`) was removed from the
+working tree in commit `4415ee8`. Recover it with:
+
+```
+git show 3e4a113:docs/PLAN_FIRE_AI_FEATURES.md
+```
+
+## 3. Data folders (verified: files, row counts, columns)
+
+### A. `C:\Users\DELL\Desktop\Sifeddine\new-folder-2026-09-04`
+
+| File | Rows | What it is |
+|---|---|---|
+| `bejaia_jijel_fire_daily_v3fix_2016_2026.csv` | 3,884 | Earliest Kabylie (Béjaïa + Jijel) daily set. 13 cols: label, year, date, temp_max_7d, dryair_max_7d, wind_max_7d, soil_mean_7d, precip_7d, precip_30d, NDVI, elevation, slope, landcover. |
+| `kabylie_grid_climo_2027.csv` | 1 | Broken/sample export (has `label` + `count`). Do not use. |
+| `kabylie_grid_climo_2027_v2.csv` | 3,882 | Unlabeled scoring grid for future climatology. Same features as v5/v4 minus label, plus `constant`. |
+| `v4_master_7wilayas_2016_2026.csv` | 5,630 | Seven-wilaya master. 21 cols. Label balance: 2,322 positive / 3,308 negative. |
+| `v5_kabylie_dense_final_2016_2026.csv` | 3,884 | Kabylie dense final. 21 cols, same features as v4. Balance: 1,676 positive / 2,208 random negative. |
+
+### B. `C:\Users\DELL\Desktop\Sifeddine\Data`
+
+| File | Rows | What it is |
+|---|---|---|
+| `v6_final_everything_2016_2026.csv` | 5,466 | Adds hard negatives (`neg_type`) and `rain_prev_winter1/2` to v5. |
+| `v7_master_everything_2016_2026.csv` | 5,475 | **Champion dataset.** 37 cols, 2016 to 2026. Balance: 1,676 positive, 2,208 random negative, 1,591 near negative. |
+| `algeria_burn_severity_2026.csv` | 681 | **Phase B input.** dNBR point sample: `dnbr`, `severity` 1 to 4, `.geo`. Severity counts 1: 569, 2: 53, 3: 29, 4: 30. dNBR range 0.100 to 1.069. |
+| `kabylie_grid_climo_2027_v2.csv` | 3,882 | Duplicate of the new-folder v2 scoring grid. |
+| `kabylie_grid_climo_fixed_v3.csv` | 3,882 | Fixed version of the scoring grid (no label column). |
+| `environment_dza.csv` | 5,181 | World Bank environment indicators. Context only, **not** model features and not a suitability export. |
+| `azm-products.csv` | 36 | Unrelated Shopify product export from another project. Ignore. |
+
+### v7 feature list (exact, from the header)
+
+`EVI, NDVI, aspect, burned, burned_2y_ago, burned_3y_ago,
+burned_last_year, cems_drought_code, cems_ffmc, cems_fwi, cems_ignition,
+cems_isi, date, dist_to_builtup, dist_to_cropland, dryair_max_7d,
+elevation, hot_days_7d, label, landcover, neg_type, precip_30d, precip_7d,
+precip_90d, rain_spring_cur, rain_spring_prev, rand, rh_min_7d, slope,
+soil_mean_7d, temp_max_7d, vpd_max_7d, wind_dir_7d, wind_max_7d, year`
+
+Notes: label 1 means burned. `neg_type` is `fire`, `near`, or `random`.
+`near` negatives were added to teach the model what almost burned. Units
+are raw (temp in Kelvin, precip in meters, NDVI scaled by 10,000), not
+normalized.
+
+## 4. The model story (what the repo recorded, nothing more)
+
+- Iterations: v3fix (Béjaïa + Jijel daily, 13 features), v4 (seven
+  wilayas, 21 features), v5 (Kabylie dense, same features, cleaner
+  balance), v6 (hard negatives + winter rain), v7 (CEMS FWI family,
+  burned history 1 to 3 years, EVI, VPD, aspect, spring rain, hot days).
+  This version progression is inferred from the CSV headers, which are
+  verified.
+- Champion: **v7, AUC 0.826**, validated against the **unseen summer 2026**.
+  The algorithm itself is not recorded in the repo. Do not claim random
+  forest, XGBoost, or anything else without asking the owner.
+- Output: a 1 km grid over Béjaïa + Jijel, **3,882 scored points**, stored
+  in the app as `src/data/risk-grid.ts` tuples `[lng, lat, risk 0-1]`.
+  File is 88 KB.
+- Repo evidence: `docs/CHANGELOG.md` line 160, `docs/FEATURES.md` line 19,
+  header comment in `src/data/risk-grid.ts`, commits `69a25ac` (Phase A)
+  and `3e4a113` (plan).
+
+### Honest caveats to preserve
+
+- The score is a typical-summer climatology, not a forecast for a given
+  day, and it is not ground-verified.
+- Positives come from burned-area labels. The dataset is roughly 30%
+  positive in v7, which is a modeling balance, not real-world prevalence.
+- AUC is the only metric recorded. No calibration, Brier score, or
+  reliability curve is documented.
+- The graph exists but the training code does not, locally. Any retrain
+  or live scoring starts by recovering the original workspace.
+
+## 5. What is integrated in the app today (Phase A, live)
+
+- `src/data/risk-grid.ts`: generated asset, 3,882 tuples, header says
+  "Generated from the Kabylie fire-risk model (v7 champion, AUC 0.826)".
+- `src/lib/risk.ts`: `RiskPoint`, `RISK_POINTS`, `riskGeoJSON()`.
+- `src/components/map/risk-layer.ts`: MapLibre circle layer, opacity 0.55,
+  interpolated ramp green `#1a9850` to yellow `#fee08b` to orange
+  `#f46d43` to dark red `#a50026`. No pulse, on purpose: the pulsing
+  stays the community-fire signature.
+- `src/components/map/useHeroMapMount.ts` and `map-layers.ts`: the layer
+  is wired as the fifth layer (`"risk"`).
+- Action card: fifth chip (TrendingUp icon, terracotta tone), **default
+  OFF** because fires are the default view.
+- Detail panel: clicking a risk dot opens `RiskBody` with the score,
+  band, current fire weather (Open-Meteo, fail-soft), the honest
+  disclaimer, and a directions link.
+- i18n: full AR/EN/FR (`home.layers.risk`, `tooltip.layers.risk`,
+  `detail.eyebrow.risk`, `detail.risk`).
+- Verified at build time: tsc clean, 209/209 tests (8 in `risk.test.ts`),
+  build green, live browser probe showed the correct gradient over the
+  Kabylie fire belt and the chip toggling in Arabic.
+
+Refresh model: static asset. Updating the published risk means replacing
+the asset and redeploying. There is no server route and no cron.
+
+## 6. What is not built, and what each needs
+
+1. **Live scoring / forecast**: export current weather features from
+   Earth Engine, score with the v7 model, serve as GeoJSON through a
+   route following the hotspots pattern, cache and refresh daily. In the
+   roadmap as "live forecast instead of climatological estimate".
+2. **Coastal/national expansion**: new EE export across all coastal
+   wilayas, score, swap the bundled asset. In the roadmap as the
+   "coastal/national risk-grid expansion". The plan estimated a 4 to 6
+   hour export for the coastal master.
+3. **Burn-damage layer (Phase B)**: the CSV now exists (681 point
+   samples, severity 1 to 4). Still missing: a decision on points versus
+   the original raster, the severity-class styling (dark scars, not the
+   risk ramp), a serving route, and the plant-form nudge ("this wilaya
+   has burn damage, plant here first").
+4. **Planting suitability (Phase C)**: no export exists. Needs an Earth
+   Engine export of soil, climate, terrain, and land cover, then scoring
+   and a "planting guide" layer that reuses the existing wilaya species
+   matrix. `environment_dza.csv` is not this data.
+5. **Tree health (Phase D)**: MODIS NDVI per planted site, weekly. The
+   app has the "needs water" flag but no scheduled job infrastructure.
+6. **Known follow-ups from the roadmap**: self-vote prevention on fire
+   confirmations (submitter is currently only deduped by device hash),
+   reputation weighting via `voter_trust`, and a `verified_labels` export
+   for retraining the model on community-confirmed fires.
+
+## 7. Rules that apply to any continuation
+
+- **Owner approval before schema changes, deploys, or new dependencies.**
+  The repo already broke this rule once in spirit; do not repeat it.
+- Migrations are migration files, applied with explicit approval, then
+  reflected in `docs/DATABASE.md`.
+- Keep `docs` current in the same change: `CHANGELOG.md` (dated pass
+  entries), `FEATURES.md`, `DATABASE.md`, `PROJECT_STRUCTURE.md`,
+  `SYSTEM_INSTRUCTIONS.md`, `ROADMAP.md`.
+- Max 250 lines per hand-written file. Commit after every phase, never
+  end with uncommitted work.
+- Product copy: AR/EN/FR with RTL, no hardcoded text, honest labels
+  ("model estimate, not a live forecast, not ground-verified"), the
+  Protection Civile disclaimer stays on every fire surface, risk layers
+  default OFF, color-blind-safe ramps, legend visible when on.
+- Verification standard: tsc, unit tests, build, and for UI a real browser
+  probe. "Done" means executed and committed. Say "not verified" when
+  you did not verify.
+- Owner preferences: English only in prompts and reports, no em-dash
+  character, verdict first, one concrete next step.
+
+## 8. Open questions for the owner (answer before building)
+
+1. Where is the `fire_prediction_project` training workspace? It is not
+   in the repo or in either data folder.
+2. Which scoring file produced the bundled grid: `kabylie_grid_climo_2027_v2.csv`,
+   `kabylie_grid_climo_fixed_v3.csv`, or another export?
+3. Is `algeria_burn_severity_2026.csv` a complete season sample or a
+   subset? Where is the source raster?
+4. For the next step, does the owner want the coastal/national risk
+   expansion first, the burn-damage layer first, or the live forecast
+   first?
+5. Do we want calibration (Brier, reliability) before presenting scores
+   as probabilities?
+
+## 9. Commands
+
+```
+bun install
+bun run dev          # http://localhost:5173
+bun run test
+bunx tsc --noEmit
+bun run build
+```
+
+## 10. Evidence trail
+
+- `3e4a113` docs: fire AI features plan + community confirmations spec.
+- `69a25ac` feat: fire-risk model layer (Phase A), 18 files.
+- `4e8379a` feat: community fire confirmations (Phase E), 12 files.
+- `abb7b2c` chore(db): apply `fire_confirmations` migration live, fold
+  into master schema (DATABASE.md records applied 2026-09-13).
+- `d052e3f` current `main` head at the time of writing, tree clean.
