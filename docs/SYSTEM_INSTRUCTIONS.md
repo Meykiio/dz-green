@@ -38,14 +38,14 @@ The fire flow is a community map, not an emergency service. The "call Protection
 
 ## E2E fixture recipe (running `e2e/flows.spec.ts` + `e2e/admin.spec.ts`)
 
-The suites need three auth users, recreated via SQL before a run and deleted after — the suites do not clean up:
+The suites need four auth users, recreated via SQL before a run and deleted after — the suites do not clean up. Passwords are NOT in the repo (2026-11-08): pick your own, export them as the env vars below, and use the same values in the fixture SQL (`e2e/fixtures.ts`):
 
 | Fixture | UUID | Email / password | Role + wilayas |
 |---|---|---|---|
-| moderator | `11111111-1111-4111-8111-111111111111` | `e2e.moderator@test.local` / `ModeratorPass123!` | `moderator` + `['16']` (asserted as `reviewed_by`) |
-| admin | `aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa` | `e2e.admin@test.local` / `AdminPass123!` | `admin` |
-| mod2 | `22222222-2222-4222-8222-222222222222` | `e2e.mod2@test.local` / `Mod2Pass123!` | `moderator`, **no wilayas** (the admin spec assigns/removes them) |
-| regular | `33333333-3333-4333-8333-333333333333` | `e2e.regular@test.local` / `RegularPass123!` | **no role** (the activity spec's plain user) |
+| moderator | `11111111-1111-4111-8111-111111111111` | `e2e.moderator@test.local` / `$E2E_MOD_PASSWORD` | `moderator` + `['16']` (asserted as `reviewed_by`) |
+| admin | `aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa` | `e2e.admin@test.local` / `$E2E_ADMIN_PASSWORD` | `admin` |
+| mod2 | `22222222-2222-4222-8222-222222222222` | `e2e.mod2@test.local` / `$E2E_MOD2_PASSWORD` | `moderator`, **no wilayas** (the admin spec assigns/removes them) |
+| regular | `33333333-3333-4333-8333-333333333333` | `e2e.regular@test.local` / `$E2E_REGULAR_PASSWORD` | **no role** (the activity spec's plain user) |
 
 `admin.spec.ts` also needs two seeded pending sites: `notes = 'ADMIN E2E - delete me B'` in wilaya `31` (Oran, `35.6969, -0.6333`) and `'ADMIN E2E - delete me C'` in wilaya `16` (Alger, `36.7538, 3.0588`), both `photo_url = ''`.
 

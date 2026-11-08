@@ -1,11 +1,8 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
 import { pinEnglish, unmaskPii } from "./locale";
+import { ADMIN_EMAIL, ADMIN_PASSWORD, MOD2_EMAIL, MOD2_PASSWORD } from "./fixtures";
 
-const ADMIN_EMAIL = "e2e.admin@test.local";
-const ADMIN_PASSWORD = "AdminPass123!";
-const MOD2_EMAIL = "e2e.mod2@test.local";
-const MOD2_PASSWORD = "Mod2Pass123!";
 const MARKER_B = "ADMIN E2E - delete me B";
 const MARKER_C = "ADMIN E2E - delete me C";
 
@@ -70,7 +67,7 @@ test.describe("Admin role management (live)", () => {
     await pinEnglish(context);
     await unmaskPii(context);
     adminPage = await context.newPage();
-    await signIn(adminPage, ADMIN_EMAIL, ADMIN_PASSWORD);
+    await signIn(adminPage, ADMIN_EMAIL, ADMIN_PASSWORD());
   });
 
   test("admin sees users and assigns a wilaya", async () => {
@@ -99,7 +96,7 @@ test.describe("Admin role management (live)", () => {
 
   test("assigned moderator sees only that wilaya and approves", async ({ browser }) => {
     const mod2 = await freshPage(browser);
-    await signIn(mod2, MOD2_EMAIL, MOD2_PASSWORD);
+    await signIn(mod2, MOD2_EMAIL, MOD2_PASSWORD());
     await mod2.goto("/moderate");
     await expect(mod2.getByRole("heading", { name: "Pending plantings" })).toBeVisible();
 
@@ -130,7 +127,7 @@ test.describe("Admin role management (live)", () => {
     await expect(row).toContainText("No role", { timeout: 15_000 });
 
     const mod2 = await freshPage(browser);
-    await signIn(mod2, MOD2_EMAIL, MOD2_PASSWORD);
+    await signIn(mod2, MOD2_EMAIL, MOD2_PASSWORD());
     await mod2.goto("/moderate");
     await expect(mod2).toHaveURL("/", { timeout: 20_000 });
     await mod2.close();

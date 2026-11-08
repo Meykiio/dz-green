@@ -1,13 +1,8 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
 import { pinEnglish, unmaskPii } from "./locale";
+import { ADMIN_EMAIL, ADMIN_PASSWORD, MOD_EMAIL, MOD_PASSWORD, REG_EMAIL, REG_PASSWORD } from "./fixtures";
 
-const ADMIN_EMAIL = "e2e.admin@test.local";
-const ADMIN_PASSWORD = "AdminPass123!";
-const MOD_EMAIL = "e2e.moderator@test.local";
-const MOD_PASSWORD = "ModeratorPass123!";
-const REG_EMAIL = "e2e.regular@test.local";
-const REG_PASSWORD = "RegularPass123!";
 
 async function freshPage(browser: BrowserContext): Promise<Page> {
   const context = await browser.newContext({ baseURL: "http://localhost:8081" });
@@ -54,7 +49,7 @@ test.describe("Dashboards (live)", () => {
 
   test("a regular user sees their own activity across all three sections", async ({ browser }) => {
     const page = await freshPage(browser);
-    await signIn(page, REG_EMAIL, REG_PASSWORD);
+    await signIn(page, REG_EMAIL, REG_PASSWORD());
     await page.goto("/activity");
     await expect(page.getByRole("heading", { name: "Everything you've added to the map" })).toBeVisible({
       timeout: 30_000,
@@ -78,7 +73,7 @@ test.describe("Dashboards (live)", () => {
 
   test("a user with no submissions gets the empty states", async ({ browser }) => {
     const page = await freshPage(browser);
-    await signIn(page, MOD_EMAIL, MOD_PASSWORD);
+    await signIn(page, MOD_EMAIL, MOD_PASSWORD());
     await page.goto("/activity");
     await expect(page.getByText("No plantings yet.")).toBeVisible({ timeout: 30_000 });
     await expect(page.getByText("No care logged yet.")).toBeVisible();
@@ -87,7 +82,7 @@ test.describe("Dashboards (live)", () => {
 
   test("the admin overview shows platform stats and wilaya oversight", async ({ browser }) => {
     const page = await freshPage(browser);
-    await signIn(page, ADMIN_EMAIL, ADMIN_PASSWORD);
+    await signIn(page, ADMIN_EMAIL, ADMIN_PASSWORD());
     await page.goto("/admin");
     await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible({ timeout: 30_000 });
     await expect(page.getByText("Users")).toBeVisible({ timeout: 30_000 });
