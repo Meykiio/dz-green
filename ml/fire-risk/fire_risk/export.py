@@ -7,7 +7,9 @@ from . import config as C
 
 
 def write_app_grid(cells: pd.DataFrame, summary: dict, path=C.APP_GRID) -> int:
-    rows = cells.sort_values("rank")
+    # Geographic order, NOT by rank: the map draws later points on top, and
+    # rank order would paint every overlap red at low zoom.
+    rows = cells.sort_values(["lat", "lon"])
     tuples = [[round(lon, 4), round(lat, 4), round(rank, 3)]
               for lon, lat, rank in zip(rows.lon, rows.lat, rows["rank"])]
     m = summary["mean"]

@@ -36,7 +36,9 @@ export function addRiskLayers(
       "circle-color": riskColor,
       "circle-opacity": 0.55,
       "circle-stroke-width": 0,
-      "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 3, 10, 5, 14, 8],
+      // Cells are 1 km apart: grow with the map (exponential) so dots stay
+      // close to their real footprint instead of piling up at low zoom.
+      "circle-radius": ["interpolate", ["exponential", 2], ["zoom"], 6, 1.5, 9, 3, 12, 9, 14, 18],
     },
   });
   map.on("click", "ga-risk-points", (e: MapLayerMouseEvent) => {
