@@ -193,6 +193,7 @@ export const home = {
     needsAttention: "Besoin d'attention",
     update: "Mise à jour",
   },
+  dataLight: "Économiseur de données activé : les mises à jour en direct sont en pause. Rechargez pour voir les nouveaux signalements.",
   riskLegend: {
     title: "Priorité de risque d'incendie, été 2027",
     loading: "Chargement de la carte…",

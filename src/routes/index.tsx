@@ -17,6 +17,7 @@ import { EMPTY_RISK } from "@/lib/risk";
 import { RiskLegend } from "@/components/home/RiskLegend";
 import { needsWater, type MapFeature, type Site } from "@/lib/types";
 import { useHydrated } from "@/hooks/useHydrated";
+import { isDataLight, useDataLight, usePageVisible } from "@/hooks/useConnection";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -40,7 +41,8 @@ function HomePage() {
   const sites = useQuery(sitesQuery);
   const careLogs = useQuery(careLogsQuery);
   const fires = useQuery(fireReportsQuery);
-  const hotspots = useQuery(hotspotsQuery);
+  // Data-light visitors get hotspots once per visit, not every 10 minutes.
+  const hotspots = useQuery({ ...hotspotsQuery, refetchInterval: () => (isDataLight() ? false : 600_000) });
   const announcements = useQuery(announcementQuery).data ?? [];
   const hasAnnouncement = useHydrated() && announcements.length > 0;
 
@@ -89,7 +91,9 @@ function HomePage() {
   // in Oran") fed by the same realtime events.
   const sitesRef = useRef<Site[]>([]);
   sitesRef.current = siteList;
-  useMapRealtime(sitesRef, (text) => setTicker({ id: Date.now(), text }));
+  const dataLight = useDataLight();
+  const pageVisible = usePageVisible();
+  useMapRealtime(sitesRef, (text) => setTicker({ id: Date.now(), text }), pageVisible && !dataLight);
 
   useEffect(() => {
     if (!ticker) return;
@@ -151,6 +155,11 @@ function HomePage() {
         </div>
 
         {view === "map" && <ActivityTicker message={ticker} />}
+        {dataLight && (
+          <p className="absolute inset-x-0 top-16 z-10 mx-auto w-fit max-w-[90vw] rounded-full border border-border bg-card/95 px-3 py-1.5 text-center text-xs text-muted-foreground">
+            {t("home.dataLight")}
+          </p>
+        )}
         {view === "map" && layers.risk && <RiskLegend status={riskMap.status} />}
 
         {/* The action card — map view only: in list/board it would float

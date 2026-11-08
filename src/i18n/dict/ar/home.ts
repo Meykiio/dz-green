@@ -192,6 +192,7 @@ export const home: typeof import("../en/home").home = {
     needsAttention: "تحتاج إلى عناية",
     update: "تحديث",
   },
+  dataLight: "توفير البيانات مفعّل: التحديثات المباشرة متوقفة. أعد تحميل الصفحة لرؤية البلاغات الجديدة.",
   riskLegend: {
     title: "أولوية خطر الحرائق، صيف 2027",
     loading: "جارٍ تحميل الخريطة…",
