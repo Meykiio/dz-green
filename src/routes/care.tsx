@@ -16,6 +16,7 @@ import { getDeviceSecret } from "@/lib/device";
 import { submitCare } from "@/lib/submissions.functions";
 import { submitResilient } from "@/lib/offline";
 import { wilayaName } from "@/lib/wilayas";
+import { todayLocalISO } from "@/lib/dates";
 
 const searchSchema = z.object({ site: z.string().uuid().optional() });
 
@@ -49,7 +50,7 @@ function CarePage() {
   const [hp, setHp] = useState("");
   const [siteId, setSiteId] = useState(initialSite ?? "");
   const [action, setAction] = useState<(typeof ACTIONS)[number]["value"]>("watered");
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(() => todayLocalISO());
   const [notes, setNotes] = useState("");
   const [photo, setPhoto] = useState<string | null>(null);
   const [name, setName] = useState("");
@@ -163,7 +164,7 @@ function CarePage() {
             <input
               type="date"
               required
-              max={new Date().toISOString().slice(0, 10)}
+              max={todayLocalISO()}
               value={date}
               onChange={(e) => setDate(e.target.value)}
               className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"

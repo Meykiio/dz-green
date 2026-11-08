@@ -196,6 +196,8 @@ export const info = {
     eyebrow: "Reçu",
     heading: "Votre signalement",
     checking: "Vérification…",
+    loadError: "Impossible de vérifier ce lien pour le moment.",
+    retry: "Réessayer",
     notFound: "Ce lien ne correspond à aucun signalement",
     notFoundBody:
       "Les liens de suivi sont affichés une seule fois, juste après l'envoi. Vérifiez les fautes de frappe — si vous l'avez perdu, il est irrécupérable (nous ne pouvons pas dire quel signalement était le vôtre, et c'est voulu).",

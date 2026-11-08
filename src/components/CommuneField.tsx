@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useI18n } from "@/i18n";
 import { COMMUNES_BY_WILAYA } from "@/data/communes";
@@ -22,6 +22,16 @@ interface Props {
 export function CommuneField({ wilaya, value, onChange }: Props) {
   const { t, locale } = useI18n();
   const [otherMode, setOtherMode] = useState(false);
+  // A commune belongs to one wilaya: when the wilaya changes, clear it.
+  // Before, the old commune silently stayed and showed up as "Other".
+  const prevWilaya = useRef(wilaya);
+  useEffect(() => {
+    if (prevWilaya.current === wilaya) return;
+    prevWilaya.current = wilaya;
+    setOtherMode(false);
+    if (value !== "") onChange("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wilaya]);
   const communes = COMMUNES_BY_WILAYA[wilaya] ?? [];
   const inList = communes.some((c) => c.latin === value);
   const selectValue = otherMode || (value !== "" && !inList) ? OTHER : value;

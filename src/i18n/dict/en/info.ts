@@ -196,6 +196,8 @@ export const info = {
     eyebrow: "Receipt",
     heading: "Your submission",
     checking: "Checking…",
+    loadError: "Couldn't check this link right now.",
+    retry: "Try again",
     notFound: "This link doesn't match any submission",
     notFoundBody:
       "Receipt links are shown once, right after you submit. Check the link for typos — if you lost it, there is no way to recover it (we can't tell which submission was yours, and that's deliberate).",

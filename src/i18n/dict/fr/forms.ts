@@ -97,6 +97,8 @@ export const forms = {
       "Les alertes ne sont pas disponibles ici — elles demandent une connexion sécurisée (HTTPS) et un navigateur moderne. Elles fonctionnent sur le site en ligne.",
   },
   location: {
+    gpsDenied: "La localisation est bloquée pour ce site. Autorisez-la dans les réglages du navigateur, ou placez le point sur la carte ou choisissez une wilaya.",
+    gpsUnavailable: "Impossible d'obtenir votre position. Réessayez à l'extérieur, ou placez le point sur la carte ou choisissez une wilaya.",
     wilaya: "Wilaya *",
     chooseWilaya: "Choisir une wilaya",
     detected: "Détectée depuis votre repère — corrigez-la ici si elle est fausse.",

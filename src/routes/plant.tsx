@@ -16,6 +16,7 @@ import { localizeError, ssrT, useI18n } from "@/i18n";
 import { getDeviceSecret } from "@/lib/device";
 import { submitPlanting } from "@/lib/submissions.functions";
 import { submitResilient } from "@/lib/offline";
+import { todayLocalISO } from "@/lib/dates";
 
 export const Route = createFileRoute("/plant")({
   head: () => ({
@@ -42,7 +43,7 @@ function PlantPage() {
   const [commune, setCommune] = useState("");
   const [species, setSpecies] = useState("");
   const [count, setCount] = useState("1");
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(() => todayLocalISO());
   const [notes, setNotes] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -160,7 +161,7 @@ function PlantPage() {
               <input
                 type="date"
                 required
-                max={new Date().toISOString().slice(0, 10)}
+                max={todayLocalISO()}
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 className="tap-target mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-base"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link2, Loader2 } from "lucide-react";
 
 import { useI18n } from "@/i18n";
@@ -14,9 +14,19 @@ export function MapsLinkField({ onLocation }: { onLocation: (lat: number, lng: n
   const { t } = useI18n();
   const [mapsLink, setMapsLink] = useState("");
   const [linkState, setLinkState] = useState<"idle" | "busy" | "ok" | "bad">("idle");
+  // Typing a short link used to hit the server on every keystroke once it
+  // matched the pattern, and a slow early answer could overwrite a later
+  // one. Debounce, and drop answers for text that has since changed.
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const latestRef = useRef("");
+  useEffect(() => () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+  }, []);
 
-  async function applyMapsLink(value: string) {
+  function applyMapsLink(value: string) {
     setMapsLink(value);
+    latestRef.current = value;
+    if (timerRef.current) clearTimeout(timerRef.current);
     const direct = parseGoogleMapsLink(value);
     if (direct) {
       onLocation(direct.lat, direct.lng);
@@ -25,20 +35,25 @@ export function MapsLinkField({ onLocation }: { onLocation: (lat: number, lng: n
     }
     if (isShortMapsLink(value)) {
       setLinkState("busy");
-      try {
-        const resolved = await resolveMapsLink({ data: { url: value.trim() } });
-        if (resolved) {
-          onLocation(resolved.lat, resolved.lng);
-          setLinkState("ok");
-        } else {
-          setLinkState("bad");
-        }
-      } catch {
-        setLinkState("bad");
-      }
+      timerRef.current = setTimeout(() => void resolveShort(value), 400);
       return;
     }
     setLinkState(value.trim() ? "bad" : "idle");
+  }
+
+  async function resolveShort(value: string) {
+    try {
+      const resolved = await resolveMapsLink({ data: { url: value.trim() } });
+      if (latestRef.current !== value) return;
+      if (resolved) {
+        onLocation(resolved.lat, resolved.lng);
+        setLinkState("ok");
+      } else {
+        setLinkState("bad");
+      }
+    } catch {
+      if (latestRef.current === value) setLinkState("bad");
+    }
   }
 
   return (
@@ -47,7 +62,7 @@ export function MapsLinkField({ onLocation }: { onLocation: (lat: number, lng: n
         <Link2 className="size-4 shrink-0 text-muted-foreground" />
         <input
           value={mapsLink}
-          onChange={(e) => void applyMapsLink(e.target.value)}
+          onChange={(e) => applyMapsLink(e.target.value)}
           placeholder={t("forms.location.pasteLink")}
           inputMode="url"
           className="w-full bg-transparent outline-none placeholder:text-muted-foreground"
