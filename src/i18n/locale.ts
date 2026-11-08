@@ -1,3 +1,5 @@
+import { requestStore } from "@/lib/request-context";
+
 export type Locale = "en" | "ar" | "fr";
 
 const KEY = "ga-locale";
@@ -17,12 +19,13 @@ function detect(): Locale {
   if (typeof window !== "undefined") {
     return window.__GA_LOCALE__ ?? "ar";
   }
-  // Server: src/server.ts sets this per request from the visitor's cookie.
-  return ((globalThis as { __GA_LOCALE_SSR__?: string }).__GA_LOCALE_SSR__ as Locale | undefined) ?? "ar";
+  // Server: src/server.ts runs each request inside its own async context
+  // (request-context.ts), so concurrent renders never see each other's locale.
+  return (requestStore()?.locale as Locale | undefined) ?? "ar";
 }
 
 export function getLocale(): Locale {
-  return current;
+  return typeof window === "undefined" ? detect() : current;
 }
 
 export function setLocale(locale: Locale): void {
