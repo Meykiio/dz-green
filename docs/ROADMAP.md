@@ -64,7 +64,8 @@ them**, not a replacement. First customer is likely the association
 
 ## Phase 2: survival layer (3 months; items marked schema need owner approval)
 
-- [ ] **Survival check-ins** at 3, 12 and 36 months: status (alive,
+- [~] **Survival check-ins (2a): code deployed, migration waiting for the
+  owner to run it (`docs/pending-migrations/README.md`).** At 3, 12 and 36 months: status (alive,
   stressed, dead, burned, grazed), repeat photo, reminders, overdue sites
   highlighted on the map; public survival rate per wilaya with sample size
   and method. (schema)

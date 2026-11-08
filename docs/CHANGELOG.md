@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-11-08 (hundred-thirteenth pass): Phase 2a survival checks (code live, migration pending)
+
+- **Design + migration:** `docs/pending-migrations/2026-11_phase2_survival_design.md`, `2026-11_phase2a_survival_checks.sql` (additive; dry-run in PGlite: survival maths, due windows, column grants, write denial, constraints, rollback). Owner delegated the decisions; recommended defaults taken (photo required; headline rate counts only independent and staff checks).
+- **Code:** `/check` form; `submitSurvivalCheck` (abuse gate kind `survival`, approved sites only, duplicate-photo hash, idempotent `client_request_id`, independence decided server-side) and `reviewSurvivalCheck` (live role + wilaya scope; rejecting deletes the photo); site panel survival timeline and due status; due ring on map tree dots; moderator "Survival checks" tab; survival at 1 year per wilaya on Where to plant with sample, coverage and method (no rate below 10 checked plantings). Everything shows "coming soon" or stays hidden until the migration runs. `requireStaff`/`assertScope` moved to `staff.server.ts` (refactor commit). Home page empty fallbacks made stable (map data no longer rebuilt on every render while loading).
+- **Tooling:** `bun run smoke` (headless page check using the installed Edge).
+- **Verified:** tsc clean; unit 272/272 (9 rules + 9 server-path tests new); lint clean on changed files; production build smoke-tested against the live database (map renders with 27 trees, 49 wilayas on Where to plant, `/check` shows coming soon, zero page errors). **Not verified:** the feature with the migration applied on the live database (owner step), moderator tab in a browser (login).
+
 ## 2026-11-08 (hundred-twelfth pass): deploy, Phase 1 quick wins from the research roadmap
 
 - **Deployed** (first push was blocked by Vercel: TanStack Start 1.168.47 has CVE-2026-102989 XSS; upgraded to react-start 1.169.4 / react-router 1.170.46 / router-plugin 1.168.48, error pages now type the thrown value as `unknown`). Live checks: `/restore`, risk files, security headers.
