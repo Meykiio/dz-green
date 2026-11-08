@@ -29,6 +29,7 @@ export const moderation = {
     reject: "Rejeter",
   },
   triage: {
+    noSuspectsRule: "Règle : un signalement décrit uniquement le feu. Marquez comme fausse alerte, ou demandez sa suppression à un administrateur, tout signalement dont le texte ou la photo nomme, décrit ou localise un incendiaire présumé.",
     loading: "Chargement des feux…",
     error: "Impossible de charger les feux — vérifiez votre connexion et rechargez.",
     empty: "Aucun feu signalé pour l'instant.",

@@ -37,6 +37,14 @@ Standing rules for anyone — human or AI — working on Green Algeria. Owner: S
 
 ## Safety rule specific to this product
 
+**Fire reports never point at people.** A false arson accusation led to a
+lynching in 2021, and since October 2026 forest arson can carry the death
+penalty. The fire form tells reporters to describe the fire only, and the
+moderators' triage view carries the rule: any report whose text or photo
+names, describes or locates a suspected arsonist is marked false alarm or
+deleted. Never add a field, filter or feature that collects or displays
+suspects.
+
 The fire flow is a community map, not an emergency service. The "call Protection Civile on 14 / 1021" disclaimer must remain visible on the fire form and its confirmation screen. Do not soften it, hide it behind a tooltip, or imply any dispatch capability.
 
 ## E2E fixture recipe (running `e2e/flows.spec.ts` + `e2e/admin.spec.ts`)

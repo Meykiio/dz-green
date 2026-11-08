@@ -29,6 +29,7 @@ export const moderation = {
     reject: "Reject",
   },
   triage: {
+    noSuspectsRule: "Rule: a fire report must describe the fire only. Mark as false alarm, or ask an admin to delete, any report whose text or photo names, describes or locates a suspected arsonist.",
     loading: "Loading fire reports…",
     error: "Couldn't load fire reports — check your connection and refresh.",
     empty: "No fire reports yet.",

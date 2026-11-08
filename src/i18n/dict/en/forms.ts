@@ -58,6 +58,7 @@ export const forms = {
     submit: "Log care",
   },
   fire: {
+    noSuspects: "Describe the fire only (smoke, flames, where it is spreading). Never name or describe people you suspect: false accusations have cost lives. Suspicions go to the Gendarmerie (1055) or Police (17), not here.",
     title: "Report a fire",
     intro:
       "Just the wilaya is enough — everything else is optional. Reports publish immediately.",
