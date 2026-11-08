@@ -161,6 +161,7 @@ export const home = {
       species: "Espèce",
       by: "Par",
       status: "Statut",
+      updated: "Mis à jour",
       reported: "Signalé",
       severity: "Gravité",
     },
@@ -184,6 +185,7 @@ export const home = {
     careCta: "Déclarer un soin pour ce site",
     directions: "Itinéraire",
     fireDirections: "Itinéraire vers ce signalement",
+    fireSource: "Source : un signalement communautaire sur cette carte, non vérifié par les autorités. Les changements de statut viennent des modérateurs bénévoles.",
     fireDisclaimer:
       "Signalement communautaire — pas un service d'urgence. En danger immédiat, appelez la Protection Civile (14) ou le 1021.",
   },

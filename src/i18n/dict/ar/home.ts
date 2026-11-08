@@ -160,6 +160,7 @@ export const home: typeof import("../en/home").home = {
       species: "النوع",
       by: "من طرف",
       status: "الحالة",
+      updated: "آخر تحديث",
       reported: "بلاغ",
       severity: "الحجم",
     },
@@ -183,6 +184,7 @@ export const home: typeof import("../en/home").home = {
     careCta: "سجّل متابعة لهذا الموقع",
     directions: "الاتجاهات",
     fireDirections: "الاتجاهات إلى هذا البلاغ",
+    fireSource: "المصدر: بلاغ من المجتمع على هذه الخريطة، غير مؤكد من السلطات. تغييرات الحالة يقوم بها مشرفون متطوعون.",
     fireDisclaimer:
       "بلاغ مجتمعي — ليست خدمة طوارئ. في الخطر المباشر اتصل بالحماية المدنية (14) أو 1021.",
   },
