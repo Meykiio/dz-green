@@ -1,7 +1,6 @@
 import type { Map as MapLibreMap } from "maplibre-gl";
 import type { FeatureCollection } from "geojson";
 
-import { riskGeoJSON } from "@/lib/risk";
 import { colorsFor } from "./map-style";
 import { addDataLayers, applyAlgeriaLabelFilter, applyLayerVisibility, type LayerRefs } from "./map-layers";
 import { wireInteractions } from "./map-interactions";
@@ -19,7 +18,12 @@ const wiredMaps = new WeakSet<MapLibreMap>();
  * never re-added the risk layer and re-attached every handler (stacking
  * duplicates). Handlers are attached once per map; visibility runs last.
  */
-export function installLayers(map: MapLibreMap, refs: LayerRefs, hotspots: FeatureCollection): void {
+export function installLayers(
+  map: MapLibreMap,
+  refs: LayerRefs,
+  hotspots: FeatureCollection,
+  risk: FeatureCollection,
+): void {
   const wire = !wiredMaps.has(map);
   wiredMaps.add(map);
   const onSelect = (f: Parameters<LayerRefs["selectRef"]["current"]>[0]) => refs.selectRef.current(f);
@@ -28,7 +32,7 @@ export function installLayers(map: MapLibreMap, refs: LayerRefs, hotspots: Featu
   if (wire) wireInteractions(map, refs);
   addHotspotLayers(map, colorsFor(refs.themeRef.current).hotspots, onSelect, wire);
   setHotspotsData(map, hotspots);
-  addRiskLayers(map, onSelect, wire);
-  setRiskData(map, riskGeoJSON());
+  addRiskLayers(map, colorsFor(refs.themeRef.current), onSelect, wire);
+  setRiskData(map, risk);
   applyLayerVisibility(map, refs.layersRef);
 }

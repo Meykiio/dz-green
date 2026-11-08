@@ -4,7 +4,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 RESULTS = ROOT / "results"
-APP_GRID = ROOT.parent.parent / "src" / "data" / "risk-grid.ts"
 
 POINTS_CSV = DATA / "v7_master_everything_2016_2026.csv"
 GRID_CSV = DATA / "kabylie_grid_climo_fixed_v3.csv"

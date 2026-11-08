@@ -102,6 +102,8 @@
   --color-sand: var(--sand);
   --color-on-sand: var(--on-sand);
   --color-terracotta: var(--terracotta);
+  --color-risk-high: var(--risk-high);
+  --color-risk-medium: var(--risk-medium);
 }
 
 :root {
@@ -144,6 +146,8 @@
   --sand: #96751f; /* Canopy --quaternary (light) */
   --on-sand: #ffffff; /* Canopy --on-quaternary (light) */
   --terracotta: #b5652e; /* Canopy --secondary (light) */
+  --risk-high: #d7301f; /* fire-risk High band (mirrors map-style.ts) */
+  --risk-medium: #d98b0b; /* fire-risk Medium band */
   --glass: rgba(255, 255, 255, 0.82);
 
   /* Map surface (light): warm-paper landmass, clay hairlines */
@@ -206,6 +210,8 @@
   --sand: #e0b65c;
   --on-sand: #2e1e00; /* Canopy --on-quaternary (dark) */
   --terracotta: #d99b6c;
+  --risk-high: #f0503f;
+  --risk-medium: #f2a541;
   --glass: rgba(23, 19, 15, 0.78);
 
   /* Map surface (dark): night-soil landmass, sprout strokes */

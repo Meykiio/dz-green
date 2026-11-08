@@ -17,6 +17,7 @@ import { applyLayerVisibility, type Layer } from "./map-layers";
 import { installLayers } from "./map-setup";
 import { useHeroMapMount } from "./useHeroMapMount";
 import { setHotspotsData } from "./hotspots-layer";
+import { setRiskData } from "./risk-layer";
 import { MapFailureOverlay, type MapFailure } from "./map-failure";
 
 export type { Layer };
@@ -26,6 +27,8 @@ interface Props {
   careLogs: CareLog[];
   fires: FireReport[];
   hotspots: FeatureCollection;
+  /** National risk map; empty until the risk layer is first turned on. */
+  risk: FeatureCollection;
   layers: Record<Layer, boolean>;
   onSelectFeature: (feature: MapFeature) => void;
 }
@@ -36,7 +39,7 @@ interface Props {
  * tree/care/fire, and real geography underneath. Light/dark via OpenFreeMap
  * styles.
  */
-export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeature }: Props) {
+export function HeroMap({ sites, careLogs, fires, hotspots, risk, layers, onSelectFeature }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const pulseRef = useRef(0);
@@ -73,6 +76,8 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
   const refs = { dataRef, layersRef, themeRef, selectRef, sitesRef, careLogsRef, firesRef };
   const hotspotsRef = useRef(hotspots);
   hotspotsRef.current = hotspots;
+  const riskRef = useRef(risk);
+  riskRef.current = risk;
 
   useHeroMapMount({
     containerRef: container,
@@ -82,6 +87,7 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
     themeRef,
     refs,
     hotspotsRef,
+    riskRef,
     ctrlPos: ctrlPosRef.current,
     controlsRef,
     onFailure: setFailure,
@@ -96,7 +102,7 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
     const style = theme === "dark" ? DARK_STYLE : LIGHT_STYLE;
     if (style === styleRef.current) return;
     styleRef.current = style;
-    const once = () => installLayers(map, refs, hotspotsRef.current);
+    const once = () => installLayers(map, refs, hotspotsRef.current, riskRef.current);
     map.once("style.load", once);
     map.setStyle(style);
   }, [theme]);
@@ -129,6 +135,12 @@ export function HeroMap({ sites, careLogs, fires, hotspots, layers, onSelectFeat
     const map = mapRef.current;
     if (map) setHotspotsData(map, hotspots);
   }, [hotspots]);
+
+  // Risk map arrives lazily (first time the layer is turned on).
+  useEffect(() => {
+    const map = mapRef.current;
+    if (map) setRiskData(map, risk);
+  }, [risk]);
 
   // Layer toggles.
   useEffect(() => {

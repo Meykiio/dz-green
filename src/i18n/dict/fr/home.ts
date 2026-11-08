@@ -27,7 +27,7 @@ export const home = {
       care: "Afficher ou masquer les soins",
       fires: "Afficher ou masquer les feux signalés",
       hotspots: "Afficher ou masquer les points chauds des satellites NASA",
-      risk: "Afficher ou masquer la carte des priorités de risque d'incendie (Kabylie, été 2027)",
+      risk: "Afficher ou masquer la carte des priorités de risque d'incendie (nord de l'Algérie, été 2027)",
     },
     board: "Course mensuelle des wilayas — les plantations approuvées sont additionnées par wilaya, remise à zéro le 1er.",
     needsWater: "Aucun soin enregistré pour ce site depuis 14 jours.",
@@ -151,7 +151,7 @@ export const home = {
         high: "Élevé",
       },
       disclaimer:
-        "Classe ce point par rapport au reste des terres cartographiées de Kabylie pour l'été 2027. C'est une estimation du modèle pour planifier la prévention, pas une prévision d'un jour précis, et non vérifiée sur le terrain. Basée sur les zones brûlées les années passées, l'occupation du sol, l'altitude et la distance aux terres agricoles. En danger immédiat, appelez la Protection Civile (14) ou le 1021.",
+        "Classe ce carré de 2 km par rapport au reste du nord de l'Algérie pour l'été 2027. Seuls les 30 % de terres les plus à risque sont affichés. C'est une estimation du modèle pour planifier la prévention (débroussaillage, pare-feu, patrouilles), pas une prévision d'un jour précis, et non vérifiée sur le terrain. Basée sur les feux de végétation détectés par les satellites de la NASA de 2001 à 2025. En danger immédiat, appelez la Protection Civile (14) ou le 1021.",
     },
     field: {
       wilaya: "Wilaya",
@@ -192,6 +192,14 @@ export const home = {
     checked: "Vérifié",
     needsAttention: "Besoin d'attention",
     update: "Mise à jour",
+  },
+  riskLegend: {
+    title: "Priorité de risque d'incendie, été 2027",
+    loading: "Chargement de la carte…",
+    error: "La carte du risque n'a pas pu se charger. Désactivez puis réactivez la couche pour réessayer.",
+    high: "Élevé : les 10 % de terres les plus à risque",
+    medium: "Moyen : les 20 % suivants",
+    note: "Là où les feux reviennent (satellites NASA, 2001-2025). Une aide à la planification, pas une prévision.",
   },
   confirm: {
     title: "Vérification communautaire",

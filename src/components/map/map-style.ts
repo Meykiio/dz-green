@@ -28,6 +28,9 @@ export interface ThemeColors {
   wilayaLine: string;
   wilayaFill: string;
   mask: string;
+  /** Fire-risk priority bands (filled dots, no pulse). Mirror --risk-* in styles.css. */
+  riskHigh: string;
+  riskMedium: string;
 }
 
 /** Canopy map palette (docs/design-system/canopy.html): green trees, wadi
@@ -43,6 +46,8 @@ export function colorsFor(theme: "light" | "dark"): ThemeColors {
         wilayaLine: "#6ED08A",
         wilayaFill: "#6ED08A",
         mask: "#100d0a",
+        riskHigh: "#F0503F",
+        riskMedium: "#F2A541",
       }
     : {
         trees: "#2F6B3F",
@@ -52,6 +57,8 @@ export function colorsFor(theme: "light" | "dark"): ThemeColors {
         wilayaLine: "#2F6B3F",
         wilayaFill: "#2F6B3F",
         mask: "#fdfbf8",
+        riskHigh: "#D7301F",
+        riskMedium: "#D98B0B",
       };
 }
 

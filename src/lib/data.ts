@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getRainFallback } from "@/lib/weather.functions";
 
 import type { CareLog, FireReport, Site } from "./types";
+import { RISK_MAP_URL, RISK_TARGET_YEAR, decodeRiskMap, riskGeoJSON, type RiskMapFile } from "@/lib/risk";
 
 export const SITE_COLUMNS =
   "id,lat,lng,wilaya_code,location_approximate,commune,photo_url,species,tree_count,planted_date,notes,planter_display_name,status,created_at";
@@ -76,6 +77,21 @@ export const hotspotsQuery = queryOptions({
   },
   staleTime: 600_000,
   refetchInterval: 600_000,
+});
+
+/**
+ * The national fire-risk priority map (static file from ml/fire-risk). Loaded
+ * only when the risk layer is turned on; it never changes within a session.
+ */
+export const riskMapQuery = queryOptions({
+  queryKey: ["risk-map", RISK_TARGET_YEAR],
+  queryFn: async (): Promise<FeatureCollection> => {
+    const res = await fetch(RISK_MAP_URL);
+    if (!res.ok) throw new Error(`risk map ${res.status}`);
+    return riskGeoJSON(decodeRiskMap((await res.json()) as RiskMapFile));
+  },
+  staleTime: Infinity,
+  gcTime: Infinity,
 });
 
 /**

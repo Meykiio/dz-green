@@ -27,7 +27,7 @@ export const home = {
       care: "Show or hide care updates",
       fires: "Show or hide fire reports",
       hotspots: "Show or hide NASA satellite hotspot detections",
-      risk: "Show or hide the fire-risk priority map (Kabylie, summer 2027)",
+      risk: "Show or hide the fire-risk priority map (northern Algeria, summer 2027)",
     },
     board: "Monthly wilaya race — approved plantings are summed per wilaya, reset on the 1st.",
     needsWater: "No care logged for this site in the last 14 days.",
@@ -151,7 +151,7 @@ export const home = {
         high: "High",
       },
       disclaimer:
-        "Ranks this spot against the rest of the mapped Kabylie land for summer 2027. It is a model estimate for planning prevention, not a forecast of any specific day and not ground-verified. Based on where fires burned in past years, land cover, elevation and distance to farmland. For immediate danger call Protection Civile (14) or 1021.",
+        "Ranks this 2 km square against the rest of northern Algeria for summer 2027. Only the riskiest 30% of land is drawn. It is a model estimate for planning prevention (clearing, firebreaks, patrols), not a forecast of any specific day, and not ground-verified. Based on where NASA satellites detected vegetation fires from 2001 to 2025. For immediate danger call Protection Civile (14) or 1021.",
     },
     field: {
       wilaya: "Wilaya",
@@ -192,6 +192,14 @@ export const home = {
     checked: "Checked",
     needsAttention: "Needs attention",
     update: "Update",
+  },
+  riskLegend: {
+    title: "Fire-risk priority, summer 2027",
+    loading: "Loading the map…",
+    error: "The risk map could not load. Turn the layer off and on to retry.",
+    high: "High: riskiest 10% of land",
+    medium: "Medium: next 20%",
+    note: "Where fires keep returning (NASA satellites, 2001-2025). A planning aid, not a forecast.",
   },
   confirm: {
     title: "Community check",
