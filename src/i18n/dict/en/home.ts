@@ -161,6 +161,7 @@ export const home = {
       species: "Species",
       by: "By",
       status: "Status",
+      updated: "Updated",
       reported: "Reported",
       severity: "Severity",
     },
@@ -184,6 +185,7 @@ export const home = {
     careCta: "Log care for this site",
     directions: "Directions",
     fireDirections: "Directions to this report",
+    fireSource: "Source: a community report on this map, not verified by the authorities. Status changes come from volunteer moderators.",
     fireDisclaimer:
       "Community report — not an emergency service. For immediate danger call Protection Civile (14) or 1021.",
   },

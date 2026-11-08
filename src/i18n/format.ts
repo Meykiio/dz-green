@@ -95,3 +95,19 @@ export function formatDateTime(date: Date | string): string {
     minute: "2-digit",
   });
 }
+
+/**
+ * "3 hours ago" in the visitor's language (Intl.RelativeTimeFormat), for
+ * fire items where the age matters more than the date. Minutes under an
+ * hour, hours under two days, then days.
+ */
+export function timeAgo(date: Date | string, locale: Locale = getLocale(), now = Date.now()): string {
+  const seconds = Math.round((new Date(date).getTime() - now) / 1000);
+  const rtf = new Intl.RelativeTimeFormat(locale === "ar" ? "ar-DZ" : locale === "fr" ? "fr-DZ" : "en", {
+    numeric: "auto",
+  });
+  const abs = Math.abs(seconds);
+  if (abs < 3600) return rtf.format(Math.round(seconds / 60), "minute");
+  if (abs < 48 * 3600) return rtf.format(Math.round(seconds / 3600), "hour");
+  return rtf.format(Math.round(seconds / 86400), "day");
+}

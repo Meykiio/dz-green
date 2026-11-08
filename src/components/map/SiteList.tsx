@@ -6,6 +6,7 @@ import { useI18n } from "@/i18n";
 import { photoUrl } from "@/lib/data";
 import { needsWater, type CareLog, type FireReport, type MapFeature, type Site } from "@/lib/types";
 import { wilayaName } from "@/lib/wilayas";
+import { timeAgo } from "@/i18n/format";
 
 const FIRE_STATUS_KEY: Record<FireReport["status"], string> = {
   active: "moderation.triage.badge.active",
@@ -171,7 +172,7 @@ function FireRow({
   fire: FireReport;
   onSelectFeature: (feature: MapFeature) => void;
 }) {
-  const { t, formatDateShort } = useI18n();
+  const { t, locale } = useI18n();
   return (
     <button
       type="button"
@@ -190,7 +191,7 @@ function FireRow({
         </span>
         <span className="block text-xs text-muted-foreground">
           {fire.commune ? `${fire.commune} · ` : ""}
-          {t("home.list.reported", { date: formatDateShort(fire.created_at) })}
+          {t("home.list.reported", { date: timeAgo(fire.created_at, locale) })}
           {fire.location_approximate ? ` · ${t("home.list.wilayaLevel")}` : ""}
         </span>
       </span>

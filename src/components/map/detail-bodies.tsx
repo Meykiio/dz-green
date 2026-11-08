@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { PhotoThumb } from "@/components/PhotoThumb";
 import { useI18n } from "@/i18n";
+import { timeAgo } from "@/i18n/format";
 import { photoUrl } from "@/lib/data";
 import { directionsUrl } from "@/lib/maps-link";
 import type { FireReport, Hotspot } from "@/lib/types";
@@ -122,7 +123,7 @@ export function Field({ label, value }: { label: string; value: string }) {
 /** Detail body for a community fire report: photo, fields, weather,
  *  confirmations, the Protection Civile disclaimer, directions. */
 export function FireBody({ fire }: { fire: FireReport }) {
-  const { t, formatDate } = useI18n();
+  const { t, formatDateTime, locale } = useI18n();
   return (
     <div className="mt-4 space-y-4">
       <PhotoThumb
@@ -139,7 +140,16 @@ export function FireBody({ fire }: { fire: FireReport }) {
             `home.detail.status.${fire.status.replace("_", "") === "falsealarm" ? "falseAlarm" : fire.status}`,
           )}
         />
-        <Field label={t("home.detail.field.reported")} value={formatDate(fire.created_at)} />
+        <Field
+          label={t("home.detail.field.reported")}
+          value={`${formatDateTime(fire.created_at)} · ${timeAgo(fire.created_at, locale)}`}
+        />
+        {fire.resolved_at && (
+          <Field
+            label={t("home.detail.field.updated")}
+            value={`${formatDateTime(fire.resolved_at)} · ${timeAgo(fire.resolved_at, locale)}`}
+          />
+        )}
         {fire.severity && (
           <Field
             label={t("home.detail.field.severity")}
@@ -154,6 +164,7 @@ export function FireBody({ fire }: { fire: FireReport }) {
         </p>
       )}
       {fire.description && <p className="text-sm text-muted-foreground">{fire.description}</p>}
+      <p className="text-xs text-muted-foreground">{t("home.detail.fireSource")}</p>
       <FireWeatherBlock lat={fire.lat} lng={fire.lng} />
       <FireConfirmations fireReportId={fire.id} />
       <p className="rounded-lg border border-fire/40 bg-fire/10 px-3 py-2 text-sm">
