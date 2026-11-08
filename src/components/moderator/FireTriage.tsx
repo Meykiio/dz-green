@@ -94,6 +94,9 @@ export function FireTriage() {
 
   return (
     <div>
+      <p className="mb-3 rounded-lg border border-fire/30 bg-fire/5 px-3 py-2 text-xs" role="note">
+        {t("moderation.triage.noSuspectsRule")}
+      </p>
       <div className="mb-3 flex flex-wrap gap-1.5">
         {(["all", "active", "resolved", "false_alarm"] as const).map((f) => (
           <button

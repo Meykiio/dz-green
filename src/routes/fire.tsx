@@ -160,8 +160,14 @@ function FirePage() {
               maxLength={600}
               rows={3}
               onChange={(e) => setDescription(e.target.value)}
+              aria-describedby="fire-no-suspects"
               className="mt-1 w-full rounded-lg border border-input bg-card px-3 py-2 text-base"
             />
+            {/* Never name suspects (2021 lynching after a false arson
+                accusation; arson can carry the death penalty). */}
+            <span id="fire-no-suspects" className="mt-1 block text-xs text-muted-foreground">
+              {t("forms.fire.noSuspects")}
+            </span>
           </label>
 
           <PhotoInput value={photo} onChange={setPhoto} label={t("forms.fire.photo")} />

@@ -58,6 +58,7 @@ export const forms = {
     submit: "Enregistrer le soin",
   },
   fire: {
+    noSuspects: "Décrivez uniquement le feu (fumée, flammes, direction). Ne nommez ni ne décrivez jamais une personne que vous soupçonnez : de fausses accusations ont coûté des vies. Les soupçons vont à la Gendarmerie (1055) ou à la Police (17), pas ici.",
     title: "Signaler un feu",
     intro:
       "La wilaya suffit — tout le reste est optionnel. Les signalements sont publiés immédiatement.",
