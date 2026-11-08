@@ -33,8 +33,10 @@ await check("/restore?w=6", () => {
   };
 });
 await check("/check", () => ({
-  comingSoon: document.querySelector("[role=status]")?.textContent ?? null,
+  // The form only renders when the survival tables exist; otherwise a
+  // "coming soon" note sits inside the page article (not the banner).
   formShown: !!document.querySelector("form select"),
+  comingSoon: document.querySelector("main [role=status]")?.textContent?.slice(0, 60) ?? null,
 }));
 await check("/plant", () => ({ form: !!document.querySelector("form"), season: !!document.querySelector("p svg") }));
 
