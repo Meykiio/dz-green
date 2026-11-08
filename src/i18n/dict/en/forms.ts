@@ -57,6 +57,11 @@ export const forms = {
     name: "Your name (optional)",
     submit: "Log care",
   },
+  season: {
+    now: "It is planting season (November to March): roots settle before the summer drought. Water new trees through their first two summers.",
+    soon: "Planting season starts with the autumn rains (November). Now is the time to choose sites, prepare holes and order seedlings.",
+    off: "Summer is too dry for new seedlings: most trees planted now die in their first drought. If you plant anyway, water every week until autumn, and keep caring for trees already in the ground.",
+  },
   fire: {
     noSuspects: "Describe the fire only (smoke, flames, where it is spreading). Never name or describe people you suspect: false accusations have cost lives. Suspicions go to the Gendarmerie (1055) or Police (17), not here.",
     title: "Report a fire",

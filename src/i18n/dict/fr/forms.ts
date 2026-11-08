@@ -57,6 +57,11 @@ export const forms = {
     name: "Votre nom (optionnel)",
     submit: "Enregistrer le soin",
   },
+  season: {
+    now: "C'est la saison de plantation (novembre à mars) : les racines s'installent avant la sécheresse de l'été. Arrosez les jeunes arbres pendant leurs deux premiers étés.",
+    soon: "La saison de plantation commence avec les pluies d'automne (novembre). C'est le moment de choisir les sites, préparer les trous et commander les plants.",
+    off: "L'été est trop sec pour de jeunes plants : la plupart des arbres plantés maintenant meurent à la première sécheresse. Si vous plantez quand même, arrosez chaque semaine jusqu'à l'automne, et continuez à suivre les arbres déjà en terre.",
+  },
   fire: {
     noSuspects: "Décrivez uniquement le feu (fumée, flammes, direction). Ne nommez ni ne décrivez jamais une personne que vous soupçonnez : de fausses accusations ont coûté des vies. Les soupçons vont à la Gendarmerie (1055) ou à la Police (17), pas ici.",
     title: "Signaler un feu",
