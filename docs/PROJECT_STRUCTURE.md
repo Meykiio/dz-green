@@ -11,7 +11,7 @@ from the 250-line rule.
 
 | Path | Purpose |
 |---|---|
-| `package.json` | Scripts: dev, build, build:dev, preview, test (vitest), lint, format. |
+| `package.json` | Scripts: dev, build, build:dev, preview, test (vitest), lint, format, smoke (`scripts/smoke.mjs`: headless page check with installed Edge). |
 | `vite.config.ts` | TanStack Start + React + Tailwind + Nitro (Vercel build; route rules: security headers + CSP — `optimizeDeps.exclude: ["maplibre-gl"]` is load-bearing, dev-only). |
 | `playwright.config.ts` | Live E2E: dev server on :8081, chromium, workers 1, retries 1, 15-min global cap. |
 | `vitest.config.ts` / `tsconfig.json` / `eslint.config.js` / `.prettierrc` | Test/type/lint/format setup. |
@@ -42,7 +42,7 @@ from the 250-line rule.
 
 `__root.tsx` (html shell + providers + boundaries) · `index.tsx` (map home)
 · `plant.tsx` / `care.tsx` / `fire.tsx` (submission flows) ·
-`my/$token.tsx` (receipt) · `restore.tsx` (Where to plant) · `auth.tsx` · `volunteer.tsx` ·
+`my/$token.tsx` (receipt) · `restore.tsx` (Where to plant) · `check.tsx` (survival check) · `auth.tsx` · `volunteer.tsx` ·
 `about/privacy/terms.tsx` · `_authenticated/` (gate + `moderate.tsx`,
 `admin.tsx`, `activity.tsx`) · `api/public/photo/$.ts` (bucket proxy) ·
 `api/public/hotspots.ts` (FIRMS proxy) · `api/mobile/submissions.ts`
@@ -60,6 +60,7 @@ from the 250-line rule.
 | `map/` | `HeroMap`, `useHeroMapMount`, `map-setup` (installLayers: mount + theme switch), `map-layers`, `map-interactions`, `map-style`, `map-data`, `hotspots-layer`, `risk-layer`, `DetailPanel`, `detail-bodies` (Hotspot/Risk/Fire bodies), `FireConfirmations`, `SiteList`, `map-failure`. |
 | `home/` | `ActionCard` (stat strip, CTAs, icon layer toggles), `ViewToggle`, `ActivityTicker`, `Leaderboard`, `RiskLegend`, `useMapRealtime`. |
 | `restore/` | `WilayaTable` (ranked wilayas), `WilayaRestorePanel` (figures, fire-aware species, Plant here). |
+| `survival/` | `StatusPicker`, `SurvivalSection` (site panel timeline), `SurvivalStats` (rate with sample and method). `moderator/SurvivalReview` is the review tab. |
 | `moderator/` | `PendingQueue` (keyboard-first review + age chips), `FireTriage`, `RejectedQueue`, `ContactReveal`, `ModTabs`, `StatusBadge`. |
 | `admin/` | `AdminOverview`, `AdminUsersPanel`, `CreateAccountDialog`, `AssignWilayasDialog`, `WilayaChecklist`, `VolunteerPanel`, `FeedbackPanel`, `AdminAnnouncementsPanel` + `announce-form-bits`. |
 | `activity/` | `ActivitySections` (three dashboards, presentation only). |
@@ -75,6 +76,7 @@ Query options + server functions + pure helpers. Key files:
 inserts + receipts + location resolution), `moderation.functions.ts`
 (scope-checked staff actions), `admin-*.functions.ts` +
 `admin-shared.server.ts`, `confirmations.*`, `risk.ts` (risk map decode + bands), `restore.ts` (Where to plant data),
+`survival.ts` (rules, shapes), `survival-data.ts` (queries; null = not live), `survival.{functions,impl.server}` (submit/review), `staff.server.ts` (live role + wilaya scope), `planting-season.ts`,
 `rate-limit.ts` (in-memory sliding window), `request-context.ts` (per-request SSR store), `dates.ts` (local dates),
 `receipts.server.ts`, `push.{server,functions}.ts`, `hotspots.server.ts`,
 `weather.*`, `plantnet.*`, `maps.*`, `push.*`, `geo.ts` / `wilaya-geo.ts` /

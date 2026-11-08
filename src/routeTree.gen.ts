@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CareRouteImport } from './routes/care'
+import { Route as CheckRouteImport } from './routes/check'
 import { Route as FireRouteImport } from './routes/fire'
 import { Route as PlantRouteImport } from './routes/plant'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -50,6 +51,11 @@ const AuthRoute = AuthRouteImport.update({
 const CareRoute = CareRouteImport.update({
   id: '/care',
   path: '/care',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckRoute = CheckRouteImport.update({
+  id: '/check',
+  path: '/check',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FireRoute = FireRouteImport.update({
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/care': typeof CareRoute
+  '/check': typeof CheckRoute
   '/fire': typeof FireRoute
   '/plant': typeof PlantRoute
   '/privacy': typeof PrivacyRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/care': typeof CareRoute
+  '/check': typeof CheckRoute
   '/fire': typeof FireRoute
   '/plant': typeof PlantRoute
   '/privacy': typeof PrivacyRoute
@@ -163,6 +171,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/care': typeof CareRoute
+  '/check': typeof CheckRoute
   '/fire': typeof FireRoute
   '/plant': typeof PlantRoute
   '/privacy': typeof PrivacyRoute
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/care'
+    | '/check'
     | '/fire'
     | '/plant'
     | '/privacy'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/care'
+    | '/check'
     | '/fire'
     | '/plant'
     | '/privacy'
@@ -223,6 +234,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/care'
+    | '/check'
     | '/fire'
     | '/plant'
     | '/privacy'
@@ -244,6 +256,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   CareRoute: typeof CareRoute
+  CheckRoute: typeof CheckRoute
   FireRoute: typeof FireRoute
   PlantRoute: typeof PlantRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -291,6 +304,13 @@ declare module '@tanstack/react-router' {
       path: '/care'
       fullPath: '/care'
       preLoaderRoute: typeof CareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/check': {
+      id: '/check'
+      path: '/check'
+      fullPath: '/check'
+      preLoaderRoute: typeof CheckRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fire': {
@@ -408,6 +428,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   CareRoute: CareRoute,
+  CheckRoute: CheckRoute,
   FireRoute: FireRoute,
   PlantRoute: PlantRoute,
   PrivacyRoute: PrivacyRoute,

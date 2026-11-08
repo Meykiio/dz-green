@@ -7,6 +7,9 @@ import { FireTriage } from "@/components/moderator/FireTriage";
 import { ModTabs, type Section } from "@/components/moderator/ModTabs";
 import { PendingQueue } from "@/components/moderator/PendingQueue";
 import { RejectedQueue } from "@/components/moderator/RejectedQueue";
+import { SurvivalReview } from "@/components/moderator/SurvivalReview";
+import { useQuery } from "@tanstack/react-query";
+import { survivalReviewQuery } from "@/lib/survival-data";
 import { ssrT, useI18n } from "@/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useModerationStats } from "@/lib/moderation";
@@ -15,6 +18,7 @@ const SECTION_KEY: Record<Section, string> = {
   queue: "moderation.mod.headingQueue",
   fires: "moderation.mod.headingFires",
   rejected: "moderation.mod.headingRejected",
+  survival: "survival.reviewTab",
 };
 
 export const Route = createFileRoute("/_authenticated/moderate")({
@@ -36,6 +40,8 @@ function ModeratePage() {
   const navigate = useNavigate();
   const stats = useModerationStats(isModerator);
   const [section, setSection] = useState<Section>("queue");
+  // Hooks before any early return (rules of hooks). Only fetched for staff.
+  const survivalQueue = useQuery({ ...survivalReviewQuery, enabled: isModerator });
 
   useEffect(() => {
     if (!loading && !isModerator) void navigate({ to: "/" });
@@ -55,6 +61,7 @@ function ModeratePage() {
     queue: stats.data?.pending ?? 0,
     fires: stats.data?.activeFires ?? 0,
     rejected: stats.data?.rejected ?? 0,
+    survival: survivalQueue.data?.length ?? 0,
   };
 
   return (
@@ -76,6 +83,7 @@ function ModeratePage() {
           {section === "queue" && <PendingQueue />}
           {section === "fires" && <FireTriage />}
           {section === "rejected" && <RejectedQueue />}
+          {section === "survival" && <SurvivalReview />}
         </main>
       </div>
     </AppShell>

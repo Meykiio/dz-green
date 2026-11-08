@@ -20,9 +20,10 @@ const HOURLY_LIMITS: Record<Kind, number> = {
   planting: 6,
   care: 20,
   fire: 8,
+  survival: 20,
 };
 
-export type Kind = "planting" | "care" | "fire";
+export type Kind = "planting" | "care" | "fire" | "survival";
 
 export interface GateInput {
   /** Hidden honeypot field. Bots fill it, humans never see it. */

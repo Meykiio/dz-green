@@ -1,9 +1,9 @@
-import { Flame, Sprout, XCircle } from "lucide-react";
+import { ClipboardCheck, Flame, Sprout, XCircle } from "lucide-react";
 
 import { SectionTabs } from "@/components/SectionTabs";
 import { useI18n } from "@/i18n";
 
-export type Section = "queue" | "fires" | "rejected";
+export type Section = "queue" | "fires" | "rejected" | "survival";
 
 interface Props {
   section: Section;
@@ -23,6 +23,7 @@ export function ModTabs({ section, onSelect, counts }: Props) {
         { id: "queue", label: t("moderation.tabs.pending"), icon: Sprout, count: counts.queue },
         { id: "fires", label: t("moderation.tabs.fires"), icon: Flame, count: counts.fires },
         { id: "rejected", label: t("moderation.tabs.rejected"), icon: XCircle, count: counts.rejected },
+        { id: "survival", label: t("survival.reviewTab"), icon: ClipboardCheck, count: counts.survival },
       ]}
     />
   );
