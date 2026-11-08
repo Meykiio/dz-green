@@ -2,6 +2,14 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-11-08 (hundred-twelfth pass): deploy, Phase 1 quick wins from the research roadmap
+
+- **Deployed** (first push was blocked by Vercel: TanStack Start 1.168.47 has CVE-2026-102989 XSS; upgraded to react-start 1.169.4 / react-router 1.170.46 / router-plugin 1.168.48, error pages now type the thrown value as `unknown`). Live checks: `/restore`, risk files, security headers.
+- **Supabase MCP** added to `.mcp.json` (production project, `read_only=true` per the owner's standing rule). Owner authentication pending.
+- **Research:** six sourced tracks, report in `docs/archive/RESEARCH_2026-11_NEXT_LEVEL.md`, roadmap rewritten around the survival-layer strategy.
+- **Phase 1 shipped:** MapLibre 6.16 (native Arabic; RTL plugin and `'wasm-unsafe-eval'` removed); never-name-suspects rule on the fire form and triage (+ SYSTEM_INSTRUCTIONS); Realtime closes on hidden tabs and pauses under Data Saver/2G; fire items show time, age, last update and source; planting-season status on Where to plant and the plant form.
+- **Verified:** tsc clean; unit 254/254 (one photo-decode test got an explicit 20 s budget after a single timeout under load, assertions unchanged); build green; production build in the browser (Arabic labels with no plugin and the stricter CSP, fire form rule rendered AR/EN, season note on both pages, no hydration warnings). **Not verified:** moderator triage view (login), E2E, real phone.
+
 ## 2026-11-08 (hundred-eleventh pass): security, bug fixes, national fire model, Where to plant (local main, not pushed)
 
 - **Security** (`fix/security-hardening`): push endpoint allowlist + 5 s send timeout + batched fan-out (blind SSRF / fire-report stall); per-IP throttles on push subscribe, fire votes, PlantNet; per-request SSR store (AsyncLocalStorage) so concurrent renders cannot leak locale or coarse location; Arabic map-text plugin self-hosted as ESM (the unpkg version was blocked by our CSP in production, so Arabic place names rendered broken), CSP adds only `'wasm-unsafe-eval'`, plus HSTS; E2E passwords moved to env vars; CI least-privilege + SHA-pinned actions + model tests. Pending migration for the new throttle kinds.

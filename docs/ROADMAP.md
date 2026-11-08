@@ -48,18 +48,19 @@ them**, not a replacement. First customer is likely the association
 
 ## Phase 1: quick wins (code, no schema, weeks)
 
-- [ ] **Never-name-suspects rule** for fire reports, written into the
+- [x] **Never-name-suspects rule** for fire reports, written into the
   moderation guide and the fire form copy (2021 lynching; Oct 2026
   death-penalty bill for arson).
-- [ ] **MapLibre upgrade to 6.9+:** Arabic renders natively, so drop the
+- [x] **MapLibre upgrade to 6.9+ (6.16):** Arabic renders natively, so drop the
   self-hosted RTL plugin and the `'wasm-unsafe-eval'` CSP exception.
-- [ ] **Low-bandwidth mode:** load the map after first paint, honour
-  Save-Data / slow connections (no risk grid, thumbnails, no Realtime),
-  close the Realtime channel when the tab is hidden, `updateData` for
-  inserts.
-- [ ] **"Last updated" + source label** on every fire item and data layer.
-- [ ] **Planting-window and first-summer advice** on Where to plant (the
-  first summer drought is the main seedling killer).
+- [x] **Low-bandwidth mode:** Realtime closes on hidden tabs (catch-up on
+  return); Data Saver / 2G pauses live updates and the hotspot refresh,
+  with a note. Still open: deferring the map until after first paint,
+  thumbnails in data-saver mode, `updateData` for inserts.
+- [x] **Time, age and source** on fire items (layers already carry
+  their source in the legend and detail panels).
+- [x] **Planting-season status** (now / prepare / too dry) on Where to
+  plant and the planting form.
 
 ## Phase 2: survival layer (3 months; items marked schema need owner approval)
 
