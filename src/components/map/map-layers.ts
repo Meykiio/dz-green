@@ -93,8 +93,12 @@ export function addDataLayers(map: MapLibreMap, refs: LayerRefs) {
       paint: {
         "circle-color": color,
         "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 5, 10, 7, 14, 10],
-        "circle-stroke-width": 1.5,
-        "circle-stroke-color": "rgba(255,255,255,0.7)",
+        // Plantings due for a survival check get a thick terracotta ring.
+        "circle-stroke-width": kind === "trees" ? ["case", ["==", ["get", "due"], true], 3.5, 1.5] : 1.5,
+        "circle-stroke-color":
+          kind === "trees"
+            ? ["case", ["==", ["get", "due"], true], colors.due, "rgba(255,255,255,0.7)"]
+            : "rgba(255,255,255,0.7)",
       },
     });
     // Pulse halo — animated by the rAF loop in startPulse.

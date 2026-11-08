@@ -30,6 +30,8 @@ export interface ThemeColors {
   /** Fire-risk priority bands (filled dots, no pulse). Mirror --risk-* in styles.css. */
   riskHigh: string;
   riskMedium: string;
+  /** Ring on plantings due for a survival check (terracotta, not a fire colour). */
+  due: string;
 }
 
 /** Canopy map palette (docs/design-system/canopy.html): green trees, wadi
@@ -47,6 +49,7 @@ export function colorsFor(theme: "light" | "dark"): ThemeColors {
         mask: "#100d0a",
         riskHigh: "#F0503F",
         riskMedium: "#F2A541",
+        due: "#D99B6C",
       }
     : {
         trees: "#2F6B3F",
@@ -58,6 +61,7 @@ export function colorsFor(theme: "light" | "dark"): ThemeColors {
         mask: "#fdfbf8",
         riskHigh: "#D7301F",
         riskMedium: "#D98B0B",
+        due: "#B5652E",
       };
 }
 

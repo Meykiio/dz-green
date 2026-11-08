@@ -6,13 +6,15 @@ export function featureCollection(
   sites: Site[],
   careLogs: CareLog[],
   fires: FireReport[],
+  /** Plantings due for a survival check: drawn with a ring (Phase 2a). */
+  dueSiteIds: ReadonlySet<string> = new Set(),
 ): FeatureCollection {
   const siteById = new Map(sites.map((s) => [s.id, s]));
   const features: Feature[] = [];
   for (const site of sites) {
     features.push({
       type: "Feature",
-      properties: { kind: "trees", id: site.id },
+      properties: { kind: "trees", id: site.id, due: dueSiteIds.has(site.id) },
       geometry: { type: "Point", coordinates: [site.lng, site.lat] },
     });
   }

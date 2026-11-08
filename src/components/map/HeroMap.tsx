@@ -29,6 +29,8 @@ interface Props {
   hotspots: FeatureCollection;
   /** National risk map; empty until the risk layer is first turned on. */
   risk: FeatureCollection;
+  /** Plantings due for a survival check (empty until the feature is live). */
+  dueSiteIds?: ReadonlySet<string>;
   layers: Record<Layer, boolean>;
   onSelectFeature: (feature: MapFeature) => void;
 }
@@ -39,7 +41,7 @@ interface Props {
  * tree/care/fire, and real geography underneath. Light/dark via OpenFreeMap
  * styles.
  */
-export function HeroMap({ sites, careLogs, fires, hotspots, risk, layers, onSelectFeature }: Props) {
+export function HeroMap({ sites, careLogs, fires, hotspots, risk, dueSiteIds, layers, onSelectFeature }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const pulseRef = useRef(0);
@@ -50,7 +52,10 @@ export function HeroMap({ sites, careLogs, fires, hotspots, risk, layers, onSele
   const isMobile = useIsMobile();
   const themeRef = useRef(theme);
   themeRef.current = theme;
-  const data = useMemo(() => featureCollection(sites, careLogs, fires), [sites, careLogs, fires]);
+  const data = useMemo(
+    () => featureCollection(sites, careLogs, fires, dueSiteIds),
+    [sites, careLogs, fires, dueSiteIds],
+  );
   const dataRef = useRef(data);
   dataRef.current = data;
   const layersRef = useRef(layers);

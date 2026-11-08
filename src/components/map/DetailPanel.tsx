@@ -12,6 +12,7 @@ import { wilayaName } from "@/lib/wilayas";
 import { FireBody, Field, HotspotBody, RiskBody } from "./detail-bodies";
 
 import type { MapFeature } from "@/lib/types";
+import { SurvivalSection } from "@/components/survival/SurvivalSection";
 
 const ACTION_KEY: Record<CareLog["action"], "watered" | "checked" | "needsAttention" | "update"> = {
   watered: "watered",
@@ -112,6 +113,8 @@ export function DetailPanel({
                 {t("home.detail.thirsty")}
               </p>
             )}
+
+            <SurvivalSection siteId={site.id} />
 
             <div>
               <p className="eyebrow">{t("home.detail.timeline")}</p>

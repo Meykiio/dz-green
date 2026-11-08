@@ -15,9 +15,11 @@ import { ssrT, useI18n } from "@/i18n";
 import { announcementQuery, careLogsQuery, fireReportsQuery, hotspotsQuery, rainFallbackQuery, riskMapQuery, sitesQuery } from "@/lib/data";
 import { EMPTY_RISK } from "@/lib/risk";
 import { RiskLegend } from "@/components/home/RiskLegend";
-import { needsWater, type MapFeature, type Site } from "@/lib/types";
+import { needsWater, type CareLog, type MapFeature, type Site } from "@/lib/types";
 import { useHydrated } from "@/hooks/useHydrated";
 import { isDataLight, useDataLight, usePageVisible } from "@/hooks/useConnection";
+import { siteSurvivalStatusQuery } from "@/lib/survival-data";
+import { isDue } from "@/lib/survival";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -36,6 +38,12 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
+// Stable fallbacks while data loads: a fresh [] or {} on every render would
+// change the memo dependencies below and rebuild the map's data each time.
+const NO_SITES: Site[] = [];
+const NO_LOGS: CareLog[] = [];
+const NO_RAIN: Record<string, number> = {};
+
 function HomePage() {
   const { t } = useI18n();
   const sites = useQuery(sitesQuery);
@@ -53,6 +61,12 @@ function HomePage() {
     hotspots: true,
     risk: false,
   });
+  // Survival layer: plantings due for a check get a ring (null = not live yet).
+  const survival = useQuery(siteSurvivalStatusQuery);
+  const dueSiteIds = useMemo(
+    () => new Set((survival.data ?? []).filter((s) => isDue(s.due)).map((s) => s.site_id)),
+    [survival.data],
+  );
   // Loaded once, on demand: most visitors never turn the risk layer on.
   const riskMap = useQuery({ ...riskMapQuery, enabled: layers.risk });
   const [view, setView] = useState<HomeView>("map");
@@ -66,8 +80,8 @@ function HomePage() {
     if (window.matchMedia("(max-width: 767px)").matches) setCardHidden(true);
   }, []);
 
-  const siteList = sites.data ?? [];
-  const logList = careLogs.data ?? [];
+  const siteList = sites.data ?? NO_SITES;
+  const logList = careLogs.data ?? NO_LOGS;
   // Public views show ACTIVE fires only (owner 2026-09-01): resolved and
   // false-alarm reports are hidden from the map and list; reopening one in
   // triage makes it active again, so it reappears. Triage keeps its own view.
@@ -85,7 +99,7 @@ function HomePage() {
     [siteList, logList],
   );
   const rain = useQuery(rainFallbackQuery(rainCandidates));
-  const rainById = rain.data ?? {};
+  const rainById = rain.data ?? NO_RAIN;
 
   // Live map subscription + anonymous activity ticker ("2 trees just planted
   // in Oran") fed by the same realtime events.
@@ -144,6 +158,7 @@ function HomePage() {
             fires={fireList}
             hotspots={hotspots.data ?? { type: "FeatureCollection", features: [] }}
             risk={riskMap.data ?? EMPTY_RISK}
+            dueSiteIds={dueSiteIds}
             layers={layers}
             onSelectFeature={setFeature}
           />

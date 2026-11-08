@@ -6,6 +6,7 @@ import { useI18n } from "@/i18n";
 import { suggestForFireExposed, suggestForWilaya } from "@/lib/planting-guide";
 import { formatKm2, type RestoreRow } from "@/lib/restore";
 import { wilayaName } from "@/lib/wilayas";
+import { SurvivalStats } from "@/components/survival/SurvivalStats";
 
 /** One wilaya's restoration picture: figures, species that suit it, and the
  *  two actions that matter (plant here, look after what is planted). */
@@ -43,6 +44,8 @@ export function WilayaRestorePanel({ row, onClose }: { row: RestoreRow; onClose:
         </li>
         <li>{t("restore.detailTrees", { n: n(row.trees) })}</li>
       </ul>
+
+      <SurvivalStats wilayaCode={row.code} />
 
       <h3 className="mt-5 text-sm font-semibold">{t("restore.speciesTitle")}</h3>
       {suggestions.length === 0 ? (
