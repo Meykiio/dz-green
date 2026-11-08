@@ -45,3 +45,7 @@ playwright-report
 *.njsproj
 *.sln
 *.sw?
+
+# Deep-research working notes and reports (kept local)
+research_notes/
+reports/
