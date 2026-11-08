@@ -1,6 +1,7 @@
 export const chrome = {
   brandTagline: "La carte communautaire du reboisement en Algérie",
   nav: {
+    restore: "Où planter",
     map: "Carte",
     plant: "J'ai planté un arbre",
     care: "Déclarer un soin",

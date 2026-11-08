@@ -1,6 +1,7 @@
 export const chrome = {
   brandTagline: "The community map of tree planting in Algeria",
   nav: {
+    restore: "Where to plant",
     map: "Map",
     plant: "I planted a tree",
     care: "Log care",

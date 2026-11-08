@@ -58,3 +58,15 @@ describe("suggestForWilaya", () => {
     }
   });
 });
+
+describe("suggestForFireExposed", () => {
+  it("never suggests flammable pines or eucalyptus and leads with fire-resilient natives", async () => {
+    const { suggestForFireExposed } = await import("@/lib/planting-guide");
+    for (const code of ["06", "15", "18", "21", "36"]) {
+      const got = suggestForFireExposed(code);
+      expect(got.length).toBeGreaterThan(0);
+      expect(got.some((s) => s.species.fire === "prone")).toBe(false);
+      expect(got[0]!.species.fire).toBe("resilient");
+    }
+  });
+});

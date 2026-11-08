@@ -45,6 +45,12 @@ export function PlantingGuide({
               {" — "}
               {locale === "ar" ? species.noteAr : species.noteEn}
             </span>
+            {species.fire === "prone" && (
+              <span className="inline-flex items-center gap-1 text-xs text-fire">
+                <TriangleAlert className="size-3" />
+                {t("forms.plant.guideFireProne")}
+              </span>
+            )}
             {species.cautionAr && (
               <span className="inline-flex items-center gap-1 text-xs text-fire">
                 <TriangleAlert className="size-3" />

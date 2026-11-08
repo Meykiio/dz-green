@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
+import { z } from "zod";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -17,8 +18,13 @@ import { getDeviceSecret } from "@/lib/device";
 import { submitPlanting } from "@/lib/submissions.functions";
 import { submitResilient } from "@/lib/offline";
 import { todayLocalISO } from "@/lib/dates";
+import { wilayaCodeOf, wilayaNumParam } from "@/lib/wilayas";
+
+// ?wilaya=6 pre-selects the wilaya (links from the "Where to plant" page).
+const searchSchema = z.object({ wilaya: wilayaNumParam.optional().catch(undefined) });
 
 export const Route = createFileRoute("/plant")({
+  validateSearch: searchSchema,
   head: () => ({
     meta: [
       { title: ssrT("meta.plantTitle") },
@@ -39,7 +45,8 @@ function PlantPage() {
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
   const [accuracy, setAccuracy] = useState<number | null>(null);
-  const [wilaya, setWilaya] = useState("");
+  const { wilaya: initialWilaya } = Route.useSearch();
+  const [wilaya, setWilaya] = useState(() => (initialWilaya == null ? "" : wilayaCodeOf(initialWilaya)));
   const [commune, setCommune] = useState("");
   const [species, setSpecies] = useState("");
   const [count, setCount] = useState("1");

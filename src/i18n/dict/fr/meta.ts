@@ -2,6 +2,8 @@ export const meta = {
   homeTitle: "Algérie Verte — la carte vivante du reboisement en Algérie",
   homeDesc:
     "Chaque arbre planté dans les 69 wilayas d'Algérie, les soins près de chez vous, et les feux signalés — sur une carte gérée par la communauté.",
+  restoreTitle: "Où planter — Algérie Verte",
+  restoreDesc: "Les wilayas qui ont perdu le plus de terres au feu, où le risque d'incendie 2027 est le plus élevé, et quoi y planter.",
   aboutTitle: "À propos d'Algérie Verte — une carte communautaire, pas un service d'urgence",
   aboutDesc:
     "Comment fonctionne Algérie Verte : des plantations publiques relues avant publication, des soins et des feux signalés immédiatement, gérés par la communauté pour tout le pays.",
