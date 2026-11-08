@@ -193,6 +193,7 @@ export const home = {
     needsAttention: "Needs attention",
     update: "Update",
   },
+  dataLight: "Data saver is on: live updates are paused. Reload to see new reports.",
   riskLegend: {
     title: "Fire-risk priority, summer 2027",
     loading: "Loading the map…",

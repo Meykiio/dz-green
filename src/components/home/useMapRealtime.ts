@@ -10,10 +10,16 @@ import { wilayaName } from "@/lib/wilayas";
  * Live map subscription: filtered channels (approved plantings, all fire
  * reports, care inserts) invalidate the queries, and each INSERT surfaces an
  * anonymous activity line for the ticker ("3 trees just planted in Oran").
+ *
+ * The channel only exists while `enabled` (tab visible, not in data-light
+ * mode). Every open tab holds one of the plan's Realtime connections (200
+ * on Free, 500 on Pro), so hidden tabs let theirs go; when the tab comes
+ * back the map refetches once to catch up on anything it missed.
  */
 export function useMapRealtime(
   sitesRef: MutableRefObject<Site[]>,
   onActivity: (text: string) => void,
+  enabled = true,
 ) {
   const queryClient = useQueryClient();
   const { t } = useI18n();
@@ -22,7 +28,21 @@ export function useMapRealtime(
   const tRef = useRef(t);
   tRef.current = t;
 
+  // Set once the channel has been paused, so the catch-up refetch only runs
+  // when a hidden tab comes back, never on the first load.
+  const pausedRef = useRef(false);
+
   useEffect(() => {
+    if (!enabled) {
+      pausedRef.current = true;
+      return;
+    }
+    if (pausedRef.current) {
+      pausedRef.current = false;
+      for (const key of ["sites", "fire_reports", "care_logs"]) {
+        void queryClient.invalidateQueries({ queryKey: [key] });
+      }
+    }
     // Audit 2026-08-28: a burst of inserts (e.g. a day of fire reports)
     // would invalidate queries dozens of times per second. Debounce each
     // invalidate so the client re-fetches at most every 2s, per table.
@@ -97,5 +117,5 @@ export function useMapRealtime(
       void supabase.removeChannel(channel);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryClient, sitesRef]);
+  }, [queryClient, sitesRef, enabled]);
 }
