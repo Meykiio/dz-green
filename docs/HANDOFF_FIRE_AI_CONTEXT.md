@@ -12,6 +12,10 @@ verified, the model history is what the repo recorded.
 
 ## 1. TL;DR
 
+**Read section 11 first (re-test, 2026-11-08).** It corrects three claims
+below: the honest held-out AUC is 0.742, not 0.826; the live map was not
+produced by the saved v7 model; the training workspace was found.
+
 - A fire-risk model exists and is documented as **v7 champion, AUC 0.826,
   validated against the unseen summer 2026**. It is real but it is a
   **climatological estimate for typical summer conditions, not a live
@@ -220,3 +224,58 @@ bun run build
 - `abb7b2c` chore(db): apply `fire_confirmations` migration live, fold
   into master schema (DATABASE.md records applied 2026-09-13).
 - `d052e3f` current `main` head at the time of writing, tree clean.
+
+## 11. Re-test of the saved v7 model (2026-11-08)
+
+Workspace found: `C:\Users\DELL\Projects\fire_prediction_project` (not a
+git repo). It holds the saved models (`fire_model_v3_final.joblib`,
+`fire_model_v7_champion.joblib`), datasets v1 to v4, one early backtest,
+and `risk_map_2027_all_spots.csv` + PNG. **No training or scoring code**:
+it was lost with the OpenCode session. Re-test scripts now live in its
+`scripts/` folder (`retest_v7.py`, `holdout_v7.py`; need xgboost,
+scikit-learn, pandas, joblib).
+
+**The saved v7 model:** XGBClassifier, 400 trees, depth 4, learning rate
+0.05, 19 inputs: EVI, NDVI, aspect, dist_to_builtup, dist_to_cropland,
+dryair_max_7d, elevation, hot_days_7d, landcover, precip_7d/30d/90d,
+rh_min_7d, slope, soil_mean_7d, temp_max_7d, vpd_max_7d, wind_dir_7d,
+wind_max_7d. No leaking columns (`neg_type`, `burned`, `rand`, `year`
+are not inputs). The CEMS fire-weather and burn-history columns in the v7
+CSV are not used.
+
+**2026 was in its training data.** The saved model scores AUC 0.88 to 0.99
+on every year including 2026 (0.932), so its own scores are not a test.
+
+**Honest scores** (same settings retrained on all earlier years, tested on
+the next year, `holdout_v7.py`):
+
+| Test year | AUC | Fires vs near-misses | Top 20% of points holds |
+|---|---|---|---|
+| 2022 | 0.588 | 0.546 | 28% of fires |
+| 2023 | 0.702 | 0.665 | 41% |
+| 2024 | 0.828 | 0.809 | 59% |
+| 2025 | 0.874 | 0.867 | 59% |
+| 2026 | 0.742 | 0.725 | 37% |
+
+Read: useful (2026 top 20% catches about 1.9x its share) but unstable year
+to year. 0.826 matches the 2024 row; it is not the 2026 result.
+
+**Calibration (saved model, in-sample 2026):** scores overstate risk in
+the middle (0.4 to 0.6 predicted, 0.13 actual). Do not present scores as
+probabilities.
+
+**Strongest inputs (2016-2025 model):** elevation, dist_to_cropland,
+landcover, EVI, aspect, slope. The model mostly learned *where* fires
+happen, not *when*, which suits a yearly prevention map.
+
+**The live map is not v7 output.** `src/data/risk-grid.ts` equals
+`risk_map_2027_all_spots.csv` (3,882 points). That grid lacks 4 of v7's 19
+inputs (EVI, aspect, hot_days_7d, vpd_max_7d), and scoring it with v7
+(missing = empty) differs from the published values by up to 0.64
+(correlation 0.89). It came from another, unsaved model. The map also
+gives risk to water (58 points, up to 0.62) and built-up land (108 points,
+up to 0.96).
+
+**Answers to section 8:** Q1 found (above). Q2: the bundled grid is
+`risk_map_2027_all_spots.csv`, origin model unknown. Q5: yes, calibration
+is needed before any probability wording.
