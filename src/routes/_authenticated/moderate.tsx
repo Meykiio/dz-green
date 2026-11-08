@@ -44,7 +44,7 @@ function ModeratePage() {
   if (loading) {
     return (
       <AppShell>
-        <p className="p-8 text-muted-foreground">{t("mod.mod.checking")}</p>
+        <p className="p-8 text-muted-foreground">{t("moderation.mod.checking")}</p>
       </AppShell>
     );
   }

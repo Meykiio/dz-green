@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BadgeCheck, Check, HelpCircle, ThumbsDown, ThumbsUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useI18n } from "@/i18n";
+import { localizeError, useI18n } from "@/i18n";
 import { getDeviceSecret } from "@/lib/device";
 import { getFireCounts, getMyVote, submitFireVote } from "@/lib/confirmations.functions";
 import type { Verdict } from "@/lib/confirmations.server";
@@ -39,6 +40,9 @@ export function FireConfirmations({ fireReportId }: { fireReportId: string }) {
         queryClient.invalidateQueries({ queryKey: ["fire-counts", fireReportId] }),
         queryClient.invalidateQueries({ queryKey: ["my-vote", fireReportId] }),
       ]);
+    } catch (error) {
+      // Used to fail silently: the button just stopped spinning.
+      toast.error(localizeError(error instanceof Error ? error.message : ""));
     } finally {
       setPending(null);
     }
@@ -53,12 +57,12 @@ export function FireConfirmations({ fireReportId }: { fireReportId: string }) {
       <div className="flex items-center justify-between gap-2">
         <p className="eyebrow flex items-center gap-1.5">
           <BadgeCheck className="size-3.5 text-plant" />
-          {t("confirm.title")}
+          {t("home.confirm.title")}
         </p>
         {verified && (
           <span className="inline-flex items-center gap-1 rounded-full border border-plant/40 bg-plant/10 px-2 py-0.5 text-xs font-semibold text-plant">
             <BadgeCheck className="size-3" />
-            {t("confirm.verified")}
+            {t("home.confirm.verified")}
           </span>
         )}
       </div>
@@ -66,21 +70,21 @@ export function FireConfirmations({ fireReportId }: { fireReportId: string }) {
       <div className="mt-2 grid grid-cols-3 gap-2">
         <VoteButton
           icon={<ThumbsUp className="size-4" />}
-          label={t("confirm.yes")}
+          label={t("home.confirm.yes")}
           active={current === "yes"}
           busy={pending === "yes"}
           onClick={() => void vote("yes")}
         />
         <VoteButton
           icon={<ThumbsDown className="size-4" />}
-          label={t("confirm.no")}
+          label={t("home.confirm.no")}
           active={current === "no"}
           busy={pending === "no"}
           onClick={() => void vote("no")}
         />
         <VoteButton
           icon={<HelpCircle className="size-4" />}
-          label={t("confirm.unsure")}
+          label={t("home.confirm.unsure")}
           active={current === "unsure"}
           busy={pending === "unsure"}
           onClick={() => void vote("unsure")}
@@ -89,10 +93,10 @@ export function FireConfirmations({ fireReportId }: { fireReportId: string }) {
 
       {c && (c.conf_yes + c.conf_no + c.conf_unsure > 0) && (
         <p className="mt-2 text-xs text-muted-foreground">
-          {t("confirm.counts", { yes: c.conf_yes, no: c.conf_no, unsure: c.conf_unsure })}
+          {t("home.confirm.counts", { yes: c.conf_yes, no: c.conf_no, unsure: c.conf_unsure })}
         </p>
       )}
-      <p className="mt-1 text-xs text-muted-foreground">{t("confirm.note")}</p>
+      <p className="mt-1 text-xs text-muted-foreground">{t("home.confirm.note")}</p>
     </div>
   );
 }
