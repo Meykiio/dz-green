@@ -93,7 +93,6 @@ display centre with `location_approximate = true`) → `storePhoto` (data URL
 | Open-Meteo | fire weather, air quality, rain fallback | keyless, fail-soft |
 | PlantNet | species suggestion from photos | server-held, fail-soft |
 | Web Push (VAPID) | fire alerts | public key in bundle, private server-only |
-| mapbox-gl-rtl-text (self-hosted) | Arabic map labels | `public/vendor/*.mjs`, loaded by MapLibre with import(); CSP allows only `'wasm-unsafe-eval'` for it |
 | NASA FIRMS yearly archive | fire-risk model training (offline, `ml/fire-risk/`) | public files, no key; never called by the app |
 
 ## Conventions an agent must follow

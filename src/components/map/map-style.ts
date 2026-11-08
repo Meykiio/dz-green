@@ -1,5 +1,4 @@
 import {
-  setRTLTextPlugin,
   setWorkerUrl,
 } from "maplibre-gl";
 import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
@@ -66,19 +65,9 @@ export function colorsFor(theme: "light" | "dark"): ThemeColors {
 // nothing — the worker 404s in production and every GeoJSON source (wilaya
 // borders, dots) silently never renders. ?worker&url bundles the worker and
 // its maplibre-gl-shared.mjs sibling into one self-contained asset.
-// MUST run before setRTLTextPlugin below: registering the RTL plugin
-// instantiates an internal throwaway map, which acquires the (singleton)
-// worker pool using whatever WORKER_URL is set at that moment.
+// Runs at module load, before any map acquires the (singleton) worker pool.
 setWorkerUrl(maplibreWorkerUrl);
 
-// Arabic labels need the RTL shaping plugin or they render reversed and
-// detached. Browser-only (SSR has no document); module scope so maplibre's
-// "cannot be called multiple times" can't trip on StrictMode remounts.
-// Self-hosted .mjs (2026-11-08): the old unpkg .js URL was blocked by our
-// CSP in production (maplibre fetches a .js plugin and eval()s it); an .mjs
-// from our origin is loaded with import(), which script-src 'self' allows.
-// The plugin compiles WebAssembly, hence 'wasm-unsafe-eval' in the CSP.
-if (typeof document !== "undefined") {
-  setRTLTextPlugin(new URL("/vendor/mapbox-gl-rtl-text-0.3.0.mjs", location.origin).href, true);
-}
+// Arabic labels: MapLibre 6.9+ shapes Arabic and Hebrew natively, so the
+// RTL text plugin (and its CSP 'wasm-unsafe-eval' exception) is gone.
 

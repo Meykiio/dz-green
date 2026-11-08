@@ -231,5 +231,7 @@ describe("storePhoto", () => {
     const path = await storePhoto(`data:image/jpeg;base64,${b64}`, "plantings");
     expect(path).toMatch(/^plantings\/.+\.jpg$/);
     expect(upload).toHaveBeenCalledTimes(1);
-  });
+    // Decoding 1.2 MB of base64 in happy-dom can pass the 5 s default on a
+    // busy machine (seen once in a full run); same assertions, longer budget.
+  }, 20_000);
 });
