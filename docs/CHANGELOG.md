@@ -2,6 +2,13 @@
 
 Reconstructed from git history (17 commits, 2026-08-12 → 2026-08-13) plus the live database state. Commit messages are mostly the generic "Changes", so entries below are grouped by what the diffs actually contain, not by message. Superseded on 2026-08-17: the working tree was committed as the repo's single initial commit `ecb4209`, so history from here on is real.
 
+## 2026-11-08 (hundred-fourteenth pass): Phase 2a migration applied live, folded into the master schema
+
+- **Owner applied** the 2a SQL in the Supabase SQL editor and confirmed the `/check` form appears.
+- **Verified live as anon** (public key from the deployed bundle): `site_survival_status` returns real plantings with due states; `survival_stats_wilaya` returns per-wilaya rows (El Tarf 1 eligible, 0 checked); `user_id`, `photo_sha256`, `client_request_id`, `reviewed_by` and `select *` are refused (42501); anonymous insert is refused (42501).
+- **Master schema** gains the `survival_status` enum, section 14c (table, grants, policies, both views, verbatim from the applied file), the widened `submission_meta.kind` CHECK and the realtime publication entry. `DATABASE.md` documents the table and views. The applied SQL, its dry-run script and the throttle file are removed from `pending-migrations/` (git history keeps them).
+- **Still to do:** regenerate the Supabase TypeScript types (needs the project-scoped Supabase MCP in a fresh session) and drop the untyped-client casts in `src/lib/survival-*.ts`.
+
 ## 2026-11-08 (hundred-thirteenth pass): Phase 2a survival checks (code live, migration pending)
 
 - **Design + migration:** `docs/pending-migrations/2026-11_phase2_survival_design.md`, `2026-11_phase2a_survival_checks.sql` (additive; dry-run in PGlite: survival maths, due windows, column grants, write denial, constraints, rollback). Owner delegated the decisions; recommended defaults taken (photo required; headline rate counts only independent and staff checks).

@@ -20,7 +20,8 @@ entries, 2026-08-17 → 2026-09-02); this repo does not replay it.
 
 `site_status` (pending/approved/rejected) · `care_action`
 (watered/checked/needs_attention/other) · `fire_status`
-(active/resolved/false_alarm) · `user_role` (admin/moderator).
+(active/resolved/false_alarm) · `user_role` (admin/moderator) ·
+`survival_status` (alive/stressed/dead/burned/grazed/not_found).
 
 ## Tables (12, all in `public`)
 
@@ -70,8 +71,8 @@ Indexes: location GiST, status, created_at DESC, (status, created_at DESC),
 user_id. Realtime: yes.
 
 ### submission_meta — abuse ledger, deny-all
-kind! (CHECK planting/care/fire/feedback/volunteer; widening to push/vote/identify
-is pending: `docs/pending-migrations/2026-11-08_throttle_kinds.sql`), ip_hash!
+kind! (CHECK planting/care/fire/feedback/volunteer/push/vote/identify/survival,
+widened 2026-11-08), ip_hash!
 (SHA-256 of `<project-id>:<ip>`), device_fingerprint (daily-rotating HMAC),
 created_at!. Zero client grants, RLS on, zero policies. Indexes:
 (ip_hash, created_at), (kind, created_at), (device_fingerprint, kind,
@@ -132,7 +133,8 @@ No updated_at columns or triggers anywhere.
 
 ## Realtime
 
-Publication `supabase_realtime`: sites, care_logs, fire_reports.
+Publication `supabase_realtime`: sites, care_logs, fire_reports, survival_checks
+(the app does not subscribe to survival_checks yet; reads refresh on a timer).
 
 ## Storage
 
@@ -159,6 +161,24 @@ bucket — uploads via service role, public reads only via
   PostGIS extension, not even `postgres`). Fix is entirely on Supabase
   support (ticket filed 2026-08-30, GitHub issue #40) — keep the ticket
   alive until confirmed fixed. Not reachable through the PostgREST API.
+
+### survival_checks: Phase 2a survival layer (applied 2026-11-08)
+site_id (FK CASCADE), status! (`survival_status`), trees_checked! (1..100000),
+trees_alive! (0..trees_checked), photo_url!, photo_sha256! (duplicate guard),
+checked_date!, notes (<= 600), submitter_name (<= 80, public), user_id
+(hidden), independence! (independent/self/staff/unknown, server-set),
+grade! (unverified/verified/rejected), reviewed_by (hidden), reviewed_at,
+client_request_id UNIQUE (hidden, idempotency), created_at!. Column-level
+SELECT for anon + authenticated on the public columns only (`select *`
+fails on purpose). Policies: public read of non-rejected checks on approved
+sites; moderators read checks in their wilayas. No client write policies or
+grants (writes: `submitSurvivalCheck` / `reviewSurvivalCheck`, service role).
+Views, both `security_invoker = true`: `site_survival_status` (last status
+and due window per approved site: too_early, due_3m, due_12m, due_36m,
+up_to_date) and `survival_stats_wilaya` (per wilaya: eligible sites, sites
+with an independent or staff check 9-18 months after planting, trees
+checked/alive). Verified live as anon 2026-11-08: views return rows; hidden
+columns and `select *` give 42501; anon insert gives 42501.
 
 ### fire_confirmations — community votes, service-role only (applied 2026-09-13)
 fire_report_id (FK CASCADE), voter_key! (daily-rotating device hash), verdict!

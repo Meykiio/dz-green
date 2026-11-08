@@ -1,11 +1,11 @@
 /**
  * In-memory sliding-window limiter (per server instance).
  *
- * Best-effort first line for endpoints whose throttle kind is not yet
- * allowed by the submission_meta check constraint (see
- * docs/pending-migrations/). On serverless each warm instance keeps its own
- * window, so a determined attacker spread across instances gets more; it
- * still stops the cheap single-client flood. Pure and testable.
+ * Cheap first line in front of the database throttle (submission_meta,
+ * shared across instances). On serverless each warm instance keeps its own
+ * window, so on its own it would not stop a spread-out attacker; it does
+ * stop a single-client flood before any database round trip, and it keeps
+ * a limit in place if a throttle insert ever fails. Pure and testable.
  */
 export class SlidingWindowLimiter {
   private readonly hits = new Map<string, number[]>();

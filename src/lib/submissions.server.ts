@@ -111,8 +111,9 @@ export async function throttle(kind: ThrottleKind, limitPerHour: number): Promis
   if (!error && (count ?? 0) >= limitPerHour) {
     throw new GateError("You've sent a lot of messages in the last hour. Please try again later.");
   }
-  // Kinds newer than the live check constraint fail this insert quietly
-  // (pending migration); the in-memory window above still applies.
+  // Recorded for the database count above. Errors are ignored on purpose:
+  // a failed ledger insert must not block the action; the in-memory window
+  // above still applies.
   await supabaseAdmin.from("submission_meta").insert({ kind, ip_hash: ipHash });
 }
 

@@ -1,6 +1,6 @@
 # Phase 2 design: the survival layer (awaiting owner approval)
 
-Status: design only, nothing applied. Evidence: `docs/archive/RESEARCH_2026-11_NEXT_LEVEL.md`.
+Status: **2a applied live 2026-11-08** (master schema section 14c; verified as anon). 2b and 2c are designs only. Evidence: `docs/archive/RESEARCH_2026-11_NEXT_LEVEL.md`.
 Approve each migration separately: **2a** is the core; 2b and 2c build on it.
 
 ## 1. What we are solving

@@ -23,8 +23,7 @@ them**, not a replacement. First customer is likely the association
 1. Authenticate the Supabase MCP once (terminal: `claude`, then `/mcp`,
    supabase, Authenticate, account notsifeddine@gmail.com). It is
    configured read-only on purpose (production).
-2. Apply `docs/pending-migrations/2026-11-08_throttle_kinds.sql` in the
-   Supabase SQL editor (safe, relaxes a CHECK). The app works without it.
+2. ~~Apply the throttle-kinds SQL~~ done 2026-11-08 (included in Phase 2a).
 3. Delete any E2E fixture accounts still in the live project (their
    passwords were public until 2026-11-08).
 4. Phone pass in Arabic: map labels, risk layer + legend, `/restore`, one
@@ -64,8 +63,7 @@ them**, not a replacement. First customer is likely the association
 
 ## Phase 2: survival layer (3 months; items marked schema need owner approval)
 
-- [~] **Survival check-ins (2a): code deployed, migration waiting for the
-  owner to run it (`docs/pending-migrations/README.md`).** At 3, 12 and 36 months: status (alive,
+- [x] **Survival check-ins (2a), live 2026-11-08.** At 3, 12 and 36 months: status (alive,
   stressed, dead, burned, grazed), repeat photo, reminders, overdue sites
   highlighted on the map; public survival rate per wilaya with sample size
   and method. (schema)

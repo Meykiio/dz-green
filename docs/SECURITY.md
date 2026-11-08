@@ -83,10 +83,9 @@ Layers, outermost first:
    on Pro), custom SMTP if signup volume grows (built-in caps at 2/hour).
 4. **Rate limits are check-then-insert**, so a fast parallel burst can
    exceed an hourly limit, and they fail open on a database error. The
-   atomic fix is a Postgres function (schema change, in ROADMAP). New
-   throttle kinds (`push`, `vote`, `identify`) are counted in memory per
-   server instance until `docs/pending-migrations/2026-11-08_throttle_kinds.sql`
-   is applied.
+   atomic fix is a Postgres function (schema change, in ROADMAP). The
+   push/vote/identify/survival kinds are counted in the database since
+   2026-11-08 (the in-memory window stays as a first line).
 5. **A moderator can update `sites` through PostgREST directly** (column
    grant + policy), bypassing `moderateSite`'s transition rules and photo
    deletion. Narrow by revoking the UPDATE grant and routing all moderation
